@@ -16,7 +16,7 @@ Edit config.ini
 [Enigma2]
 ```
 
-Netowrk have syntax
+Netowrok have syntax
 
 ```
 [Network]
@@ -34,7 +34,15 @@ Copy "nxmp" folder to switch sdcard (/switch/nxmp)
 
 Usage
 -----
-- TODO
+Buttons Mapping
+- A select (play/pause during playback)
+- B back (stop during playback)
+- Y Main Menu
+- X show OSD (during playback)
+- R L ZR ZL (seek +/-  during playback)
+- + Exit NXMP
+- R Stick Button Toggle Masterlock (during playback, only A button will work)
+
 
 FAQ
 -----
