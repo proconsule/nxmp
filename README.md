@@ -21,7 +21,7 @@ FAQ
 
 Thanks to
 -----
-bodyXY @ GBATemp forum for banner and icons
-docgold @ GBATemp forum for Enigma2 samples and support on decoders
-tataniko @ GBATemp forum for suggestions and bug hunting
-All guys on GBAtemp
+- bodyXY @ GBATemp forum for banner and icons
+- docgold @ GBATemp forum for Enigma2 samples and support on decoders
+- tataniko @ GBATemp forum for suggestions and bug hunting
+- All guys on GBAtemp
