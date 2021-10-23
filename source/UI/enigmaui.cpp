@@ -14,11 +14,8 @@ namespace Windows {
         std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		
         if (ImGui::Begin("Enigma2", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
-            if (!*focus) {
-                ImGui::SetNextWindowFocus();
-                *focus = true;
-            }
-			if (ImGui::BeginListBox("Enigma2 Browser Menu",ImVec2(1280.0f, 720.0f))){
+			ImGui::SetNextWindowFocus();
+            if (ImGui::BeginListBox("Enigma2 Browser Menu",ImVec2(1280.0f, 720.0f))){
 				if(item.enigma2bouquet == ""){
 					for (unsigned int n = 0; n < enigma2->e2services.size(); n++){
 						const bool is_selected = (item_current_idx == n);
@@ -31,6 +28,10 @@ namespace Windows {
 							ImGui::SetItemDefaultFocus();
 							
 					}
+					if (*first_item) {
+						ImGui::SetFocusID(ImGui::GetID(enigma2->e2services[0].name.c_str()), ImGui::GetCurrentWindow());
+						*first_item = false;
+					}
 				}else if(item.enigma2bouquet != ""){
 					for (unsigned int n = 0; n < enigma2->e2currbouqet.size(); n++){
 						const bool is_selected = (item_current_idx == n);
@@ -42,6 +43,11 @@ namespace Windows {
 						}
 						if (is_selected)
 						ImGui::SetItemDefaultFocus();
+					}
+					if (*first_item) {
+						std::string channame = std::to_string(0) + std::string(". ") +enigma2->e2currbouqet[0].name;
+						ImGui::SetFocusID(ImGui::GetID(channame.c_str()), ImGui::GetCurrentWindow());
+						*first_item = false;
 					}
 				}
 			}

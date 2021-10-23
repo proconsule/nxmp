@@ -37,9 +37,19 @@ bool renderloopdone = false;
 Tex SdCardTexture;
 Tex NetworkTexture;
 Tex Enigma2Texture;
+Tex InfoTexture;
 
 Tex FolderTexture;
 Tex FileTexture;
+
+Tex FTPTexture;
+Tex HTTPTexture;
+
+Tex FFMPEGTexture;
+Tex MPVTexture;
+
+Tex NXMPBannerTexture;
+Tex ExitTexture;
 
 const GLuint WIDTH = 1280, HEIGHT = 720;
 
@@ -94,7 +104,7 @@ int main() {
 	
 	printf("Loading Config\n");
 	
-	configini = new Config("config-test.ini");
+	configini = new Config("config.ini");
 	
 	/*
 	if(rc<0){
@@ -142,7 +152,7 @@ int main() {
         
         ImGui::StyleColorsDark();
 		printf("Init MPV\n");
-		GUI::initMpv();	
+		GUI::initMpv();
 		printf("Init SDL\n");
 		ImGui_ImplSDL2_InitForOpenGL(window, context);
         printf("Init OPENGL\n");
@@ -222,6 +232,17 @@ int main() {
 	Utility::TxtLoadPNGFromFile("romfs:/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
+	
+	Utility::TxtLoadPNGFromFile("romfs:/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
+	
+	
+	Utility::TxtLoadJPGFromFile("romfs:/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
+	
 	
 	enigma2 = new Enigma2();
 	httpdir = new HTTPDir();

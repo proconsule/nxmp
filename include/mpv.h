@@ -64,6 +64,9 @@ public:
     mpv_handle *getHandle();
 
     mpv_render_context *getContext();
+	
+	std::string mpv_version;
+	std::string ffmpeg_version;
 
 //    MediaInfo getMediaInfo(const c2d::Io::File &file);
 

@@ -62,6 +62,8 @@ Mpv::Mpv(const std::string &configPath, bool initRender) {
             mpv_terminate_destroy(handle);
             handle = nullptr;
         }
+		mpv_version = mpv_get_property_string(handle, "mpv-version");
+		ffmpeg_version = mpv_get_property_string(handle, "ffmpeg-version");
 		printf("MPV Init Completed\n");
 
     }

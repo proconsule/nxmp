@@ -19,6 +19,7 @@ namespace Windows {
 	void EnigmaWindow(bool *focus, bool *first_item);
 	void MainMenuWindow(bool *focus, bool *first_item);
 	void NetworkWindow(bool *focus, bool *first_item);
+	void InfoMenuWindow(bool *focus, bool *first_item);
 	void VideoWindow(bool *focus, bool *first_item);
     
 }

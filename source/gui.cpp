@@ -62,6 +62,7 @@ namespace GUI {
 						renderloopdone = true;
 				}
 				if (event.type == SDL_JOYBUTTONDOWN) {
+					
 					Uint8 button = event.jbutton.button;
 					if (button == SDL_KEY_RSTICK){
 						if(item.state == MENU_STATE_PLAYER){
@@ -141,18 +142,21 @@ namespace GUI {
 					if (button == SDL_KEY_Y){
 						if(item.state != MENU_STATE_HOME){
 							item.networkselect = true;
+							item.first_item = true;
 							item.state = MENU_STATE_HOME;
 						}
 						
 					}
 					if (button == SDL_KEY_B){
 						if(item.state == MENU_STATE_ENIGMABROWSER && mpv->isStopped()){
+							item.first_item = true;
 							if(item.enigma2bouquet != ""){
 								item.enigma2bouquet = "";
 							}
 						}
 						
 						if(item.state == MENU_STATE_NETWORKBROWSER && mpv->isStopped()){
+							item.first_item = true;
 							if(item.networklastpath != "/"){
 								item.networklastpath = item.networklastpath.substr(0, item.networklastpath.find_last_of("\\/"));
 								if(item.networklastpath == "")item.networklastpath="/";
@@ -182,6 +186,7 @@ namespace GUI {
 						}
 						
 						if(item.state == MENU_STATE_FILEBROWSER && mpv->isStopped()){
+							item.first_item = true;
 							if(item.localpath != "/"){
 								item.localpath = item.localpath.substr(0, item.localpath.find_last_of("\\/"));
 								if(item.localpath == "")item.localpath="/";
@@ -234,7 +239,7 @@ namespace GUI {
 	}
 	
 	void HandleLayers(){
-		bool focus = false, first_item = true;
+		//bool focus = false, first_item = true;
 		ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
@@ -242,16 +247,19 @@ namespace GUI {
 			//GUI
 			switch (item.state) {
 				case MENU_STATE_HOME:
-					Windows::MainMenuWindow(&focus, &first_item);
+					Windows::MainMenuWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_FILEBROWSER:
-					Windows::FileBrowserWindow(&focus, &first_item);
+					Windows::FileBrowserWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_NETWORKBROWSER:
-					Windows::NetworkWindow(&focus, &first_item);
+					Windows::NetworkWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_ENIGMABROWSER:
-					Windows::EnigmaWindow(&focus, &first_item);
+					Windows::EnigmaWindow(&item.focus, &item.first_item);
+					break;
+				case MENU_STATE_INFO:
+					Windows::InfoMenuWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_PLAYER:
 					if(item.playershowcontrols){

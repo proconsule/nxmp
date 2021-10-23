@@ -13,11 +13,10 @@ namespace Windows {
 		static unsigned int item_current_idx = 0;
         std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		
-        if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
-            if (!*focus) {
-                ImGui::SetNextWindowFocus();
-                *focus = true;
-            }
+        if (ImGui::Begin("File Browser", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+            
+            ImGui::SetNextWindowFocus();
+            
 			if (ImGui::BeginMenuBar()) {
 				ImGui::Text("current path: %s",item.localpath.c_str());
 				ImGui::EndMenuBar();
@@ -37,6 +36,7 @@ namespace Windows {
 						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
 						if (ImGui::Selectable(item.localfileentries[n].name, is_selected)){
 							if(item.localfileentries[n].type == FsDirEntryType_Dir){
+								item.first_item = true;
 								item_current_idx = 0;
 								if(item.localpath!="/"){
 									item.localpath.append("/");
@@ -59,6 +59,10 @@ namespace Windows {
 					}
 					if (is_selected)
 						ImGui::SetItemDefaultFocus();
+				}
+				if (*first_item) {
+					ImGui::SetFocusID(ImGui::GetID(item.localfileentries[0].name), ImGui::GetCurrentWindow());
+					*first_item = false;
 				}
 			}	
 			ImGui::EndListBox();		

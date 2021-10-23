@@ -22,6 +22,7 @@ enum MENU_STATES {
     MENU_STATE_FILEBROWSER,
 	MENU_STATE_NETWORKBROWSER,
 	MENU_STATE_ENIGMABROWSER,
+	MENU_STATE_INFO,
     MENU_STATE_OPTIONS,
 	MENU_STATE_SETTINGS,
 	MENU_STATE_PLAYER
@@ -44,6 +45,9 @@ typedef struct {
 	int playershowcontrols = false;
 	int playershowstats = false;
 	bool masterlock = false;
+	
+	bool first_item;
+	bool focus;
 	
     
 } MenuItem;
@@ -72,9 +76,19 @@ extern Config *configini;
 extern Tex SdCardTexture;
 extern Tex NetworkTexture;
 extern Tex Enigma2Texture;
+extern Tex InfoTexture;
 
 extern Tex FolderTexture;
 extern Tex FileTexture;
+
+extern Tex FTPTexture;
+extern Tex HTTPTexture;
+
+extern Tex FFMPEGTexture;
+extern Tex MPVTexture;
+
+extern Tex NXMPBannerTexture;
+extern Tex ExitTexture;
 
 
 

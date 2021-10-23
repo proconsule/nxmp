@@ -71,7 +71,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -llua -lnx -lz
+LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lnx -lz
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
