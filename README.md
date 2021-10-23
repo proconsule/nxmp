@@ -40,7 +40,7 @@ Buttons Mapping
 - Y Main Menu
 - X show OSD (during playback)
 - R L ZR ZL (seek +/-  during playback)
-- + Exit NXMP
+- \+ Exit NXMP
 - R Stick Button Toggle Masterlock (during playback, only A button will work)
 
 
