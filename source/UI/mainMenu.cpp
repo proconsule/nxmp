@@ -52,10 +52,14 @@ namespace Windows {
 						}
 						if(n==2){
 							std::string e2uri = configini->getEnigma();
-							urlschema e2schema = Utility::parseUrl(e2uri);
-							enigma2->enigma2ip = e2schema.server;
-							enigma2->getServices();
-							item.state = MENU_STATE_ENIGMABROWSER;
+							if(e2uri == ""){
+								item.state = MENU_STATE_ENIGMABROWSER;
+							}else{
+								urlschema e2schema = Utility::parseUrl(e2uri);
+								enigma2->enigma2ip = e2schema.server;
+								enigma2->getServices();
+								item.state = MENU_STATE_ENIGMABROWSER;
+							}
 						}
 					}
 					if (is_selected)

@@ -94,7 +94,7 @@ int main() {
 	
 	printf("Loading Config\n");
 	
-	configini = new Config("config.ini");
+	configini = new Config("config-test.ini");
 	
 	/*
 	if(rc<0){

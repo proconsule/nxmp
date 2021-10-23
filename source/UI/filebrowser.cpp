@@ -19,7 +19,7 @@ namespace Windows {
                 *focus = true;
             }
 			if (ImGui::BeginMenuBar()) {
-				ImGui::TextUnformatted("current path: %s",item.localpath.c_str());
+				ImGui::Text("current path: %s",item.localpath.c_str());
 				ImGui::EndMenuBar();
 			}
 			if (ImGui::BeginListBox("File Browser Menu",ImVec2(1280.0f, 720.0f))){

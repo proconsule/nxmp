@@ -25,6 +25,7 @@ std::vector<networkSource> Config::getNetworks(){
 	std::vector<networkSource> tmpret;
 	CSimpleIniA::TNamesDepend values;
 	ini->GetAllValues("Network", "source", values);
+	if(values.size() == 0)return tmpret;
 	CSimpleIniA::TNamesDepend::const_iterator it;
 	
 	for (it = values.begin(); it != values.end(); ++it) {

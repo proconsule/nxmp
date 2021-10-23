@@ -32,7 +32,7 @@ typedef struct {
     MENU_STATES state = MENU_STATE_HOME;
 	MENU_STATES laststate = MENU_STATE_FILEBROWSER;
 	int selected = 0;
-	std::string localpath = "/";
+	std::string localpath = "/switch/nxmp";
 	std::string enigma2bouquet = "";
     std::vector<FsDirectoryEntry> localfileentries;
 	std::vector<networkSource> networksources;
