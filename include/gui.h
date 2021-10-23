@@ -15,24 +15,22 @@
 #include "remotefs.h"
 #include "utils.h"
 #include "Enigma2.h"
+#include "HTTPDir.h"
 
 enum MENU_STATES {
+	MENU_STATE_HOME,
     MENU_STATE_FILEBROWSER,
+	MENU_STATE_NETWORKBROWSER,
+	MENU_STATE_ENIGMABROWSER,
     MENU_STATE_OPTIONS,
 	MENU_STATE_SETTINGS,
 	MENU_STATE_PLAYER
 };
 
-enum BROWSER_STATES {
-    BROWSER_STATE_HOME,
-	BROWSER_STATE_LOCAL,
-	BROWSER_STATE_NETWORK,
-	BROWSER_STATE_ENIGMA2,
-};
 
 typedef struct {
-    MENU_STATES state = MENU_STATE_FILEBROWSER;
-	BROWSER_STATES browserstate = BROWSER_STATE_HOME;
+    MENU_STATES state = MENU_STATE_HOME;
+	MENU_STATES laststate = MENU_STATE_FILEBROWSER;
 	int selected = 0;
 	std::string localpath = "/";
 	std::string enigma2bouquet = "";
@@ -44,6 +42,8 @@ typedef struct {
 	
 	bool networkselect = true;
 	int playershowcontrols = false;
+	int playershowstats = false;
+	bool masterlock = false;
 	
     
 } MenuItem;
@@ -53,6 +53,7 @@ extern SDL_Window *window;
 extern MenuItem item;
 
 extern Mpv *mpv;
+extern HTTPDir *httpdir;
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
 
@@ -68,8 +69,14 @@ extern Enigma2 *enigma2;
 
 extern Config *configini;
 
+extern Tex SdCardTexture;
+extern Tex NetworkTexture;
+extern Tex Enigma2Texture;
+
 extern Tex FolderTexture;
 extern Tex FileTexture;
+
+
 
 namespace GUI {
 	

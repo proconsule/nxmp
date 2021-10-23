@@ -12,17 +12,19 @@ Mpv::Mpv(const std::string &configPath, bool initRender) {
         printf("Mpv::Mpv: error: mpv_create\n");
         return;
     }
-
+	printf("MPV Handle Created\n");
     mpv_set_option_string(handle, "config", "yes");
     mpv_set_option_string(handle, "config-dir", configPath.c_str());
     mpv_set_option_string(handle, "terminal", "yes");
-    mpv_set_option_string(handle, "msg-level", "all=v");
+    mpv_set_option_string(handle, "msg-level", "all=errors");
     mpv_set_option_string(handle, "vd-lavc-threads", "4");
     //mpv_set_option_string(handle, "vd-lavc-fast", "yes");
     mpv_set_option_string(handle, "vd-lavc-skiploopfilter", "all");
     mpv_set_option_string(handle, "audio-channels", "stereo");
     mpv_set_option_string(handle, "video-timing-offset", "0");
 	mpv_set_option_string(handle, "osd-bar-align-y", "0.9");
+	mpv_set_option_string(handle, "fbo-format", "rgba8");
+	
 
     if (!initRender) {
         mpv_set_option_string(handle, "vid", "no");
@@ -31,7 +33,7 @@ Mpv::Mpv(const std::string &configPath, bool initRender) {
         mpv_set_option_string(handle, "vo", "null");
         mpv_set_option_string(handle, "ao", "null");
     }
-
+	printf("MPV Handle initialize\n");
     int res = mpv_initialize(handle);
     if (res) {
         printf("Mpv::Mpv: error: mpv_initialize: %s\n", mpv_error_string(res));
@@ -39,21 +41,28 @@ Mpv::Mpv(const std::string &configPath, bool initRender) {
         handle = nullptr;
         return;
     }
+	
+	printf("MPV Init Renderer\n");
+	
+	
 
+	
     if (initRender) {
-        mpv_opengl_init_params gl_init_params{get_proc_address_mpv, nullptr, nullptr};
+        mpv_opengl_init_params mpv_gl_init_params = {
+			.get_proc_address = [] (void *, const char *name) -> void * { return SDL_GL_GetProcAddress(name); },
+		};
         mpv_render_param params[]{
-                {MPV_RENDER_PARAM_API_TYPE,           const_cast<char *>(MPV_RENDER_API_TYPE_OPENGL)},
-                {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &gl_init_params},
-                {MPV_RENDER_PARAM_INVALID,            nullptr}
+                {MPV_RENDER_PARAM_API_TYPE, (void *) MPV_RENDER_API_TYPE_OPENGL},
+                {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &mpv_gl_init_params},
+                {(mpv_render_param_type)0}
         };
-
+		printf("MPV Init Context\n");
         if (mpv_render_context_create(&context, handle, params) < 0) {
             printf("error: mpv_render_context_create: %s\n", mpv_error_string(res));
             mpv_terminate_destroy(handle);
             handle = nullptr;
         }
-		
+		printf("MPV Init Completed\n");
 
     }
 }
@@ -63,7 +72,8 @@ Mpv::~Mpv() {
         mpv_render_context_free(context);
     }
     if (handle) {
-        mpv_terminate_destroy(handle);
+		//mpv_terminate_destroy(handle);
+		mpv_detach_destroy(handle);
     }
 }
 

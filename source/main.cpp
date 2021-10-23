@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "localfiles.h"
 #include "ftplib.h"
+#include "HTTPDir.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -22,6 +23,7 @@ static bool init();
 SDL_Window *window;
 SDL_GLContext context;
 Mpv *mpv;
+HTTPDir *httpdir;
 Config *configini;
 Enigma2 *enigma2;
 uint32_t wakeup_on_mpv_render_update;
@@ -31,6 +33,10 @@ mpv_opengl_fbo fbo;
 mpv_render_param params[3];
 int __fbo_one = 1;
 bool renderloopdone = false;
+
+Tex SdCardTexture;
+Tex NetworkTexture;
+Tex Enigma2Texture;
 
 Tex FolderTexture;
 Tex FileTexture;
@@ -43,6 +49,7 @@ std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + 
 static bool init() {
     bool success = true;
 
+	SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "no");
     if( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0 ){
         printf("%s: SDL could not initialize! SDL Error: %s", __func__, SDL_GetError());
         success =  false;
@@ -82,7 +89,10 @@ static bool init() {
 
 int main() {
 	
+	socketInitializeDefault();
+	nxlinkStdio();
 	
+	printf("Loading Config\n");
 	
 	configini = new Config("config.ini");
 	
@@ -110,15 +120,13 @@ int main() {
 	*/
 	//std::string pippo = (char *)configini.GetValue("Enigma2", "e2address", "default");
 	//urlschema testschema = Utility::parseUrl(pippo);
-		
-	socketInitializeDefault();
-	nxlinkStdio();
 	
 	Result ret;
 	if (R_FAILED(ret = romfsInit())) {
 		printf("romfsInit() failed: 0x%x\n", ret);
 		return ret;
 	}
+	printf("Init GUI\n");
 	if ( init() ) {
 		
         IMGUI_CHECKVERSION();
@@ -133,24 +141,29 @@ int main() {
 		io.MouseDrawCursor = false;
         
         ImGui::StyleColorsDark();
-		
+		printf("Init MPV\n");
+		GUI::initMpv();	
+		printf("Init SDL\n");
 		ImGui_ImplSDL2_InitForOpenGL(window, context);
-        ImGui_ImplOpenGL3_Init("#version 330 core");
-
+        printf("Init OPENGL\n");
+		ImGui_ImplOpenGL3_Init("#version 330 core");
+		
+		
+		
 		plInitialize(PlServiceType_System);
 		if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {
 			printf("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
 			return ret;
 		}
-
+		printf("Init Fonts\n");
         Result ret = 0;
-		PlFontData standard, fonts_ext;
-		if (R_FAILED(ret = plGetSharedFontByType(&standard, PlSharedFontType_Standard))) {
-			printf("plGetSharedFontByType(PlSharedFontType_Standard) failed: 0x%x\n", ret);
-			return ret;
-		}
+		//PlFontData standard, fonts_ext;
+		//if (R_FAILED(ret = plGetSharedFontByType(&standard, PlSharedFontType_Standard))) {
+		//	printf("plGetSharedFontByType(PlSharedFontType_Standard) failed: 0x%x\n", ret);
+		//	return ret;
+		//}
 		
-		 plGetSharedFontByType(&fonts_ext, PlSharedFontType_NintendoExt);
+		 //plGetSharedFontByType(&fonts_ext, PlSharedFontType_NintendoExt);
 
 		
 		unsigned char *pixels = nullptr;
@@ -158,10 +171,10 @@ int main() {
 		ImFontConfig font_cfg;
 		
 		font_cfg.FontDataOwnedByAtlas = false;
-		
+		printf("Loading TTF\n");
 		io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());
 		font_cfg.MergeMode = true;
-		io.Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 28.0f, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
+		//io.Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 28.0f, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
 		
 		    static const ImWchar ranges[] =
                 {
@@ -190,7 +203,8 @@ int main() {
 					0,
                 };
 	
-    io.Fonts->AddFontFromMemoryTTF (fonts_ext.address, fonts_ext.size, 24.0f, &font_cfg, ranges);
+	printf("Loading Extended Chars\n");
+    //io.Fonts->AddFontFromMemoryTTF (fonts_ext.address, fonts_ext.size, 24.0f, &font_cfg, ranges);
 	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
 		
 		
@@ -198,20 +212,29 @@ int main() {
 	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
 	io.Fonts->Build();
 	
+	printf("Opening SD Card\n");
 	devices[0] = *fsdevGetDeviceFileSystem("sdmc");
 	fs = &devices[0];
 	
+	printf("Loading Textures\n");
+	Utility::TxtLoadPNGFromFile("romfs:/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/network.png",&NetworkTexture.id,&NetworkTexture.width,&NetworkTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
-		
-	
-	GUI::initMpv();	
 	
 	enigma2 = new Enigma2();
+	httpdir = new HTTPDir();
 	
-	if (R_FAILED(ret = GUI::RenderLoop()))
-		return ret;
 	
+	
+	
+	GUI::RenderLoop();
+	printf("Ending Render Loop\n");
+		//return ret;
+	delete(mpv);
+	delete(httpdir);
+	delete(enigma2);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -220,8 +243,11 @@ int main() {
     SDL_DestroyWindow(window);
     window = NULL;
     SDL_Quit();
-	delete(mpv);
+	
+	
+	
 	//nsExit();
+	printf("Exit Services\n");
 	ncmExit();
 	plExit();
 	romfsExit();

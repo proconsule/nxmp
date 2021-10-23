@@ -35,6 +35,23 @@ namespace GUI {
 		
 	}
 	
+	void toggleStats(){
+		const char *cmd[] = {"script-binding","stats/display-stats-toggle" ,NULL};
+		mpv_command_async(mpv->getHandle(), 0, cmd);
+	}
+	
+	void toggleMasterLock(){
+		item.masterlock = !item.masterlock;
+		if(item.masterlock){
+			const char *cmd[] = {"show-text", "Masterlock Enabled","2000", NULL};
+			mpv_command_async(mpv->getHandle(), 0, cmd);
+		}else{
+			const char *cmd[] = {"show-text", "Masterlock Disabled","2000", NULL};
+			mpv_command_async(mpv->getHandle(), 0, cmd);
+		}
+		
+	}
+	
 	void HandleEvents(){
 		SDL_Event event;
 			while (SDL_PollEvent(&event)) {
@@ -46,8 +63,19 @@ namespace GUI {
 				}
 				if (event.type == SDL_JOYBUTTONDOWN) {
 					Uint8 button = event.jbutton.button;
-					if (button == SDL_KEY_ZR){
+					if (button == SDL_KEY_RSTICK){
 						if(item.state == MENU_STATE_PLAYER){
+							toggleMasterLock();
+						}
+					}
+					if (button == SDL_KEY_MINUS){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
+							toggleStats();
+						}
+					}
+					
+					if (button == SDL_KEY_ZR){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
 								mpv->seekOSD(mpv->getPosition() + 60.0);
 							}else{
@@ -57,7 +85,7 @@ namespace GUI {
 						
 					}
 					if (button == SDL_KEY_ZL){
-						if(item.state == MENU_STATE_PLAYER){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
 								mpv->seekOSD(mpv->getPosition() - 60.0);
 							}else{
@@ -67,7 +95,7 @@ namespace GUI {
 						
 					}
 					if (button == SDL_KEY_R){
-						if(item.state == MENU_STATE_PLAYER){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
 								mpv->seekOSD(mpv->getPosition() + 10.0);
 							}else{
@@ -77,7 +105,7 @@ namespace GUI {
 						
 					}
 					if (button == SDL_KEY_L){
-						if(item.state == MENU_STATE_PLAYER){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
 								mpv->seekOSD(mpv->getPosition() - 10.0);
 							}else{
@@ -87,7 +115,7 @@ namespace GUI {
 						
 					}
 					if (button == SDL_KEY_X){
-						if(item.state == MENU_STATE_PLAYER){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
 								item.playershowcontrols=false;
 								mpv_set_option_string(mpv->getHandle(), "osd-level", "0");
@@ -100,9 +128,7 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_A){
 						if(item.state == MENU_STATE_FILEBROWSER){
-							if(item.browserstate == BROWSER_STATE_LOCAL){
 								FS::GetDirList(item.localpath.c_str(),item.localfileentries);
-							}
 						}
 						if(item.state == MENU_STATE_PLAYER){
 							if(mpv->isPaused()){
@@ -113,53 +139,57 @@ namespace GUI {
 						}
 					}
 					if (button == SDL_KEY_Y){
-						if(item.state == MENU_STATE_FILEBROWSER){
+						if(item.state != MENU_STATE_HOME){
 							item.networkselect = true;
-							item.browserstate = BROWSER_STATE_HOME;
+							item.state = MENU_STATE_HOME;
 						}
 						
 					}
 					if (button == SDL_KEY_B){
-						if(item.state == MENU_STATE_FILEBROWSER && mpv->isStopped()){
-							if(item.browserstate == BROWSER_STATE_ENIGMA2){
-								if(item.enigma2bouquet != ""){
-									item.enigma2bouquet = "";
-								}
-							}
-							if(item.browserstate == BROWSER_STATE_LOCAL){
-								if(item.localpath != "/"){
-									item.localpath = item.localpath.substr(0, item.localpath.find_last_of("\\/"));
-									if(item.localpath == "")item.localpath="/";
-								}
-								FS::GetDirList(item.localpath.c_str(),item.localfileentries);
-							}
-							if(item.browserstate == BROWSER_STATE_NETWORK){
-								if(item.networklastpath != "/"){
-									item.networklastpath = item.networklastpath.substr(0, item.networklastpath.find_last_of("\\/"));
-									if(item.networklastpath == "")item.networklastpath="/";
-								}
-								urlschema thisurl = Utility::parseUrl(item.networkurl);
-								if(thisurl.scheme == "ftp"){
-											netbuf *ftp_con = nullptr;
-											std::string ftphost = thisurl.server+std::string(":21");
-											if (!FtpConnect(ftphost.c_str(), &ftp_con)) {
-												printf("could not connect to ftp server\n");
-											}else{
-											
-												if (!FtpLogin(thisurl.user.c_str(), thisurl.pass.c_str(), ftp_con)) {
-												printf("could not connect to ftp server\n");
-													FtpQuit(ftp_con);
-												}else{
-												
-													item.networkentries = FtpDirList(item.networklastpath.c_str(), ftp_con);
-												}
-											}
-								}
-							
+						if(item.state == MENU_STATE_ENIGMABROWSER && mpv->isStopped()){
+							if(item.enigma2bouquet != ""){
+								item.enigma2bouquet = "";
 							}
 						}
 						
-						if(!mpv->isStopped()){
+						if(item.state == MENU_STATE_NETWORKBROWSER && mpv->isStopped()){
+							if(item.networklastpath != "/"){
+								item.networklastpath = item.networklastpath.substr(0, item.networklastpath.find_last_of("\\/"));
+								if(item.networklastpath == "")item.networklastpath="/";
+							}
+							urlschema thisurl = Utility::parseUrl(item.networkurl);
+							if(thisurl.scheme == "http" || thisurl.scheme == "https"){
+								httpdir->backDir();
+								item.networklastpath = httpdir->getCurrentRelPath();									item.networkentries = httpdir->dirList("");
+								std::sort(item.networkentries.begin(),item.networkentries.end(),Utility::compare);
+							}
+							if(thisurl.scheme == "ftp"){
+								netbuf *ftp_con = nullptr;
+								std::string ftphost = thisurl.server+std::string(":21");
+								if (!FtpConnect(ftphost.c_str(), &ftp_con)) {
+									printf("could not connect to ftp server\n");
+								}else{
+									if (!FtpLogin(thisurl.user.c_str(), thisurl.pass.c_str(), ftp_con)) {
+										printf("could not connect to ftp server\n");
+										FtpQuit(ftp_con);
+									}else{
+										item.networkentries = FtpDirList(item.networklastpath.c_str(), ftp_con);
+										std::sort(item.networkentries.begin(),item.networkentries.end(),Utility::compare);
+									}
+								}
+							}
+							
+						}
+						
+						if(item.state == MENU_STATE_FILEBROWSER && mpv->isStopped()){
+							if(item.localpath != "/"){
+								item.localpath = item.localpath.substr(0, item.localpath.find_last_of("\\/"));
+								if(item.localpath == "")item.localpath="/";
+							}
+							FS::GetDirList(item.localpath.c_str(),item.localfileentries);	
+						}
+						
+						if(!mpv->isStopped()  && !item.masterlock){
 							mpv->stop();
 						}
 					}
@@ -182,11 +212,13 @@ namespace GUI {
 						continue;
 					}if (mp_event->event_id == MPV_EVENT_START_FILE) {
 						printf("START FILE\n");
+						item.laststate = item.state;
 						item.state = MENU_STATE_PLAYER;
 					}
 					if (mp_event->event_id == MPV_EVENT_END_FILE) {
 						printf("END FILE\n");
-						item.state = MENU_STATE_FILEBROWSER;
+						item.state = item.laststate;
+						item.masterlock = false;
 					}
 					
 					count --;
@@ -209,8 +241,17 @@ namespace GUI {
 		//if(mpv->isStopped()){
 			//GUI
 			switch (item.state) {
+				case MENU_STATE_HOME:
+					Windows::MainMenuWindow(&focus, &first_item);
+					break;
 				case MENU_STATE_FILEBROWSER:
 					Windows::FileBrowserWindow(&focus, &first_item);
+					break;
+				case MENU_STATE_NETWORKBROWSER:
+					Windows::NetworkWindow(&focus, &first_item);
+					break;
+				case MENU_STATE_ENIGMABROWSER:
+					Windows::EnigmaWindow(&focus, &first_item);
 					break;
 				case MENU_STATE_PLAYER:
 					if(item.playershowcontrols){

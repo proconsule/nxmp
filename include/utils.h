@@ -37,6 +37,7 @@ namespace Utility{
 	bool compare(const remotefs_entry &a, const remotefs_entry &b);
 	bool TxtLoadJPGFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height);
 	bool TxtLoadPNGFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height);
+	std::string humanSize(uint64_t bytes);
 }
 
 #endif
