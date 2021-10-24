@@ -16,7 +16,7 @@ Edit config.ini
 [Enigma2]
 ```
 
-Netwrok have syntax
+Network have syntax
 
 ```
 [Network]
