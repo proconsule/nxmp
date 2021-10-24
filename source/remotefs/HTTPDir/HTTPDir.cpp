@@ -54,8 +54,6 @@ std::vector<remotefs_entry> HTTPDir::dirList(std::string path){
 	std::string geturl = url + currentrelpath + path;
 	HTTPMemoryStruct *chunk = (HTTPMemoryStruct *)malloc(sizeof(HTTPMemoryStruct));
 	curlDownload((char *)geturl.c_str(),chunk);
-	//printf("%s\n",chunk->memory);
-	
 	std::string s = chunk->memory;
 	std::smatch sm;
 	currentrelpath = currentrelpath+path;

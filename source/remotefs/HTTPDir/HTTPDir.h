@@ -10,8 +10,6 @@
 #include <curl/curl.h>
 #include "remotefs.h"
 
-
-
 struct HTTPMemoryStruct {
   char *memory;
   size_t size;

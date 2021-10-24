@@ -77,6 +77,7 @@ extern Tex SdCardTexture;
 extern Tex NetworkTexture;
 extern Tex Enigma2Texture;
 extern Tex InfoTexture;
+extern Tex SettingsTexture;
 
 extern Tex FolderTexture;
 extern Tex FileTexture;

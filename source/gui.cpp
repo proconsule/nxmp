@@ -30,9 +30,7 @@ namespace GUI {
 		wakeup_on_mpv_events        = SDL_RegisterEvents(1);
 		mpv_set_wakeup_callback(mpv->getHandle(), [](void *) -> void {SDL_Event event = {.type = wakeup_on_mpv_events}; SDL_PushEvent(&event);}, NULL);
 		mpv_render_context_set_update_callback(mpv->getContext(), [](void *) -> void { SDL_Event event = {.type = wakeup_on_mpv_render_update}; SDL_PushEvent(&event); }, NULL);
-
-
-		
+	
 	}
 	
 	void toggleStats(){
@@ -229,22 +227,14 @@ namespace GUI {
 					count --;
 					printf("event: %s\n", mpv_event_name(mp_event->event_id));
 					}
-
-
 				}
-				
-
 			}
-		
 	}
 	
 	void HandleLayers(){
-		//bool focus = false, first_item = true;
 		ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
-		//if(mpv->isStopped()){
-			//GUI
 			switch (item.state) {
 				case MENU_STATE_HOME:
 					Windows::MainMenuWindow(&item.focus, &item.first_item);
@@ -258,6 +248,9 @@ namespace GUI {
 				case MENU_STATE_ENIGMABROWSER:
 					Windows::EnigmaWindow(&item.focus, &item.first_item);
 					break;
+				case MENU_STATE_SETTINGS:
+					Windows::SettingsMenuWindow(&item.focus, &item.first_item);
+					break;
 				case MENU_STATE_INFO:
 					Windows::InfoMenuWindow(&item.focus, &item.first_item);
 					break;
@@ -269,9 +262,6 @@ namespace GUI {
 				
 				
 			}
-			
-			
-		//}
 		
 	}
 	

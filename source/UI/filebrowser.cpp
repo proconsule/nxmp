@@ -23,9 +23,8 @@ namespace Windows {
 			}
 			if (ImGui::BeginListBox("File Browser Menu",ImVec2(1280.0f, 720.0f))){
 				int total_w = ImGui::GetContentRegionAvail().x;
-						//ImGui::Text("current path: %s",item.localpath.c_str());
 				for (unsigned int n = 0; n < item.localfileentries.size(); n++){
-					const bool is_selected = (item_current_idx == n);
+					static int selected = -1;
 					if(item.localfileentries[n].type == FsDirEntryType_Dir || FS::GetFileType(item.localfileentries[n].name) != FileTypeNone){
 						if(item.localfileentries[n].type == FsDirEntryType_Dir){
 							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
@@ -34,7 +33,7 @@ namespace Windows {
 						}
 						ImGui::SameLine();
 						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
-						if (ImGui::Selectable(item.localfileentries[n].name, is_selected)){
+						if (ImGui::Selectable(item.localfileentries[n].name, selected == n)){
 							if(item.localfileentries[n].type == FsDirEntryType_Dir){
 								item.first_item = true;
 								item_current_idx = 0;
@@ -57,7 +56,7 @@ namespace Windows {
 							ImGui::Text("%s",Utility::humanSize(item.localfileentries[n].file_size).c_str());
 						}
 					}
-					if (is_selected)
+					if (selected)
 						ImGui::SetItemDefaultFocus();
 				}
 				if (*first_item) {

@@ -21,6 +21,7 @@ namespace Windows {
 	void NetworkWindow(bool *focus, bool *first_item);
 	void InfoMenuWindow(bool *focus, bool *first_item);
 	void VideoWindow(bool *focus, bool *first_item);
+	void SettingsMenuWindow(bool *focus, bool *first_item);
     
 }
 

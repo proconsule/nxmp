@@ -38,6 +38,8 @@ Tex SdCardTexture;
 Tex NetworkTexture;
 Tex Enigma2Texture;
 Tex InfoTexture;
+Tex SettingsTexture;
+
 
 Tex FolderTexture;
 Tex FileTexture;
@@ -100,8 +102,9 @@ static bool init() {
 int main() {
 	
 	socketInitializeDefault();
+#ifdef NDEBUG
 	nxlinkStdio();
-	
+#endif	
 	printf("Loading Config\n");
 	
 	configini = new Config("config.ini");
@@ -233,6 +236,8 @@ int main() {
 	Utility::TxtLoadPNGFromFile("romfs:/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/settings.png",&SettingsTexture.id,&SettingsTexture.width,&SettingsTexture.height);
+	
 	Utility::TxtLoadPNGFromFile("romfs:/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);

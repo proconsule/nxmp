@@ -10,7 +10,7 @@
 namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
-		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2","Info","Exit"};
+		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2","Settings","Info","Exit"};
 		
         if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
 			ImGui::SetNextWindowFocus();
@@ -29,6 +29,9 @@ namespace Windows {
 					}
 					else if(topmenu[n] == "Info"){
 						ImGui::Image((void*)(intptr_t)InfoTexture.id, ImVec2(40,40));
+					}
+					else if(topmenu[n] == "Settings"){
+						ImGui::Image((void*)(intptr_t)SettingsTexture.id, ImVec2(40,40));
 					}
 					else if(topmenu[n] == "Exit"){
 						ImGui::Image((void*)(intptr_t)ExitTexture.id, ImVec2(40,40));
@@ -66,9 +69,12 @@ namespace Windows {
 							}
 						}
 						if(n==3){
-							item.state = MENU_STATE_INFO;
+							item.state = MENU_STATE_SETTINGS;
 						}
 						if(n==4){
+							item.state = MENU_STATE_INFO;
+						}
+						if(n==5){
 							renderloopdone = true;
 						}
 					}

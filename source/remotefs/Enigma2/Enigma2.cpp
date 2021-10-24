@@ -88,7 +88,6 @@ vector<EnigmaServices> Enigma2::parseBouquet(char * data){
 				XMLElement * pe2serviceRef = pe2service->FirstChildElement("e2servicereference");
 				tmpele.name = pe2serviceName->GetText();
 				tmpele.bouquetref = pe2serviceRef->GetText();
-				printf("%s\n",tmpele.name.c_str());
 				tmpret.push_back(tmpele);
 				pe2service = pe2service->NextSiblingElement("e2service");
 			}

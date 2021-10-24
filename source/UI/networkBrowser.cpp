@@ -20,7 +20,7 @@ namespace Windows {
 			if(item.networkselect){
 				if (ImGui::BeginListBox("Network Source Menu",ImVec2(1280.0f, 720.0f))){
 					for(unsigned int n=0;n<item.networksources.size();n++){
-						const bool is_selected = (item_current_idx == n);
+						static int selected = -1;
 						urlschema thisurl = Utility::parseUrl(item.networksources[n].url);
 						if(thisurl.scheme == "ftp"){
 							ImGui::Image((void*)(intptr_t)FTPTexture.id, ImVec2(40,40));
@@ -31,18 +31,20 @@ namespace Windows {
 						ImGui::SameLine();
 						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
 						
-						if (ImGui::Selectable(item.networksources[n].name.c_str(), is_selected)){
+						if (ImGui::Selectable(item.networksources[n].name.c_str(), selected == n)){
 							item.first_item = true;		
 							item.networkselect = false;
 							item.networkurl = item.networksources[n].url;
-							item.networklastpath = thisurl.path;
+							
 							if(thisurl.scheme == "http" || thisurl.scheme == "https"){
+								item.networklastpath = "";
 								item_current_idx = 0;
 								httpdir->setUrl(item.networkurl = item.networksources[n].url);
 								item.networkentries = httpdir->dirList("");
 								std::sort(item.networkentries.begin(),item.networkentries.end(),Utility::compare);
 							}
 							if(thisurl.scheme == "ftp"){
+								item.networklastpath = thisurl.path;
 								netbuf *ftp_con = nullptr;
 								printf("FTP CONNECT %s\n",thisurl.server.c_str());
 								if(thisurl.port == "")thisurl.port = "21";
@@ -61,7 +63,7 @@ namespace Windows {
 									}
 								}
 							}
-							if (is_selected)
+							if (selected)
 								ImGui::SetItemDefaultFocus();
 						}
 								
@@ -92,8 +94,8 @@ namespace Windows {
 							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
 						
 							urlschema thisurl = Utility::parseUrl(item.networkurl);
-							const bool is_selected = (item_current_idx == n);
-							if (ImGui::Selectable(item.networkentries[n].name.c_str(), is_selected)){
+							static int selected = -1;
+							if (ImGui::Selectable(item.networkentries[n].name.c_str(), selected == n)){
 										
 								if(item.networkentries[n].isDir){
 									item.first_item = true;
@@ -138,8 +140,7 @@ namespace Windows {
 									}
 								}
 							}
-							if (is_selected)
-								ImGui::SetItemDefaultFocus();
+							
 							if(!item.networkentries[n].isDir && thisurl.scheme != "http"){
 								ImGui::SameLine(total_w-150);
 								ImGui::Text("%s",Utility::humanSize(item.networkentries[n].size).c_str());

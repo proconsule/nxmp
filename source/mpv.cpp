@@ -1,10 +1,6 @@
 #include <SDL2/SDL_video.h>
 #include "mpv.h"
 
-static void *get_proc_address_mpv(void *unused, const char *name) {
-    return SDL_GL_GetProcAddress(name);
-}
-
 Mpv::Mpv(const std::string &configPath, bool initRender) {
 
     handle = mpv_create();
@@ -74,8 +70,7 @@ Mpv::~Mpv() {
         mpv_render_context_free(context);
     }
     if (handle) {
-		//mpv_terminate_destroy(handle);
-		mpv_detach_destroy(handle);
+		mpv_terminate_destroy(handle);
     }
 }
 

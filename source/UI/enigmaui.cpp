@@ -18,13 +18,13 @@ namespace Windows {
             if (ImGui::BeginListBox("Enigma2 Browser Menu",ImVec2(1280.0f, 720.0f))){
 				if(item.enigma2bouquet == ""){
 					for (unsigned int n = 0; n < enigma2->e2services.size(); n++){
-						const bool is_selected = (item_current_idx == n);
-						if (ImGui::Selectable(enigma2->e2services[n].name.c_str(), is_selected)){
+						static int selected = -1;
+						if (ImGui::Selectable(enigma2->e2services[n].name.c_str(), selected == n)){
 			
 							enigma2->m3uParser((char *)enigma2->e2services[n].bouquetref.c_str());
 							item.enigma2bouquet =  enigma2->e2services[n].bouquetref;
 						}
-						if (is_selected)
+						if (selected)
 							ImGui::SetItemDefaultFocus();
 							
 					}
@@ -34,14 +34,14 @@ namespace Windows {
 					}
 				}else if(item.enigma2bouquet != ""){
 					for (unsigned int n = 0; n < enigma2->e2currbouqet.size(); n++){
-						const bool is_selected = (item_current_idx == n);
+						static int selected = -1;
 						std::string channame = std::to_string(n) + std::string(". ") +enigma2->e2currbouqet[n].name;
-						if (ImGui::Selectable(channame.c_str(), is_selected)){
+						if (ImGui::Selectable(channame.c_str(), selected == n)){
 									
 							const char *cmd[] = {"loadfile", enigma2->e2currbouqet[n].url.c_str(), NULL};
 							mpv_command_async(mpv->getHandle(), 0, cmd);
 						}
-						if (is_selected)
+						if (selected)
 						ImGui::SetItemDefaultFocus();
 					}
 					if (*first_item) {
