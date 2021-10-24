@@ -16,7 +16,7 @@ Edit config.ini
 [Enigma2]
 ```
 
-Netowrok have syntax
+Netwrok have syntax
 
 ```
 [Network]
@@ -24,7 +24,7 @@ source=TESTFtp|ftp://user:pass@192.168.1.10:21/path/
 source=TestHTTP|http://192.168.1.10/path/
 ```
 
-Eningma2 have syntax
+Enigma2 have syntax
 ```
 [Enigma2]
 e2address=http://192.168.1.10/
