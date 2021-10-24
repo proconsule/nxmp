@@ -22,7 +22,7 @@ static bool init();
 
 SDL_Window *window;
 SDL_GLContext context;
-Mpv *mpv;
+libMpv *libmpv;
 HTTPDir *httpdir;
 Config *configini;
 Enigma2 *enigma2;
@@ -258,7 +258,7 @@ int main() {
 	GUI::RenderLoop();
 	printf("Ending Render Loop\n");
 		//return ret;
-	delete(mpv);
+	delete(libmpv);
 	delete(httpdir);
 	delete(enigma2);
     ImGui_ImplOpenGL3_Shutdown();

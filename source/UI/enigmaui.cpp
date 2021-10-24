@@ -39,7 +39,7 @@ namespace Windows {
 						if (ImGui::Selectable(channame.c_str(), selected == n)){
 									
 							const char *cmd[] = {"loadfile", enigma2->e2currbouqet[n].url.c_str(), NULL};
-							mpv_command_async(mpv->getHandle(), 0, cmd);
+							mpv_command_async(libmpv->getHandle(), 0, cmd);
 						}
 						if (selected)
 						ImGui::SetItemDefaultFocus();

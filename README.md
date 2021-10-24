@@ -52,6 +52,7 @@ FAQ
 
 Thanks to
 -----
+- cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv part)
 - bodyXY @ GBATemp forum for banner and icons
 - docgold @ GBATemp forum for Enigma2 samples and support on decoders
 - tataniko @ GBATemp forum for suggestions and bug hunting

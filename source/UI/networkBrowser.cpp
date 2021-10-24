@@ -131,12 +131,12 @@ namespace Windows {
 									if(thisurl.scheme == "http" || thisurl.scheme == "https"){
 										std::string openurl = httpdir->getUrl() + httpdir->getCurrentRelPath() + item.networkentries[n].path;
 										const char *cmd[] = {"loadfile", openurl.c_str(), NULL};
-										mpv_command_async(mpv->getHandle(), 0, cmd);
+										mpv_command_async(libmpv->getHandle(), 0, cmd);
 									}
 									if(thisurl.scheme == "ftp"){
 										std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + item.networkentries[n].path + item.networkentries[n].name;
 										const char *cmd[] = {"loadfile", openurl.c_str(), NULL};
-										mpv_command_async(mpv->getHandle(), 0, cmd);
+										mpv_command_async(libmpv->getHandle(), 0, cmd);
 									}
 								}
 							}

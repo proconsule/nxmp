@@ -25,27 +25,27 @@ namespace GUI {
 	};
 	
 	void initMpv(){
-		mpv = new Mpv("mpv", true);
+		libmpv = new libMpv("mpv");
 		wakeup_on_mpv_render_update = SDL_RegisterEvents(1);
 		wakeup_on_mpv_events        = SDL_RegisterEvents(1);
-		mpv_set_wakeup_callback(mpv->getHandle(), [](void *) -> void {SDL_Event event = {.type = wakeup_on_mpv_events}; SDL_PushEvent(&event);}, NULL);
-		mpv_render_context_set_update_callback(mpv->getContext(), [](void *) -> void { SDL_Event event = {.type = wakeup_on_mpv_render_update}; SDL_PushEvent(&event); }, NULL);
+		mpv_set_wakeup_callback(libmpv->getHandle(), [](void *) -> void {SDL_Event event = {.type = wakeup_on_mpv_events}; SDL_PushEvent(&event);}, NULL);
+		mpv_render_context_set_update_callback(libmpv->getContext(), [](void *) -> void { SDL_Event event = {.type = wakeup_on_mpv_render_update}; SDL_PushEvent(&event); }, NULL);
 	
 	}
 	
 	void toggleStats(){
 		const char *cmd[] = {"script-binding","stats/display-stats-toggle" ,NULL};
-		mpv_command_async(mpv->getHandle(), 0, cmd);
+		mpv_command_async(libmpv->getHandle(), 0, cmd);
 	}
 	
 	void toggleMasterLock(){
 		item.masterlock = !item.masterlock;
 		if(item.masterlock){
 			const char *cmd[] = {"show-text", "Masterlock Enabled","2000", NULL};
-			mpv_command_async(mpv->getHandle(), 0, cmd);
+			mpv_command_async(libmpv->getHandle(), 0, cmd);
 		}else{
 			const char *cmd[] = {"show-text", "Masterlock Disabled","2000", NULL};
-			mpv_command_async(mpv->getHandle(), 0, cmd);
+			mpv_command_async(libmpv->getHandle(), 0, cmd);
 		}
 		
 	}
@@ -76,9 +76,9 @@ namespace GUI {
 					if (button == SDL_KEY_ZR){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
-								mpv->seekOSD(mpv->getPosition() + 60.0);
+								libmpv->seekOSD(libmpv->getPosition() + 60.0);
 							}else{
-								mpv->seek(mpv->getPosition() + 60.0);
+								libmpv->seekSilent(libmpv->getPosition() + 60.0);
 							}
 						}
 						
@@ -86,9 +86,9 @@ namespace GUI {
 					if (button == SDL_KEY_ZL){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
-								mpv->seekOSD(mpv->getPosition() - 60.0);
+								libmpv->seekOSD(libmpv->getPosition() - 60.0);
 							}else{
-								mpv->seek(mpv->getPosition() - 60.0);
+								libmpv->seekSilent(libmpv->getPosition() - 60.0);
 							}
 						}
 						
@@ -96,9 +96,9 @@ namespace GUI {
 					if (button == SDL_KEY_R){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
-								mpv->seekOSD(mpv->getPosition() + 10.0);
+								libmpv->seekOSD(libmpv->getPosition() + 10.0);
 							}else{
-								mpv->seek(mpv->getPosition() + 10.0);
+								libmpv->seekSilent(libmpv->getPosition() + 10.0);
 							}
 						}
 						
@@ -106,9 +106,9 @@ namespace GUI {
 					if (button == SDL_KEY_L){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
-								mpv->seekOSD(mpv->getPosition() - 10.0);
+								libmpv->seekOSD(libmpv->getPosition() - 10.0);
 							}else{
-								mpv->seek(mpv->getPosition() - 10.0);
+								libmpv->seekSilent(libmpv->getPosition() - 10.0);
 							}
 						}
 						
@@ -117,11 +117,11 @@ namespace GUI {
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
 								item.playershowcontrols=false;
-								mpv_set_option_string(mpv->getHandle(), "osd-level", "0");
+								mpv_set_option_string(libmpv->getHandle(), "osd-level", "0");
 								
 							}else{
 								item.playershowcontrols=true;
-								mpv_set_option_string(mpv->getHandle(), "osd-level", "3");
+								mpv_set_option_string(libmpv->getHandle(), "osd-level", "3");
 							}
 						}
 					}
@@ -130,10 +130,10 @@ namespace GUI {
 								FS::GetDirList(item.localpath.c_str(),item.localfileentries);
 						}
 						if(item.state == MENU_STATE_PLAYER){
-							if(mpv->isPaused()){
-								mpv->resume();
+							if(libmpv->Paused()){
+								libmpv->Resume();
 							}else{
-								mpv->pause();
+								libmpv->Pause();
 							}
 						}
 					}
@@ -146,14 +146,14 @@ namespace GUI {
 						
 					}
 					if (button == SDL_KEY_B){
-						if(item.state == MENU_STATE_ENIGMABROWSER && mpv->isStopped()){
+						if(item.state == MENU_STATE_ENIGMABROWSER && libmpv->Stopped()){
 							item.first_item = true;
 							if(item.enigma2bouquet != ""){
 								item.enigma2bouquet = "";
 							}
 						}
 						
-						if(item.state == MENU_STATE_NETWORKBROWSER && mpv->isStopped()){
+						if(item.state == MENU_STATE_NETWORKBROWSER && libmpv->Stopped()){
 							item.first_item = true;
 							if(item.networklastpath != "/"){
 								item.networklastpath = item.networklastpath.substr(0, item.networklastpath.find_last_of("\\/"));
@@ -183,7 +183,7 @@ namespace GUI {
 							
 						}
 						
-						if(item.state == MENU_STATE_FILEBROWSER && mpv->isStopped()){
+						if(item.state == MENU_STATE_FILEBROWSER && libmpv->Stopped()){
 							item.first_item = true;
 							if(item.localpath != "/"){
 								item.localpath = item.localpath.substr(0, item.localpath.find_last_of("\\/"));
@@ -192,20 +192,20 @@ namespace GUI {
 							FS::GetDirList(item.localpath.c_str(),item.localfileentries);	
 						}
 						
-						if(!mpv->isStopped()  && !item.masterlock){
-							mpv->stop();
+						if(!libmpv->Stopped()  && !item.masterlock){
+							libmpv->Stop();
 						}
 					}
 				}
 				if (event.type == wakeup_on_mpv_render_update)
 				{
-					mpv_render_context_update(mpv->getContext());
+					mpv_render_context_update(libmpv->getContext());
 				}
 				if (event.type == wakeup_on_mpv_events)
 				{
 					int count = 10;
 					while (count) {
-					mpv_event *mp_event = (mpv_event*) mpv_wait_event(mpv->getHandle(), 0);
+					mpv_event *mp_event = (mpv_event*) mpv_wait_event(libmpv->getHandle(), 0);
 					if (mp_event->event_id == MPV_EVENT_NONE)
 						break;
 					if (mp_event->event_id == MPV_EVENT_LOG_MESSAGE) {
@@ -287,7 +287,7 @@ namespace GUI {
 			params[0] = {MPV_RENDER_PARAM_OPENGL_FBO, &fbo};
 			params[1] = {MPV_RENDER_PARAM_FLIP_Y, &__fbo_one};
 			params[2] = {(mpv_render_param_type)0};
-			mpv_render_context_render(mpv->getContext(), params);
+			mpv_render_context_render(libmpv->getContext(), params);
 		}
     	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

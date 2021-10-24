@@ -19,8 +19,8 @@ namespace Windows {
 			char ffmpegtext[32];
 			char mpvtext[32];
 			sprintf(nxmptext,"NXMP v%d.%d.%d",VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO);
-			sprintf(ffmpegtext,"FFMPEG %s",mpv->ffmpeg_version.c_str());
-			sprintf(mpvtext,"MPV %s",mpv->mpv_version.c_str());
+			sprintf(ffmpegtext,"FFMPEG %s",libmpv->ffmpeg_version.c_str());
+			sprintf(mpvtext,"MPV %s",libmpv->mpv_version.c_str());
 			auto windowWidth = ImGui::GetWindowSize().x;
 			ImGui::SetCursorPosX((windowWidth - NXMPBannerTexture.width) * 0.5f);
 			ImGui::Image((void*)(intptr_t)NXMPBannerTexture.id, ImVec2(NXMPBannerTexture.width,NXMPBannerTexture.height));

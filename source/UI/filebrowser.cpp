@@ -48,7 +48,7 @@ namespace Windows {
 								playfilepath.append("/");
 								playfilepath.append(item.localfileentries[n].name);
 								const char *cmd[] = {"loadfile", playfilepath.c_str(), NULL};
-								mpv_command_async(mpv->getHandle(), 0, cmd);
+								mpv_command_async(libmpv->getHandle(), 0, cmd);
 							}
 						}
 						if(item.localfileentries[n].type != FsDirEntryType_Dir){

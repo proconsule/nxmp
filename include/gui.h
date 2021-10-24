@@ -7,7 +7,7 @@
 #include <switch.h>
 #include <glad/glad.h>
 #include "windows.h"
-#include "mpv.h"
+#include "libmpv.h"
 #include "config.h"
 #include "remotefs.h"
 #include "SimpleIni.h"
@@ -56,7 +56,7 @@ typedef struct {
 extern SDL_Window *window;
 extern MenuItem item;
 
-extern Mpv *mpv;
+extern libMpv *libmpv;
 extern HTTPDir *httpdir;
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
