@@ -50,7 +50,8 @@
 #include <netdb.h>
 #include <inet.h>
 #elif defined(_WIN32)
-#include <winsock.h>
+#include <winsock2.h>
+#define hstrerror strerror
 #endif
 #if defined(__APPLE__)
 #undef _REENTRANT
@@ -1157,13 +1158,13 @@ static int FtpXfer(const char *localfile, const char *path,
     return rv;
 }
 
-std::vector<remotefs_entry> FtpDirList(const char *p, netbuf *nControl) {
+std::vector<FS::FileEntry> FtpDirList(const char *p, netbuf *nControl,const std::vector<std::string> &extensions) {
 
     int len;
     char *buf;
     netbuf *nData;
     struct ftpparse fp{};
-    std::vector<remotefs_entry> files;
+    std::vector<FS::FileEntry> files;
 
     if (!FtpAccess(p, FTPLIB_DIR_VERBOSE, FTPLIB_ASCII, nControl, &nData)) {
         return files;
@@ -1184,14 +1185,28 @@ std::vector<remotefs_entry> FtpDirList(const char *p, netbuf *nControl) {
             if (!path.empty() && '/' != path.back()) {
                 path += "/";
             }
-            remotefs_entry tmpentry;
+            FS::FileEntry tmpentry;
 			tmpentry.name=name;
 			tmpentry.path=path;
-			tmpentry.isDir = fp.flagtrycwd;
+			tmpentry.type = fp.flagtrycwd == 1 ? FS::FileEntryType::Directory : FS::FileEntryType::File;
 			tmpentry.size = fp.size;
 			files.push_back(tmpentry);
+			
+			
         }
     }
+	
+	std::sort(files.begin(), files.end(), FS::Sort);
+				
+	files.erase(
+		std::remove_if(files.begin(), files.end(), [extensions](const FS::FileEntry &file) {
+			for (auto &ext : extensions) {
+				if (Utility::endsWith(file.name, ext, false)) {
+					return false;
+				}
+			}
+			return file.type == FS::FileEntryType::File;
+	}), files.end());
 
     free(buf);
     FtpClose(nData);

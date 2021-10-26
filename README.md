@@ -10,13 +10,14 @@ Installation
 Edit config.ini
 ```
 [Main]
+startpath=/switch/nxmp
 
 [Network]
 
 [Enigma2]
 ```
 
-Network have syntax
+Network have syntax (you can add as many source as you like)
 
 ```
 [Network]
@@ -50,9 +51,13 @@ FAQ
 
 **Answer** Keep in mind that currently Homebrew apps can't access the HW Decoder, so all is done with CPU, 4K file is too heavy to be decoded
 
+**Q:** What is Enigma2?
+
+**A:** Enigma2 is an application used in Linux-based Digital Video Broadcasting (DVB-S, DVB-C, DVB-T) receivers or TV set-top boxes and Internet Protocol television receivers.
+
 Thanks to
 -----
-- cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv part)
+- Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv part)
 - bodyXY @ GBATemp forum for banner and icons
 - docgold @ GBATemp forum for Enigma2 samples and support on decoders
 - tataniko @ GBATemp forum for suggestions and bug hunting

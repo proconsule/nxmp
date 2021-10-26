@@ -12,18 +12,24 @@
 #include "localfiles.h"
 #include "ftplib.h"
 #include "HTTPDir.h"
+#include "FTPDir.h"
+
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include "SimpleIni.h"
 
+//#define NDEBUG 1
+
 static bool init();
 
 SDL_Window *window;
 SDL_GLContext context;
 libMpv *libmpv;
-HTTPDir *httpdir;
+FTPDir *ftpdir = nullptr;
+HTTPDir *httpdir = nullptr;
+USBMounter *usbmounter = nullptr;
 Config *configini;
 Enigma2 *enigma2;
 uint32_t wakeup_on_mpv_render_update;
@@ -37,12 +43,14 @@ bool renderloopdone = false;
 Tex SdCardTexture;
 Tex NetworkTexture;
 Tex Enigma2Texture;
+Tex UsbTexture;
 Tex InfoTexture;
 Tex SettingsTexture;
 
 
 Tex FolderTexture;
 Tex FileTexture;
+
 
 Tex FTPTexture;
 Tex HTTPTexture;
@@ -52,6 +60,8 @@ Tex MPVTexture;
 
 Tex NXMPBannerTexture;
 Tex ExitTexture;
+
+
 
 const GLuint WIDTH = 1280, HEIGHT = 720;
 
@@ -109,30 +119,6 @@ int main() {
 	
 	configini = new Config("config.ini");
 	
-	/*
-	if(rc<0){
-		consoleInit(NULL);
-		padConfigureInput(1, HidNpadStyleSet_NpadStandard);
-		PadState pad;
-		padInitializeDefault(&pad);
-
-		printf("Failed to load config.ini file, press + to exit\n");
-
-		while(appletMainLoop())
-		{
-			padUpdate(&pad);
-			u64 kDown = padGetButtonsDown(&pad);
-
-			if (kDown & HidNpadButton_Plus) break;
-			consoleUpdate(NULL);
-		}
-
-			consoleExit(NULL);
-			return 0;
-	};
-	*/
-	//std::string pippo = (char *)configini.GetValue("Enigma2", "e2address", "default");
-	//urlschema testschema = Utility::parseUrl(pippo);
 	
 	Result ret;
 	if (R_FAILED(ret = romfsInit())) {
@@ -169,8 +155,7 @@ int main() {
 			return ret;
 		}
 		printf("Init Fonts\n");
-        Result ret = 0;
-		//PlFontData standard, fonts_ext;
+        //PlFontData standard, fonts_ext;
 		//if (R_FAILED(ret = plGetSharedFontByType(&standard, PlSharedFontType_Standard))) {
 		//	printf("plGetSharedFontByType(PlSharedFontType_Standard) failed: 0x%x\n", ret);
 		//	return ret;
@@ -225,12 +210,10 @@ int main() {
 	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
 	io.Fonts->Build();
 	
-	printf("Opening SD Card\n");
-	devices[0] = *fsdevGetDeviceFileSystem("sdmc");
-	fs = &devices[0];
 	
 	printf("Loading Textures\n");
 	Utility::TxtLoadPNGFromFile("romfs:/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
+	Utility::TxtLoadPNGFromFile("romfs:/usb.png",&UsbTexture.id,&UsbTexture.width,&UsbTexture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/network.png",&NetworkTexture.id,&NetworkTexture.width,&NetworkTexture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
 	Utility::TxtLoadPNGFromFile("romfs:/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
@@ -249,17 +232,14 @@ int main() {
 	Utility::TxtLoadJPGFromFile("romfs:/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
 	
 	
+	printf("Init Enigma2\n");
 	enigma2 = new Enigma2();
-	httpdir = new HTTPDir();
 	
-	
-	
+	item.localpath = configini->getStartPath();
 	
 	GUI::RenderLoop();
 	printf("Ending Render Loop\n");
-		//return ret;
 	delete(libmpv);
-	delete(httpdir);
 	delete(enigma2);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
@@ -271,8 +251,6 @@ int main() {
     SDL_Quit();
 	
 	
-	
-	//nsExit();
 	printf("Exit Services\n");
 	ncmExit();
 	plExit();

@@ -24,18 +24,15 @@
 #define GLOBALDEF
 #define GLOBALREF extern
 #elif defined(_WIN32)
-#if defined BUILDING_LIBRARY
-#define GLOBALDEF __declspec(dllexport)
-#define GLOBALREF __declspec(dllexport)
-#else
-#define GLOBALREF __declspec(dllimport)
-#endif
+#define GLOBALDEF
+#define GLOBALREF extern
+
 #endif
 
 #include <limits.h>
 #include <inttypes.h>
 /// nxmp
-#include "remotefs.h"
+#include "localfiles.h"
 /// nxmp
 
 /* FtpAccess() type codes */
@@ -119,7 +116,7 @@ GLOBALREF int FtpDelete(const char *fnm, netbuf *nControl);
 GLOBALREF void FtpQuit(netbuf *nControl);
 
 // nxmp
-std::vector<remotefs_entry> FtpDirList(const char *path, netbuf *nControl);
+std::vector<FS::FileEntry> FtpDirList(const char *path, netbuf *nControl,const std::vector<std::string> &extensions);
 
 #ifdef __cplusplus
 };

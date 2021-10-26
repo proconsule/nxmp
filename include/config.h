@@ -15,6 +15,7 @@ public:
 	Config(std::string inifile);
 	std::vector<networkSource> getNetworks();
 	std::string getEnigma();
+	std::string getStartPath();
 	
 	CSimpleIniA *ini;
 };

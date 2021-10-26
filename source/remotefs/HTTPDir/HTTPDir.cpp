@@ -45,18 +45,26 @@ void HTTPDir::curlDownload(char * url ,HTTPMemoryStruct * chunk){
 	curl_global_cleanup();
 }
 
-HTTPDir::HTTPDir(){
-
+HTTPDir::HTTPDir(std::string _url){
+	url = _url;
+	urlschema thisurl = Utility::parseUrl(url);
+	basepath = thisurl.path; 
+	
 }
 
-std::vector<remotefs_entry> HTTPDir::dirList(std::string path){
-	std::vector<remotefs_entry> tmpret;
-	std::string geturl = url + currentrelpath + path;
+HTTPDir::~HTTPDir(){
+	
+}
+
+std::vector<FS::FileEntry> HTTPDir::getDir(std::string path,const std::vector<std::string> &extensions){
+	std::vector<FS::FileEntry> tmpret;
+	urlschema thisurl = Utility::parseUrl(url);
+	std::string geturl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + path;
 	HTTPMemoryStruct *chunk = (HTTPMemoryStruct *)malloc(sizeof(HTTPMemoryStruct));
 	curlDownload((char *)geturl.c_str(),chunk);
 	std::string s = chunk->memory;
 	std::smatch sm;
-	currentrelpath = currentrelpath+path;
+	currentpath = path;
 	std::regex rgxdirlist("<h1>Index of");
 	if(!regex_search(s, sm, rgxdirlist)){
 		return tmpret;
@@ -66,35 +74,51 @@ std::vector<remotefs_entry> HTTPDir::dirList(std::string path){
 	
 	while (regex_search(s, sm, rgxlinks))
 	{
-		remotefs_entry tmpentry;
+		FS::FileEntry tmpentry;
 		std::string relurlref = sm[1];
 		std::string name = sm[2];
 		tmpentry.name = sm[2];
 		tmpentry.path = sm[1];
-		if(tmpentry.name.back() == '/')tmpentry.isDir = true;
+		if(tmpentry.name.back() == '/'){
+			tmpentry.type = FS::FileEntryType::Directory;
+		}else{
+			tmpentry.type = FS::FileEntryType::File;
+		}
 		tmpentry.size = 0;
 		tmpret.push_back(tmpentry);
 		s = sm.suffix();
 	}
 	free(chunk->memory);
+	std::sort(tmpret.begin(), tmpret.end(), FS::Sort);
+				
+	tmpret.erase(
+		std::remove_if(tmpret.begin(), tmpret.end(), [extensions](const FS::FileEntry &file) {
+			for (auto &ext : extensions) {
+				if (Utility::endsWith(file.name, ext, false)) {
+					return false;
+				}
+			}
+			return file.type == FS::FileEntryType::File;
+	}), tmpret.end());
 	return tmpret;
 	
 }
 
-void HTTPDir::backDir(){
-	currentrelpath = currentrelpath.substr(0, currentrelpath.find_last_of("\\/"));
-	currentrelpath = currentrelpath.substr(0, currentrelpath.find_last_of("\\/")+1);
-}
-
-void HTTPDir::setCurrentRelPath(std::string _path){
-	currentrelpath = _path;
-}
-std::string HTTPDir::getCurrentRelPath(){
-	return currentrelpath;
-}
-void HTTPDir::setUrl(std::string _path){
-	url = _path;
-}
 std::string HTTPDir::getUrl(){
 	return url;
+}
+
+std::string HTTPDir::getCurrPath(){
+	return currentpath;
+}
+
+std::string HTTPDir::getBasePath(){
+	return basepath;
+}
+
+std::string HTTPDir::backDir(){
+	if(currentpath == basepath)return basepath;
+	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
+	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/")+1);
+	return currentpath;
 }

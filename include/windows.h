@@ -16,6 +16,7 @@ namespace Windows {
     };
 
     void FileBrowserWindow(bool *focus, bool *first_item);
+	void USBBrowserWindow(bool *focus, bool *first_item);
 	void EnigmaWindow(bool *focus, bool *first_item);
 	void MainMenuWindow(bool *focus, bool *first_item);
 	void NetworkWindow(bool *focus, bool *first_item);

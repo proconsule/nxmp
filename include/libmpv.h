@@ -11,6 +11,8 @@ public:
 
 	libMpv(const std::string &configDir);
 	
+	~libMpv();
+	
 	void Pause();
 
 	void Resume();

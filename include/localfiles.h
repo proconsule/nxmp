@@ -1,12 +1,17 @@
 #ifndef NXMP_LOCALFILES_H
 #define NXMP_LOCALFILES_H
 
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <dirent.h>
 #include <string>
 #include <vector>
+#include "utils.h"
+/*
 #include <switch.h>
-
-extern FsFileSystem *fs;
-extern FsFileSystem devices[4];
+*/
 
 typedef enum FileType {
     FileTypeNone,
@@ -15,8 +20,25 @@ typedef enum FileType {
 } FileType;
 
 namespace FS {
-	Result GetDirList(const char *path, std::vector<FsDirectoryEntry> &entries);
+	
+	enum class FileEntryType {
+		Unknown = 0,
+		File = 1,
+		Directory = 2
+	};
+	
+	struct FileEntry{
+		std::string name;
+		std::string path;
+		size_t size = 0;
+		FileEntryType type = FileEntryType::Unknown;
+	};
+	
+	std::string removeLastSlash(const std::string &string);
 	FileType GetFileType(const std::string &filename);
+	std::vector<FileEntry> getDirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
+	std::string backPath(std::string path);
+	bool Sort(const FileEntry &entryA, const FileEntry &entryB);
 }
 
 #endif

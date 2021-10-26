@@ -45,7 +45,7 @@ INCLUDES	:=	libs/simpleini libs/imgui include source/remotefs/Enigma2 source/rem
 ROMFS		:=	romfs
 
 VERSION_MAJOR := 0
-VERSION_MINOR := 1
+VERSION_MINOR := 2
 VERSION_MICRO := 0
 
 APP_TITLE     := NXMP

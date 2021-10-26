@@ -8,7 +8,9 @@
 #include <cstring>
 #include <regex>
 #include <curl/curl.h>
-#include "remotefs.h"
+#include "localfiles.h"
+
+
 
 struct HTTPMemoryStruct {
   char *memory;
@@ -17,19 +19,21 @@ struct HTTPMemoryStruct {
 
 class HTTPDir{
 public:
-	HTTPDir();
+	HTTPDir(std::string _url);
+	~HTTPDir();
 	void curlDownload(char * url ,HTTPMemoryStruct * chunk);
-	void setCurrentRelPath(std::string _path);
-	std::string getCurrentRelPath();
-	void setUrl(std::string _path);
+	
+	std::vector<FS::FileEntry> getDir(std::string path,const std::vector<std::string> &extensions);
+	std::string backDir();
 	std::string getUrl();
-	std::vector<remotefs_entry> dirList(std::string path);
-	void backDir();
+	std::string getBasePath();
+	std::string getCurrPath();
+	
+	
 private:
-	
-	std::string currentrelpath = "";
 	std::string url;
-	
+	std::string basepath = "";
+	std::string currentpath = "";
 };
 
 #endif

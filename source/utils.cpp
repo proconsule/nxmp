@@ -154,4 +154,59 @@ namespace Utility{
 		return ret;
 	}
 	
+	bool endsWith(const std::string &value, const std::string &ending, bool sensitive) {
+		if (ending.size() > value.size()) return false;
+		if (sensitive) {
+			return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+		} else {
+			std::string val_low = toLower(value);
+			std::string end_low = toLower(ending);
+			return std::equal(end_low.rbegin(), end_low.rend(), val_low.rbegin());
+		}
+	}
+	std::string toLower(const std::string &str) {
+		std::string ret = str;
+		std::transform(ret.begin(), ret.end(), ret.begin(),[](unsigned char c) { return std::tolower(c); });
+		return ret;
+	}
+
+	std::string toUpper(const std::string &str) {
+		std::string ret = str;
+		std::transform(ret.begin(), ret.end(), ret.begin(),[](unsigned char c) { return std::toupper(c); });
+		return ret;
+	}
+	
+	std::vector<std::string> getMediaExtensions() {
+    return {
+            ".8svx",
+            ".aac",
+            ".ac3",
+            ".aif",
+            ".asf",
+            ".avi",
+            ".dv",
+            ".flv",
+            ".m2ts",
+            ".m2v",
+            ".m4a",
+            ".mkv",
+            ".mov",
+            ".mp3",
+            ".mp4",
+            ".mpeg",
+            ".mpg",
+            ".mts",
+            ".ogg",
+            ".rmvb",
+            ".swf",
+            ".ts",
+            ".vob",
+            ".wav",
+            ".wma",
+            ".wmv",
+            ".m3u",
+            ".m3u8"
+    };
+}
+	
 }

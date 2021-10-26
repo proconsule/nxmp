@@ -24,11 +24,19 @@ namespace GUI {
 		SDL_KEY_SL_LEFT, SDL_KEY_SR_LEFT, SDL_KEY_SL_RIGHT, SDL_KEY_SR_RIGHT
 	};
 	
+	static void on_mpv_events(void *ctx)
+	{
+		SDL_Event event = {.type = wakeup_on_mpv_events};
+		SDL_PushEvent(&event);
+	}
+	
 	void initMpv(){
 		libmpv = new libMpv("mpv");
 		wakeup_on_mpv_render_update = SDL_RegisterEvents(1);
 		wakeup_on_mpv_events        = SDL_RegisterEvents(1);
-		mpv_set_wakeup_callback(libmpv->getHandle(), [](void *) -> void {SDL_Event event = {.type = wakeup_on_mpv_events}; SDL_PushEvent(&event);}, NULL);
+		//mpv_set_wakeup_callback(libmpv->getHandle(), [](void *) -> void {SDL_Event event = {.type = wakeup_on_mpv_events}; SDL_PushEvent(&event);}, NULL);
+		mpv_set_wakeup_callback(libmpv->getHandle(), on_mpv_events, NULL);
+
 		mpv_render_context_set_update_callback(libmpv->getContext(), [](void *) -> void { SDL_Event event = {.type = wakeup_on_mpv_render_update}; SDL_PushEvent(&event); }, NULL);
 	
 	}
@@ -49,6 +57,7 @@ namespace GUI {
 		}
 		
 	}
+	
 	
 	void HandleEvents(){
 		SDL_Event event;
@@ -126,9 +135,6 @@ namespace GUI {
 						}
 					}
 					if (button == SDL_KEY_A){
-						if(item.state == MENU_STATE_FILEBROWSER){
-								FS::GetDirList(item.localpath.c_str(),item.localfileentries);
-						}
 						if(item.state == MENU_STATE_PLAYER){
 							if(libmpv->Paused()){
 								libmpv->Resume();
@@ -137,11 +143,26 @@ namespace GUI {
 							}
 						}
 					}
-					if (button == SDL_KEY_Y){
-						if(item.state != MENU_STATE_HOME){
+					if (button == SDL_KEY_Y && !item.masterlock){
+						if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER){
+							if(usbmounter != nullptr){
+								delete usbmounter;
+								usbmounter = nullptr;
+							}
+							if(ftpdir != nullptr){
+								delete ftpdir;
+								ftpdir = nullptr;
+							}
+							if(httpdir != nullptr){
+								delete httpdir;
+								httpdir = nullptr;
+							}
+							item.localpath = configini->getStartPath();
 							item.networkselect = true;
 							item.first_item = true;
 							item.state = MENU_STATE_HOME;
+							item.usbpath = "";
+							
 						}
 						
 					}
@@ -155,44 +176,45 @@ namespace GUI {
 						
 						if(item.state == MENU_STATE_NETWORKBROWSER && libmpv->Stopped()){
 							item.first_item = true;
-							if(item.networklastpath != "/"){
-								item.networklastpath = item.networklastpath.substr(0, item.networklastpath.find_last_of("\\/"));
-								if(item.networklastpath == "")item.networklastpath="/";
-							}
 							urlschema thisurl = Utility::parseUrl(item.networkurl);
 							if(thisurl.scheme == "http" || thisurl.scheme == "https"){
-								httpdir->backDir();
-								item.networklastpath = httpdir->getCurrentRelPath();									item.networkentries = httpdir->dirList("");
-								std::sort(item.networkentries.begin(),item.networkentries.end(),Utility::compare);
+								item.networkentries = httpdir->getDir(httpdir->backDir(),Utility::getMediaExtensions());
+								item.networklastpath = httpdir->getCurrPath();
 							}
 							if(thisurl.scheme == "ftp"){
-								netbuf *ftp_con = nullptr;
-								std::string ftphost = thisurl.server+std::string(":21");
-								if (!FtpConnect(ftphost.c_str(), &ftp_con)) {
-									printf("could not connect to ftp server\n");
-								}else{
-									if (!FtpLogin(thisurl.user.c_str(), thisurl.pass.c_str(), ftp_con)) {
-										printf("could not connect to ftp server\n");
-										FtpQuit(ftp_con);
-									}else{
-										item.networkentries = FtpDirList(item.networklastpath.c_str(), ftp_con);
-										std::sort(item.networkentries.begin(),item.networkentries.end(),Utility::compare);
-									}
-								}
+								item.networkentries = ftpdir->getDir(ftpdir->backDir(),Utility::getMediaExtensions());
+								item.networklastpath = ftpdir->getCurrPath();
 							}
 							
 						}
 						
+						if(item.state == MENU_STATE_USB && libmpv->Stopped()){
+							item.first_item = true;
+							if(item.usbpath != item.usbbasepath){
+								item.usbpath = item.usbpath.substr(0, item.usbpath.find_last_of("\\/"));
+								if(item.usbpath == "")item.usbpath=item.usbbasepath;
+							}
+							item.usbfileentries = FS::getDirList(item.usbpath.c_str(),true,Utility::getMediaExtensions());
+						}
+						
 						if(item.state == MENU_STATE_FILEBROWSER && libmpv->Stopped()){
 							item.first_item = true;
-							if(item.localpath != "/"){
-								item.localpath = item.localpath.substr(0, item.localpath.find_last_of("\\/"));
-								if(item.localpath == "")item.localpath="/";
+							item.localpath = FS::backPath(item.localpath);
+							item.localfileentries = FS::getDirList(item.localpath,true,Utility::getMediaExtensions());
+							
+						}
+						
+						if(item.state == MENU_STATE_USB && libmpv->Stopped()){
+							item.first_item = true;
+							if(item.usbpath != "ums0:/"){
+								item.usbpath = item.usbpath.substr(0, item.usbpath.find_last_of("\\/"));
+								if(item.usbpath == "")item.usbpath="/";
 							}
-							FS::GetDirList(item.localpath.c_str(),item.localfileentries);	
+							//FS::GetDirList(item.usbpath.c_str(),item.localfileentries);	
 						}
 						
 						if(!libmpv->Stopped()  && !item.masterlock){
+							item.state = item.laststate;
 							libmpv->Stop();
 						}
 					}
@@ -203,7 +225,7 @@ namespace GUI {
 				}
 				if (event.type == wakeup_on_mpv_events)
 				{
-					int count = 10;
+					int count = 20;
 					while (count) {
 					mpv_event *mp_event = (mpv_event*) mpv_wait_event(libmpv->getHandle(), 0);
 					if (mp_event->event_id == MPV_EVENT_NONE)
@@ -218,10 +240,12 @@ namespace GUI {
 						item.laststate = item.state;
 						item.state = MENU_STATE_PLAYER;
 					}
+					printf("Event id: %d\n",mp_event->event_id);
 					if (mp_event->event_id == MPV_EVENT_END_FILE) {
 						printf("END FILE\n");
 						item.state = item.laststate;
 						item.masterlock = false;
+						printf("MENU STATE: %d\n",item.state );
 					}
 					
 					count --;
@@ -241,6 +265,9 @@ namespace GUI {
 					break;
 				case MENU_STATE_FILEBROWSER:
 					Windows::FileBrowserWindow(&item.focus, &item.first_item);
+					break;
+				case MENU_STATE_USB:
+					Windows::USBBrowserWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_NETWORKBROWSER:
 					Windows::NetworkWindow(&item.focus, &item.first_item);

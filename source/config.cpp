@@ -39,6 +39,15 @@ std::vector<networkSource> Config::getNetworks(){
 	return tmpret;
 }
 
+std::string Config::getStartPath(){
+	const char* pv;
+	pv = ini->GetValue("Main", "startpath");
+	if(pv==nullptr){
+		return "/switch/nxmp";
+	}
+	return pv;
+}
+
 std::string Config::getEnigma(){
 	const char* pv;
 	pv = ini->GetValue("Enigma2", "e2address");

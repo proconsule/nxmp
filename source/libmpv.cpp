@@ -70,7 +70,8 @@ void libMpv::Resume() {
 }
 
 void libMpv::Stop() {
-	mpv_command_string(handle, "stop");
+	const char *cmd[] = {"stop",  NULL};
+	mpv_command_async(handle, 0, cmd);
 }
 	
 void libMpv::seekSilent(double position) {
@@ -101,4 +102,13 @@ mpv_handle *libMpv::getHandle() {
 
 mpv_render_context *libMpv::getContext() {
     return context;
+}
+
+libMpv::~libMpv(){
+	if (context) {
+        mpv_render_context_free(context);
+    }
+    if (handle) {
+        mpv_terminate_destroy(handle);
+    }
 }
