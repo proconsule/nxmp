@@ -12,8 +12,7 @@
 #include <remotefs.h>
 
 #include <glad/glad.h>
-#include <turbojpeg.h>
-#include <png.h>
+
 
 typedef struct {
     GLuint id = 0;
@@ -37,8 +36,7 @@ namespace Utility{
 	std::string formatTimeShort(double seconds);
 	urlschema parseUrl(std::string url); 
 	bool compare(const remotefs_entry &a, const remotefs_entry &b);
-	bool TxtLoadJPGFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height);
-	bool TxtLoadPNGFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height);
+	bool TxtLoadFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height);
 	std::string toLower(const std::string &str);
 	std::string toUpper(const std::string &str);
 	bool endsWith(const std::string &value, const std::string &ending, bool sensitive);

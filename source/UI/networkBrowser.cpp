@@ -1,7 +1,7 @@
 #include "gui.h"
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "windows.h"
+#include "appwindows.h"
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
@@ -12,7 +12,7 @@ namespace Windows {
         Windows::SetupWindow();
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		
-        if (ImGui::Begin("Network Browser", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+        if (ImGui::Begin("Network Source Selection", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
            
             ImGui::SetNextWindowFocus();
            

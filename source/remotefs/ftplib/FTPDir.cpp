@@ -3,7 +3,7 @@
 FTPDir::FTPDir(std::string _url){
 	url = _url;	
 	urlschema thisurl = Utility::parseUrl(url);
-	basepath = thisurl.path; 
+	basepath = thisurl.path;
 }
 
 FTPDir::~FTPDir(){
@@ -46,7 +46,10 @@ std::string FTPDir::getBasePath(){
 }
 
 std::string FTPDir::backDir(){
+	if(currpath.find_last_of("/") == 0)return basepath;
+	if(currpath.find_last_of("/") == -1)return basepath;
 	if(currpath == basepath)return basepath;
-	currpath = currpath.substr(0, currpath.find_last_of("\\/")+1);
+	currpath = FS::removeLastSlash(currpath);
+	currpath = currpath.substr(0, currpath.find_last_of("/"));
 	return currpath;
 }

@@ -4,9 +4,11 @@
 #include <vector>
 #include <string>
 #include <SDL.h>
+#ifdef __SWITCH__
 #include <switch.h>
+#endif
 #include <glad/glad.h>
-#include "windows.h"
+#include "appwindows.h"
 #include "libmpv.h"
 #include "config.h"
 #include "remotefs.h"
@@ -41,7 +43,6 @@ typedef struct {
 	std::string usbpath = "";
 	std::string usbbasepath = "";
 	std::vector<FS::FileEntry> usbfileentries;
-	std::string enigma2bouquet = "";
 	std::vector<networkSource> networksources;
 	std::string networkurl;
 	std::string networklastpath;
@@ -65,7 +66,9 @@ extern MenuItem item;
 extern libMpv *libmpv;
 extern HTTPDir *httpdir;
 extern FTPDir *ftpdir;
+#ifdef __SWITCH__
 extern USBMounter *usbmounter;
+#endif
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
 
@@ -101,7 +104,7 @@ extern Tex MPVTexture;
 extern Tex NXMPBannerTexture;
 extern Tex ExitTexture;
 
-
+extern ImFont* fontSmall;
 
 
 

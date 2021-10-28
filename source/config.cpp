@@ -19,6 +19,24 @@ Config::Config(std::string inifile){
 	ini = new CSimpleIniA(true,true);
 	ini->SetUnicode();
 	ini->LoadFile(inifile.c_str());
+	
+	CSimpleIniA::TNamesDepend values;
+	
+	topmenu.push_back("Local Files");
+	topmenu.push_back("USB");
+	
+	ini->GetAllValues("Network", "source", values);
+	if(getNetworks().size() != 0){
+		topmenu.push_back("Network");
+	}
+	
+	if(getEnigma() != ""){
+		topmenu.push_back("Enigma2");
+	}
+	topmenu.push_back("Settings");
+	topmenu.push_back("Info");
+	topmenu.push_back("Exit");
+	
 }
 
 std::vector<networkSource> Config::getNetworks(){
@@ -43,7 +61,13 @@ std::string Config::getStartPath(){
 	const char* pv;
 	pv = ini->GetValue("Main", "startpath");
 	if(pv==nullptr){
+#ifdef __SWITCH__
 		return "/switch/nxmp";
+#else
+#ifdef _WIN32
+		return "c:\\";
+#endif
+#endif
 	}
 	return pv;
 }

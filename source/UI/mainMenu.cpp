@@ -1,7 +1,7 @@
 #include "gui.h"
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "windows.h"
+#include "appwindows.h"
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
@@ -10,7 +10,8 @@
 namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
-		std::vector<std::string> topmenu = {"Local Files","USB","Network","Enigma2","Settings","Info","Exit"};
+		//std::vector<std::string> topmenu = {"Local Files","USB","Network","Enigma2","Settings","Info","Exit"};
+		std::vector<std::string> topmenu = configini->topmenu;
 		
         if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
 			ImGui::SetNextWindowFocus();
@@ -51,10 +52,12 @@ namespace Windows {
 							item.first_item = true;
 						}
 						if(topmenu[n] == "USB"){
+#ifdef __SWITCH__
 							usbInit();
 							item.state = MENU_STATE_USB;
 							usbmounter = new USBMounter();
 							item.first_item = true;
+#endif
 						}
 						if(topmenu[n] == "Network"){
 							item.networksources.clear();
@@ -66,6 +69,7 @@ namespace Windows {
 									
 						}
 						if(topmenu[n] == "Enigma2"){
+							enigma2 = new Enigma2();
 							item.first_item = true;
 							std::string e2uri = configini->getEnigma();
 							if(e2uri == ""){

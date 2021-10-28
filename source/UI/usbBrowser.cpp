@@ -1,7 +1,7 @@
 #include "gui.h"
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "windows.h"
+#include "appwindows.h"
 #include "utils.h"
 #include "localfiles.h"
 
@@ -11,7 +11,7 @@ namespace Windows {
         Windows::SetupWindow();
 		
         if (ImGui::Begin("USB Browser", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
-            
+#ifdef __SWITCH__
             ImGui::SetNextWindowFocus();
             if(item.usbpath == ""){
 				
@@ -79,6 +79,7 @@ namespace Windows {
 				}	
 				ImGui::EndListBox();	
 			}
+#endif
         }
         Windows::ExitWindow();
     }

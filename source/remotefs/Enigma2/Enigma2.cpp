@@ -136,12 +136,17 @@ void Enigma2::m3uParser(char * url){
 		XMLElement * pe2service = pRootElement->FirstChildElement("e2event");
 		while(pe2service){
 			XMLElement * pe2serviceref = pe2service->FirstChildElement("e2eventservicereference");
-			//XMLElement * pe2serviceName = pe2service->FirstChildElement("e2eventservicename");
 			XMLElement * pe2eventTitle = pe2service->FirstChildElement("e2eventtitle");
+			XMLElement * pe2eventStart = pe2service->FirstChildElement("e2eventstart");
+			XMLElement * pe2eventDuration = pe2service->FirstChildElement("e2eventduration");
+			XMLElement * pe2eventCurrTime = pe2service->FirstChildElement("e2eventcurrenttime");
 			if(string(pe2eventTitle->GetText()) != "None"){
 				for(unsigned int i=0;i<e2currbouqet.size();i++){
 					if(string(pe2serviceref->GetText()) == e2currbouqet[i].srvref){
-						e2currbouqet[i].epgtitle = pe2eventTitle->GetText();
+						e2currbouqet[i].epg.title = pe2eventTitle->GetText();
+						pe2eventStart->QueryIntText(&e2currbouqet[i].epg.startTime);
+						pe2eventDuration->QueryIntText(&e2currbouqet[i].epg.duration);
+						pe2eventCurrTime->QueryIntText(&e2currbouqet[i].epg.currTime);
 						break;
 					}
 				}
@@ -165,5 +170,18 @@ bool Enigma2::getServices(){
 	free(chunk->memory);
 	free(chunk);
 	return true;
+}
+
+EnigmaServices Enigma2::getCurrBouquet(){
+	return currbouquet;
+}
+
+void Enigma2::setCurrBouquet(EnigmaServices _bouquet){
+	currbouquet = _bouquet;
+}
+
+void Enigma2::backToTop(){
+	EnigmaServices dummy;
+	currbouquet = dummy;
 }
  

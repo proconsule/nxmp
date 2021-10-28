@@ -1,3 +1,4 @@
+#ifdef __SWITCH__
 #ifndef NXMP_USBFS_H
 #define NXMP_USBFS_H
 
@@ -32,4 +33,5 @@ private:
 
 void usbInit();
 
+#endif
 #endif

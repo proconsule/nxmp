@@ -17,6 +17,7 @@ public:
 	std::string getEnigma();
 	std::string getStartPath();
 	
+	std::vector<std::string> topmenu;
 	CSimpleIniA *ini;
 };
 

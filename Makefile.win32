@@ -1,0 +1,73 @@
+CC=gcc
+CPP=g++
+
+TOPDIR ?= $(CURDIR)
+BUILD		:=	build-win32
+
+TARGET		:=	$(notdir $(CURDIR))
+
+VERSION_MAJOR := 0
+VERSION_MINOR := 2
+VERSION_MICRO := 1
+
+CFLAGS	:=	-g -Wall -Wno-sign-compare -O2 -ffunction-sections 
+CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags`
+CFLAGS	+=	$(INCLUDE) -D_WIN32 -DWIN32_LEAN_AND_MEAN
+
+CFLAGS  += -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) -gdwarf-2 -gstrict-dwarf
+
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
+		-DIMGUI_DISABLE_OBSOLETE_FUNCTIONS -DIMGUI_ENABLE_FREETYPE -fpermissive
+
+
+LIBS	:=  $(shell pkgconf mpv --libs --static) $(shell pkgconf libavcodec --libs --static) -lmpv  `curl-config --libs`  `sdl2-config --static-libs` `freetype-config --libs`  -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -lfreetype -lfribidi -lpng -lbz2 -ltinyxml2 -llua5.1 -ldwmapi -llcms2 -lglfw3 -lopengl32 -lmingw32 -lSDLmain -lSDL2 -mwindows -liconv -lm -luser32 -lgdi32 -lwinmm -ldxguid -lws2_32 -lavrt -lz
+
+ 
+SOURCES		:=	libs/glad/src/ libs/imgui libs/imgui/misc/freetype source source/UI source/remotefs/Enigma2 source/remotefs/ftplib source/remotefs/HTTPDir
+INCLUDES	:=	/mingw64/include/ libs/glad/include libs/simpleini libs/imgui include source/remotefs/Enigma2 source/remotefs/ftplib source/remotefs/HTTPDir
+
+
+ifneq ($(BUILD),$(notdir $(CURDIR)))
+
+export OUTPUT	:=	$(CURDIR)/$(TARGET)
+
+export TOPDIR	:=	$(CURDIR)
+export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
+			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+			-I$(CURDIR)/$(BUILD)
+
+export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
+			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
+
+CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp))) 
+
+export OFILES_SRC	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
+export OFILES 	:=	$(OFILES_BIN) $(OFILES_SRC)
+
+.PHONY: $(BUILD) clean all
+
+
+all: $(BUILD)
+
+$(BUILD):
+	@[ -d $@ ] || mkdir -p $@
+	@$(MAKE) -C $(BUILD) -f ../Makefile.win32
+
+clean:
+	@echo clean ...
+	@rm -fr $(BUILD) imgui-test.exe
+	
+
+else
+
+
+all: $(OUTPUT).exe
+	
+%.o: %.cpp
+	$(CPP) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+$(OUTPUT).exe:	$(OFILES)
+	$(CPP) $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
+	
+endif

@@ -63,14 +63,60 @@ namespace GUI {
 		SDL_Event event;
 			while (SDL_PollEvent(&event)) {
 				ImGui_ImplSDL2_ProcessEvent(&event);
-				if (event.type == SDL_JOYBUTTONDOWN) {
-					Uint8 button = event.jbutton.button;
-					if (button == SDL_KEY_PLUS)
-						renderloopdone = true;
+#ifndef __SWITCH__
+				if (event.type == SDL_KEYDOWN) {
+					Uint8 keycode = event.key.keysym.sym;
+					if(keycode == SDLK_ESCAPE){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_PLUS;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_y){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_Y;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_b){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_B;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_a){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_A;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_x){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_X;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_r){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_R;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_l){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_L;
+						SDL_PushEvent(&sdlevent);
+					}
+					
 				}
+#endif
 				if (event.type == SDL_JOYBUTTONDOWN) {
 					
 					Uint8 button = event.jbutton.button;
+					if (button == SDL_KEY_PLUS)
+						renderloopdone = true;
+					
 					if (button == SDL_KEY_RSTICK){
 						if(item.state == MENU_STATE_PLAYER){
 							toggleMasterLock();
@@ -145,10 +191,12 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_Y && !item.masterlock){
 						if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER){
+#ifdef __SWITCH__
 							if(usbmounter != nullptr){
 								delete usbmounter;
 								usbmounter = nullptr;
 							}
+#endif
 							if(ftpdir != nullptr){
 								delete ftpdir;
 								ftpdir = nullptr;
@@ -157,6 +205,10 @@ namespace GUI {
 								delete httpdir;
 								httpdir = nullptr;
 							}
+							if(enigma2 != nullptr){
+								delete enigma2;
+								enigma2 = nullptr;
+							}
 							item.localpath = configini->getStartPath();
 							item.networkselect = true;
 							item.first_item = true;
@@ -164,14 +216,12 @@ namespace GUI {
 							item.usbpath = "";
 							
 						}
-						
+										
 					}
 					if (button == SDL_KEY_B){
 						if(item.state == MENU_STATE_ENIGMABROWSER && libmpv->Stopped()){
 							item.first_item = true;
-							if(item.enigma2bouquet != ""){
-								item.enigma2bouquet = "";
-							}
+							enigma2->backToTop();
 						}
 						
 						if(item.state == MENU_STATE_NETWORKBROWSER && libmpv->Stopped()){
@@ -189,12 +239,15 @@ namespace GUI {
 						}
 						
 						if(item.state == MENU_STATE_USB && libmpv->Stopped()){
-							item.first_item = true;
-							if(item.usbpath != item.usbbasepath){
-								item.usbpath = item.usbpath.substr(0, item.usbpath.find_last_of("\\/"));
-								if(item.usbpath == "")item.usbpath=item.usbbasepath;
+							if(item.usbbasepath != ""){
+								item.first_item = true;
+								if(item.usbpath != item.usbbasepath){
+									item.usbpath = item.usbpath.substr(0, item.usbpath.find_last_of("\\/"));
+									if(item.usbpath == "")item.usbpath=item.usbbasepath;
+								}
+								
+								item.usbfileentries = FS::getDirList(item.usbpath.c_str(),true,Utility::getMediaExtensions());
 							}
-							item.usbfileentries = FS::getDirList(item.usbpath.c_str(),true,Utility::getMediaExtensions());
 						}
 						
 						if(item.state == MENU_STATE_FILEBROWSER && libmpv->Stopped()){
@@ -202,15 +255,6 @@ namespace GUI {
 							item.localpath = FS::backPath(item.localpath);
 							item.localfileentries = FS::getDirList(item.localpath,true,Utility::getMediaExtensions());
 							
-						}
-						
-						if(item.state == MENU_STATE_USB && libmpv->Stopped()){
-							item.first_item = true;
-							if(item.usbpath != "ums0:/"){
-								item.usbpath = item.usbpath.substr(0, item.usbpath.find_last_of("\\/"));
-								if(item.usbpath == "")item.usbpath="/";
-							}
-							//FS::GetDirList(item.usbpath.c_str(),item.localfileentries);	
 						}
 						
 						if(!libmpv->Stopped()  && !item.masterlock){

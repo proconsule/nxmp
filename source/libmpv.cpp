@@ -19,7 +19,9 @@ libMpv::libMpv(const std::string &configDir) {
     mpv_set_option_string(handle, "video-timing-offset", "0");
 	mpv_set_option_string(handle, "osd-bar-align-y", "0.9");
 	mpv_set_option_string(handle, "fbo-format", "rgba8");
-	
+#ifdef _WIN32
+	mpv_set_option_string(handle, "hwdec", "auto-copy");
+#endif
 	
 	printf("MPV Handle initialize\n");
     int res = mpv_initialize(handle);

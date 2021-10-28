@@ -1,7 +1,7 @@
 #include "gui.h"
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "windows.h"
+#include "appwindows.h"
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
@@ -10,19 +10,23 @@
 namespace Windows {
     void EnigmaWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
-		static unsigned int item_current_idx = 0;
-        std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
+		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		
         if (ImGui::Begin("Enigma2", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
 			ImGui::SetNextWindowFocus();
+			if (ImGui::BeginMenuBar()) {
+				ImGui::Text("%s",enigma2->getCurrBouquet().name.c_str());
+				ImGui::EndMenuBar();
+			}
             if (ImGui::BeginListBox("Enigma2 Browser Menu",ImVec2(1280.0f, 720.0f))){
-				if(item.enigma2bouquet == ""){
+				if(enigma2->getCurrBouquet().bouquetref == ""){
 					for (unsigned int n = 0; n < enigma2->e2services.size(); n++){
 						static int selected = -1;
+						
 						if (ImGui::Selectable(enigma2->e2services[n].name.c_str(), selected == n)){
 			
 							enigma2->m3uParser((char *)enigma2->e2services[n].bouquetref.c_str());
-							item.enigma2bouquet =  enigma2->e2services[n].bouquetref;
+							enigma2->setCurrBouquet(enigma2->e2services[n]);
 						}
 						if (selected)
 							ImGui::SetItemDefaultFocus();
@@ -32,21 +36,37 @@ namespace Windows {
 						ImGui::SetFocusID(ImGui::GetID(enigma2->e2services[0].name.c_str()), ImGui::GetCurrentWindow());
 						*first_item = false;
 					}
-				}else if(item.enigma2bouquet != ""){
+				}else if(enigma2->getCurrBouquet().bouquetref != ""){
 					for (unsigned int n = 0; n < enigma2->e2currbouqet.size(); n++){
 						static int selected = -1;
-						std::string channame = std::to_string(n) + std::string(". ") +enigma2->e2currbouqet[n].name;
-						if (ImGui::Selectable(channame.c_str(), selected == n)){
+						std::string itemid = "##" + std::to_string(n);
+						float currstartpos = ImGui::GetCursorPosX();
+						if (ImGui::Selectable(itemid.c_str(), selected == n, 0, ImVec2(0, 70))){
 									
 							const char *cmd[] = {"loadfile", enigma2->e2currbouqet[n].url.c_str(), NULL};
 							mpv_command_async(libmpv->getHandle(), 0, cmd);
 						}
+						ImGui::SameLine();
+						ImGui::SetCursorPosX(currstartpos);
+						ImGui::Text("%s",enigma2->e2currbouqet[n].name.c_str());
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY()-40.0f);
+						ImGui::PushFont(fontSmall);
+						ImGui::Text(u8"%s",enigma2->e2currbouqet[n].epg.title.c_str());
+						ImGui::PopFont();
+						float progressval = (float)(enigma2->e2currbouqet[n].epg.currTime-enigma2->e2currbouqet[n].epg.startTime)/(float)enigma2->e2currbouqet[n].epg.duration;
+						std::string progressid = std::string("progress") + itemid;
+						if(enigma2->e2currbouqet[n].epg.title == "")progressval=0.0f;
+						ImGui::PushStyleColor(ImGuiCol_PlotHistogram,ImVec4(1.0f,1.0f,1.0f,0.6f));
+						ImGui::ProgressBar(progressval,ImVec2(-1.0f,15),"");
+						ImGui::PopStyleColor(1);
+						ImGui::Separator();
 						if (selected)
 						ImGui::SetItemDefaultFocus();
+					
 					}
 					if (*first_item) {
-						std::string channame = std::to_string(0) + std::string(". ") +enigma2->e2currbouqet[0].name;
-						ImGui::SetFocusID(ImGui::GetID(channame.c_str()), ImGui::GetCurrentWindow());
+						std::string itemid = "##" + std::to_string(0);
+						ImGui::SetFocusID(ImGui::GetID(itemid.c_str()), ImGui::GetCurrentWindow());
 						*first_item = false;
 					}
 				}

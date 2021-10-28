@@ -1,6 +1,8 @@
 #include <cstdio>
 #include "usbfs.h"
 
+#ifdef __SWITCH__
+
 static UEvent *g_statusChangeEvent, g_exitEvent;
 static UsbHsFsDevice *g_usbDevices;
 static u32 g_usbDeviceCount;
@@ -132,3 +134,4 @@ void usbInit() {
 
 }
 
+#endif

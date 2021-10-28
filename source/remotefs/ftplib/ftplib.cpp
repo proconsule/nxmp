@@ -1167,6 +1167,8 @@ std::vector<FS::FileEntry> FtpDirList(const char *p, netbuf *nControl,const std:
     std::vector<FS::FileEntry> files;
 
     if (!FtpAccess(p, FTPLIB_DIR_VERBOSE, FTPLIB_ASCII, nControl, &nData)) {
+		printf("FtpAccess Fail\n");
+		fflush(stdout);
         return files;
     }
 

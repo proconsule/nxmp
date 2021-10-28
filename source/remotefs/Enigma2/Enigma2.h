@@ -17,17 +17,24 @@ struct MemoryStruct {
   size_t size;
 };
 
+struct epgStruct{
+	string title;
+	int startTime;
+	int duration;
+	int currTime;
+};
+
 struct ChannelStruct{
 	string name;
 	string url;
 	string srvref;
-	string epgtitle;
+	epgStruct epg;
 };
 
 
 struct EnigmaServices{
-	std::string name;
-	std::string bouquetref;
+	std::string name = "";
+	std::string bouquetref = "";
 	
 };
 
@@ -38,10 +45,18 @@ public:
 	void m3uParser(char * url);
 	void curlDownload(char * url ,MemoryStruct * chunk);
 	
+	void backToTop();
+	EnigmaServices getCurrBouquet();
+	void setCurrBouquet(EnigmaServices _bouquet);
+	
 	bool getServices();
 	
 	vector<ChannelStruct> e2currbouqet;
 	vector<EnigmaServices> e2services;
+	
+	private:
+	
+	EnigmaServices currbouquet;
 	
 	
 };

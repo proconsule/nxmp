@@ -1,4 +1,6 @@
+#ifdef __SWITCH__
 #include <switch.h>
+#endif
 
 #include <stdio.h>
 #include <ctype.h>
@@ -26,12 +28,14 @@ static bool init();
 
 SDL_Window *window;
 SDL_GLContext context;
-libMpv *libmpv;
+libMpv *libmpv = nullptr;
 FTPDir *ftpdir = nullptr;
 HTTPDir *httpdir = nullptr;
+#ifdef __SWITCH__
 USBMounter *usbmounter = nullptr;
+#endif
 Config *configini;
-Enigma2 *enigma2;
+Enigma2 *enigma2 = nullptr;
 uint32_t wakeup_on_mpv_render_update;
 uint32_t wakeup_on_mpv_events;
 
@@ -61,6 +65,7 @@ Tex MPVTexture;
 Tex NXMPBannerTexture;
 Tex ExitTexture;
 
+ImFont* fontSmall;
 
 
 const GLuint WIDTH = 1280, HEIGHT = 720;
@@ -108,23 +113,30 @@ static bool init() {
     return success;
 }
 
-
+#ifdef __SWITCH__
 int main() {
-	
+#else
+int main(int argc,char *argv[]){
+#endif
+
+
+#ifdef __SWITCH__
 	socketInitializeDefault();
 #ifdef NDEBUG
 	nxlinkStdio();
 #endif	
+#endif
 	printf("Loading Config\n");
 	
 	configini = new Config("config.ini");
 	
-	
+#ifdef __SWITCH__
 	Result ret;
 	if (R_FAILED(ret = romfsInit())) {
 		printf("romfsInit() failed: 0x%x\n", ret);
 		return ret;
 	}
+#endif
 	printf("Init GUI\n");
 	if ( init() ) {
 		
@@ -148,12 +160,13 @@ int main() {
 		ImGui_ImplOpenGL3_Init("#version 330 core");
 		
 		
-		
+#ifdef __SWITCH__
 		plInitialize(PlServiceType_System);
 		if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {
 			printf("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
 			return ret;
 		}
+#endif
 		printf("Init Fonts\n");
         //PlFontData standard, fonts_ext;
 		//if (R_FAILED(ret = plGetSharedFontByType(&standard, PlSharedFontType_Standard))) {
@@ -170,7 +183,13 @@ int main() {
 		
 		font_cfg.FontDataOwnedByAtlas = false;
 		printf("Loading TTF\n");
+#ifdef __SWITCH__
 		io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());
+		fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());
+#else
+		io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());
+		fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());;
+#endif
 		font_cfg.MergeMode = true;
 		//io.Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 28.0f, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
 		
@@ -203,7 +222,13 @@ int main() {
 	
 	printf("Loading Extended Chars\n");
     //io.Fonts->AddFontFromMemoryTTF (fonts_ext.address, fonts_ext.size, 24.0f, &font_cfg, ranges);
-	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
+#ifdef __SWITCH__
+//	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
+//	fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
+#else
+	io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
+	fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
+#endif
 		
 		
 	io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
@@ -212,35 +237,48 @@ int main() {
 	
 	
 	printf("Loading Textures\n");
-	Utility::TxtLoadPNGFromFile("romfs:/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/usb.png",&UsbTexture.id,&UsbTexture.width,&UsbTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/network.png",&NetworkTexture.id,&NetworkTexture.width,&NetworkTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/settings.png",&SettingsTexture.id,&SettingsTexture.width,&SettingsTexture.height);
-	
-	Utility::TxtLoadPNGFromFile("romfs:/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
-	
-	Utility::TxtLoadPNGFromFile("romfs:/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
-	Utility::TxtLoadPNGFromFile("romfs:/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
-	
-	
-	Utility::TxtLoadJPGFromFile("romfs:/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
-	
+#ifdef __SWITCH__
+	Utility::TxtLoadFromFile("romfs:/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
+	Utility::TxtLoadFromFile("romfs:/usb.png",&UsbTexture.id,&UsbTexture.width,&UsbTexture.height);
+	Utility::TxtLoadFromFile("romfs:/network.png",&NetworkTexture.id,&NetworkTexture.width,&NetworkTexture.height);
+	Utility::TxtLoadFromFile("romfs:/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
+	Utility::TxtLoadFromFile("romfs:/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
+	Utility::TxtLoadFromFile("romfs:/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
+	Utility::TxtLoadFromFile("romfs:/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
+	Utility::TxtLoadFromFile("romfs:/settings.png",&SettingsTexture.id,&SettingsTexture.width,&SettingsTexture.height);
+	Utility::TxtLoadFromFile("romfs:/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
+	Utility::TxtLoadFromFile("romfs:/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
+	Utility::TxtLoadFromFile("romfs:/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
+	Utility::TxtLoadFromFile("romfs:/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
+	Utility::TxtLoadFromFile("romfs:/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
+	Utility::TxtLoadFromFile("romfs:/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
+#else
+	Utility::TxtLoadFromFile("./romfs/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
+	Utility::TxtLoadFromFile("./romfs/usb.png",&UsbTexture.id,&UsbTexture.width,&UsbTexture.height);
+	Utility::TxtLoadFromFile("./romfs/network.png",&NetworkTexture.id,&NetworkTexture.width,&NetworkTexture.height);
+	Utility::TxtLoadFromFile("./romfs/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
+	Utility::TxtLoadFromFile("./romfs/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
+	Utility::TxtLoadFromFile("./romfs/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
+	Utility::TxtLoadFromFile("./romfs/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
+	Utility::TxtLoadFromFile("./romfs/settings.png",&SettingsTexture.id,&SettingsTexture.width,&SettingsTexture.height);
+	Utility::TxtLoadFromFile("./romfs/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
+	Utility::TxtLoadFromFile("./romfs/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
+	Utility::TxtLoadFromFile("./romfs/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
+	Utility::TxtLoadFromFile("./romfs/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
+	Utility::TxtLoadFromFile("./romfs/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
+	Utility::TxtLoadFromFile("./romfs/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
+#endif	
 	
 	printf("Init Enigma2\n");
-	enigma2 = new Enigma2();
 	
 	item.localpath = configini->getStartPath();
 	
 	GUI::RenderLoop();
 	printf("Ending Render Loop\n");
-	delete(libmpv);
-	delete(enigma2);
+	delete libmpv;
+	libmpv = nullptr;
+	delete enigma2;
+	enigma2 = nullptr;
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -252,9 +290,11 @@ int main() {
 	
 	
 	printf("Exit Services\n");
+#ifdef __SWITCH__
 	ncmExit();
 	plExit();
 	romfsExit();
     socketExit();
+#endif
     return 0;	
 }
