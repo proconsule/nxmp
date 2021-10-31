@@ -26,19 +26,5 @@ namespace Windows {
     
 }
 
-namespace PlayerWindows {
-	inline void SetupWindow(void) {
-        ImGui::SetNextWindowPos(ImVec2(0.0f, 600.0f), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(1280.0f, 120.0f), ImGuiCond_Once);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    };
-	inline void ExitWindow(void) {
-        ImGui::End();
-        ImGui::PopStyleVar();
-    };
-	
-	void PlayerControls();
-	
-}
 
 #endif

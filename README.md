@@ -43,6 +43,8 @@ Buttons Mapping
 - R L ZR ZL (seek +/-  during playback)
 - \+ Exit NXMP
 - R Stick Button Toggle Masterlock (during playback, only A button will work)
+- Dpad Right (during playback show right menu)
+- Dpad Left (during playback close right menu)
 
 
 FAQ
@@ -58,6 +60,7 @@ FAQ
 Thanks to
 -----
 - Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv part)
+- DarkMatterCore for libusbhsfs https://github.com/DarkMatterCore/libusbhsfs (this gives NXMP USB support)
 - bodyXY @ GBATemp forum for banner and icons
 - docgold @ GBATemp forum for Enigma2 samples and support on decoders
 - tataniko @ GBATemp forum for suggestions and bug hunting

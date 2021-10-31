@@ -41,7 +41,8 @@ namespace Utility{
 	std::string toUpper(const std::string &str);
 	bool endsWith(const std::string &value, const std::string &ending, bool sensitive);
 	std::vector<std::string> getMediaExtensions();
-	std::string humanSize(uint64_t bytes);
+	std::string humanSize(size_t bytes);
+	std::string str_tolower(std::string s);
 }
 
 #endif

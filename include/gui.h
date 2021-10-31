@@ -9,6 +9,8 @@
 #endif
 #include <glad/glad.h>
 #include "appwindows.h"
+#include "apppopups.h"
+#include "playerwindows.h"
 #include "libmpv.h"
 #include "config.h"
 #include "remotefs.h"
@@ -33,10 +35,29 @@ enum MENU_STATES {
 	MENU_STATE_PLAYER
 };
 
+enum APP_POPUP_STATES {
+	POPUP_STATE_NONE,
+	POPUP_STATE_SAVE_SETTINGS
+};
+
+enum PLAYER_RIGHT_MENU_STATES {
+	PLAYER_RIGHT_MENU_PLAYER,
+	PLAYER_RIGHT_MENU_HOME,
+	PLAYER_RIGHT_MENU_TRACKS,
+	PLAYER_RIGHT_MENU_TRACKS_VIDEO,
+	PLAYER_RIGHT_MENU_TRACKS_AUDIO,
+	PLAYER_RIGHT_MENU_TRACKS_SUB,
+	PLAYER_RIGHT_MENU_CHAPTERS,
+	PLAYER_RIGHT_MENU_ARATIO,
+	PLAYER_RIGHT_MENU_CUSTOMARATIO
+};
+
 
 typedef struct {
     MENU_STATES state = MENU_STATE_HOME;
 	MENU_STATES laststate = MENU_STATE_FILEBROWSER;
+	PLAYER_RIGHT_MENU_STATES rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
+	APP_POPUP_STATES popupstate = POPUP_STATE_NONE;
 	int selected = 0;
 	std::string localpath = "/switch/nxmp";
 	std::vector<FS::FileEntry> localfileentries;
@@ -55,6 +76,9 @@ typedef struct {
 	
 	bool first_item;
 	bool focus;
+	
+	bool rightmenu_first_item;
+	bool rightmenu_focus;
 	
     
 } MenuItem;

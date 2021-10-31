@@ -81,12 +81,12 @@ namespace Utility{
 		return true;
 	}
 	
-	std::string humanSize(uint64_t bytes)
+	std::string humanSize(size_t bytes)
 	{
 		std::vector<std::string>suffix = {"B", "KB", "MB", "GB", "TB"};
 	
 		int i = 0;
-		double dblBytes = bytes;
+		 double dblBytes = bytes;
 
 		if (bytes > 1024) {
 			for (i = 0; (bytes / 1024) > 0 && i<(int)suffix.size()-1; i++, bytes /= 1024)

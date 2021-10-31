@@ -34,9 +34,7 @@ namespace GUI {
 		libmpv = new libMpv("mpv");
 		wakeup_on_mpv_render_update = SDL_RegisterEvents(1);
 		wakeup_on_mpv_events        = SDL_RegisterEvents(1);
-		//mpv_set_wakeup_callback(libmpv->getHandle(), [](void *) -> void {SDL_Event event = {.type = wakeup_on_mpv_events}; SDL_PushEvent(&event);}, NULL);
 		mpv_set_wakeup_callback(libmpv->getHandle(), on_mpv_events, NULL);
-
 		mpv_render_context_set_update_callback(libmpv->getContext(), [](void *) -> void { SDL_Event event = {.type = wakeup_on_mpv_render_update}; SDL_PushEvent(&event); }, NULL);
 	
 	}
@@ -70,6 +68,18 @@ namespace GUI {
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_JOYBUTTONDOWN;
 						sdlevent.jbutton.button = SDL_KEY_PLUS;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_m){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_DRIGHT;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_n){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_DLEFT;
 						SDL_PushEvent(&sdlevent);
 					}
 					if(keycode == SDLK_y){
@@ -114,8 +124,29 @@ namespace GUI {
 				if (event.type == SDL_JOYBUTTONDOWN) {
 					
 					Uint8 button = event.jbutton.button;
-					if (button == SDL_KEY_PLUS)
+					if (button == SDL_KEY_PLUS && !item.masterlock)
 						renderloopdone = true;
+					
+					if (button == SDL_KEY_DRIGHT){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
+							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO){
+									item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+								}
+							}
+						}
+					}
+					
+					if (button == SDL_KEY_DLEFT){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
+							if(item.rightmenustate != PLAYER_RIGHT_MENU_PLAYER){
+								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO){
+									item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
+								}
+								
+							}
+						}
+					}
 					
 					if (button == SDL_KEY_RSTICK){
 						if(item.state == MENU_STATE_PLAYER){
@@ -130,41 +161,28 @@ namespace GUI {
 					
 					if (button == SDL_KEY_ZR){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
-							if(item.playershowcontrols){
-								libmpv->seekOSD(libmpv->getPosition() + 60.0);
-							}else{
-								libmpv->seekSilent(libmpv->getPosition() + 60.0);
-							}
+							libmpv->seek(libmpv->getPosition() + configini->getLongSeek(false),item.playershowcontrols);
 						}
 						
 					}
 					if (button == SDL_KEY_ZL){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
-							if(item.playershowcontrols){
-								libmpv->seekOSD(libmpv->getPosition() - 60.0);
-							}else{
-								libmpv->seekSilent(libmpv->getPosition() - 60.0);
-							}
+							libmpv->seek(libmpv->getPosition() - configini->getLongSeek(false),item.playershowcontrols);
+						
 						}
 						
 					}
 					if (button == SDL_KEY_R){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
-							if(item.playershowcontrols){
-								libmpv->seekOSD(libmpv->getPosition() + 10.0);
-							}else{
-								libmpv->seekSilent(libmpv->getPosition() + 10.0);
-							}
+							libmpv->seek(libmpv->getPosition() + configini->getShortSeek(false),item.playershowcontrols);
+						
 						}
 						
 					}
 					if (button == SDL_KEY_L){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
-							if(item.playershowcontrols){
-								libmpv->seekOSD(libmpv->getPosition() - 10.0);
-							}else{
-								libmpv->seekSilent(libmpv->getPosition() - 10.0);
-							}
+							libmpv->seek(libmpv->getPosition() - configini->getShortSeek(false),item.playershowcontrols);
+						
 						}
 						
 					}
@@ -182,15 +200,17 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_A){
 						if(item.state == MENU_STATE_PLAYER){
-							if(libmpv->Paused()){
-								libmpv->Resume();
-							}else{
-								libmpv->Pause();
+							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+								if(libmpv->Paused()){
+									libmpv->Resume();
+								}else{
+									libmpv->Pause();
+								}
 							}
 						}
 					}
 					if (button == SDL_KEY_Y && !item.masterlock){
-						if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER){
+						if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER && item.popupstate == POPUP_STATE_NONE){
 #ifdef __SWITCH__
 							if(usbmounter != nullptr){
 								delete usbmounter;
@@ -257,9 +277,29 @@ namespace GUI {
 							
 						}
 						
-						if(!libmpv->Stopped()  && !item.masterlock){
-							item.state = item.laststate;
-							libmpv->Stop();
+						if(item.state == MENU_STATE_PLAYER){
+							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+								if(!libmpv->Stopped()  && !item.masterlock){
+									item.state = item.laststate;
+									libmpv->Stop();
+								}
+							}else if(item.rightmenustate == PLAYER_RIGHT_MENU_TRACKS){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_TRACKS_VIDEO||item.rightmenustate == PLAYER_RIGHT_MENU_TRACKS_AUDIO||item.rightmenustate == PLAYER_RIGHT_MENU_TRACKS_SUB){
+								item.rightmenustate = PLAYER_RIGHT_MENU_TRACKS;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_CHAPTERS){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_ARATIO){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_CUSTOMARATIO){
+								item.rightmenustate = PLAYER_RIGHT_MENU_ARATIO;
+							}
+							
+							
 						}
 					}
 				}
@@ -279,19 +319,29 @@ namespace GUI {
 						if (strstr(msg->text, "DR image"))
 							printf("log: %s", msg->text);
 						continue;
-					}if (mp_event->event_id == MPV_EVENT_START_FILE) {
+					}
+					if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
+						libmpv->getfileInfo();
+					}
+					if (mp_event->event_id == MPV_EVENT_START_FILE) {
+#ifdef __SWITCH__
+						appletSetMediaPlaybackState(true);
+#endif
 						printf("START FILE\n");
 						item.laststate = item.state;
 						item.state = MENU_STATE_PLAYER;
 					}
-					printf("Event id: %d\n",mp_event->event_id);
+					//printf("Event id: %d\n",mp_event->event_id);
 					if (mp_event->event_id == MPV_EVENT_END_FILE) {
+#ifdef __SWITCH__
+						appletSetMediaPlaybackState(false);
+#endif
 						printf("END FILE\n");
 						item.state = item.laststate;
 						item.masterlock = false;
 						printf("MENU STATE: %d\n",item.state );
 					}
-					
+				
 					count --;
 					printf("event: %s\n", mpv_event_name(mp_event->event_id));
 					}
@@ -321,27 +371,57 @@ namespace GUI {
 					break;
 				case MENU_STATE_SETTINGS:
 					Windows::SettingsMenuWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_SAVE_SETTINGS){
+						Popups::SaveSettingsPopup();
+					}
 					break;
 				case MENU_STATE_INFO:
 					Windows::InfoMenuWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_PLAYER:
-					if(item.playershowcontrols){
-						//PlayerWindows::PlayerControls();
-					}
 					break;
 				
+				
+			}
+			
+			switch (item.rightmenustate) {
+				case PLAYER_RIGHT_MENU_PLAYER:
+					break;
+				case PLAYER_RIGHT_MENU_HOME:
+					playerWindows::RightHomeWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_TRACKS:
+					playerWindows::RightTrackWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_TRACKS_VIDEO:
+					playerWindows::RightTrackVideoWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_TRACKS_AUDIO:
+					playerWindows::RightTrackAudioWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_TRACKS_SUB:
+					playerWindows::RightTrackSubWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_CHAPTERS:
+					playerWindows::RightChapterWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_ARATIO:
+					playerWindows::RightHomeARatio(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_CUSTOMARATIO:
+					playerWindows::RightHomeCustomARatio(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
 				
 			}
 		
 	}
 	
 	void HandleRender(){
-		 ImGui::Render();
-		 ImGuiIO &io = ImGui::GetIO();
-		 glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
-		 glClearColor(0.00f, 0.00f, 0.00f, 1.00f);
-		 glClear(GL_COLOR_BUFFER_BIT);
+		ImGui::Render();
+		ImGuiIO &io = ImGui::GetIO();
+		glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
+		glClearColor(0.00f, 0.00f, 0.00f, 1.00f);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
@@ -361,7 +441,6 @@ namespace GUI {
 			mpv_render_context_render(libmpv->getContext(), params);
 		}
     	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 		SDL_GL_SwapWindow(window);
 
 	}

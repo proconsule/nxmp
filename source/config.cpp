@@ -16,11 +16,17 @@ std::vector<std::string> char_split (const std::string &s, char delim) {
 }
 
 Config::Config(std::string inifile){
+	inifilePath = inifile;
 	ini = new CSimpleIniA(true,true);
 	ini->SetUnicode();
 	ini->LoadFile(inifile.c_str());
 	
 	CSimpleIniA::TNamesDepend values;
+	
+	longseek = ini->GetLongValue("Main", "longseek");
+	shortseek = ini->GetLongValue("Main", "shortseek");
+	tmplongseek = longseek;
+	tmpshortseek = shortseek;
 	
 	topmenu.push_back("Local Files");
 	topmenu.push_back("USB");
@@ -80,5 +86,38 @@ std::string Config::getEnigma(){
 	}
 	return pv;
 	
+}
+
+int Config::getLongSeek(bool tmpvalue){
+	if(tmpvalue){
+		return tmplongseek;
+	}
+	return longseek; 
+}
+
+int Config::getShortSeek(bool tmpvalue){
+	if(tmpvalue){
+		return tmpshortseek;
+	}
+	return shortseek;
+}
+
+void Config::setLongSeek(int seektime){
+	tmplongseek = seektime;
+}
+void Config::setShortSeek(int seektime){
+	tmpshortseek = seektime;
+}
+
+void Config::saveSettings(){
+	longseek = tmplongseek;
+	shortseek = tmpshortseek;
+	ini->Delete("Main", "shortseek");
+	ini->SetLongValue("Main", "shortseek", shortseek, NULL, false);
+	ini->Delete("Main", "longseek");
+	ini->SetLongValue("Main", "longseek", longseek, NULL, false);
+	std::string data;
+	int rc = ini->Save(data);
+	rc = ini->SaveFile(inifilePath.c_str());
 }
 

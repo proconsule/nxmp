@@ -82,6 +82,8 @@ namespace Windows {
 							}
 						}
 						if(topmenu[n] == "Settings"){
+							configini->setLongSeek(configini->getLongSeek(false));
+							configini->setShortSeek(configini->getShortSeek(false));
 							item.state = MENU_STATE_SETTINGS;
 						}
 						if(topmenu[n] == "Info"){
