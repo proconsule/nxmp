@@ -10,7 +10,6 @@
 namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
-		//std::vector<std::string> topmenu = {"Local Files","USB","Network","Enigma2","Settings","Info","Exit"};
 		std::vector<std::string> topmenu = configini->topmenu;
 		
         if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
@@ -48,7 +47,8 @@ namespace Windows {
 					if (ImGui::Selectable(topmenu[n].c_str(), selected == n)){
 						if(topmenu[n] == "Local Files"){
 							item.state = MENU_STATE_FILEBROWSER;
-							item.localfileentries = FS::getDirList(item.localpath,true,Utility::getMediaExtensions());
+							localdir = new localFs(configini->getStartPath());
+							localdir->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 							item.first_item = true;
 						}
 						if(topmenu[n] == "USB"){
@@ -56,15 +56,14 @@ namespace Windows {
 							usbInit();
 							item.state = MENU_STATE_USB;
 							usbmounter = new USBMounter();
-							item.first_item = true;
+							//item.first_item = true;
+							
 #endif
 						}
 						if(topmenu[n] == "Network"){
 							item.networksources.clear();
 							item.networksources = configini->getNetworks();
 							item.state = MENU_STATE_NETWORKBROWSER;
-							item.networkurl = "";
-							item.networklastpath = "";
 							item.first_item = true;
 									
 						}
@@ -97,9 +96,10 @@ namespace Windows {
 					ImGui::SetItemDefaultFocus();
 				}
 				if (*first_item) {
-					ImGui::SetFocusID(ImGui::GetID((topmenu[0].c_str())), ImGui::GetCurrentWindow());
+					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
+					ImGui::ScrollToItem();
 					*first_item = false;
-                }
+				}
 			}				
 			ImGui::EndListBox();
 		}	

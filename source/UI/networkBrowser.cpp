@@ -8,6 +8,121 @@
 
 
 namespace Windows {
+	
+	void FtpWindow(bool *focus, bool *first_item){
+		Windows::SetupWindow();
+		if (ImGui::Begin("Ftp Browser", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+           
+            ImGui::SetNextWindowFocus();
+           
+			if (ImGui::BeginMenuBar()) {
+				ImGui::Text("current path: %s",ftpdir->getCurrPath().c_str());
+				ImGui::EndMenuBar();
+			}
+			if (ImGui::BeginListBox("Ftp Browser Menu",ImVec2(1280.0f, 720.0f))){
+				//ImGui::Text("Current Dir: %s\n",item.networklastpath.c_str());
+				int total_w = ImGui::GetContentRegionAvail().x;
+				std::vector<FS::FileEntry> thislist = ftpdir->getCurrList();
+				for(unsigned int n=0;n<thislist.size();n++){
+						
+						if(thislist[n].type == FS::FileEntryType::Directory){
+							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+						}else{
+							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+						}
+						ImGui::SameLine();
+						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+					
+						urlschema thisurl = Utility::parseUrl(ftpdir->getUrl());
+						static int selected = -1;
+						if (ImGui::Selectable(thislist[n].name.c_str(), selected == n)){
+										
+							if(thislist[n].type == FS::FileEntryType::Directory){
+								item.first_item = true;
+								ftpdir->DirList(thislist[n].path + thislist[n].name,Utility::getMediaExtensions());
+									
+							}else if (thislist[n].type == FS::FileEntryType::File){
+											
+									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + thislist[n].path + thislist[n].name;
+									const char *cmd[] = {"loadfile", openurl.c_str(), NULL};
+									mpv_command_async(libmpv->getHandle(), 0, cmd);
+							}
+						}
+							
+						if(thislist[n].type == FS::FileEntryType::File){
+							ImGui::SameLine(total_w-150);
+							ImGui::Text("%s",Utility::humanSize(thislist[n].size).c_str());
+						}
+						
+								
+				}
+				if (*first_item && thislist.size() >0) {
+					ImGui::SetFocusID(ImGui::GetID((thislist[0].name.c_str())), ImGui::GetCurrentWindow());
+					*first_item = false;
+				}	
+			}
+			ImGui::EndListBox();
+		}
+		Windows::ExitWindow();
+	}
+	
+	void HttpWindow(bool *focus, bool *first_item){
+		Windows::SetupWindow();
+		if (ImGui::Begin("Http Browser", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+           
+            ImGui::SetNextWindowFocus();
+           
+			if (ImGui::BeginMenuBar()) {
+				ImGui::Text("current path: %s",httpdir->getCurrPath().c_str());
+				ImGui::EndMenuBar();
+			}
+			if (ImGui::BeginListBox("Http Browser Menu",ImVec2(1280.0f, 720.0f))){
+				//ImGui::Text("Current Dir: %s\n",item.networklastpath.c_str());
+				std::vector<FS::FileEntry> thislist = httpdir->getCurrList();
+				for(unsigned int n=0;n<thislist.size();n++){
+						
+						if(thislist[n].type == FS::FileEntryType::Directory){
+							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+						}else{
+							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+						}
+						ImGui::SameLine();
+						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+					
+						static int selected = -1;
+						if (ImGui::Selectable(thislist[n].name.c_str(), selected == n)){
+										
+							if(thislist[n].type == FS::FileEntryType::Directory){
+								item.first_item = true;
+								httpdir->DirList(httpdir->getCurrPath() + thislist[n].path,Utility::getMediaExtensions());
+									
+							}else if (thislist[n].type == FS::FileEntryType::File){
+									
+									urlschema thisurl = Utility::parseUrl(httpdir->getUrl());
+									std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
+									const char *cmd[] = {"loadfile", openurl.c_str() , NULL};
+									mpv_command_async(libmpv->getHandle(), 0, cmd);
+									
+							}
+						}
+						/*
+						if(thislist[n].type == FS::FileEntryType::File){
+							ImGui::SameLine(total_w-150);
+							ImGui::Text("%s",Utility::humanSize(thislist[n].size).c_str());
+						}
+						*/
+								
+				}
+				if (*first_item && thislist.size() >0) {
+					ImGui::SetFocusID(ImGui::GetID((thislist[0].name.c_str())), ImGui::GetCurrentWindow());
+					*first_item = false;
+				}	
+			}
+			ImGui::EndListBox();
+		}
+		Windows::ExitWindow();
+	}
+	
     void NetworkWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
@@ -33,17 +148,16 @@ namespace Windows {
 						if (ImGui::Selectable(item.networksources[n].name.c_str(), selected == n)){
 							item.first_item = true;		
 							item.networkselect = false;
-							item.networkurl = item.networksources[n].url;
 							
 							if(thisurl.scheme == "http" || thisurl.scheme == "https"){
-								httpdir = new HTTPDir(item.networkurl);
-								item.networklastpath = httpdir->getBasePath();
-								item.networkentries = httpdir->getDir(httpdir->getBasePath(),Utility::getMediaExtensions());
+								httpdir = new HTTPDir(item.networksources[n].url);
+								httpdir->DirList(httpdir->getBasePath(),Utility::getMediaExtensions());
+								item.state = MENU_STATE_HTTPBROWSER;
 							}
 							if(thisurl.scheme == "ftp"){
-								ftpdir = new FTPDir(item.networkurl);
-								item.networklastpath = ftpdir->getBasePath();
-								item.networkentries = ftpdir->getDir(ftpdir->getBasePath(),Utility::getMediaExtensions());	
+								ftpdir = new FTPDir(item.networksources[n].url);
+								ftpdir->DirList(ftpdir->getBasePath(),Utility::getMediaExtensions());	
+								item.state = MENU_STATE_FTPBROWSER;
 							}
 							if (selected)
 								ImGui::SetItemDefaultFocus();
@@ -54,71 +168,6 @@ namespace Windows {
                         ImGui::SetFocusID(ImGui::GetID((item.networksources[0].name.c_str())), ImGui::GetCurrentWindow());
                         *first_item = false;
                     }
-				}
-				ImGui::EndListBox();
-			} else {
-				if (ImGui::BeginMenuBar()) {
-					ImGui::Text("current path: %s",item.networklastpath.c_str());
-					ImGui::EndMenuBar();
-				}
-				if (ImGui::BeginListBox("Network Browser Menu",ImVec2(1280.0f, 720.0f))){
-					//ImGui::Text("Current Dir: %s\n",item.networklastpath.c_str());
-					int total_w = ImGui::GetContentRegionAvail().x;
-					for(unsigned int n=0;n<item.networkentries.size();n++){
-						
-							if(item.networkentries[n].type == FS::FileEntryType::Directory){
-								ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
-							}else{
-								ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
-							}
-							ImGui::SameLine();
-							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
-						
-							urlschema thisurl = Utility::parseUrl(item.networkurl);
-							static int selected = -1;
-							if (ImGui::Selectable(item.networkentries[n].name.c_str(), selected == n)){
-										
-								if(item.networkentries[n].type == FS::FileEntryType::Directory){
-									item.first_item = true;
-				
-									if(thisurl.scheme == "http" || thisurl.scheme == "https"){
-										item.networklastpath = httpdir->getCurrPath()+item.networkentries[n].path;
-										item.networkentries = httpdir->getDir(httpdir->getCurrPath()+item.networkentries[n].path,Utility::getMediaExtensions());
-									}
-											
-									if(thisurl.scheme == "ftp"){
-										item.networklastpath =  item.networkentries[n].path + item.networkentries[n].name;
-										item.networkentries = ftpdir->getDir(item.networklastpath,Utility::getMediaExtensions());
-									
-										
-									}
-								}else if (item.networkentries[n].type == FS::FileEntryType::File){
-											
-									urlschema thisurl = Utility::parseUrl(item.networkurl);
-									if(thisurl.scheme == "http" || thisurl.scheme == "https"){
-										std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + httpdir->getCurrPath() + item.networkentries[n].name;
-										const char *cmd[] = {"loadfile", openurl.c_str() , NULL};
-										mpv_command_async(libmpv->getHandle(), 0, cmd);
-									}
-									if(thisurl.scheme == "ftp"){
-										std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + item.networkentries[n].path + item.networkentries[n].name;
-										const char *cmd[] = {"loadfile", openurl.c_str(), NULL};
-										mpv_command_async(libmpv->getHandle(), 0, cmd);
-									}
-								}
-							}
-							
-							if(item.networkentries[n].type == FS::FileEntryType::File && thisurl.scheme != "http"){
-								ImGui::SameLine(total_w-150);
-								ImGui::Text("%s",Utility::humanSize(item.networkentries[n].size).c_str());
-							}
-						
-								
-					}
-					if (*first_item) {
-                        ImGui::SetFocusID(ImGui::GetID((item.networkentries[0].name.c_str())), ImGui::GetCurrentWindow());
-                        *first_item = false;
-                    }	
 				}
 				ImGui::EndListBox();
 			}

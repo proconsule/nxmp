@@ -23,6 +23,11 @@ public:
 	void setLongSeek(int seektime);
 	void setShortSeek(int seektime);
 	
+	bool getUseAlang(bool tmpvalue);
+	void setUseAlang(bool _val);
+	int getAlang(bool tmpvalue);
+	void setAlang(int lang);
+	
 	void saveSettings();
 	
 	std::vector<std::string> topmenu;
@@ -34,6 +39,12 @@ private:
 	
 	int tmpshortseek;
 	int tmplongseek;
+	
+	bool tmpusealang;
+	bool usealang;
+	
+	int tmpalang;
+	int alang;
 	
 	std::string inifilePath;
 };

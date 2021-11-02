@@ -13,6 +13,8 @@
 struct usb_devices{
 	std::string mount_point;
 	std::string name;
+	std::string fstype;
+	size_t capacity;
 };
 
 int usbThread(void *arg);
@@ -23,7 +25,7 @@ public:
 	~USBMounter();
 	std::vector<usb_devices> mounted_devs;
 	
-	thrd_t g_thread = {0};
+	
 	
 private:
 	

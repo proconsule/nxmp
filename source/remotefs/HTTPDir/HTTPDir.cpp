@@ -56,8 +56,8 @@ HTTPDir::~HTTPDir(){
 	
 }
 
-std::vector<FS::FileEntry> HTTPDir::getDir(std::string path,const std::vector<std::string> &extensions){
-	std::vector<FS::FileEntry> tmpret;
+void HTTPDir::DirList(std::string path,const std::vector<std::string> &extensions){
+	currentlist.clear();
 	urlschema thisurl = Utility::parseUrl(url);
 	std::string geturl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + path;
 	HTTPMemoryStruct *chunk = (HTTPMemoryStruct *)malloc(sizeof(HTTPMemoryStruct));
@@ -67,7 +67,7 @@ std::vector<FS::FileEntry> HTTPDir::getDir(std::string path,const std::vector<st
 	currentpath = path;
 	std::regex rgxdirlist("<h1>Index of");
 	if(!regex_search(s, sm, rgxdirlist)){
-		return tmpret;
+		return;
 	}
 	
 	std::regex rgxlinks("<tr>.*?<td><a href=\"(.*?)\".*?>(?!Parent Directory)(.*?)<\/a>.*?<\/td><\/tr>");
@@ -85,22 +85,21 @@ std::vector<FS::FileEntry> HTTPDir::getDir(std::string path,const std::vector<st
 			tmpentry.type = FS::FileEntryType::File;
 		}
 		tmpentry.size = 0;
-		tmpret.push_back(tmpentry);
+		currentlist.push_back(tmpentry);
 		s = sm.suffix();
 	}
 	free(chunk->memory);
-	std::sort(tmpret.begin(), tmpret.end(), FS::Sort);
+	std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
 				
-	tmpret.erase(
-		std::remove_if(tmpret.begin(), tmpret.end(), [extensions](const FS::FileEntry &file) {
+	currentlist.erase(
+		std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {
 			for (auto &ext : extensions) {
 				if (Utility::endsWith(file.name, ext, false)) {
 					return false;
 				}
 			}
 			return file.type == FS::FileEntryType::File;
-	}), tmpret.end());
-	return tmpret;
+	}), currentlist.end());
 	
 }
 
@@ -116,9 +115,12 @@ std::string HTTPDir::getBasePath(){
 	return basepath;
 }
 
-std::string HTTPDir::backDir(){
-	if(currentpath == basepath)return basepath;
+std::vector<FS::FileEntry> HTTPDir::getCurrList(){
+	return currentlist;
+}
+
+void HTTPDir::backDir(){
+	if(currentpath == basepath)return;
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/")+1);
-	return currentpath;
 }

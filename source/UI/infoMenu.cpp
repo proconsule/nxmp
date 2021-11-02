@@ -58,8 +58,6 @@ namespace Windows {
 				}
 				ImGui::EndTable();
 			}
-			
-			
 		}	
 		Windows::ExitWindow();
 	}

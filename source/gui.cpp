@@ -118,6 +118,9 @@ namespace GUI {
 						sdlevent.jbutton.button = SDL_KEY_L;
 						SDL_PushEvent(&sdlevent);
 					}
+					if(keycode == SDLK_t){
+
+					}
 					
 				}
 #endif
@@ -130,7 +133,7 @@ namespace GUI {
 					if (button == SDL_KEY_DRIGHT){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
-								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO){
+								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO){
 									item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 								}
 							}
@@ -140,7 +143,7 @@ namespace GUI {
 					if (button == SDL_KEY_DLEFT){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.rightmenustate != PLAYER_RIGHT_MENU_PLAYER){
-								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO){
+								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO){
 									item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
 								}
 								
@@ -211,6 +214,10 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_Y && !item.masterlock){
 						if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER && item.popupstate == POPUP_STATE_NONE){
+							if(localdir != nullptr){
+								delete localdir;
+								localdir = nullptr;
+							}
 #ifdef __SWITCH__
 							if(usbmounter != nullptr){
 								delete usbmounter;
@@ -229,7 +236,6 @@ namespace GUI {
 								delete enigma2;
 								enigma2 = nullptr;
 							}
-							item.localpath = configini->getStartPath();
 							item.networkselect = true;
 							item.first_item = true;
 							item.state = MENU_STATE_HOME;
@@ -244,17 +250,16 @@ namespace GUI {
 							enigma2->backToTop();
 						}
 						
-						if(item.state == MENU_STATE_NETWORKBROWSER && libmpv->Stopped()){
+						if(item.state == MENU_STATE_FTPBROWSER && libmpv->Stopped()){
 							item.first_item = true;
-							urlschema thisurl = Utility::parseUrl(item.networkurl);
-							if(thisurl.scheme == "http" || thisurl.scheme == "https"){
-								item.networkentries = httpdir->getDir(httpdir->backDir(),Utility::getMediaExtensions());
-								item.networklastpath = httpdir->getCurrPath();
-							}
-							if(thisurl.scheme == "ftp"){
-								item.networkentries = ftpdir->getDir(ftpdir->backDir(),Utility::getMediaExtensions());
-								item.networklastpath = ftpdir->getCurrPath();
-							}
+							ftpdir->backDir();
+							ftpdir->DirList(ftpdir->getCurrPath(),Utility::getMediaExtensions());
+						}
+						
+						if(item.state == MENU_STATE_HTTPBROWSER && libmpv->Stopped()){
+							item.first_item = true;
+							httpdir->backDir();
+							httpdir->DirList(httpdir->getCurrPath(),Utility::getMediaExtensions());
 							
 						}
 						
@@ -272,15 +277,16 @@ namespace GUI {
 						
 						if(item.state == MENU_STATE_FILEBROWSER && libmpv->Stopped()){
 							item.first_item = true;
-							item.localpath = FS::backPath(item.localpath);
-							item.localfileentries = FS::getDirList(item.localpath,true,Utility::getMediaExtensions());
+							localdir->backPath();
+							localdir->DirList(localdir->getCurrentPath(),true,Utility::getMediaExtensions());
 							
 						}
 						
-						if(item.state == MENU_STATE_PLAYER){
+						if(item.state == MENU_STATE_PLAYER || item.state == MENU_STATE_PLAYERCACHING){
 							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
 								if(!libmpv->Stopped()  && !item.masterlock){
 									item.state = item.laststate;
+									
 									libmpv->Stop();
 								}
 							}else if(item.rightmenustate == PLAYER_RIGHT_MENU_TRACKS){
@@ -297,6 +303,12 @@ namespace GUI {
 							}
 							else if(item.rightmenustate == PLAYER_RIGHT_MENU_CUSTOMARATIO){
 								item.rightmenustate = PLAYER_RIGHT_MENU_ARATIO;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_IMAGE){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_AUDIO){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 							}
 							
 							
@@ -322,6 +334,7 @@ namespace GUI {
 					}
 					if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
 						libmpv->getfileInfo();
+						item.state = MENU_STATE_PLAYER;
 					}
 					if (mp_event->event_id == MPV_EVENT_START_FILE) {
 #ifdef __SWITCH__
@@ -329,7 +342,7 @@ namespace GUI {
 #endif
 						printf("START FILE\n");
 						item.laststate = item.state;
-						item.state = MENU_STATE_PLAYER;
+						item.state = MENU_STATE_PLAYERCACHING;
 					}
 					//printf("Event id: %d\n",mp_event->event_id);
 					if (mp_event->event_id == MPV_EVENT_END_FILE) {
@@ -358,13 +371,19 @@ namespace GUI {
 					Windows::MainMenuWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_FILEBROWSER:
-					Windows::FileBrowserWindow(&item.focus, &item.first_item);
+					Windows::FileBrowserWindow(&item.focus, item.first_item);
 					break;
 				case MENU_STATE_USB:
 					Windows::USBBrowserWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_NETWORKBROWSER:
 					Windows::NetworkWindow(&item.focus, &item.first_item);
+					break;
+				case MENU_STATE_FTPBROWSER:
+					Windows::FtpWindow(&item.focus, &item.first_item);
+					break;
+				case MENU_STATE_HTTPBROWSER:
+					Windows::HttpWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_ENIGMABROWSER:
 					Windows::EnigmaWindow(&item.focus, &item.first_item);
@@ -378,9 +397,11 @@ namespace GUI {
 				case MENU_STATE_INFO:
 					Windows::InfoMenuWindow(&item.focus, &item.first_item);
 					break;
+				case MENU_STATE_PLAYERCACHING:
+					playerWindows::CacheWindow();
+					break;
 				case MENU_STATE_PLAYER:
 					break;
-				
 				
 			}
 			
@@ -410,6 +431,12 @@ namespace GUI {
 					break;
 				case PLAYER_RIGHT_MENU_CUSTOMARATIO:
 					playerWindows::RightHomeCustomARatio(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_IMAGE:
+					playerWindows::RightHomeImage(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_AUDIO:
+					playerWindows::RightHomeAudio(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;
 				
 			}

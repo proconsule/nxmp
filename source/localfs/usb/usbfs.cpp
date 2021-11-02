@@ -7,8 +7,11 @@ static UEvent *g_statusChangeEvent, g_exitEvent;
 static UsbHsFsDevice *g_usbDevices;
 static u32 g_usbDeviceCount;
 
+static thrd_t g_thread = {0};
+
 
 int usbThread(void *arg) {
+	sleep(1);
 	USBMounter * mymounter = (USBMounter *)arg;
 	printf("USB Thread Started\n");
     (void) arg;
@@ -68,8 +71,7 @@ int usbThread(void *arg) {
                         "\t- Logical Unit Capacity: 0x%lX bytes.\n" \
                         "\t- Mount name: \"%s\".\n" \
                         "\t- Filesystem type: %s.\n" \
-                        "\t- Mount flags: 0x%08X.\n" \
-                        "\t- Filesystem tests:\n", \
+                        "\t- Mount flags: 0x%08X.\n", \
                         i + 1, \
                         device->usb_if_id, \
                         device->lun, \
@@ -87,6 +89,8 @@ int usbThread(void *arg) {
             
             tmpdev.mount_point = device->name;
 			tmpdev.name = device->product_name;
+			tmpdev.fstype = LIBUSBHSFS_FS_TYPE_STR(device->fs_type);
+			tmpdev.capacity = device->capacity;
 			mymounter->mounted_devs.push_back(tmpdev);
             
         }

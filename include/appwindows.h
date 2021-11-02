@@ -15,10 +15,12 @@ namespace Windows {
         ImGui::PopStyleVar();
     };
 
-    void FileBrowserWindow(bool *focus, bool *first_item);
+    void FileBrowserWindow(bool *focus, bool first_item);
 	void USBBrowserWindow(bool *focus, bool *first_item);
 	void EnigmaWindow(bool *focus, bool *first_item);
 	void MainMenuWindow(bool *focus, bool *first_item);
+	void FtpWindow(bool *focus, bool *first_item);
+	void HttpWindow(bool *focus, bool *first_item);
 	void NetworkWindow(bool *focus, bool *first_item);
 	void InfoMenuWindow(bool *focus, bool *first_item);
 	void VideoWindow(bool *focus, bool *first_item);

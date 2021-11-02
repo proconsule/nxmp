@@ -3,6 +3,7 @@
 
 #include <string>
 #include "fileInfo.h"
+#include "config.h"
 
 #include <mpv/client.h>
 #include <mpv/render_gl.h>
@@ -11,6 +12,8 @@ struct decoderlist_struct{
 	std::string codecname;
 	std::string codecdesc;
 };
+
+extern Config *configini;
 
 class libMpv{
 public:
@@ -43,6 +46,19 @@ public:
 	void setSid(int id, bool osd);
 	
 	void setAspectRatio(double ratio,bool osd);
+	
+	void setBrightness(int value, bool osd);
+	void setContrast(int value, bool osd);
+	void setSaturation(int value, bool osd);
+	void setGamma(int value, bool osd);
+	void setHue(int value, bool osd);
+	
+	void setRotate(int value, bool osd);
+	
+	void setVolume(int value,bool osd);
+	void setAudioDelay(double value,bool osd);
+	
+
 	
 	void getfileInfo();
 	

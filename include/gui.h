@@ -17,6 +17,7 @@
 #include "localfiles.h"
 #include "SimpleIni.h"
 #include "remotefs.h"
+#include "localFs.h"
 #include "utils.h"
 #include "usbfs.h"
 #include "Enigma2.h"
@@ -28,11 +29,14 @@ enum MENU_STATES {
     MENU_STATE_FILEBROWSER,
 	MENU_STATE_USB,
 	MENU_STATE_NETWORKBROWSER,
+	MENU_STATE_FTPBROWSER,
+	MENU_STATE_HTTPBROWSER,
 	MENU_STATE_ENIGMABROWSER,
 	MENU_STATE_INFO,
 //    MENU_STATE_OPTIONS,
 	MENU_STATE_SETTINGS,
-	MENU_STATE_PLAYER
+	MENU_STATE_PLAYER,
+	MENU_STATE_PLAYERCACHING
 };
 
 enum APP_POPUP_STATES {
@@ -49,7 +53,9 @@ enum PLAYER_RIGHT_MENU_STATES {
 	PLAYER_RIGHT_MENU_TRACKS_SUB,
 	PLAYER_RIGHT_MENU_CHAPTERS,
 	PLAYER_RIGHT_MENU_ARATIO,
-	PLAYER_RIGHT_MENU_CUSTOMARATIO
+	PLAYER_RIGHT_MENU_CUSTOMARATIO,
+	PLAYER_RIGHT_MENU_IMAGE,
+	PLAYER_RIGHT_MENU_AUDIO
 };
 
 
@@ -59,15 +65,12 @@ typedef struct {
 	PLAYER_RIGHT_MENU_STATES rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
 	APP_POPUP_STATES popupstate = POPUP_STATE_NONE;
 	int selected = 0;
-	std::string localpath = "/switch/nxmp";
-	std::vector<FS::FileEntry> localfileentries;
 	std::string usbpath = "";
 	std::string usbbasepath = "";
 	std::vector<FS::FileEntry> usbfileentries;
+	
 	std::vector<networkSource> networksources;
-	std::string networkurl;
-	std::string networklastpath;
-	std::vector<FS::FileEntry> networkentries;
+	
 	
 	bool networkselect = true;
 	int playershowcontrols = false;
@@ -88,6 +91,7 @@ extern SDL_Window *window;
 extern MenuItem item;
 
 extern libMpv *libmpv;
+extern localFs *localdir;
 extern HTTPDir *httpdir;
 extern FTPDir *ftpdir;
 #ifdef __SWITCH__
@@ -129,9 +133,6 @@ extern Tex NXMPBannerTexture;
 extern Tex ExitTexture;
 
 extern ImFont* fontSmall;
-
-
-
 
 namespace GUI {
 	

@@ -5,6 +5,14 @@
 
 
 namespace playerWindows{
+	
+	inline void SetupCacheWindow(void){
+		ImGui::SetNextWindowPos(ImVec2(10.0f, 600.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(250.0f, 80.0f), ImGuiCond_Once);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
+	}
+	
 	inline void SetupRightWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(1080.0f, 0.0f), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(200.0f, 720.0f), ImGuiCond_Once);
@@ -19,8 +27,6 @@ namespace playerWindows{
 		ImGui::PopStyleColor();
     };
 	
-	
-	
 	void RightHomeWindow(bool *focus, bool *first_item);
 	void RightTrackWindow(bool *focus, bool *first_item);
 	void RightChapterWindow(bool *focus, bool *first_item);
@@ -29,6 +35,10 @@ namespace playerWindows{
 	void RightTrackSubWindow(bool *focus, bool *first_item);
 	void RightHomeARatio(bool *focus, bool *first_item);
 	void RightHomeCustomARatio(bool *focus, bool *first_item);
+	void RightHomeImage(bool *focus, bool *first_item);
+	void RightHomeAudio(bool *focus, bool *first_item);
+	
+	void CacheWindow();
 	
 }
 

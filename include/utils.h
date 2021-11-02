@@ -32,6 +32,11 @@ struct urlschema{
 
 namespace Utility{
 	
+	struct lang_code_struct {
+		std::string lang2;
+		std::string lang3;
+	};
+	
 	
 	std::string formatTimeShort(double seconds);
 	urlschema parseUrl(std::string url); 
@@ -43,6 +48,12 @@ namespace Utility{
 	std::vector<std::string> getMediaExtensions();
 	std::string humanSize(size_t bytes);
 	std::string str_tolower(std::string s);
+	std::vector<lang_code_struct> getLanguages();
+	int getLanguagesIdx(std::string lang);
+	
+	std::string ltrim(const std::string &s);
+	std::string rtrim(const std::string &s);
+	std::string trim(const std::string &s);
 }
 
 #endif

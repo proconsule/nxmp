@@ -2,6 +2,7 @@
 #include <regex>
 #include <string>
 #include <vector>
+#include "utils.h"
 
 std::vector<std::string> char_split (const std::string &s, char delim) {
     std::vector<std::string> result;
@@ -25,8 +26,27 @@ Config::Config(std::string inifile){
 	
 	longseek = ini->GetLongValue("Main", "longseek");
 	shortseek = ini->GetLongValue("Main", "shortseek");
+	if(longseek == 0)longseek = 60;
+	if(shortseek == 0)shortseek = 10;
+	
 	tmplongseek = longseek;
 	tmpshortseek = shortseek;
+	
+
+	usealang = ini->GetBoolValue("Main", "usealang");
+	tmpusealang = usealang;
+	const char* alangpv;
+	alangpv = ini->GetValue("Main", "alang");
+	std::string alangstring = "eng";
+	if(alangpv!= nullptr){
+		alangstring = alangpv;
+	}
+	if(alangstring == ""){
+		alangstring = "eng";
+	}
+	
+	alang = Utility::getLanguagesIdx(alangstring);
+	tmpalang = alang;
 	
 	topmenu.push_back("Local Files");
 	topmenu.push_back("USB");
@@ -109,15 +129,44 @@ void Config::setShortSeek(int seektime){
 	tmpshortseek = seektime;
 }
 
+bool Config::getUseAlang(bool tmpvalue){
+	if(tmpvalue){
+		return tmpusealang;
+	}
+	return usealang;
+}
+void Config::setUseAlang(bool _val){
+	tmpusealang = _val;
+}
+
+int Config::getAlang(bool tmpvalue){
+	if(tmpvalue){
+		return tmpalang;
+	}
+	return alang; 
+}
+
+void Config::setAlang(int lang){
+	tmpalang = lang;
+}
+
 void Config::saveSettings(){
 	longseek = tmplongseek;
 	shortseek = tmpshortseek;
+	usealang = tmpusealang;
+	
 	ini->Delete("Main", "shortseek");
 	ini->SetLongValue("Main", "shortseek", shortseek, NULL, false);
 	ini->Delete("Main", "longseek");
 	ini->SetLongValue("Main", "longseek", longseek, NULL, false);
+	
+	ini->Delete("Main", "usealang");
+	ini->SetBoolValue("Main", "usealang", usealang, NULL, false);
+	
+	ini->Delete("Main", "alang");
+	ini->SetValue("Main", "alang", Utility::getLanguages()[tmpalang].lang3.c_str());
 	std::string data;
-	int rc = ini->Save(data);
-	rc = ini->SaveFile(inifilePath.c_str());
+	ini->Save(data);
+	ini->SaveFile(inifilePath.c_str());
 }
 

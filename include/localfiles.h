@@ -32,6 +32,7 @@ namespace FS {
 		std::string path;
 		size_t size = 0;
 		FileEntryType type = FileEntryType::Unknown;
+		bool checked = false;
 	};
 	
 	std::string removeLastSlash(const std::string &string);

@@ -28,6 +28,12 @@ libMpv::libMpv(const std::string &configDir) {
     mpv_set_option_string(handle, "video-timing-offset", "0");
 	mpv_set_option_string(handle, "osd-bar-align-y", "0.9");
 	mpv_set_option_string(handle, "fbo-format", "rgba8");
+	mpv_set_option_string(handle, "volume-max", "200");
+	
+	if(configini->getUseAlang(false)){
+		std::string alangstring = Utility::getLanguages()[configini->getAlang(false)].lang3 + std::string(",") + Utility::getLanguages()[configini->getAlang(false)].lang2 + std::string(",eng,en");
+		mpv_set_option_string(handle, "alang", alangstring.c_str());
+	}
 #ifdef _WIN32
 	mpv_set_option_string(handle, "hwdec", "auto-copy");
 #endif
@@ -345,6 +351,82 @@ void libMpv::setSid(int id, bool osd) {
 
 void libMpv::setAspectRatio(double ratio,bool osd){
 	mpv_set_property_async(handle, 0,"video-aspect-override", MPV_FORMAT_DOUBLE, &ratio);
+}
+
+void libMpv::setBrightness(int value,bool osd){
+	if(osd){
+		std::string cmd = "set brightness " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set brightness " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
+void libMpv::setContrast(int value,bool osd){
+	if(osd){
+		std::string cmd = "set contrast " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set contrast " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
+void libMpv::setSaturation(int value,bool osd){
+	if(osd){
+		std::string cmd = "set saturation " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set saturation " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
+void libMpv::setGamma(int value,bool osd){
+	if(osd){
+		std::string cmd = "set gamma " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set gamma " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
+void libMpv::setHue(int value,bool osd){
+	if(osd){
+		std::string cmd = "set hue " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set hue " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
+
+void libMpv::setRotate(int value,bool osd){
+	if(value == -1){
+		std::string cmd = "set video-rotate no";
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set video-rotate " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
+
+void libMpv::setVolume(int value,bool osd){
+	if(osd){
+		std::string cmd = "set volume " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set volume " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
+void libMpv::setAudioDelay(double value, bool osd){
+	mpv_set_property_async(handle, 0,"audio-delay", MPV_FORMAT_DOUBLE, &value);
 }
 
 libMpv::~libMpv(){

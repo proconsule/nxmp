@@ -4,16 +4,19 @@ FTPDir::FTPDir(std::string _url){
 	url = _url;	
 	urlschema thisurl = Utility::parseUrl(url);
 	basepath = thisurl.path;
+	currpath = basepath;
 }
 
 FTPDir::~FTPDir(){
 	
 }
 
-std::vector<FS::FileEntry> FTPDir::getDir(std::string path,const std::vector<std::string> &extensions){
+void FTPDir::DirList(std::string path,const std::vector<std::string> &extensions){
+	currpath = path;
 	FtpInit();
 	urlschema thisurl = Utility::parseUrl(url);
-	std::vector<FS::FileEntry> retvector;
+	currentlist.clear();
+	//std::vector<FS::FileEntry> retvector;
 	if(thisurl.port == "")thisurl.port = "21";
 	std::string ftphost = thisurl.server+std::string(":")+thisurl.port;
 	if (!FtpConnect(ftphost.c_str(), &ftp_con)) {
@@ -25,12 +28,12 @@ std::vector<FS::FileEntry> FTPDir::getDir(std::string path,const std::vector<std
 			FtpQuit(ftp_con);
 		}else{
 			currpath = path;
-			retvector = FtpDirList(path.c_str(), ftp_con,extensions);
+			currentlist = FtpDirList(path.c_str(), ftp_con,extensions);
 			FtpQuit(ftp_con);
 			
 		}
 	}
-	return retvector;
+	//return retvector;
 }
 
 std::string FTPDir::getUrl(){
@@ -45,11 +48,14 @@ std::string FTPDir::getBasePath(){
 	return basepath;
 }
 
-std::string FTPDir::backDir(){
-	if(currpath.find_last_of("/") == 0)return basepath;
-	if(currpath.find_last_of("/") == -1)return basepath;
-	if(currpath == basepath)return basepath;
+std::vector<FS::FileEntry> FTPDir::getCurrList(){
+	return currentlist;
+}
+
+void FTPDir::backDir(){
+	if(currpath.find_last_of("/") == 0)currpath = basepath;
+	if(currpath.find_last_of("/") == -1)currpath = basepath;
+	if(currpath == basepath)return;
 	currpath = FS::removeLastSlash(currpath);
 	currpath = currpath.substr(0, currpath.find_last_of("/"));
-	return currpath;
 }

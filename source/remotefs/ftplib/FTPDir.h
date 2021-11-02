@@ -12,9 +12,10 @@ class FTPDir{
 public:
 	FTPDir(std::string _url);
 	~FTPDir();
-	std::vector<FS::FileEntry> getDir(std::string path,const std::vector<std::string> &extensions);
+	void DirList(std::string path,const std::vector<std::string> &extensions);
+	std::vector<FS::FileEntry> getCurrList();
 	
-	std::string backDir();
+	void backDir();
 	std::string getUrl();
 	std::string getCurrPath();
 	std::string getBasePath();
@@ -24,6 +25,7 @@ private:
 	std::string url;
 	std::string currpath;
 	std::string basepath;
+	std::vector<FS::FileEntry> currentlist;
 	netbuf *ftp_con = nullptr;
 
 };

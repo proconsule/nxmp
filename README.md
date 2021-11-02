@@ -45,7 +45,7 @@ Buttons Mapping
 - R Stick Button Toggle Masterlock (during playback, only A button will work)
 - Dpad Right (during playback show right menu)
 - Dpad Left (during playback close right menu)
-
+- R Stick Up/Down Fast Scroll on file list
 
 FAQ
 -----

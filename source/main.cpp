@@ -17,6 +17,7 @@
 #include "FTPDir.h"
 
 
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -29,6 +30,7 @@ static bool init();
 SDL_Window *window;
 SDL_GLContext context;
 libMpv *libmpv = nullptr;
+localFs *localdir = nullptr;
 FTPDir *ftpdir = nullptr;
 HTTPDir *httpdir = nullptr;
 #ifdef __SWITCH__
@@ -129,6 +131,7 @@ int main(int argc,char *argv[]){
 	printf("Loading Config\n");
 	
 	configini = new Config("config.ini");
+	
 	
 #ifdef __SWITCH__
 	Result ret;
@@ -271,7 +274,6 @@ int main(int argc,char *argv[]){
 	
 	printf("Init Enigma2\n");
 	
-	item.localpath = configini->getStartPath();
 	
 	GUI::RenderLoop();
 	printf("Ending Render Loop\n");
@@ -279,6 +281,7 @@ int main(int argc,char *argv[]){
 	libmpv = nullptr;
 	delete enigma2;
 	enigma2 = nullptr;
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -287,6 +290,7 @@ int main(int argc,char *argv[]){
     SDL_DestroyWindow(window);
     window = NULL;
     SDL_Quit();
+	
 	
 	
 	printf("Exit Services\n");

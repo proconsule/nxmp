@@ -23,14 +23,16 @@ public:
 	~HTTPDir();
 	void curlDownload(char * url ,HTTPMemoryStruct * chunk);
 	
-	std::vector<FS::FileEntry> getDir(std::string path,const std::vector<std::string> &extensions);
-	std::string backDir();
+	void DirList(std::string path,const std::vector<std::string> &extensions);
+	void backDir();
+	std::vector<FS::FileEntry> getCurrList();
 	std::string getUrl();
 	std::string getBasePath();
 	std::string getCurrPath();
 	
 	
 private:
+	std::vector<FS::FileEntry> currentlist;
 	std::string url;
 	std::string basepath = "";
 	std::string currentpath = "";
