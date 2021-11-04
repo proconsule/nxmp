@@ -58,6 +58,15 @@ public:
 	void setVolume(int value,bool osd);
 	void setAudioDelay(double value,bool osd);
 	
+	void setAudioEQ(int *eqval,bool osd);
+	void setAudioSuperEQ(float *eqval,bool osd);
+	
+	void setSubDelay(double value,bool osd);
+	void setSubPos(int value,bool osd);
+	void setSubFontSize(int value,bool osd);
+	
+	void setDeinterlace(int value);
+	
 
 	
 	void getfileInfo();

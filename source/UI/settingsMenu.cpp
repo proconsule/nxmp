@@ -82,6 +82,25 @@ namespace Windows {
 				if(!alangbool){
 					ImGui::EndDisabled();
 				}
+				
+				std::vector<std::string> deintmenu = {"No","Yes","Auto"};
+				const char* combo_deintpreview_value = deintmenu[configini->getDeinterlace(true)].c_str();
+				ImGui::PushItemWidth(300);
+				if (ImGui::BeginCombo("Deinterlace", combo_deintpreview_value, 0))
+				{	
+					for (int n = 0; n < deintmenu.size(); n++)
+					{
+						const bool is_selected = (configini->getDeinterlace(true) == n);
+						if (ImGui::Selectable(deintmenu[n].c_str(), is_selected))
+							configini->setDeinterlace(n);
+
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+				
+				
 				ImGui::PopItemWidth();
 				ImGui::EndTabItem();
 			}

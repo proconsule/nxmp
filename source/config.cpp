@@ -48,6 +48,22 @@ Config::Config(std::string inifile){
 	alang = Utility::getLanguagesIdx(alangstring);
 	tmpalang = alang;
 	
+	const char* deintpv;
+	deintpv = ini->GetValue("Main", "deinterlace");
+	std::string deintstring;
+	if(deintpv!= nullptr){
+		deintstring = deintpv;
+	}
+	if(deintstring == ""){
+		deintstring = "no";
+	}
+	
+	if(deintstring == "no")tmpdeint = 0;
+	if(deintstring == "yes")tmpdeint = 1;
+	if(deintstring == "auto")tmpdeint = 2;
+	deint = tmpdeint;
+	
+	
 	topmenu.push_back("Local Files");
 	topmenu.push_back("USB");
 	
@@ -150,10 +166,22 @@ void Config::setAlang(int lang){
 	tmpalang = lang;
 }
 
+void Config::setDeinterlace(int value){
+	tmpdeint = value;
+}
+
+int Config::getDeinterlace(bool tmpvalue){
+	if(tmpvalue){
+		return tmpdeint;
+	}
+	return deint; 
+}
+
 void Config::saveSettings(){
 	longseek = tmplongseek;
 	shortseek = tmpshortseek;
 	usealang = tmpusealang;
+	deint = tmpdeint;
 	
 	ini->Delete("Main", "shortseek");
 	ini->SetLongValue("Main", "shortseek", shortseek, NULL, false);
@@ -165,6 +193,9 @@ void Config::saveSettings(){
 	
 	ini->Delete("Main", "alang");
 	ini->SetValue("Main", "alang", Utility::getLanguages()[tmpalang].lang3.c_str());
+	std::vector<std::string> deintopts = {"no","yes","auto"};
+	ini->Delete("Main", "deinterlace");
+	ini->SetValue("Main", "deinterlace", deintopts[deint].c_str());
 	std::string data;
 	ini->Save(data);
 	ini->SaveFile(inifilePath.c_str());

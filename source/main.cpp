@@ -69,7 +69,6 @@ Tex ExitTexture;
 
 ImFont* fontSmall;
 
-
 const GLuint WIDTH = 1280, HEIGHT = 720;
 
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
@@ -273,7 +272,6 @@ int main(int argc,char *argv[]){
 #endif	
 	
 	printf("Init Enigma2\n");
-	
 	
 	GUI::RenderLoop();
 	printf("Ending Render Loop\n");

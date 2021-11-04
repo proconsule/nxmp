@@ -21,6 +21,21 @@ namespace playerWindows{
 		
     };
 
+	inline void SetupAudioEqWindow(void) {
+        ImGui::SetNextWindowPos(ImVec2(277.0f, 480.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(725.0f, 210.0f), ImGuiCond_Once);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
+		
+    };
+	
+	inline void SetupAudioPlayerWindow(void) {
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Once);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
+    };
+
     inline void ExitWindow(void) {
         ImGui::End();
         ImGui::PopStyleVar();
@@ -37,6 +52,12 @@ namespace playerWindows{
 	void RightHomeCustomARatio(bool *focus, bool *first_item);
 	void RightHomeImage(bool *focus, bool *first_item);
 	void RightHomeAudio(bool *focus, bool *first_item);
+	void RightHomeSub(bool *focus, bool *first_item);
+	void AudioEqualizer(bool *focus, bool *first_item);
+	void AudioSuperEqualizer(bool *focus, bool *first_item);
+	
+	void AudioplayerWindow(bool *focus, bool *first_item);
+	
 	
 	void CacheWindow();
 	

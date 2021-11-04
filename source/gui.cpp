@@ -119,7 +119,10 @@ namespace GUI {
 						SDL_PushEvent(&sdlevent);
 					}
 					if(keycode == SDLK_t){
-
+						mpv_set_option_string(libmpv->getHandle(), "gpu-nxmp-deint", "0");
+					}
+					if(keycode == SDLK_e){
+						mpv_set_option_string(libmpv->getHandle(), "gpu-nxmp-deint", "1");
 					}
 					
 				}
@@ -133,7 +136,7 @@ namespace GUI {
 					if (button == SDL_KEY_DRIGHT){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
-								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO){
+								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO && item.rightmenustate != PLAYER_RIGHT_MENU_SUB && item.rightmenustate != PLAYER_AUDIOEQ && item.rightmenustate != PLAYER_SUPERAUDIOEQ){
 									item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 								}
 							}
@@ -143,7 +146,7 @@ namespace GUI {
 					if (button == SDL_KEY_DLEFT){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.rightmenustate != PLAYER_RIGHT_MENU_PLAYER){
-								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO){
+								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO && item.rightmenustate != PLAYER_RIGHT_MENU_SUB && item.rightmenustate != PLAYER_AUDIOEQ && item.rightmenustate != PLAYER_SUPERAUDIOEQ){
 									item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
 								}
 								
@@ -310,6 +313,15 @@ namespace GUI {
 							else if(item.rightmenustate == PLAYER_RIGHT_MENU_AUDIO){
 								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_SUB){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
+							else if(item.rightmenustate == PLAYER_AUDIOEQ){
+								item.rightmenustate = PLAYER_RIGHT_MENU_AUDIO;
+							}
+							else if(item.rightmenustate == PLAYER_SUPERAUDIOEQ){
+								item.rightmenustate = PLAYER_RIGHT_MENU_AUDIO;
+							}
 							
 							
 						}
@@ -335,6 +347,11 @@ namespace GUI {
 					if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
 						libmpv->getfileInfo();
 						item.state = MENU_STATE_PLAYER;
+						if(libmpv->getFileInfo()->videos.size() == 0){
+							item.playerstate = PLAYER_STATE_AUDIO;	
+						}else{
+							item.playerstate = PLAYER_STATE_VIDEO;	
+						}
 					}
 					if (mp_event->event_id == MPV_EVENT_START_FILE) {
 #ifdef __SWITCH__
@@ -351,6 +368,7 @@ namespace GUI {
 #endif
 						printf("END FILE\n");
 						item.state = item.laststate;
+						item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
 						item.masterlock = false;
 						printf("MENU STATE: %d\n",item.state );
 					}
@@ -401,6 +419,9 @@ namespace GUI {
 					playerWindows::CacheWindow();
 					break;
 				case MENU_STATE_PLAYER:
+					if(item.playerstate == PLAYER_STATE_AUDIO){
+						playerWindows::AudioplayerWindow(&item.focus, &item.first_item);
+					}
 					break;
 				
 			}
@@ -438,7 +459,16 @@ namespace GUI {
 				case PLAYER_RIGHT_MENU_AUDIO:
 					playerWindows::RightHomeAudio(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;
-				
+				case PLAYER_RIGHT_MENU_SUB:
+					playerWindows::RightHomeSub(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;	
+				case PLAYER_AUDIOEQ:
+					playerWindows::AudioEqualizer(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_SUPERAUDIOEQ:
+					playerWindows::AudioSuperEqualizer(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;	
+					
 			}
 		
 	}
@@ -449,7 +479,7 @@ namespace GUI {
 		glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
 		glClearColor(0.00f, 0.00f, 0.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
-
+	
 		SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
 		SDL_GL_MakeCurrent(backup_current_window, backup_current_context);

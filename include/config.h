@@ -28,6 +28,9 @@ public:
 	int getAlang(bool tmpvalue);
 	void setAlang(int lang);
 	
+	int getDeinterlace(bool tmpvalue);
+	void setDeinterlace(int value);
+	
 	void saveSettings();
 	
 	std::vector<std::string> topmenu;
@@ -45,6 +48,9 @@ private:
 	
 	int tmpalang;
 	int alang;
+	
+	int tmpdeint;
+	int deint;
 	
 	std::string inifilePath;
 };
