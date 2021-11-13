@@ -20,6 +20,7 @@ public:
         int sample_rate;
         int width;
         int height;
+		bool albumart = false;
 		bool selected = false;
     };
 	
@@ -35,12 +36,20 @@ public:
         int aud_id = -1;
         int sub_id = -1;
         int position = 0;
+		int duration = 0;
+		std::string title;
+		std::string artist;
+		double getplayPerc(){
+			return (double)position/(double)duration;
+		}
+		bool islive = false;
     };
 
     
     std::string title = "Unknown";
     std::string path;
     long duration = 0;
+	long resume = 0;
     int bit_rate = 0;
     std::vector<Track> videos;
     std::vector<Track> audios;

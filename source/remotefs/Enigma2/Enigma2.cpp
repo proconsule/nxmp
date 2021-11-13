@@ -1,5 +1,5 @@
 #include "Enigma2.h"
-
+#include "utils.h"
 
 static size_t
 WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -99,8 +99,13 @@ vector<EnigmaServices> Enigma2::parseBouquet(char * data){
 
 void Enigma2::m3uParser(char * url){
 	e2currbouqet.clear();
-	string m3uurl = "http://";
-	m3uurl.append(enigma2ip);
+	urlschema e2schema = Utility::parseUrl(enigmaurl);
+	string m3uurl =  e2schema.scheme;
+	m3uurl.append("://");
+	m3uurl.append(e2schema.server);
+	if(e2schema.port == "")e2schema.port="80";
+	m3uurl.append(":");
+	m3uurl.append(e2schema.port);
 	m3uurl.append("/web/services.m3u?bRef=");
 	m3uurl.append(urlencode(url));
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
@@ -122,8 +127,12 @@ void Enigma2::m3uParser(char * url){
 		s = sm.suffix();
 	}
 	
-	string epguurl = "http://";
-	epguurl.append(enigma2ip);
+	string epguurl =  e2schema.scheme;
+	epguurl.append("://");
+	epguurl.append(e2schema.server);
+	if(e2schema.port == "")e2schema.port="80";
+	epguurl.append(":");
+	epguurl.append(e2schema.port);
 	epguurl.append("/web/epgnow?bRef=");
 	epguurl.append(urlencode(url));
 	MemoryStruct *chunk2 = (MemoryStruct *)malloc(sizeof(MemoryStruct));
@@ -162,8 +171,15 @@ void Enigma2::m3uParser(char * url){
 
 bool Enigma2::getServices(){
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
-	string downurl = "http://";
-	downurl.append(enigma2ip);
+	//string downurl = "http://";
+	//downurl.append(enigma2ip);
+	urlschema e2schema = Utility::parseUrl(enigmaurl);
+	string downurl =  e2schema.scheme;
+	downurl.append("://");
+	downurl.append(e2schema.server);
+	if(e2schema.port == "")e2schema.port="80";
+	downurl.append(":");
+	downurl.append(e2schema.port);
 	downurl.append("/web/getservices");
 	curlDownload((char *)downurl.c_str(),chunk);
 	e2services =  parseBouquet(chunk->memory);
@@ -183,5 +199,9 @@ void Enigma2::setCurrBouquet(EnigmaServices _bouquet){
 void Enigma2::backToTop(){
 	EnigmaServices dummy;
 	currbouquet = dummy;
+}
+
+Enigma2::Enigma2(std::string _url){
+	enigmaurl = _url;
 }
  

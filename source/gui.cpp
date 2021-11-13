@@ -64,22 +64,41 @@ namespace GUI {
 #ifndef __SWITCH__
 				if (event.type == SDL_KEYDOWN) {
 					Uint8 keycode = event.key.keysym.sym;
+					//printf("Key code :%d\n",keycode);
 					if(keycode == SDLK_ESCAPE){
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_JOYBUTTONDOWN;
 						sdlevent.jbutton.button = SDL_KEY_PLUS;
 						SDL_PushEvent(&sdlevent);
 					}
-					if(keycode == SDLK_m){
+					if(keycode == 79){
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_JOYBUTTONDOWN;
 						sdlevent.jbutton.button = SDL_KEY_DRIGHT;
 						SDL_PushEvent(&sdlevent);
 					}
-					if(keycode == SDLK_n){
+					if(keycode == 80){
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_JOYBUTTONDOWN;
 						sdlevent.jbutton.button = SDL_KEY_DLEFT;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == 82){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_DUP;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == 81){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_DDOWN;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == 32){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_A;
 						SDL_PushEvent(&sdlevent);
 					}
 					if(keycode == SDLK_y){
@@ -119,10 +138,13 @@ namespace GUI {
 						SDL_PushEvent(&sdlevent);
 					}
 					if(keycode == SDLK_t){
-						mpv_set_option_string(libmpv->getHandle(), "gpu-nxmp-deint", "0");
+						//mpv_set_option_string(libmpv->getHandle(), "gpu-nxmp-deint", "0");
+						//mpv_set_option_string(libmpv->getHandle(), "glsl-shader", "C:\\Users\\Ceco\\C-Dev\\imgui-test\\mpv\\shaders\\test.hook");
+						mpv_command_string(libmpv->getHandle(),"no-osd change-list glsl-shaders set C:\\Users\\Ceco\\C-Dev\\imgui-test\\mpv\\shaders\\scale.glsl");
 					}
 					if(keycode == SDLK_e){
-						mpv_set_option_string(libmpv->getHandle(), "gpu-nxmp-deint", "1");
+						mpv_command_string(libmpv->getHandle(),"no-osd change-list glsl-shaders clr \"\"");
+						//mpv_set_option_string(libmpv->getHandle(), "gpu-nxmp-deint", "1");
 					}
 					
 				}
@@ -133,25 +155,39 @@ namespace GUI {
 					if (button == SDL_KEY_PLUS && !item.masterlock)
 						renderloopdone = true;
 					
+					if (button == SDL_KEY_DUP){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.popupstate == POPUP_STATE_NONE){
+						
+						}
+					}
+					
+					if (button == SDL_KEY_DDOWN){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.popupstate == POPUP_STATE_NONE){
+							if(item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
+								item.playercontrolstate = PLAYER_CONTROL_STATE_CONTROLS;
+							}else{
+								item.playercontrolstate = PLAYER_CONTROL_STATE_NONE;
+							}
+						}
+					}
+					
 					if (button == SDL_KEY_DRIGHT){
-						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.playercontrolstate != PLAYER_CONTROL_STATE_CONTROLS && item.popupstate == POPUP_STATE_NONE){
 							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
 								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO && item.rightmenustate != PLAYER_RIGHT_MENU_SUB && item.rightmenustate != PLAYER_AUDIOEQ && item.rightmenustate != PLAYER_SUPERAUDIOEQ){
 									item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+								}
+							}else if(item.rightmenustate != PLAYER_RIGHT_MENU_PLAYER){
+								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO && item.rightmenustate != PLAYER_RIGHT_MENU_SUB && item.rightmenustate != PLAYER_AUDIOEQ && item.rightmenustate != PLAYER_SUPERAUDIOEQ){
+									item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
+									item.rightmenu_startpos = 1280.0f;
 								}
 							}
 						}
 					}
 					
 					if (button == SDL_KEY_DLEFT){
-						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
-							if(item.rightmenustate != PLAYER_RIGHT_MENU_PLAYER){
-								if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO && item.rightmenustate != PLAYER_RIGHT_MENU_SUB && item.rightmenustate != PLAYER_AUDIOEQ && item.rightmenustate != PLAYER_SUPERAUDIOEQ){
-									item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
-								}
-								
-							}
-						}
+						
 					}
 					
 					if (button == SDL_KEY_RSTICK){
@@ -206,7 +242,7 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_A){
 						if(item.state == MENU_STATE_PLAYER){
-							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.playercontrolstate == PLAYER_CONTROL_STATE_NONE && item.popupstate == POPUP_STATE_NONE){
 								if(libmpv->Paused()){
 									libmpv->Resume();
 								}else{
@@ -286,7 +322,7 @@ namespace GUI {
 						}
 						
 						if(item.state == MENU_STATE_PLAYER || item.state == MENU_STATE_PLAYERCACHING){
-							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
 								if(!libmpv->Stopped()  && !item.masterlock){
 									item.state = item.laststate;
 									
@@ -333,30 +369,36 @@ namespace GUI {
 				}
 				if (event.type == wakeup_on_mpv_events)
 				{
-					int count = 20;
-					while (count) {
+					while (1) {
 					mpv_event *mp_event = (mpv_event*) mpv_wait_event(libmpv->getHandle(), 0);
 					if (mp_event->event_id == MPV_EVENT_NONE)
 						break;
 					if (mp_event->event_id == MPV_EVENT_LOG_MESSAGE) {
 						mpv_event_log_message *msg = (mpv_event_log_message *) mp_event->data;
-						if (strstr(msg->text, "DR image"))
-							printf("log: %s", msg->text);
 						continue;
 					}
 					if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
 						libmpv->getfileInfo();
 						item.state = MENU_STATE_PLAYER;
-						if(libmpv->getFileInfo()->videos.size() == 0){
-							item.playerstate = PLAYER_STATE_AUDIO;	
+						if(libmpv->getFileInfo()->videos.size() == 0 || (libmpv->getFileInfo()->videos.size() == 1 && libmpv->getFileInfo()->videos[0].albumart) ){
+							item.playerstate = PLAYER_STATE_AUDIO;
+							mpv_observe_property(libmpv->getHandle(), 0, "playback-time", MPV_FORMAT_DOUBLE);
+							mpv_observe_property(libmpv->getHandle(), 0, "duration", MPV_FORMAT_DOUBLE);
+							mpv_observe_property(libmpv->getHandle(), 0, "metadata", MPV_FORMAT_NODE);
+							item.playercontrolstate = PLAYER_CONTROL_STATE_CONTROLS;
+							
 						}else{
-							item.playerstate = PLAYER_STATE_VIDEO;	
+							mpv_observe_property(libmpv->getHandle(), 0, "playback-time", MPV_FORMAT_DOUBLE);
+							mpv_observe_property(libmpv->getHandle(), 0, "duration", MPV_FORMAT_DOUBLE);
+							mpv_observe_property(libmpv->getHandle(), 0, "metadata", MPV_FORMAT_NODE);
+							item.playerstate = PLAYER_STATE_VIDEO;
 						}
 					}
+					
 					if (mp_event->event_id == MPV_EVENT_START_FILE) {
 #ifdef __SWITCH__
 						appletSetMediaPlaybackState(true);
-#endif
+#endif					
 						printf("START FILE\n");
 						item.laststate = item.state;
 						item.state = MENU_STATE_PLAYERCACHING;
@@ -365,16 +407,68 @@ namespace GUI {
 					if (mp_event->event_id == MPV_EVENT_END_FILE) {
 #ifdef __SWITCH__
 						appletSetMediaPlaybackState(false);
-#endif
-						printf("END FILE\n");
+#endif					
+						struct mpv_event_end_file *eof = (struct mpv_event_end_file *)mp_event->data;
+						libmpv->setLoop(false);
+						if(item.playerstate == PLAYER_STATE_VIDEO  && libmpv->getFileInfo()->playbackInfo.islive == false && sqlitedb != nullptr){
+							if(libmpv->getFileInfoPerc() >= configini->getResumeStartPerc(false) && 100-libmpv->getFileInfoPerc() >= configini->getResumeStopPerc(false)){
+								sqlitedb->writeResume(libmpv->getFileInfo()->path,libmpv->getFileInfo()->playbackInfo.position);
+							}else{
+								if(eof->reason != MPV_END_FILE_REASON_EOF){
+									sqlitedb->deleteResume(libmpv->getFileInfo()->path);
+								}
+							}
+							if(eof->reason == MPV_END_FILE_REASON_EOF){
+								printf("FILE EOF\n");
+								sqlitedb->deleteResume(libmpv->getFileInfo()->path);
+							}
+						}
+						printf("END PLAY FILE\n");
 						item.state = item.laststate;
 						item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
+						item.playercontrolstate = PLAYER_CONTROL_STATE_NONE;
 						item.masterlock = false;
 						printf("MENU STATE: %d\n",item.state );
 					}
-				
-					count --;
-					printf("event: %s\n", mpv_event_name(mp_event->event_id));
+					if(mp_event->event_id == MPV_EVENT_PROPERTY_CHANGE){
+						mpv_event_property *prop = (mpv_event_property*)mp_event->data;
+						if(std::string(prop->name) == "metadata" && !libmpv->Stopped()) 
+						{
+							mpv_node node = *(mpv_node *)prop->data;
+							printf("Node format %d\n",node.format);
+							if (node.format == MPV_FORMAT_NODE_MAP) {
+								for (int n = 0; n < node.u.list->num; n++) {
+									std::string key = node.u.list->keys[n];
+									if(key == "title"){
+										libmpv->getFileInfo()->playbackInfo.title = node.u.list->values[n].u.string;
+									}
+									if(key == "artist"){
+										libmpv->getFileInfo()->playbackInfo.artist = node.u.list->values[n].u.string;
+									}
+									printf("META KEY %s\n",key.c_str());
+								}
+							}
+						}
+						if(std::string(prop->name) == "playback-time") 
+						{
+							if(prop->format == MPV_FORMAT_DOUBLE)
+							{
+								double timepos = *(double *)prop->data;
+								libmpv->getFileInfo()->playbackInfo.position = (int)timepos;
+							}
+						}
+						if(std::string(prop->name) == "duration") 
+						{
+							if(prop->format == MPV_FORMAT_INT64)
+							{
+								int64_t timepos = *(int64_t *)prop->data;
+								libmpv->getFileInfo()->playbackInfo.duration = timepos;
+							}
+						}
+					}
+					if(mp_event->event_id!=22){
+						printf("event: %s %d\n", mpv_event_name(mp_event->event_id),mp_event->event_id);
+					}
 					}
 				}
 			}
@@ -389,7 +483,7 @@ namespace GUI {
 					Windows::MainMenuWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_FILEBROWSER:
-					Windows::FileBrowserWindow(&item.focus, item.first_item);
+					Windows::FileBrowserWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_USB:
 					Windows::USBBrowserWindow(&item.focus, &item.first_item);
@@ -419,11 +513,23 @@ namespace GUI {
 					playerWindows::CacheWindow();
 					break;
 				case MENU_STATE_PLAYER:
+					if(item.popupstate == POPUP_STATE_RESUME){
+						Popups::ResumePopup();
+					}
+				
 					if(item.playerstate == PLAYER_STATE_AUDIO){
-						playerWindows::AudioplayerWindow(&item.focus, &item.first_item);
+						
 					}
 					break;
 				
+			}
+			
+			switch (item.playercontrolstate) {
+				case PLAYER_CONTROL_STATE_NONE:
+					break;
+				case PLAYER_CONTROL_STATE_CONTROLS:
+					playerWindows::playerControls();
+					break;
 			}
 			
 			switch (item.rightmenustate) {

@@ -14,7 +14,7 @@ namespace Windows {
             char nxmptext[32];
 			char ffmpegtext[32];
 			char mpvtext[32];
-			sprintf(nxmptext,"NXMP v%d.%d.%d",VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO);
+			sprintf(nxmptext,"NXMP v%d.%d.%d - %s Version",VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO,RELEASE_TYPE ? "Beta":"Stable");
 			sprintf(ffmpegtext,"FFMPEG %s",libmpv->ffmpeg_version.c_str());
 			sprintf(mpvtext,"MPV %s",libmpv->mpv_version.c_str());
 			auto windowWidth = ImGui::GetWindowSize().x;

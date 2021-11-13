@@ -15,9 +15,9 @@ namespace Utility{
     if (h > 0) {
         oss << std::setfill('0') << std::setw(2) << h << ":";
     }
-    if (min > 0) {
+    //if (min > 0) {
         oss << std::setfill('0') << std::setw(2) << min << ":";
-    }
+    //}
     oss << std::setfill('0') << std::setw(2) << sec;
 
     return oss.str();
@@ -149,6 +149,7 @@ namespace Utility{
             ".wav",
             ".wma",
             ".wmv",
+			".flac",
             ".m3u",
             ".m3u8"
     };
@@ -376,4 +377,10 @@ namespace Utility{
 		return rtrim(ltrim(s));
 	}
 	
+	std::string truncateLen(std::string path,int len){
+		if(len>path.length())return path;
+		std::string retpath = path.substr(0,len);
+		return retpath + std::string("...");
+	}
+		
 }

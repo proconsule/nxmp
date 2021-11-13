@@ -8,11 +8,11 @@
 
 
 namespace Windows {
-    void FileBrowserWindow(bool *focus, bool first_item) {
+    void FileBrowserWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		
-        if (ImGui::Begin("File Browser", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+        if (ImGui::Begin("File Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
             
             ImGui::SetNextWindowFocus();
             
@@ -20,10 +20,14 @@ namespace Windows {
 				ImGui::Text("current path: %s",localdir->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
 			}
-			if (ImGui::BeginListBox("File Browser Menu",ImVec2(1280.0f, 720.0f))){
-				int total_w = ImGui::GetContentRegionAvail().x;
+			float total_w = ImGui::GetContentRegionAvail().x;
+			float total_h = ImGui::GetContentRegionAvail().y;
+			if (ImGui::BeginListBox("File Browser Menu",ImVec2(total_w, total_h))){
+				
 				std::vector<FS::FileEntry> thislist = localdir->getCurrList();
+				bool triggerselect = false;
 				for (unsigned int n = 0; n < thislist.size(); n++){
+					
 					static int selected = -1;
 					
 						if(thislist[n].type == FS::FileEntryType::Directory){
@@ -33,17 +37,24 @@ namespace Windows {
 						}
 						ImGui::SameLine();
 						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
-						if (ImGui::Selectable(thislist[n].name.c_str(), selected == n)){
+						std::string itemid = "##" + std::to_string(n);
+						if (ImGui::Selectable(itemid.c_str(), selected == n)){
 							if(localdir->getCurrList()[n].type == FS::FileEntryType::Directory){
-								item.first_item = true;
-								
+								triggerselect = true;
 								localdir->DirList(thislist[n].path,true,Utility::getMediaExtensions());
 							}
 							else{
-								const char *cmd[] = {"loadfile",  thislist[n].path.c_str(), NULL};
-								mpv_command_async(libmpv->getHandle(), 0, cmd);
+								libmpv->loadFile(thislist[n].path);
+								if(configini->getDbActive(true)){
+									libmpv->getFileInfo()->resume = sqlitedb->getResume(thislist[n].path);
+									if(libmpv->getFileInfo()->resume>0){
+										item.popupstate = POPUP_STATE_RESUME;
+									}
+								}
 							}
 						}
+						ImGui::SameLine();
+						ImGui::Text("%s",thislist[n].name.c_str());
 						if(thislist[n].type == FS::FileEntryType::File){
 							ImGui::SameLine(total_w-150);
 							ImGui::Text("%s",Utility::humanSize(thislist[n].size).c_str());
@@ -52,11 +63,14 @@ namespace Windows {
 					if (selected)
 						ImGui::SetItemDefaultFocus();
 				}
-				if (first_item && thislist.size() >0) {
-					ImGui::SetFocusID(ImGui::GetID(thislist[0].name.c_str()), ImGui::GetCurrentWindow());
-					ImGui::ScrollToItem();
-					first_item = false;
-					item.first_item = false;
+				if (*first_item && thislist.size() >0) {
+					std::string itemid = "##" + std::to_string(0);
+					ImGui::SetFocusID(ImGui::GetID(itemid.c_str()), ImGui::GetCurrentWindow());
+					ImGui::SetScrollY(0.0f);
+					*first_item = false;
+				}
+				if(triggerselect == true){
+					*first_item = true;
 				}
 			}	
 			ImGui::EndListBox();		

@@ -31,6 +31,14 @@ public:
 	int getDeinterlace(bool tmpvalue);
 	void setDeinterlace(int value);
 	
+	bool getDbActive(bool tmpvalue);
+	void setDbActive(bool value);
+	
+	int getResumeStartPerc(bool tmpvalue);
+	void setResumeStartPerc(int value);
+	int getResumeStopPerc(bool tmpvalue);
+	void setResumeStopPerc(int value);
+	
 	void saveSettings();
 	
 	std::vector<std::string> topmenu;
@@ -51,6 +59,16 @@ private:
 	
 	int tmpdeint;
 	int deint;
+	
+	
+	int tmpstartresumeperc;
+	int tmpstopresumeperc;
+	int startresumeperc;
+	int stopresumeperc;
+	
+	
+	bool tmpdbactive;
+	bool dbactive;
 	
 	std::string inifilePath;
 };

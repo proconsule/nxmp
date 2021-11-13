@@ -7,8 +7,8 @@ BUILD		:=	build-win32
 TARGET		:=	$(notdir $(CURDIR))
 
 VERSION_MAJOR := 0
-VERSION_MINOR := 2
-VERSION_MICRO := 1
+VERSION_MINOR := 5
+VERSION_MICRO := 0
 
 CFLAGS	:=	-g -Wall -Wno-sign-compare -O2 -ffunction-sections 
 CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags`
@@ -20,11 +20,11 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
 		-DIMGUI_DISABLE_OBSOLETE_FUNCTIONS -DIMGUI_ENABLE_FREETYPE -fpermissive
 
 
-LIBS	:=  $(shell pkgconf mpv --libs --static) $(shell pkgconf libavcodec --libs --static) -lmpv  `curl-config --libs`  `sdl2-config --static-libs` `freetype-config --libs`  -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -lfreetype -lfribidi -lpng -lbz2 -ltinyxml2 -llua5.1 -ldwmapi -llcms2 -lglfw3 -lopengl32 -lmingw32 -lSDLmain -lSDL2 -mwindows -liconv -lm -luser32 -lgdi32 -lwinmm -ldxguid -lws2_32 -lavrt -lz
+LIBS	:=  ../../sqlite-snapshot-202111051952/.libs/libsqlite3.a $(shell pkgconf mpv --libs --static) $(shell pkgconf libavcodec --libs --static) -lmpv  `curl-config --libs`  `sdl2-config --static-libs` `freetype-config --libs`  -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -lfreetype -lfribidi -lpng -lbz2 -ltinyxml2 -llua5.1 -ldwmapi -llcms2 -lglfw3 -lopengl32 -lmingw32 -lSDLmain -lSDL2 -mwindows -liconv -lm -luser32 -lgdi32 -lwinmm -ldxguid -lws2_32 -lavrt -lz
 
  
-SOURCES		:=	libs/glad/src/ libs/imgui libs/imgui/misc/freetype source source/UI source/remotefs/Enigma2 source/remotefs/ftplib source/remotefs/HTTPDir
-INCLUDES	:=	/mingw64/include/ libs/glad/include libs/simpleini libs/imgui include source/remotefs/Enigma2 source/remotefs/ftplib source/remotefs/HTTPDir
+SOURCES		:=	libs/glad/src/ libs/imgui libs/imgui/misc/freetype source source/eqpreset source/database source/localfs source/localfs/usb source/UI source/remotefs/Enigma2 source/remotefs/ftplib source/remotefs/HTTPDir
+INCLUDES	:=	/mingw64/include/ source/localfs/usb source/localfs libs/glad/include libs/simpleini libs/imgui source/database source/eqpreset include source/remotefs/Enigma2 source/remotefs/ftplib source/remotefs/HTTPDir
 
 
 ifneq ($(BUILD),$(notdir $(CURDIR)))

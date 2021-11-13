@@ -16,6 +16,8 @@
 #include "remotefs.h"
 #include "localfiles.h"
 #include "SimpleIni.h"
+#include "eqpreset.h"
+#include "SQLiteDB.h"
 #include "remotefs.h"
 #include "localFs.h"
 #include "utils.h"
@@ -47,7 +49,8 @@ enum PLAYER_STATES {
 
 enum APP_POPUP_STATES {
 	POPUP_STATE_NONE,
-	POPUP_STATE_SAVE_SETTINGS
+	POPUP_STATE_SAVE_SETTINGS,
+	POPUP_STATE_RESUME
 };
 
 enum PLAYER_RIGHT_MENU_STATES {
@@ -67,12 +70,18 @@ enum PLAYER_RIGHT_MENU_STATES {
 	PLAYER_SUPERAUDIOEQ
 };
 
+enum PLAYER_CONTROL_STATES {
+	PLAYER_CONTROL_STATE_NONE,
+	PLAYER_CONTROL_STATE_CONTROLS
+};
+
 
 typedef struct {
     MENU_STATES state = MENU_STATE_HOME;
 	MENU_STATES laststate = MENU_STATE_FILEBROWSER;
 	PLAYER_RIGHT_MENU_STATES rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
 	PLAYER_STATES playerstate = PLAYER_STATE_VIDEO;
+	PLAYER_CONTROL_STATES playercontrolstate = PLAYER_CONTROL_STATE_NONE;
 	APP_POPUP_STATES popupstate = POPUP_STATE_NONE;
 	int selected = 0;
 	std::string usbpath = "";
@@ -81,6 +90,7 @@ typedef struct {
 	
 	std::vector<networkSource> networksources;
 	
+	float rightmenu_startpos = 1280.0;
 	
 	bool networkselect = true;
 	int playershowcontrols = false;
@@ -121,6 +131,8 @@ extern std::string nxmpTitle;
 extern Enigma2 *enigma2;
 
 extern Config *configini;
+extern EQPreset *eqpreset;
+extern SQLiteDB *sqlitedb;
 
 extern Tex SdCardTexture;
 extern Tex UsbTexture;
@@ -141,6 +153,17 @@ extern Tex MPVTexture;
 
 extern Tex NXMPBannerTexture;
 extern Tex ExitTexture;
+
+
+extern Tex PlayIcon;
+extern Tex PauseIcon;
+extern Tex StopIcon;
+extern Tex MuteIcon;
+extern Tex VolumeIcon;
+extern Tex LoopIcon;
+extern Tex NoLoopIcon;
+
+
 
 extern ImFont* fontSmall;
 

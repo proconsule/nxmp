@@ -104,7 +104,79 @@ namespace Windows {
 				ImGui::PopItemWidth();
 				ImGui::EndTabItem();
 			}
-			 ImGui::EndTabBar();
+			if (ImGui::BeginTabItem("Database")) {
+				bool usedbbool = configini->getDbActive(true);
+				if(ImGui::Checkbox("Use Database", &usedbbool)){
+					if(sqlitedb != nullptr){
+						delete sqlitedb;
+						sqlitedb = nullptr;
+					}
+					if(usedbbool){
+						sqlitedb = new SQLiteDB("nxmp.db");
+					}
+					configini->setDbActive(usedbbool);	
+					
+				}
+				if(sqlitedb != nullptr){
+					if(sqlitedb->getCorrupted()){
+						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f),"Database File Corrupted");
+					}else{
+						ImGui::Text("Database File Version: ");
+						ImGui::SameLine();
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f),sqlitedb->getDbVersion().c_str());
+					}
+						ImGui::Text("SQLite Version: ");
+						ImGui::SameLine();
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f),sqlitedb->getSQLiteVersion().c_str());
+						
+						
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+50);
+						ImGui::Text("Start saving resume info @ ");
+						ImGui::SameLine(300,spacing);
+						ImGui::PushButtonRepeat(true);
+						if (ImGui::ArrowButton("##resumestartleft", ImGuiDir_Left)) {
+							if(configini->getResumeStartPerc(true)-1 >0){
+								configini->setResumeStartPerc(configini->getResumeStartPerc(true)-1);
+							}
+						}
+						ImGui::SameLine(0.0f, spacing);
+						if (ImGui::ArrowButton("##resumestartright", ImGuiDir_Right)) { 
+							configini->setResumeStartPerc(configini->getResumeStartPerc(true)+1);
+						}
+						ImGui::PopButtonRepeat();
+						ImGui::SameLine();
+						ImGui::Text("%d%%", configini->getResumeStartPerc(true));
+						
+						
+						ImGui::Text("Stop saving resume info @ ");
+						ImGui::SameLine(300,spacing);
+						ImGui::PushButtonRepeat(true);
+						if (ImGui::ArrowButton("##resumestopleft", ImGuiDir_Left)) {
+							if(configini->getResumeStopPerc(true)-1 >0){
+								configini->setResumeStopPerc(configini->getResumeStopPerc(true)-1);
+							}
+						}
+						ImGui::SameLine(0.0f, spacing);
+						if (ImGui::ArrowButton("##resumestopright", ImGuiDir_Right)) { 
+							if(configini->getResumeStopPerc(true)+1 <=100){
+								configini->setResumeStopPerc(configini->getResumeStopPerc(true)+1);
+							}
+						}
+						ImGui::PopButtonRepeat();
+						ImGui::SameLine();
+						ImGui::Text("%d%%", configini->getResumeStopPerc(true));
+						
+						
+						
+				}else{
+					ImGui::Text("Database not active");
+				}
+				
+				
+					
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
 		}
 			
 		ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2);

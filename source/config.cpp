@@ -64,6 +64,23 @@ Config::Config(std::string inifile){
 	deint = tmpdeint;
 	
 	
+	const char* usedbpv;
+	usedbpv = ini->GetValue("Main", "usedb");
+	dbactive = false;
+	if(usedbpv!= nullptr){
+		std::string usebdstring = usedbpv;
+		if(usebdstring == "yes")dbactive=true;
+	}
+	tmpdbactive = dbactive;
+	
+	startresumeperc = ini->GetLongValue("Main", "startresumeperc");
+	stopresumeperc = ini->GetLongValue("Main", "stopresumeperc");
+	if(startresumeperc == 0)startresumeperc = 5;
+	if(stopresumeperc == 0)stopresumeperc = 5;
+	tmpstartresumeperc = startresumeperc;
+	tmpstopresumeperc = stopresumeperc;
+	
+	
 	topmenu.push_back("Local Files");
 	topmenu.push_back("USB");
 	
@@ -177,11 +194,47 @@ int Config::getDeinterlace(bool tmpvalue){
 	return deint; 
 }
 
+
+bool Config::getDbActive(bool tmpvalue){
+	if(tmpvalue){
+		return tmpdbactive;
+	}
+	return dbactive; 
+}
+
+void Config::setDbActive(bool value){
+	tmpdbactive = value;
+}
+
+int Config::getResumeStartPerc(bool tmpvalue){
+	if(tmpvalue){
+		return tmpstartresumeperc;
+	}
+	return startresumeperc;
+}
+void Config::setResumeStartPerc(int value){
+	tmpstartresumeperc = value;
+}
+
+int Config::getResumeStopPerc(bool tmpvalue){
+	if(tmpvalue){
+		return tmpstopresumeperc;
+	}
+	return stopresumeperc;
+}
+void Config::setResumeStopPerc(int value){
+	tmpstopresumeperc = value;
+}
+
 void Config::saveSettings(){
 	longseek = tmplongseek;
 	shortseek = tmpshortseek;
 	usealang = tmpusealang;
 	deint = tmpdeint;
+	dbactive = tmpdbactive;
+	
+	startresumeperc = tmpstartresumeperc;
+	stopresumeperc = tmpstopresumeperc;
 	
 	ini->Delete("Main", "shortseek");
 	ini->SetLongValue("Main", "shortseek", shortseek, NULL, false);
@@ -196,6 +249,14 @@ void Config::saveSettings(){
 	std::vector<std::string> deintopts = {"no","yes","auto"};
 	ini->Delete("Main", "deinterlace");
 	ini->SetValue("Main", "deinterlace", deintopts[deint].c_str());
+	std::vector<std::string> usedbintopts = {"no","yes"};
+	ini->Delete("Main", "usedb");
+	ini->SetValue("Main", "usedb", usedbintopts[dbactive].c_str());
+	
+	ini->Delete("Main", "startresumeperc");
+	ini->SetLongValue("Main", "startresumeperc", startresumeperc, NULL, false);
+	ini->Delete("Main", "stopresumeperc");
+	ini->SetLongValue("Main", "stopresumeperc", stopresumeperc, NULL, false);
 	std::string data;
 	ini->Save(data);
 	ini->SaveFile(inifilePath.c_str());

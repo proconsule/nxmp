@@ -40,6 +40,8 @@ struct EnigmaServices{
 
 class Enigma2{
 public:
+
+	Enigma2(std::string url);
 	string enigma2ip;
 	vector<EnigmaServices> parseBouquet(char * data);
 	void m3uParser(char * url);
@@ -56,6 +58,7 @@ public:
 	
 	private:
 	
+	std::string enigmaurl;
 	EnigmaServices currbouquet;
 	
 	

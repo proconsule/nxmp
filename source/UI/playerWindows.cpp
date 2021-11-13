@@ -33,45 +33,12 @@ namespace playerWindows{
 	static float slider_supereq[18] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 	static char slider_superhz[][6] = {"65","92","131","185","262","370","523","740","1K","1.4K","2K","2.9K","4K","5.9K","8.3K","11K","16K","20K"};
 	
-	std::vector<std::string> supereqpresets = {"Flat","Lowered bass","Lowered treble","Sine"};
 	static int supereqpresetsidx = 0;
 	
 	
-	
-	void superEQpresets(int presetnum){
-		if(presetnum == 0){
-			for (int y = 0; y < 18; y++){
-				slider_supereq[y] = 1.0;
-			}
-		}
-		else if(presetnum == 1){
-			for (int y = 0; y < 18; y++){
-				if(y<7){
-					slider_supereq[y] = 1.0;
-				}else{
-					slider_supereq[y] = 3.0;
-				}
-			}
-		}
-		else if(presetnum == 2){
-			for (int y = 0; y < 18; y++){
-				if(y<12){
-					slider_supereq[y] = 3.0;
-				}else{
-					slider_supereq[y] = 1.0;
-				}
-			}
-		}
-		else if(presetnum == 3){
-			slider_supereq[0] = 2.0;slider_supereq[1] = 3.6;slider_supereq[2] = 4.5;slider_supereq[3] = 5.5;slider_supereq[4] = 6.0;slider_supereq[5] = 6.4;slider_supereq[6] = 6.6;slider_supereq[7] = 6.4;slider_supereq[8] = 6.0;slider_supereq[9] = 5.2;slider_supereq[10] = 4.0;slider_supereq[11] = 3.2;slider_supereq[12] = 3.0;slider_supereq[13] = 3.2;slider_supereq[14] = 3.8;slider_supereq[15] = 4.5;slider_supereq[16] = 5.2;slider_supereq[17] = 6.5;
-		}
-		
-		libmpv->setAudioSuperEQ(slider_supereq,false);
-	}
-	
-	
-	
 	void RightHomeWindow(bool *focus, bool *first_item){
+		rightmenuposX = item.rightmenu_startpos;
+		if(item.rightmenu_startpos>1080)item.rightmenu_startpos-=10;
 		playerWindows::SetupRightWindow();
 		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Image","Audio","Subtitle"};
 		if (ImGui::Begin("Right Menu Home", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
@@ -104,8 +71,9 @@ namespace playerWindows{
 					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
 					*first_item = false;
 				}
+				ImGui::EndListBox();
 			}
-			ImGui::EndListBox();
+			
 		}
 		playerWindows::ExitWindow();
 	}
@@ -570,8 +538,10 @@ namespace playerWindows{
 				ImGui::PushStyleColor(ImGuiCol_SliderGrab, (ImVec4)ImColor::HSV(colorid / 7.0f, 0.9f, 0.9f));
 				
 				sliderpos[y] = ImGui::GetCursorPosX();
-                if(ImGui::VSliderFloat("##v", ImVec2(32,150), &slider_supereq[y], 0.0f, 10.0f, "%.1f")){
-					libmpv->setAudioSuperEQ(slider_supereq,false);
+				std::string itemid = "##vsuperqslider" + std::to_string(y);
+                if(ImGui::VSliderFloat(itemid.c_str(), ImVec2(32,150), &slider_supereq[y], 0.0f, 10.0f, "%.1f")){
+					libmpv->setAudioSuperEQband(slider_supereq[y],y,false);
+					//libmpv->setAudioSuperEQ(slider_supereq,false);
 				}
 				ImGui::PopStyleColor(4);
 				ImGui::SameLine();
@@ -591,16 +561,20 @@ namespace playerWindows{
 				supereqpresetsidx = 0;
 				libmpv->setAudioSuperEQ(slider_supereq,false);
 			}
-			const char* combo_previewpreset_value = supereqpresets[supereqpresetsidx].c_str();
+			const char* combo_previewpreset_value = eqpreset->getPresets()[supereqpresetsidx].name.c_str();
 			ImGui::PushItemWidth(710*0.5);
 			ImGui::SameLine();
 			if (ImGui::BeginCombo("Presets", combo_previewpreset_value, 0))
 			{	
-				for (int n = 0; n < supereqpresets.size(); n++)
+				for (int n = 0; n < eqpreset->getPresets().size(); n++)
 				{
 				const bool is_selected = (supereqpresetsidx == n);
-				if (ImGui::Selectable(supereqpresets[n].c_str(), is_selected)){
-					superEQpresets(n);
+				
+				if (ImGui::Selectable(eqpreset->getPresets()[n].name.c_str(), is_selected)){
+					for(int y=0;y<18;y++){
+						slider_supereq[y] = eqpreset->getPresets()[n].eqvals[y];
+					}
+					libmpv->setAudioSuperEQ(slider_supereq,false);
 					supereqpresetsidx = n;
 				}
 				if (is_selected)
@@ -620,7 +594,7 @@ namespace playerWindows{
 			auto windowheight = ImGui::GetWindowSize().y;
 			ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Buffering Media...", NULL, true).x) * 0.5f);
 			ImGui::SetCursorPosY((windowheight - 24) * 0.5f);
-			ImGui::Text("Buffering Media...");
+			ImGui::Text("Buffering Media %c","|/-\\"[(int)(ImGui::GetTime() / 0.05f) & 3]);
 		}
 		playerWindows::ExitWindow();
 	}
@@ -633,6 +607,110 @@ namespace playerWindows{
 			ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Audio Playback", NULL, true).x) * 0.5f);
 			ImGui::SetCursorPosY((windowheight - 24) * 0.5f);
 			ImGui::Text("Audio Playback");
+			
+		}
+		playerWindows::ExitWindow();
+	}
+	
+	void playerControls(){
+		playerWindows::SetupPlayerControlsWindow();
+		static bool selected = -1;
+		if (ImGui::Begin("Player Controls", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+			
+			float centerposition = ImGui::GetWindowSize().x*0.5;
+			
+			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
+			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+			ImGui::ProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPerc(), ImVec2(-1.0f, 10.0f),"");
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
+			ImGui::SetCursorPosX(centerposition-90);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+5.0f);
+			
+			
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0,0.0,0.0,0.0));
+			if (ImGui::Selectable("##Play", selected == 0,0,ImVec2(60, 60))){
+				if(libmpv->Paused()){
+					libmpv->Resume();
+				}else{
+					libmpv->Pause();
+				}
+			}
+			ImGui::PopStyleColor();
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(centerposition-90);
+			if(libmpv->Paused()){
+				ImGui::Image((void*)(intptr_t)PlayIcon.id, ImVec2(60,60));
+			}else{
+				ImGui::Image((void*)(intptr_t)PauseIcon.id, ImVec2(60,60));
+			}
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(centerposition+20);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0,0.0,0.0,0.0));
+			if (ImGui::Selectable("##Stop", selected == 0,0,ImVec2(60, 60))){
+				libmpv->Stop();
+			}
+			ImGui::PopStyleColor();
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowSize().x-100.0f);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0,0.0,0.0,0.0));
+			if (ImGui::Selectable("##Mute", selected == 0,0,ImVec2(60, 60))){
+				libmpv->toggleMute();
+				printf("MUTE: %d\n",libmpv->getMute());
+			}
+			ImGui::PopStyleColor();
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowSize().x-100.0f);
+			if(libmpv->getMute()){
+				ImGui::Image((void*)(intptr_t)MuteIcon.id, ImVec2(60,60));
+			}else{
+				ImGui::Image((void*)(intptr_t)VolumeIcon.id, ImVec2(60,60));
+			}
+			
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(centerposition+20);
+			ImGui::Image((void*)(intptr_t)StopIcon.id, ImVec2(60,60));
+			ImGui::SameLine();
+			
+			ImGui::SetCursorPosX(centerposition+(centerposition*0.5));
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0,0.0,0.0,0.0));
+			if (ImGui::Selectable("##Loop", selected == 0,0,ImVec2(60, 60))){
+				libmpv->setLoop(!libmpv->getLoop());
+			}
+			ImGui::PopStyleColor();
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(centerposition+(centerposition*0.5));
+			if(libmpv->getLoop()){
+				ImGui::Image((void*)(intptr_t)LoopIcon.id, ImVec2(60,60));
+			}else{
+				ImGui::Image((void*)(intptr_t)NoLoopIcon.id, ImVec2(60,60));
+			}
+			ImGui::SameLine();
+			
+			ImGui::PushFont(fontSmall);
+			ImGui::SetCursorPosX(20);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0);
+			if(libmpv->getFileInfo()->playbackInfo.title ==""){
+				ImGui::Text("%s",Utility::truncateLen(FS::getFilefromPath(libmpv->getFileInfo()->path),63).c_str());
+			}else{
+				if(libmpv->getFileInfo()->playbackInfo.artist ==""){
+					ImGui::Text("%s",Utility::truncateLen(libmpv->getFileInfo()->playbackInfo.title.c_str(),63).c_str());
+				}else{
+					std::string titleandartist = libmpv->getFileInfo()->playbackInfo.title + std::string(" - ") + libmpv->getFileInfo()->playbackInfo.artist;
+					ImGui::Text("%s",Utility::truncateLen(titleandartist,63).c_str());
+				}
+			}
+			ImGui::SetCursorPosX(20);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()-40.0f);
+			char timetext[64];
+			sprintf(timetext,"%s - %s",Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.position).c_str(),Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.duration).c_str());
+			ImGui::SetCursorPosX(20);
+			ImGui::Text("%s",timetext);
+			ImGui::PopFont();
+			
+			
+			
 			
 		}
 		playerWindows::ExitWindow();

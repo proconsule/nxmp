@@ -2,6 +2,7 @@
 #define NXMP_PLAYERWINDOWS_H
 
 #include "imgui.h"
+#include "gui.h"
 
 
 namespace playerWindows{
@@ -13,8 +14,9 @@ namespace playerWindows{
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
 	}
 	
+	static float rightmenuposX = 1280.0f;
 	inline void SetupRightWindow(void) {
-        ImGui::SetNextWindowPos(ImVec2(1080.0f, 0.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowPos(ImVec2(rightmenuposX, 0.0f), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(200.0f, 720.0f), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
@@ -31,6 +33,13 @@ namespace playerWindows{
 	
 	inline void SetupAudioPlayerWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Once);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
+    };
+	
+	inline void SetupPlayerControlsWindow(void) {
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
@@ -60,6 +69,8 @@ namespace playerWindows{
 	
 	
 	void CacheWindow();
+	
+	void playerControls();
 	
 }
 

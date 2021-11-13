@@ -68,14 +68,12 @@ namespace Windows {
 									
 						}
 						if(topmenu[n] == "Enigma2"){
-							enigma2 = new Enigma2();
+							enigma2 = new Enigma2(configini->getEnigma());
 							item.first_item = true;
-							std::string e2uri = configini->getEnigma();
-							if(e2uri == ""){
+							if(configini->getEnigma() == ""){
 								item.state = MENU_STATE_ENIGMABROWSER;
 							}else{
-								urlschema e2schema = Utility::parseUrl(e2uri);
-								enigma2->enigma2ip = e2schema.server;
+								//urlschema e2schema = Utility::parseUrl(e2uri);
 								enigma2->getServices();
 								item.state = MENU_STATE_ENIGMABROWSER;
 							}

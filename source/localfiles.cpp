@@ -96,5 +96,10 @@ namespace FS {
 		if(retpath == "")retpath = "/";
 		return retpath;
 	}
-
+	
+	std::string getFilefromPath(std::string path){
+		std::string retpath = path.substr(path.find_last_of("\\/")+1);
+		return retpath;
+	}
+	
 }

@@ -30,6 +30,7 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "fbo-format", "rgba8");
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());
 	mpv_set_option_string(handle, "volume-max", "200");
+
 	
 	if(configini->getUseAlang(false)){
 		std::string alangstring = Utility::getLanguages()[configini->getAlang(false)].lang3 + std::string(",") + Utility::getLanguages()[configini->getAlang(false)].lang2 + std::string(",eng,en");
@@ -69,7 +70,7 @@ libMpv::libMpv(const std::string &configDir) {
 	
 	mpv_version = mpv_get_property_string(handle, "mpv-version");
 	ffmpeg_version = mpv_get_property_string(handle, "ffmpeg-version");
-	
+		
 	mpv_node node;
     mpv_get_property(handle, "decoder-list", MPV_FORMAT_NODE, &node);
     if (node.format == MPV_FORMAT_NODE_ARRAY) {
@@ -98,10 +99,49 @@ libMpv::libMpv(const std::string &configDir) {
 	
 }
 
+void libMpv::loadFile(std::string _path){
+	if(fileinfo != nullptr){
+		delete fileinfo;
+	}
+	fileinfo = new fileInfo();
+	fileinfo->path = _path;
+	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
+	mpv_command_async(handle, 0, cmd);
+	setLoop(false);
+	
+	
+}
+
+void libMpv::loadFileLive(std::string _path,std::string _changename){
+	if(fileinfo != nullptr){
+		delete fileinfo;
+	}
+	fileinfo = new fileInfo();
+	fileinfo->path = _path;
+	fileinfo->playbackInfo.title = _changename;
+	fileinfo->playbackInfo.islive = true;
+	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
+	mpv_command_async(handle, 0, cmd);
+	setLoop(false);
+}
+
 int64_t libMpv::getPosition() {
 	int64_t position = 0;
 	mpv_get_property(handle, "playback-time", MPV_FORMAT_INT64, &position);
 	return position;
+}
+
+int64_t libMpv::getDuration() {
+    int64_t duration = 0;
+    mpv_get_property(handle, "duration", MPV_FORMAT_INT64, &duration);
+    return duration;
+}
+
+int libMpv::getFileInfoPerc() {
+	if(fileinfo != nullptr){
+		return (int)(((double)((double)fileinfo->playbackInfo.position/(double)fileinfo->playbackInfo.duration))*100.0)+0.5f;
+	}
+	return 0;
 }
 
 void libMpv::Pause() {
@@ -118,6 +158,7 @@ void libMpv::Stop() {
 }
 	
 void libMpv::seek(double position,bool osd) {
+	if(position <=0)position = 0;
 	if(osd){
 		std::string cmd = "seek " + std::to_string(position) + " absolute";
 		mpv_command_string(handle, cmd.c_str());
@@ -179,6 +220,11 @@ void libMpv::getfileInfo() {
                 fileInfo::Track stream{};
 				for (int n = 0; n < node.u.list->values[i].u.list->num; n++) {
                     std::string key = node.u.list->values[i].u.list->keys[n];
+					if(key == "albumart"){
+						if (node.u.list->values[i].u.list->values[n].format == MPV_FORMAT_FLAG) {
+							stream.albumart = node.u.list->values[i].u.list->values[n].u.flag;
+						}
+					}
                     if (key == "type") {
                         if (node.u.list->values[i].u.list->values[n].format == MPV_FORMAT_STRING) {
                             stream.type = node.u.list->values[i].u.list->values[n].u.string;
@@ -257,11 +303,6 @@ void libMpv::getfileInfo() {
 	
 	
 	
-	if(fileinfo != nullptr){
-		delete fileinfo;
-	}
-	fileinfo = new fileInfo();
-	
 	fileInfo::Track dummysubstream{};
 	dummysubstream.id = -1;
 	dummysubstream.title = "None";
@@ -296,6 +337,7 @@ void libMpv::getfileInfo() {
 		fflush(stdout);
 	}
 	
+	fileinfo->playbackInfo.duration = getDuration();
 	
 }
 
@@ -439,6 +481,21 @@ void libMpv::setVolume(int value,bool osd){
 		std::string cmd = "no-osd set volume " + std::to_string(value);
 		mpv_command_string(handle, cmd.c_str());
 	}
+	volume = value;
+}
+
+bool libMpv::getMute(){
+	if(volume == 0)return true;
+	return false;
+}
+
+void libMpv::toggleMute(){
+	if(getMute()){
+		setVolume(tmpvolume,false);
+	}else{
+		tmpvolume = volume;
+		setVolume(0,false);
+	}
 }
 
 void libMpv::setAudioDelay(double value, bool osd){
@@ -471,14 +528,48 @@ void libMpv::setAudioEQ(int *eqval,bool osd){
 	
 }
 
+
+void libMpv::setAudioSuperEQband(float eqval,int band,bool osd){
+	//char eqstring[1024];
+	//sprintf(eqstring,"no-osd set af superequalizer=1b=%.1f:2b=%.1f:3b=%.1f:4b=%.1f:5b=%.1f:6b=%.1f:7b=%.1f:8b=%.1f:9b=%.1f:10b=%.1f:11b=%.1f:12b=%.1f:13b=%.1f:14b=%.1f:15b=%.1f:16b=%.1f:17b=%.1f",eqval[0],eqval[1],eqval[2],eqval[3],eqval[4],eqval[5],eqval[6],eqval[7],eqval[8],eqval[9],eqval[10],eqval[11],eqval[12],eqval[13],eqval[14],eqval[15],eqval[16]);
+	//mpv_command_string(handle, eqstring);
+
+	char eqstring2[512];
+	sprintf(eqstring2,"superequalizer=%db=%.1f",band+1,eqval);
+	const char *args[] = {"set","af",eqstring2,NULL};
+	mpv_command_async(handle,0,args);
+	
+	
+}
+
 void libMpv::setAudioSuperEQ(float *eqval,bool osd){
-	char eqstring[1024];
-	sprintf(eqstring,"no-osd set af superequalizer=1b=%.1f:2b=%.1f:3b=%.1f:4b=%.1f:5b=%.1f:6b=%.1f:7b=%.1f:8b=%.1f:9b=%.1f:10b=%.1f:11b=%.1f:12b=%.1f:13b=%.1f:14b=%.1f:15b=%.1f:16b=%.1f:17b=%.1f",eqval[0],eqval[1],eqval[2],eqval[3],eqval[4],eqval[5],eqval[6],eqval[7],eqval[8],eqval[9],eqval[10],eqval[11],eqval[12],eqval[13],eqval[14],eqval[15],eqval[16]);
-	mpv_command_string(handle, eqstring);
+	//char eqstring[1024];
+	//sprintf(eqstring,"no-osd set af superequalizer=1b=%.1f:2b=%.1f:3b=%.1f:4b=%.1f:5b=%.1f:6b=%.1f:7b=%.1f:8b=%.1f:9b=%.1f:10b=%.1f:11b=%.1f:12b=%.1f:13b=%.1f:14b=%.1f:15b=%.1f:16b=%.1f:17b=%.1f",eqval[0],eqval[1],eqval[2],eqval[3],eqval[4],eqval[5],eqval[6],eqval[7],eqval[8],eqval[9],eqval[10],eqval[11],eqval[12],eqval[13],eqval[14],eqval[15],eqval[16]);
+	//mpv_command_string(handle, eqstring);
+
+	char eqstring2[1024];
+	sprintf(eqstring2,"superequalizer=1b=%.1f:2b=%.1f:3b=%.1f:4b=%.1f:5b=%.1f:6b=%.1f:7b=%.1f:8b=%.1f:9b=%.1f:10b=%.1f:11b=%.1f:12b=%.1f:13b=%.1f:14b=%.1f:15b=%.1f:16b=%.1f:17b=%.1f",eqval[0],eqval[1],eqval[2],eqval[3],eqval[4],eqval[5],eqval[6],eqval[7],eqval[8],eqval[9],eqval[10],eqval[11],eqval[12],eqval[13],eqval[14],eqval[15],eqval[16]);
+	const char *args[] = {"set","af",eqstring2,NULL};
+	mpv_command_async(handle,0,args);
+	
+	
 }
 
 void libMpv::setDeinterlace(int value){
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(value).c_str());
+}
+
+void libMpv::setLoop(bool val){
+	if(val){
+		mpv_set_option_string(handle,"loop-file","inf");
+	}else{
+		mpv_set_option_string(handle,"loop-file","no");
+	}
+	loop = val;
+}
+
+bool libMpv::getLoop(){
+	return loop;
 }
 
 libMpv::~libMpv(){

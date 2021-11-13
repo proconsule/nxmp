@@ -22,6 +22,8 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include "SimpleIni.h"
+#include "SQLiteDB.h"
+#include "eqpreset.h"
 
 //#define NDEBUG 1
 
@@ -36,7 +38,9 @@ HTTPDir *httpdir = nullptr;
 #ifdef __SWITCH__
 USBMounter *usbmounter = nullptr;
 #endif
-Config *configini;
+Config *configini = nullptr;
+EQPreset *eqpreset = nullptr;
+SQLiteDB *sqlitedb = nullptr;
 Enigma2 *enigma2 = nullptr;
 uint32_t wakeup_on_mpv_render_update;
 uint32_t wakeup_on_mpv_events;
@@ -66,6 +70,14 @@ Tex MPVTexture;
 
 Tex NXMPBannerTexture;
 Tex ExitTexture;
+
+Tex PlayIcon;
+Tex PauseIcon;
+Tex StopIcon;
+Tex MuteIcon;
+Tex VolumeIcon;
+Tex LoopIcon;
+Tex NoLoopIcon;
 
 ImFont* fontSmall;
 
@@ -130,6 +142,12 @@ int main(int argc,char *argv[]){
 	printf("Loading Config\n");
 	
 	configini = new Config("config.ini");
+	
+	eqpreset = new EQPreset("eqpresets.ini");
+
+	if(configini->getDbActive(false)){
+		sqlitedb = new SQLiteDB("nxmp.db");
+	}
 	
 	
 #ifdef __SWITCH__
@@ -254,6 +272,14 @@ int main(int argc,char *argv[]){
 	Utility::TxtLoadFromFile("romfs:/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
 	Utility::TxtLoadFromFile("romfs:/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
 	Utility::TxtLoadFromFile("romfs:/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
+	Utility::TxtLoadFromFile("romfs:/player/play.png",&PlayIcon.id,&PlayIcon.width,&PlayIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/stop.png",&StopIcon.id,&StopIcon.width,&StopIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/pause.png",&PauseIcon.id,&PauseIcon.width,&PauseIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/mute.png",&MuteIcon.id,&MuteIcon.width,&MuteIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/volume.png",&VolumeIcon.id,&VolumeIcon.width,&VolumeIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/loop.png",&LoopIcon.id,&LoopIcon.width,&LoopIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/noloop.png",&NoLoopIcon.id,&NoLoopIcon.width,&NoLoopIcon.height);
+	
 #else
 	Utility::TxtLoadFromFile("./romfs/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
 	Utility::TxtLoadFromFile("./romfs/usb.png",&UsbTexture.id,&UsbTexture.width,&UsbTexture.height);
@@ -269,6 +295,15 @@ int main(int argc,char *argv[]){
 	Utility::TxtLoadFromFile("./romfs/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
 	Utility::TxtLoadFromFile("./romfs/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
 	Utility::TxtLoadFromFile("./romfs/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
+	Utility::TxtLoadFromFile("./romfs/player/play.png",&PlayIcon.id,&PlayIcon.width,&PlayIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/stop.png",&StopIcon.id,&StopIcon.width,&StopIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/pause.png",&PauseIcon.id,&PauseIcon.width,&PauseIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/mute.png",&MuteIcon.id,&MuteIcon.width,&MuteIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/volume.png",&VolumeIcon.id,&VolumeIcon.width,&VolumeIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/loop.png",&LoopIcon.id,&LoopIcon.width,&LoopIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/noloop.png",&NoLoopIcon.id,&NoLoopIcon.width,&NoLoopIcon.height);
+	
+	
 #endif	
 	
 	printf("Init Enigma2\n");
@@ -277,9 +312,37 @@ int main(int argc,char *argv[]){
 	printf("Ending Render Loop\n");
 	delete libmpv;
 	libmpv = nullptr;
-	delete enigma2;
-	enigma2 = nullptr;
-
+	
+	
+	
+	if(localdir != nullptr){
+		delete localdir;
+		localdir = nullptr;
+	}
+#ifdef __SWITCH__
+	if(usbmounter != nullptr){
+		delete usbmounter;
+		usbmounter = nullptr;
+	}
+#endif
+	if(ftpdir != nullptr){
+		delete ftpdir;
+		ftpdir = nullptr;
+	}
+	if(httpdir != nullptr){
+		delete httpdir;
+		httpdir = nullptr;
+	}
+	if(enigma2 != nullptr){
+		delete enigma2;
+		enigma2 = nullptr;
+	}
+	
+	if(sqlitedb != nullptr){
+		delete sqlitedb;
+		sqlitedb = nullptr;
+	}
+	
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -292,6 +355,7 @@ int main(int argc,char *argv[]){
 	
 	
 	printf("Exit Services\n");
+	
 #ifdef __SWITCH__
 	ncmExit();
 	plExit();

@@ -40,6 +40,7 @@ namespace FS {
 	std::vector<FileEntry> getDirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
 	std::string backPath(std::string path);
 	bool Sort(const FileEntry &entryA, const FileEntry &entryB);
+	std::string getFilefromPath(std::string path);
 }
 
 #endif

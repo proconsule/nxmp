@@ -16,6 +16,7 @@ namespace Popups {
     };
 
 	void SaveSettingsPopup(void);
+	void ResumePopup(void);
 }
 
 #endif

@@ -18,7 +18,9 @@ namespace Windows {
 				ImGui::Text("%s",enigma2->getCurrBouquet().name.c_str());
 				ImGui::EndMenuBar();
 			}
-            if (ImGui::BeginListBox("Enigma2 Browser Menu",ImVec2(1280.0f, 720.0f))){
+			float total_w = ImGui::GetContentRegionAvail().x;
+			float total_h = ImGui::GetContentRegionAvail().y;
+			if (ImGui::BeginListBox("Enigma2 Browser Menu",ImVec2(total_w, total_h))){
 				if(enigma2->getCurrBouquet().bouquetref == ""){
 					for (unsigned int n = 0; n < enigma2->e2services.size(); n++){
 						static int selected = -1;
@@ -43,8 +45,9 @@ namespace Windows {
 						float currstartpos = ImGui::GetCursorPosX();
 						if (ImGui::Selectable(itemid.c_str(), selected == n, 0, ImVec2(0, 70))){
 									
-							const char *cmd[] = {"loadfile", enigma2->e2currbouqet[n].url.c_str(), NULL};
-							mpv_command_async(libmpv->getHandle(), 0, cmd);
+							libmpv->loadFileLive(enigma2->e2currbouqet[n].url,enigma2->e2currbouqet[n].name);
+							
+								
 						}
 						ImGui::SameLine();
 						ImGui::SetCursorPosX(currstartpos);

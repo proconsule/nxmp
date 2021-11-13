@@ -39,18 +39,19 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	libs/imgui libs/imgui/misc/freetype source source/UI source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
+SOURCES		:=	libs/imgui libs/imgui/misc/freetype source source/eqpreset source/database source/UI source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
 DATA		:=	data
-INCLUDES	:=	libs/simpleini libs/imgui include source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
+INCLUDES	:=	libs/simpleini libs/imgui include source/eqpreset source/database source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
 ROMFS		:=	romfs
 
 VERSION_MAJOR := 0
-VERSION_MINOR := 4
-VERSION_MICRO := 1
+VERSION_MINOR := 5
+VERSION_MICRO := 0
 
 APP_TITLE     := NXMP
 APP_AUTHOR    := proconsule
 APP_VERSION   := ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}
+
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -61,7 +62,7 @@ CFLAGS	:=	-g -Wall -Wno-sign-compare -O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
 CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags`
 
-CFLAGS	+=	$(INCLUDE) -D__SWITCH__
+CFLAGS	+=	$(INCLUDE) -D__SWITCH__ $(BUILD_TYPE)
 
 CFLAGS  +=      -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) -gdwarf-2 -gstrict-dwarf
 
@@ -71,7 +72,9 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lnx -lz
+LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lnx -lz
+
+
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -174,7 +177,17 @@ all: $(BUILD)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+ifneq (,$(findstring r,$(MAKEFLAGS)))
+	@echo "Stable Release"
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile BUILD_TYPE=-DRELEASE_TYPE=0
+else
+	@echo "Beta Release"
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile BUILD_TYPE=-DRELEASE_TYPE=1
+	
+endif
+	
+	
+
 
 #---------------------------------------------------------------------------------
 clean:
@@ -196,6 +209,7 @@ DEPENDS	:=	$(OFILES:.o=.d)
 # main targets
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(APP_JSON)),)
+
 
 all	:	$(OUTPUT).nro
 
