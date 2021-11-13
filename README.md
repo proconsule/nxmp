@@ -64,6 +64,7 @@ Thanks to
 - bodyXY @ GBATemp forum for banner and icons
 - Godorowski @ GBATemp forum for player UI design and icons
 - Chocola @ GBATemp forum for usage guide and beta testing
+- student @ reboot.ms forum for beta testing
 - docgold @ GBATemp forum for Enigma2 samples and support on decoders
 - tataniko @ GBATemp forum for suggestions and bug hunting
 - All guys on GBAtemp
