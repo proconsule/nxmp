@@ -39,14 +39,14 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	libs/imgui libs/imgui/misc/freetype source source/eqpreset source/database source/UI source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
+SOURCES		:=	libs/imgui libs/imgui/misc/freetype source source/shadermania source/eqpreset source/database source/UI source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
 DATA		:=	data
-INCLUDES	:=	libs/simpleini libs/imgui include source/eqpreset source/database source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
+INCLUDES	:=	libs/simpleini libs/imgui include source/shadermania source/eqpreset source/database source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
 ROMFS		:=	romfs
 
 VERSION_MAJOR := 0
 VERSION_MINOR := 5
-VERSION_MICRO := 0
+VERSION_MICRO := 1
 
 APP_TITLE     := NXMP
 APP_AUTHOR    := proconsule

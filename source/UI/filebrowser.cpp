@@ -44,6 +44,7 @@ namespace Windows {
 								localdir->DirList(thislist[n].path,true,Utility::getMediaExtensions());
 							}
 							else{
+								item.laststate = item.state;
 								libmpv->loadFile(thislist[n].path);
 								if(configini->getDbActive(true)){
 									libmpv->getFileInfo()->resume = sqlitedb->getResume(thislist[n].path);

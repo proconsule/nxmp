@@ -48,6 +48,7 @@ namespace Windows {
 							}else if (thislist[n].type == FS::FileEntryType::File){
 											
 									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + thislist[n].path + thislist[n].name;
+									item.laststate = item.state;
 									libmpv->loadFile(openurl);
 									if(configini->getDbActive(true)){
 										libmpv->getFileInfo()->resume = sqlitedb->getResume(openurl);
@@ -118,6 +119,7 @@ namespace Windows {
 									
 									urlschema thisurl = Utility::parseUrl(httpdir->getUrl());
 									std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
+									item.laststate = item.state;
 									libmpv->loadFile(openurl);
 									libmpv->getFileInfo()->resume = sqlitedb->getResume(openurl);
 									if(libmpv->getFileInfo()->resume>0){

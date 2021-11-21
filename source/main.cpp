@@ -25,6 +25,8 @@
 #include "SQLiteDB.h"
 #include "eqpreset.h"
 
+#include "shaderMania.h"
+
 //#define NDEBUG 1
 
 static bool init();
@@ -81,6 +83,8 @@ Tex NoLoopIcon;
 
 ImFont* fontSmall;
 
+shaderMania* shadermania = nullptr;
+
 const GLuint WIDTH = 1280, HEIGHT = 720;
 
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
@@ -128,6 +132,7 @@ static bool init() {
 
 #ifdef __SWITCH__
 int main() {
+	 appletLockExit();
 #else
 int main(int argc,char *argv[]){
 #endif
@@ -149,6 +154,7 @@ int main(int argc,char *argv[]){
 		sqlitedb = new SQLiteDB("nxmp.db");
 	}
 	
+	shadermania = new shaderMania();
 	
 #ifdef __SWITCH__
 	Result ret;
@@ -308,6 +314,7 @@ int main(int argc,char *argv[]){
 	
 	printf("Init Enigma2\n");
 	
+	
 	GUI::RenderLoop();
 	printf("Ending Render Loop\n");
 	delete libmpv;
@@ -361,6 +368,7 @@ int main(int argc,char *argv[]){
 	plExit();
 	romfsExit();
     socketExit();
+	appletUnlockExit();
 #endif
     return 0;	
 }

@@ -28,6 +28,9 @@ public:
 	int getAlang(bool tmpvalue);
 	void setAlang(int lang);
 	
+	int getSubFontSize(bool tmpvalue);
+	void setSubFontSize(int val);
+	
 	int getDeinterlace(bool tmpvalue);
 	void setDeinterlace(int value);
 	
@@ -57,8 +60,13 @@ private:
 	int tmpalang;
 	int alang;
 	
+	int tmpsubfontsize;
+	int subfontsize;
+	
 	int tmpdeint;
 	int deint;
+	
+	
 	
 	
 	int tmpstartresumeperc;

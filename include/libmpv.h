@@ -63,6 +63,7 @@ public:
 	void setRotate(int value, bool osd);
 	
 	void setVolume(int value,bool osd);
+	int getVolume();
 	
 	bool getMute();
 	void toggleMute();
@@ -84,6 +85,8 @@ public:
 	
 	void getfileInfo();
 	
+	void setShader(std::string _filename);
+	void clearShader();
 
 	
 	mpv_handle *getHandle();
@@ -96,6 +99,8 @@ public:
 	
 private:
 
+
+	void resetFileInfo();
     mpv_handle *handle = nullptr;
     mpv_render_context *context = nullptr;
 	std::vector<decoderlist_struct> decoderlist;

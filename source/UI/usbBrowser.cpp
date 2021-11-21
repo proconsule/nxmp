@@ -81,7 +81,7 @@ namespace Windows {
 								item.usbfileentries = FS::getDirList(item.usbpath.c_str(),true,Utility::getMediaExtensions());
 								triggerselect = true;
 							}else if(thislist[n].type == FS::FileEntryType::File){
-								
+								item.laststate = item.state;
 								libmpv->loadFile(thislist[n].path);
 								if(configini->getDbActive(true)){
 									libmpv->getFileInfo()->resume = sqlitedb->getResume(thislist[n].path);

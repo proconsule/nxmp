@@ -44,7 +44,7 @@ namespace Windows {
 						std::string itemid = "##" + std::to_string(n);
 						float currstartpos = ImGui::GetCursorPosX();
 						if (ImGui::Selectable(itemid.c_str(), selected == n, 0, ImVec2(0, 70))){
-									
+							item.laststate = item.state;
 							libmpv->loadFileLive(enigma2->e2currbouqet[n].url,enigma2->e2currbouqet[n].name);
 							
 								

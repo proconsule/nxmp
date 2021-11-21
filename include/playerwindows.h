@@ -14,6 +14,14 @@ namespace playerWindows{
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
 	}
 	
+	inline void SetupVolumeWindow(void){
+		ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(200.0f, 50.0f), ImGuiCond_Once);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
+	}
+	
 	static float rightmenuposX = 1280.0f;
 	inline void SetupRightWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(rightmenuposX, 0.0f), ImGuiCond_Always);
@@ -42,12 +50,25 @@ namespace playerWindows{
         ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
     };
 
     inline void ExitWindow(void) {
         ImGui::End();
         ImGui::PopStyleVar();
+		ImGui::PopStyleColor();
+    };
+	
+	inline void ExitVolumeWindow(void) {
+        ImGui::End();
+        ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor();
+    };
+	
+	inline void ExitControlsWindow(void) {
+        ImGui::End();
+        ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor();
     };
 	
@@ -71,6 +92,9 @@ namespace playerWindows{
 	void CacheWindow();
 	
 	void playerControls();
+	
+	void RightHomeShaderMania();
+	void VolumeWindow();
 	
 }
 

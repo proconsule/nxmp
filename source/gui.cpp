@@ -12,6 +12,11 @@
 MenuItem item;
 
 namespace GUI {
+	
+	const int JOYSTICK_DEAD_ZONE = 8000;
+	const int JOYSTICK_EXTENDED_DEAD_ZONE = 32726;
+	
+	
 	enum SDL_KEYS {
 		SDL_KEY_A, SDL_KEY_B, SDL_KEY_X, SDL_KEY_Y,
 		SDL_KEY_LSTICK, SDL_KEY_RSTICK,
@@ -37,11 +42,6 @@ namespace GUI {
 		mpv_set_wakeup_callback(libmpv->getHandle(), on_mpv_events, NULL);
 		mpv_render_context_set_update_callback(libmpv->getContext(), [](void *) -> void { SDL_Event event = {.type = wakeup_on_mpv_render_update}; SDL_PushEvent(&event); }, NULL);
 	
-	}
-	
-	void toggleStats(){
-		const char *cmd[] = {"script-binding","stats/display-stats-toggle" ,NULL};
-		mpv_command_async(libmpv->getHandle(), 0, cmd);
 	}
 	
 	void toggleMasterLock(){
@@ -137,27 +137,97 @@ namespace GUI {
 						sdlevent.jbutton.button = SDL_KEY_L;
 						SDL_PushEvent(&sdlevent);
 					}
-					if(keycode == SDLK_t){
-						//mpv_set_option_string(libmpv->getHandle(), "gpu-nxmp-deint", "0");
-						//mpv_set_option_string(libmpv->getHandle(), "glsl-shader", "C:\\Users\\Ceco\\C-Dev\\imgui-test\\mpv\\shaders\\test.hook");
-						mpv_command_string(libmpv->getHandle(),"no-osd change-list glsl-shaders set C:\\Users\\Ceco\\C-Dev\\imgui-test\\mpv\\shaders\\scale.glsl");
+					if(keycode == SDLK_i){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_RSTICK_UP;
+						SDL_PushEvent(&sdlevent);
+					}
+					if(keycode == SDLK_k){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_RSTICK_DOWN;
+						SDL_PushEvent(&sdlevent);
+					}
+					
+					
+					if(keycode == 45){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_MINUS;
+						SDL_PushEvent(&sdlevent);
 					}
 					if(keycode == SDLK_e){
-						mpv_command_string(libmpv->getHandle(),"no-osd change-list glsl-shaders clr \"\"");
-						//mpv_set_option_string(libmpv->getHandle(), "gpu-nxmp-deint", "1");
+						
 					}
 					
 				}
 #endif
+				if(event.type == SDL_JOYAXISMOTION){
+					if( event.jaxis.axis == 3 ) {
+						if( event.jaxis.value > JOYSTICK_DEAD_ZONE ) {
+							if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+								item.showVolume = true;
+								ImGuiContext& g = *GImGui;
+								item.VolumeHide = g.Time;
+								if(libmpv->getVolume()-1>=0){
+									libmpv->setVolume(libmpv->getVolume()-1,false);
+								}
+							}
+						}
+						else if( event.jaxis.value < -JOYSTICK_DEAD_ZONE ) {
+							if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+								item.showVolume = true;
+								ImGuiContext& g = *GImGui;
+								item.VolumeHide = g.Time;
+								if(libmpv->getVolume()+1<=100){
+									libmpv->setVolume(libmpv->getVolume()+1,false);
+								}
+							}
+						}
+						
+					}
+					
+					//Uint8 axis = event.axis;
+					
+					
+				}
+				
 				if (event.type == SDL_JOYBUTTONDOWN) {
 					
 					Uint8 button = event.jbutton.button;
 					if (button == SDL_KEY_PLUS && !item.masterlock)
 						renderloopdone = true;
 					
+					
+					
+					
+					if (button == SDL_KEY_RSTICK_UP){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+							item.showVolume = true;
+							ImGuiContext& g = *GImGui;
+							item.VolumeHide = g.Time;
+							if(libmpv->getVolume()+1<=100){
+								libmpv->setVolume(libmpv->getVolume()+1,false);
+							}
+						}
+					}
+					
+					if (button == SDL_KEY_RSTICK_DOWN){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+							item.showVolume = true;
+							ImGuiContext& g = *GImGui;
+							item.VolumeHide = g.Time;
+							if(libmpv->getVolume()-1>=0){
+								libmpv->setVolume(libmpv->getVolume()-1,false);
+							}
+						}
+					}
+					
+					
 					if (button == SDL_KEY_DUP){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.popupstate == POPUP_STATE_NONE){
-						
+							
 						}
 					}
 					
@@ -165,6 +235,7 @@ namespace GUI {
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.popupstate == POPUP_STATE_NONE){
 							if(item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
 								item.playercontrolstate = PLAYER_CONTROL_STATE_CONTROLS;
+								
 							}else{
 								item.playercontrolstate = PLAYER_CONTROL_STATE_NONE;
 							}
@@ -197,7 +268,9 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_MINUS){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
-							toggleStats();
+							item.state = item.laststate;
+						}else if(item.state != MENU_STATE_PLAYER && !libmpv->Stopped()){
+							item.state = MENU_STATE_PLAYER;
 						}
 					}
 					
@@ -258,7 +331,7 @@ namespace GUI {
 								localdir = nullptr;
 							}
 #ifdef __SWITCH__
-							if(usbmounter != nullptr){
+							if(usbmounter != nullptr && libmpv->Stopped()){
 								delete usbmounter;
 								usbmounter = nullptr;
 							}
@@ -284,25 +357,25 @@ namespace GUI {
 										
 					}
 					if (button == SDL_KEY_B){
-						if(item.state == MENU_STATE_ENIGMABROWSER && libmpv->Stopped()){
+						if(item.state == MENU_STATE_ENIGMABROWSER){
 							item.first_item = true;
 							enigma2->backToTop();
 						}
 						
-						if(item.state == MENU_STATE_FTPBROWSER && libmpv->Stopped()){
+						if(item.state == MENU_STATE_FTPBROWSER){
 							item.first_item = true;
 							ftpdir->backDir();
 							ftpdir->DirList(ftpdir->getCurrPath(),Utility::getMediaExtensions());
 						}
 						
-						if(item.state == MENU_STATE_HTTPBROWSER && libmpv->Stopped()){
+						if(item.state == MENU_STATE_HTTPBROWSER){
 							item.first_item = true;
 							httpdir->backDir();
 							httpdir->DirList(httpdir->getCurrPath(),Utility::getMediaExtensions());
 							
 						}
 						
-						if(item.state == MENU_STATE_USB && libmpv->Stopped()){
+						if(item.state == MENU_STATE_USB){
 							if(item.usbbasepath != ""){
 								item.first_item = true;
 								if(item.usbpath != item.usbbasepath){
@@ -314,7 +387,7 @@ namespace GUI {
 							}
 						}
 						
-						if(item.state == MENU_STATE_FILEBROWSER && libmpv->Stopped()){
+						if(item.state == MENU_STATE_FILEBROWSER){
 							item.first_item = true;
 							localdir->backPath();
 							localdir->DirList(localdir->getCurrentPath(),true,Utility::getMediaExtensions());
@@ -325,7 +398,6 @@ namespace GUI {
 							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
 								if(!libmpv->Stopped()  && !item.masterlock){
 									item.state = item.laststate;
-									
 									libmpv->Stop();
 								}
 							}else if(item.rightmenustate == PLAYER_RIGHT_MENU_TRACKS){
@@ -357,6 +429,9 @@ namespace GUI {
 							}
 							else if(item.rightmenustate == PLAYER_SUPERAUDIOEQ){
 								item.rightmenustate = PLAYER_RIGHT_MENU_AUDIO;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_SHADERMANIA){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 							}
 							
 							
@@ -434,6 +509,7 @@ namespace GUI {
 						mpv_event_property *prop = (mpv_event_property*)mp_event->data;
 						if(std::string(prop->name) == "metadata" && !libmpv->Stopped()) 
 						{
+							if(prop->data == nullptr)continue;
 							mpv_node node = *(mpv_node *)prop->data;
 							printf("Node format %d\n",node.format);
 							if (node.format == MPV_FORMAT_NODE_MAP) {
@@ -513,6 +589,9 @@ namespace GUI {
 					playerWindows::CacheWindow();
 					break;
 				case MENU_STATE_PLAYER:
+					if(item.showVolume){
+						playerWindows::VolumeWindow();
+					}
 					if(item.popupstate == POPUP_STATE_RESUME){
 						Popups::ResumePopup();
 					}
@@ -567,7 +646,10 @@ namespace GUI {
 					break;
 				case PLAYER_RIGHT_MENU_SUB:
 					playerWindows::RightHomeSub(&item.rightmenu_focus,&item.rightmenu_first_item);
-					break;	
+					break;
+				case PLAYER_RIGHT_MENU_SHADERMANIA:
+					playerWindows::RightHomeShaderMania();
+					break;
 				case PLAYER_AUDIOEQ:
 					playerWindows::AudioEqualizer(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;
@@ -609,8 +691,12 @@ namespace GUI {
 	}
 
 	int RenderLoop(void) {
-	
+#ifdef __SWITCH__
+		while (!renderloopdone && appletMainLoop())
+#endif
+#ifdef _WIN32
 		while (!renderloopdone)
+#endif
 		{
 			HandleEvents();
 			HandleLayers();

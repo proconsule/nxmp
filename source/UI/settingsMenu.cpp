@@ -83,6 +83,24 @@ namespace Windows {
 					ImGui::EndDisabled();
 				}
 				
+				ImGui::Text("Sub Font Size");
+				ImGui::SameLine(220,spacing);
+				ImGui::PushButtonRepeat(true);
+				if (ImGui::ArrowButton("##subsizeleft", ImGuiDir_Left)) {
+					if(configini->getSubFontSize(true)-1 >0){
+						configini->setSubFontSize(configini->getSubFontSize(true)-1);
+					}
+				}
+				ImGui::SameLine(0.0f, spacing);
+				if (ImGui::ArrowButton("##subsizeright", ImGuiDir_Right)) { 
+					if(configini->getSubFontSize(true)+1 <120){
+						configini->setSubFontSize(configini->getSubFontSize(true)+1);
+					}
+				}
+				ImGui::PopButtonRepeat();
+				ImGui::SameLine();
+				ImGui::Text("%d", configini->getSubFontSize(true));
+				
 				std::vector<std::string> deintmenu = {"No","Yes","Auto"};
 				const char* combo_deintpreview_value = deintmenu[configini->getDeinterlace(true)].c_str();
 				ImGui::PushItemWidth(300);

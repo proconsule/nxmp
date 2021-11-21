@@ -48,6 +48,12 @@ Config::Config(std::string inifile){
 	alang = Utility::getLanguagesIdx(alangstring);
 	tmpalang = alang;
 	
+	subfontsize = ini->GetLongValue("Main", "subfontsize");
+	if(subfontsize == 0)subfontsize = 55;
+	tmpsubfontsize = subfontsize;
+	
+	
+	
 	const char* deintpv;
 	deintpv = ini->GetValue("Main", "deinterlace");
 	std::string deintstring;
@@ -183,6 +189,17 @@ void Config::setAlang(int lang){
 	tmpalang = lang;
 }
 
+int Config::getSubFontSize(bool tmpvalue){
+	if(tmpvalue){
+		return tmpsubfontsize;
+	}
+	return subfontsize; 
+}
+
+void Config::setSubFontSize(int val){
+	tmpsubfontsize = val;
+}
+
 void Config::setDeinterlace(int value){
 	tmpdeint = value;
 }
@@ -230,6 +247,7 @@ void Config::saveSettings(){
 	longseek = tmplongseek;
 	shortseek = tmpshortseek;
 	usealang = tmpusealang;
+	subfontsize = tmpsubfontsize;
 	deint = tmpdeint;
 	dbactive = tmpdbactive;
 	
@@ -246,6 +264,11 @@ void Config::saveSettings(){
 	
 	ini->Delete("Main", "alang");
 	ini->SetValue("Main", "alang", Utility::getLanguages()[tmpalang].lang3.c_str());
+	
+	ini->Delete("Main", "subfontsize");
+	ini->SetLongValue("Main", "subfontsize", subfontsize, NULL, false);
+	
+	
 	std::vector<std::string> deintopts = {"no","yes","auto"};
 	ini->Delete("Main", "deinterlace");
 	ini->SetValue("Main", "deinterlace", deintopts[deint].c_str());

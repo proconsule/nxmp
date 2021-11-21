@@ -45,7 +45,9 @@ Buttons Mapping
 - R Stick Button Toggle Masterlock (during playback, only A button will work)
 - Dpad Right (during playback show/hide right menu)
 - Dpad Down (during playback show/hide player UI)
-- R Stick Up/Down Fast Scroll on file list
+- R Stick Up/Down Fast Scroll on file list (Volume Control During Playback)
+- \- Show file selection during playback
+
 
 FAQ
 -----
@@ -56,6 +58,10 @@ FAQ
 **Q:** What is Enigma2?
 
 **A:** Enigma2 is an application used in Linux-based Digital Video Broadcasting (DVB-S, DVB-C, DVB-T) receivers or TV set-top boxes and Internet Protocol television receivers.
+
+**Q:** What is ShaderMania?
+
+**A:** ShaderMania is an useless but fun feature of NXMP, it uses the ability of MPV to load custom shader into the video output chain. I adopt some shaders from https://www.shadertoy.com/ to make shaders effects to the video. Some like grayscale may be usefull for someone others (like the sea shaders) is only for fun. Users can also make their custom shaders and place in mpv/shaders directory.
 
 Thanks to
 -----

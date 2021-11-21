@@ -21,7 +21,7 @@ libMpv::libMpv(const std::string &configDir) {
     mpv_set_option_string(handle, "config", "yes");
     mpv_set_option_string(handle, "config-dir", configDir.c_str());
     mpv_set_option_string(handle, "terminal", "yes");
-    mpv_set_option_string(handle, "msg-level", "all=errors");
+    mpv_set_option_string(handle, "msg-level", "all=v");
     mpv_set_option_string(handle, "vd-lavc-threads", "4");
     mpv_set_option_string(handle, "vd-lavc-skiploopfilter", "all");
     mpv_set_option_string(handle, "audio-channels", "stereo");
@@ -30,6 +30,8 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "fbo-format", "rgba8");
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());
 	mpv_set_option_string(handle, "volume-max", "200");
+	mpv_set_option_string(handle, "opengl-pbo", "yes");
+	
 
 	
 	if(configini->getUseAlang(false)){
@@ -100,21 +102,34 @@ libMpv::libMpv(const std::string &configDir) {
 }
 
 void libMpv::loadFile(std::string _path){
-	if(fileinfo != nullptr){
-		delete fileinfo;
+	
+	if(!Stopped()){
+		resetFileInfo();
+	}else{
+		if(fileinfo != nullptr){
+			delete fileinfo;
+			fileinfo = nullptr;
+		}
+		fileinfo = new fileInfo();
 	}
-	fileinfo = new fileInfo();
 	fileinfo->path = _path;
 	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);
+	setSubFontSize(configini->getSubFontSize(false),false);
 	
 	
 }
 
 void libMpv::loadFileLive(std::string _path,std::string _changename){
-	if(fileinfo != nullptr){
-		delete fileinfo;
+	if(!Stopped()){
+		resetFileInfo();
+	}else{
+		if(fileinfo != nullptr){
+			delete fileinfo;
+			fileinfo = nullptr;
+		}
+		fileinfo = new fileInfo();
 	}
 	fileinfo = new fileInfo();
 	fileinfo->path = _path;
@@ -123,6 +138,7 @@ void libMpv::loadFileLive(std::string _path,std::string _changename){
 	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);
+	setSubFontSize(configini->getSubFontSize(false),false);
 }
 
 int64_t libMpv::getPosition() {
@@ -153,6 +169,7 @@ void libMpv::Resume() {
 }
 
 void libMpv::Stop() {
+	clearShader();
 	const char *cmd[] = {"stop",  NULL};
 	mpv_command_async(handle, 0, cmd);
 }
@@ -484,6 +501,10 @@ void libMpv::setVolume(int value,bool osd){
 	volume = value;
 }
 
+int libMpv::getVolume(){
+	return volume;
+}
+
 bool libMpv::getMute(){
 	if(volume == 0)return true;
 	return false;
@@ -518,7 +539,13 @@ void libMpv::setSubPos(int value,bool osd){
 }
 
 void libMpv::setSubFontSize(int value,bool osd){
-	mpv_set_property_async(handle, 0,"sub-font-size", MPV_FORMAT_INT64, &value);
+	if(osd){
+		std::string cmd = "set sub-font-size " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set sub-font-size " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
 }
 
 void libMpv::setAudioEQ(int *eqval,bool osd){
@@ -571,6 +598,37 @@ void libMpv::setLoop(bool val){
 bool libMpv::getLoop(){
 	return loop;
 }
+
+void libMpv::setShader(std::string _filename){
+	std::string command = std::string("no-osd change-list glsl-shaders set ") + _filename;
+	mpv_command_string(handle,command.c_str());
+}
+void libMpv::clearShader(){
+	mpv_command_string(handle,"no-osd change-list glsl-shaders clr \"\"");
+}
+
+void libMpv::resetFileInfo(){
+	fileinfo->title = "Unknown";
+    fileinfo->path = "";
+    fileinfo->duration = 0;
+	fileinfo->resume = 0;
+    fileinfo->bit_rate = 0;
+    fileinfo->videos.clear();
+    fileinfo->audios.clear();
+    fileinfo->subtitles.clear();
+	
+	fileinfo->chapters.clear();
+	
+	fileinfo->playbackInfo.vid_id = -1;
+    fileinfo->playbackInfo.aud_id = -1;
+    fileinfo->playbackInfo.sub_id = -1;
+    fileinfo->playbackInfo.position = 0;
+	fileinfo->playbackInfo.duration = 0;
+	fileinfo->playbackInfo.title = "";
+	fileinfo->playbackInfo.artist = "";
+	fileinfo->playbackInfo.islive = false;
+}
+
 
 libMpv::~libMpv(){
 	if (context) {

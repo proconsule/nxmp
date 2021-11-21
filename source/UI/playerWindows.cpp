@@ -18,6 +18,7 @@ namespace playerWindows{
 	static int drag_gamma = 0;
 	static int drag_hue = 0;
 	static int rotateidx = 0;
+	static int shaderidx = 0;
 	
 	
 	
@@ -40,7 +41,7 @@ namespace playerWindows{
 		rightmenuposX = item.rightmenu_startpos;
 		if(item.rightmenu_startpos>1080)item.rightmenu_startpos-=10;
 		playerWindows::SetupRightWindow();
-		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Image","Audio","Subtitle"};
+		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Image","Audio","Subtitle","ShaderMania"};
 		if (ImGui::Begin("Right Menu Home", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
 			if (ImGui::BeginListBox("Right Menu Home List",ImVec2(1280.0f, 720.0f))){
@@ -64,6 +65,9 @@ namespace playerWindows{
 						}
 						if(topmenu[n] == "Subtitle"){
 							item.rightmenustate = PLAYER_RIGHT_MENU_SUB;
+						}
+						if(topmenu[n] == "ShaderMania"){
+							item.rightmenustate = PLAYER_RIGHT_MENU_SHADERMANIA;
 						}
 					}
 				}
@@ -419,6 +423,7 @@ namespace playerWindows{
 				auto windowWidth = ImGui::GetWindowSize().x;
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Volume", NULL, true).x) * 0.5f);
 				ImGui::Text("Volume");
+				drag_volume = libmpv->getVolume();
 				if(ImGui::DragInt("Volume", &drag_volume, 0.5f, 0, 200, "%d", ImGuiSliderFlags_NoInput)){
 					libmpv->setVolume(drag_volume,item.playershowcontrols);
 				}
@@ -460,21 +465,21 @@ namespace playerWindows{
 				if(ImGui::DragInt("Sub Position", &drag_subpos, 0.5f, 0, 100, "%d", ImGuiSliderFlags_NoInput)){
 					libmpv->setSubPos(drag_subpos,item.playershowcontrols);
 				}
-				ImGui::BeginDisabled();
+				//ImGui::BeginDisabled();
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Sub Font Size", NULL, true).x) * 0.5f);
 				ImGui::Text("Sub Font Size");
-				if(ImGui::DragInt("Sub Font Size", &drag_subfontsize, 0.5f, 1, 70, "%d", ImGuiSliderFlags_NoInput)){
+				if(ImGui::DragInt("Sub Font Size", &drag_subfontsize, 0.5f, 1, 120, "%d", ImGuiSliderFlags_NoInput)){
 					libmpv->setSubFontSize(drag_subfontsize,item.playershowcontrols);
 				}
-				ImGui::EndDisabled();
+				//ImGui::EndDisabled();
 				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
 				if(ImGui::Button("Reset to Default")){
 					drag_subpos = 100;
 					drag_subdelay = 0.0f;
-					drag_subfontsize = 55;
+					drag_subfontsize = configini->getSubFontSize(false);
 					libmpv->setSubPos(drag_subpos,false);
 					libmpv->setSubDelay(drag_subdelay,false);
-					libmpv->setSubFontSize(drag_subdelay,false);
+					libmpv->setSubFontSize(drag_subfontsize,false);
 				}
 		}
 		playerWindows::ExitWindow();
@@ -713,7 +718,67 @@ namespace playerWindows{
 			
 			
 		}
+		playerWindows::ExitControlsWindow();
+	}
+	
+	void RightHomeShaderMania(){
+		playerWindows::SetupRightWindow();
+		std::vector<std::string> topmenu  = {"Default","16:9","16:10","4:3","Custom Ratio"};
+		if (ImGui::Begin("Shader Mania", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::PushItemWidth(200-10);
+				ImGui::Text("Shaders");
+				if (ImGui::BeginCombo("Shaders Combo", shadermania->getCurrList()[shaderidx].name.c_str(), 0))
+				{	
+					for (int n = 0; n < shadermania->getCurrList().size(); n++)
+					{
+						const bool is_selected = (shaderidx == n);
+						std::string itemid = "##" + std::to_string(n);
+						if (ImGui::Selectable(itemid.c_str(), is_selected)){
+							
+							if(n == 0){
+								libmpv->clearShader();
+							}else{
+								printf("PATH: %s\n",shadermania->getCurrList()[n].path.c_str());
+								libmpv->setShader(shadermania->getCurrList()[n].path);
+							}
+							shaderidx = n;
+						}
+						ImGui::SameLine();
+						ImGui::Text("%s",shadermania->getCurrList()[n].name.c_str());
+						
+							
+
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+					ImGui::PopItemWidth();
+				}	
+		}
+		
 		playerWindows::ExitWindow();
+	}
+	
+	void VolumeWindow(){
+		playerWindows::SetupVolumeWindow();
+		if (ImGui::Begin("Volume Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+			
+			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
+			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+			ImGui::ProgressBar(libmpv->getVolume()/100.0, ImVec2(150.0, 25.0f),"");
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
+			ImGui::SameLine();
+			ImGui::Image((void*)(intptr_t)VolumeIcon.id, ImVec2(25,25));
+			ImGuiContext& g = *GImGui;
+			if(item.VolumeHide +2 < g.Time){
+				item.showVolume = false;
+			}
+		
+		}
+		
+		playerWindows::ExitVolumeWindow();
 	}
 
 }

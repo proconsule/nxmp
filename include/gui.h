@@ -26,6 +26,8 @@
 #include "HTTPDir.h"
 #include "FTPDir.h"
 
+#include "shaderMania.h"
+
 
 enum MENU_STATES {
 	MENU_STATE_HOME,
@@ -66,6 +68,7 @@ enum PLAYER_RIGHT_MENU_STATES {
 	PLAYER_RIGHT_MENU_IMAGE,
 	PLAYER_RIGHT_MENU_AUDIO,
 	PLAYER_RIGHT_MENU_SUB,
+	PLAYER_RIGHT_MENU_SHADERMANIA,
 	PLAYER_AUDIOEQ,
 	PLAYER_SUPERAUDIOEQ
 };
@@ -102,6 +105,9 @@ typedef struct {
 	
 	bool rightmenu_first_item;
 	bool rightmenu_focus;
+	
+	bool showVolume = false;
+	float VolumeHide = 0.0;
 	
     
 } MenuItem;
@@ -166,6 +172,8 @@ extern Tex NoLoopIcon;
 
 
 extern ImFont* fontSmall;
+
+extern shaderMania* shadermania;
 
 
 namespace GUI {
