@@ -30,6 +30,7 @@ struct urlschema{
 };
 
 
+
 namespace Utility{
 	
 	struct lang_code_struct {
@@ -45,6 +46,7 @@ namespace Utility{
 	std::string toLower(const std::string &str);
 	std::string toUpper(const std::string &str);
 	bool endsWith(const std::string &value, const std::string &ending, bool sensitive);
+	bool startWith(const std::string &str, const std::string &value, bool sensitive);
 	std::vector<std::string> getMediaExtensions();
 	std::string humanSize(size_t bytes);
 	std::string str_tolower(std::string s);

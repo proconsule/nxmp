@@ -194,6 +194,8 @@ namespace playerWindows{
 					ImGui::PushFont(fontSmall);
 					ImGui::Text("%s",libmpv->getFileInfo()->subtitles[n].language.c_str());
 					ImGui::PopFont();
+					
+					
 				}
 				if (*first_item) {
 						std::string itemid = "##" + std::to_string(0);
@@ -471,6 +473,13 @@ namespace playerWindows{
 				if(ImGui::DragInt("Sub Font Size", &drag_subfontsize, 0.5f, 1, 120, "%d", ImGuiSliderFlags_NoInput)){
 					libmpv->setSubFontSize(drag_subfontsize,item.playershowcontrols);
 				}
+				
+				ImGui::Text("Sub Font Color");
+				float * subcolor = configini->getSubFontColor(true);
+				if(ImGui::ColorButton("##subfontcolor", ImVec4(subcolor[0],subcolor[1],subcolor[2],subcolor[3]), ImGuiColorEditFlags_NoAlpha| ImGuiColorEditFlags_NoPicker|ImGuiColorEditFlags_InputRGB , ImVec2(190, 40))){
+					item.popupstate = POPUP_STATE_SUBFONTCOLOR;
+				}
+				
 				//ImGui::EndDisabled();
 				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
 				if(ImGui::Button("Reset to Default")){
@@ -480,6 +489,8 @@ namespace playerWindows{
 					libmpv->setSubPos(drag_subpos,false);
 					libmpv->setSubDelay(drag_subdelay,false);
 					libmpv->setSubFontSize(drag_subfontsize,false);
+					configini->setSubFontColor(configini->getSubFontColor(false));
+					libmpv->setSubFontColor(configini->getSubFontColorHex(true));
 				}
 		}
 		playerWindows::ExitWindow();
@@ -628,6 +639,14 @@ namespace playerWindows{
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 			ImGui::ProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPerc(), ImVec2(-1.0f, 10.0f),"");
+			if (ImGui::IsItemClicked()){
+				ImGuiIO& io = ImGui::GetIO();
+				double barperc = io.MousePos.x*100/1270;
+				int64_t seek_val = (barperc*libmpv->getFileInfo()->playbackInfo.duration/100);
+				libmpv->seek(seek_val,false);
+				printf("Progressbar clicked perc %f %ld\n", barperc, seek_val);
+				fflush(stdout);
+			}
 			ImGui::PopStyleColor(2);
 			ImGui::PopStyleVar();
 			ImGui::SetCursorPosX(centerposition-90);
@@ -751,7 +770,12 @@ namespace playerWindows{
 						if (is_selected)
 							ImGui::SetItemDefaultFocus();
 					}
+					ImGuiContext& g = *GImGui;
+					ImGuiWindow* window = g.CurrentWindow;
+					ImGui::NavMoveRequestTryWrapping(window, ImGuiNavMoveFlags_LoopX);
+					
 					ImGui::EndCombo();
+					
 					ImGui::PopItemWidth();
 				}	
 		}

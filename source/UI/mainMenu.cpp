@@ -9,15 +9,12 @@
 
 namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
-        Windows::SetupWindow();
+        Windows::SetupMainWindow();
 		std::vector<std::string> topmenu = configini->topmenu;
-		
-        if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
-			ImGui::SetNextWindowFocus();
-            
-			if (ImGui::BeginListBox("Browser Menu",ImVec2(1280.0f, 720.0f))){
+		if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
 				static int selected = -1;					
 				for (unsigned int n = 0; n < topmenu.size(); n++){
+					std::string itemid = "##" + std::to_string(n);
 					if(topmenu[n] == "Local Files"){
 						ImGui::Image((void*)(intptr_t)SdCardTexture.id, ImVec2(40,40));
 					}
@@ -29,6 +26,9 @@ namespace Windows {
 					}
 					else if(topmenu[n] == "Enigma2"){
 						ImGui::Image((void*)(intptr_t)Enigma2Texture.id, ImVec2(40,40));
+					}
+					else if(topmenu[n] == "Playlist"){
+						ImGui::Image((void*)(intptr_t)PlaylistTexture.id, ImVec2(40,40));
 					}
 					else if(topmenu[n] == "Info"){
 						ImGui::Image((void*)(intptr_t)InfoTexture.id, ImVec2(40,40));
@@ -44,10 +44,10 @@ namespace Windows {
 					ImGui::SameLine();
 					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
 								
-					if (ImGui::Selectable(topmenu[n].c_str(), selected == n)){
+					if (ImGui::Selectable(itemid.c_str(), selected == n)){
 						if(topmenu[n] == "Local Files"){
 							item.state = MENU_STATE_FILEBROWSER;
-							localdir = new localFs(configini->getStartPath());
+							localdir = new localFs(configini->getStartPath(),playlist);
 							localdir->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 							item.first_item = true;
 						}
@@ -55,8 +55,9 @@ namespace Windows {
 #ifdef __SWITCH__
 							usbInit();
 							item.state = MENU_STATE_USB;
-							usbmounter = new USBMounter();
-							//item.first_item = true;
+							if(usbmounter == nullptr){
+								usbmounter = new USBMounter(playlist);
+							}
 							
 #endif
 						}
@@ -73,7 +74,6 @@ namespace Windows {
 							if(configini->getEnigma() == ""){
 								item.state = MENU_STATE_ENIGMABROWSER;
 							}else{
-								//urlschema e2schema = Utility::parseUrl(e2uri);
 								enigma2->getServices();
 								item.state = MENU_STATE_ENIGMABROWSER;
 							}
@@ -83,6 +83,9 @@ namespace Windows {
 							configini->setShortSeek(configini->getShortSeek(false));
 							item.state = MENU_STATE_SETTINGS;
 						}
+						if(topmenu[n] == "Playlist"){
+							item.state = MENU_STATE_PLAYLISTBROWSER;
+						}
 						if(topmenu[n] == "Info"){
 							item.state = MENU_STATE_INFO;
 						}
@@ -90,18 +93,21 @@ namespace Windows {
 							renderloopdone = true;
 						}
 					}
-					if (selected)
-					ImGui::SetItemDefaultFocus();
+					ImGui::SameLine();
+					ImGui::Text("%s",topmenu[n].c_str());
 				}
 				if (*first_item) {
-					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
-					ImGui::ScrollToItem();
+					printf("Set Top\n");
+					fflush(stdout);
+					std::string itemid = "##" + std::to_string(0);
+					ImGui::SetFocusID(ImGui::GetID(itemid.c_str()), ImGui::GetCurrentWindow());
+					ImGuiContext& g = *ImGui::GetCurrentContext();
+					g.NavDisableHighlight = false;
+					g.NavDisableMouseHover = true;
 					*first_item = false;
 				}
-			}				
-			ImGui::EndListBox();
-		}	
-		Windows::ExitWindow();
+		}
+		Windows::ExitMainWindow();
 	}
 }
 		

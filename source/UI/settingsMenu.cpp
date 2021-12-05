@@ -21,8 +21,36 @@ namespace Windows {
 			
 			if (ImGui::BeginTabBar("Settings Tab bar", 0))
             {
+				if (ImGui::BeginTabItem("Generals")) {
+					ImGui::Text("File Browser");
+					ImGui::Separator();
+					bool showhiddenbool = configini->getshowHidden(true);
+					if(ImGui::Checkbox("Show Hidden Files", &showhiddenbool)){
+						configini->setshowHidden(showhiddenbool);
+						
+					}
+					ImGui::Dummy(ImVec2(0.0f,30.0f));
+					ImGui::Text("Navigation");
+					ImGui::Separator();
+					bool touchbool = configini->getTouchEnable(true);
+					if(ImGui::Checkbox("Enable Touch Controls", &touchbool)){
+						configini->setTouchEnable(touchbool);
+						if(touchbool){
+							ImGuiIO &io = ImGui::GetIO();
+							io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+						}else{
+							ImGuiIO &io = ImGui::GetIO();
+							io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+						}
+					}
+					
+					
+					ImGui::EndTabItem();
+				}
 				if (ImGui::BeginTabItem("Player Settings"))
                 {
+				ImGui::Text("Seek");
+				ImGui::Separator();
 				ImGui::Text("Short Seek Time");
 				ImGui::SameLine(220,spacing);
 				ImGui::PushButtonRepeat(true);
@@ -54,7 +82,10 @@ namespace Windows {
 				ImGui::PopButtonRepeat();
 				ImGui::SameLine();
 				ImGui::Text("%d sec", configini->getLongSeek(true));
-
+				ImGui::Dummy(ImVec2(0.0f,30.0f));
+				
+				ImGui::Text("Language");
+				ImGui::Separator();
 				bool alangbool = configini->getUseAlang(true);
 				if(ImGui::Checkbox("Use Auto Audio Language", &alangbool)){
 					configini->setUseAlang(alangbool);
@@ -82,7 +113,9 @@ namespace Windows {
 				if(!alangbool){
 					ImGui::EndDisabled();
 				}
-				
+				ImGui::Dummy(ImVec2(0.0f,30.0f));
+				ImGui::Text("Subtitle");
+				ImGui::Separator();
 				ImGui::Text("Sub Font Size");
 				ImGui::SameLine(220,spacing);
 				ImGui::PushButtonRepeat(true);
@@ -100,7 +133,9 @@ namespace Windows {
 				ImGui::PopButtonRepeat();
 				ImGui::SameLine();
 				ImGui::Text("%d", configini->getSubFontSize(true));
-				
+				ImGui::Dummy(ImVec2(0.0f,30.0f));
+				ImGui::Text("Video");
+				ImGui::Separator();
 				std::vector<std::string> deintmenu = {"No","Yes","Auto"};
 				const char* combo_deintpreview_value = deintmenu[configini->getDeinterlace(true)].c_str();
 				ImGui::PushItemWidth(300);
@@ -194,6 +229,20 @@ namespace Windows {
 					
 				ImGui::EndTabItem();
 			}
+			if (ImGui::BeginTabItem("Touch Settings")) {
+				
+				ImGui::Text("One Finger Swipe during playback");
+				static int touchseekradio = configini->getPlayerSwipeSeek(true);
+				if(ImGui::RadioButton("Short Seek", &touchseekradio, 0)){
+					configini->setPlayerSwipeSeek(touchseekradio);
+				}
+				ImGui::SameLine();
+				if(ImGui::RadioButton("Long Seek", &touchseekradio, 1)){
+					configini->setPlayerSwipeSeek(touchseekradio);
+				}
+				ImGui::SameLine();
+				ImGui::EndTabItem();
+			}
 			ImGui::EndTabBar();
 		}
 			
@@ -212,6 +261,23 @@ namespace Windows {
 				configini->setLongSeek(configini->getLongSeek(false));
 				configini->setShortSeek(configini->getShortSeek(false));
 				configini->setAlang(configini->getAlang(false));
+				configini->setSubFontSize(configini->getSubFontSize(false));
+				configini->setSubFontColor(configini->getSubFontColor(false));
+				configini->setDbActive(configini->getDeinterlace(false));
+				
+				
+				configini->setshowHidden(configini->getshowHidden(false));
+				configini->setTouchEnable(configini->getTouchEnable(false));
+				configini->setPlayerSwipeSeek(configini->getPlayerSwipeSeek(false));
+				if(configini->getTouchEnable(false)){
+					ImGuiIO &io = ImGui::GetIO();
+					io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+				}else{
+					ImGuiIO &io = ImGui::GetIO();
+					io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+				}
+				
+				
 				item.state = MENU_STATE_HOME;
 			}
 		}	

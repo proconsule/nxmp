@@ -15,6 +15,8 @@
 #include "ftplib.h"
 #include "HTTPDir.h"
 #include "FTPDir.h"
+#include "sshDir.h"
+#include "sambaDir.h"
 
 
 
@@ -25,7 +27,10 @@
 #include "SQLiteDB.h"
 #include "eqpreset.h"
 
+#include "playlist.h"
+
 #include "shaderMania.h"
+
 
 //#define NDEBUG 1
 
@@ -37,13 +42,18 @@ libMpv *libmpv = nullptr;
 localFs *localdir = nullptr;
 FTPDir *ftpdir = nullptr;
 HTTPDir *httpdir = nullptr;
+sshDir *sshdir = nullptr;
+sambaDir *sambadir = nullptr;
 #ifdef __SWITCH__
 USBMounter *usbmounter = nullptr;
 #endif
 Config *configini = nullptr;
 EQPreset *eqpreset = nullptr;
 SQLiteDB *sqlitedb = nullptr;
+bool dbUpdated = false;
 Enigma2 *enigma2 = nullptr;
+Playlist *playlist = nullptr;
+
 uint32_t wakeup_on_mpv_render_update;
 uint32_t wakeup_on_mpv_events;
 
@@ -55,6 +65,7 @@ bool renderloopdone = false;
 Tex SdCardTexture;
 Tex NetworkTexture;
 Tex Enigma2Texture;
+Tex PlaylistTexture;
 Tex UsbTexture;
 Tex InfoTexture;
 Tex SettingsTexture;
@@ -66,6 +77,8 @@ Tex FileTexture;
 
 Tex FTPTexture;
 Tex HTTPTexture;
+Tex SFTPTexture;
+Tex SMBTexture;
 
 Tex FFMPEGTexture;
 Tex MPVTexture;
@@ -144,17 +157,27 @@ int main(int argc,char *argv[]){
 	nxlinkStdio();
 #endif	
 #endif
+
 	printf("Loading Config\n");
 	
 	configini = new Config("config.ini");
 	
 	eqpreset = new EQPreset("eqpresets.ini");
-
+	
+	playlist = new Playlist();
+	
+	
+	//sambaDir * sambadir = new sambaDir("smb://ceco:1@10.34.0.236/Users/",playlist);
+	//sambadir->DirList("Ceco/Games",configini->getshowHidden(false),Utility::getMediaExtensions());
+	//return 0;
+	
 	if(configini->getDbActive(false)){
 		sqlitedb = new SQLiteDB("nxmp.db");
+		dbUpdated = sqlitedb->dbwasUpdated();
 	}
 	
 	shadermania = new shaderMania();
+	
 	
 #ifdef __SWITCH__
 	Result ret;
@@ -173,7 +196,12 @@ int main(int argc,char *argv[]){
 		io.ConfigFlags |= ImGuiConfigFlags_IsTouchScreen;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
+		
+		if(!configini->getTouchEnable(false)){
+			io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+		}
+		
+		  
 		io.IniFilename = nullptr;
 		io.MouseDrawCursor = false;
         
@@ -183,7 +211,7 @@ int main(int argc,char *argv[]){
 		printf("Init SDL\n");
 		ImGui_ImplSDL2_InitForOpenGL(window, context);
         printf("Init OPENGL\n");
-		ImGui_ImplOpenGL3_Init("#version 330 core");
+		ImGui_ImplOpenGL3_Init("#version 430 core");
 		
 		
 #ifdef __SWITCH__
@@ -218,7 +246,7 @@ int main(int argc,char *argv[]){
 #endif
 		font_cfg.MergeMode = true;
 		//io.Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 28.0f, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
-		
+		/*
 		    static const ImWchar ranges[] =
                 {
                     0xE000, 0xE06B,
@@ -235,7 +263,7 @@ int main(int argc,char *argv[]){
                     0xE150, 0xE153,
                     0,
                 };
-				
+		*/		
 			static const ImWchar tmranges[] =
                 {
 					0x2019, 0x2019,
@@ -246,11 +274,12 @@ int main(int argc,char *argv[]){
 					0,
                 };
 	
+	
 	printf("Loading Extended Chars\n");
     //io.Fonts->AddFontFromMemoryTTF (fonts_ext.address, fonts_ext.size, 24.0f, &font_cfg, ranges);
 #ifdef __SWITCH__
-//	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
-//	fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
+	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
+	fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
 #else
 	io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
 	fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
@@ -270,11 +299,14 @@ int main(int argc,char *argv[]){
 	Utility::TxtLoadFromFile("romfs:/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
 	Utility::TxtLoadFromFile("romfs:/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
 	Utility::TxtLoadFromFile("romfs:/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
+	Utility::TxtLoadFromFile("romfs:/playlist.png",&PlaylistTexture.id,&PlaylistTexture.width,&PlaylistTexture.height);
 	Utility::TxtLoadFromFile("romfs:/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
 	Utility::TxtLoadFromFile("romfs:/settings.png",&SettingsTexture.id,&SettingsTexture.width,&SettingsTexture.height);
 	Utility::TxtLoadFromFile("romfs:/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
 	Utility::TxtLoadFromFile("romfs:/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
 	Utility::TxtLoadFromFile("romfs:/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
+	Utility::TxtLoadFromFile("romfs:/sftp.png",&SFTPTexture.id,&SFTPTexture.width,&SFTPTexture.height);
+	Utility::TxtLoadFromFile("romfs:/smb.png",&SMBTexture.id,&SMBTexture.width,&SMBTexture.height);
 	Utility::TxtLoadFromFile("romfs:/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
 	Utility::TxtLoadFromFile("romfs:/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
 	Utility::TxtLoadFromFile("romfs:/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
@@ -294,10 +326,13 @@ int main(int argc,char *argv[]){
 	Utility::TxtLoadFromFile("./romfs/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
 	Utility::TxtLoadFromFile("./romfs/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
 	Utility::TxtLoadFromFile("./romfs/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
+	Utility::TxtLoadFromFile("./romfs/playlist.png",&PlaylistTexture.id,&PlaylistTexture.width,&PlaylistTexture.height);
 	Utility::TxtLoadFromFile("./romfs/settings.png",&SettingsTexture.id,&SettingsTexture.width,&SettingsTexture.height);
 	Utility::TxtLoadFromFile("./romfs/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
 	Utility::TxtLoadFromFile("./romfs/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
 	Utility::TxtLoadFromFile("./romfs/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
+	Utility::TxtLoadFromFile("./romfs/sftp.png",&SFTPTexture.id,&SFTPTexture.width,&SFTPTexture.height);
+	Utility::TxtLoadFromFile("./romfs/smb.png",&SMBTexture.id,&SMBTexture.width,&SMBTexture.height);
 	Utility::TxtLoadFromFile("./romfs/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
 	Utility::TxtLoadFromFile("./romfs/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
 	Utility::TxtLoadFromFile("./romfs/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);

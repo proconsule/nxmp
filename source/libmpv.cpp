@@ -117,7 +117,7 @@ void libMpv::loadFile(std::string _path){
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);
 	setSubFontSize(configini->getSubFontSize(false),false);
-	
+	setSubFontColor(configini->getSubFontColorHex(false));
 	
 }
 
@@ -546,6 +546,12 @@ void libMpv::setSubFontSize(int value,bool osd){
 		std::string cmd = "no-osd set sub-font-size " + std::to_string(value);
 		mpv_command_string(handle, cmd.c_str());
 	}
+}
+
+void libMpv::setSubFontColor(std::string hexcolor){
+	std::string cmd = "no-osd set sub-color '" + hexcolor + std::string("'");
+	mpv_command_string(handle, cmd.c_str());
+	
 }
 
 void libMpv::setAudioEQ(int *eqval,bool osd){

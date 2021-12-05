@@ -30,6 +30,9 @@ public:
 	std::string getBasePath();
 	std::string getCurrPath();
 	
+	bool *checked(int pos);
+	void clearChecked();
+	
 	
 private:
 	std::vector<FS::FileEntry> currentlist;

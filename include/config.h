@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+
+
 #include "SimpleIni.h"
 
 struct networkSource{
@@ -17,6 +19,15 @@ public:
 	std::string getEnigma();
 	std::string getStartPath();
 	
+	bool getshowHidden(bool tmpvalue);
+	void setshowHidden(bool val);
+	
+	bool getTouchEnable(bool tmpvalue);
+	void setTouchEnable(bool val);
+	
+	int getPlayerSwipeSeek(bool tmpvalue);
+	void setPlayerSwipeSeek(int val);
+	
 	int getLongSeek(bool tmpvalue);
 	int getShortSeek(bool tmpvalue);
 	
@@ -30,6 +41,10 @@ public:
 	
 	int getSubFontSize(bool tmpvalue);
 	void setSubFontSize(int val);
+	
+	float * getSubFontColor(bool tmpvalue);
+	std::string getSubFontColorHex(bool tmpvalue);
+	void setSubFontColor(float *_color);
 	
 	int getDeinterlace(bool tmpvalue);
 	void setDeinterlace(int value);
@@ -48,6 +63,16 @@ public:
 	CSimpleIniA *ini;
 	
 private:
+
+	bool showhidden;
+	bool tmpshowhidden;
+
+	bool touchenable;
+	bool tmptouchenable;
+	
+	int playeswipeseek;
+	int tmpplayeswipeseek;
+
 	int shortseek;
 	int longseek;
 	
@@ -66,6 +91,8 @@ private:
 	int tmpdeint;
 	int deint;
 	
+	float subfontcolor[4];
+	float tmpsubfontcolor[4];
 	
 	
 	

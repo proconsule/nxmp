@@ -60,6 +60,7 @@
 // Data
 static SDL_Window*  g_Window = NULL;
 static Uint64       g_Time = 0;
+static bool         g_FingerPressed = false ;
 static bool         g_MousePressed[3] = { false, false, false };
 static SDL_Cursor*  g_MouseCursors[ImGuiMouseCursor_COUNT] = {};
 static char*        g_ClipboardTextData = NULL;
@@ -101,6 +102,31 @@ bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event)
             if (event->button.button == SDL_BUTTON_LEFT) g_MousePressed[0] = true;
             if (event->button.button == SDL_BUTTON_RIGHT) g_MousePressed[1] = true;
             if (event->button.button == SDL_BUTTON_MIDDLE) g_MousePressed[2] = true;
+            return true;
+        }
+	case SDL_FINGERDOWN:
+        {
+            if(event->tfinger.fingerId == 0) {
+                io.MouseDown[0] = true;
+                g_FingerPressed = true;
+            }
+            return true;
+        }
+    case SDL_FINGERMOTION:
+        {
+
+            if(event->tfinger.fingerId == 0) {
+                io.MousePos.x = io.MousePos.x + (io.DisplaySize.x * event->tfinger.dx);
+                io.MousePos.y = io.MousePos.y + (io.DisplaySize.y * event->tfinger.dy);
+            }
+            return true;
+        }
+    case SDL_FINGERUP:
+        {
+            if(event->tfinger.fingerId == 0) {
+                g_FingerPressed = false;
+                io.MouseDown[0] = false;
+            }
             return true;
         }
     case SDL_TEXTINPUT:
@@ -236,8 +262,35 @@ void ImGui_ImplSDL2_Shutdown()
 
 static void ImGui_ImplSDL2_UpdateMousePosAndButtons()
 {
-    ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
+	if((io.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0){
+		
+	
+#ifdef __SWITCH__
+	
 
+    int mx, my;
+    mx = my = 0;
+
+    SDL_TouchID device = SDL_GetTouchDevice(0);
+    for (int i = 0; i < SDL_GetNumTouchFingers(device); i++)
+    {
+        SDL_Finger *arnold = SDL_GetTouchFinger(device, i);
+        if (arnold != NULL)
+        {
+            if (i == 0 && g_FingerPressed)
+            {
+                mx = io.DisplaySize.x * arnold->x;
+                my = io.DisplaySize.y * arnold->y;
+                io.MousePos = ImVec2((float)mx, (float)my);
+                g_FingerPressed = false;
+                return;
+            }
+        }
+    }
+#endif
+#ifdef _WIN32
+	
     // Set OS mouse position if requested (rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user)
     if (io.WantSetMousePos)
         SDL_WarpMouseInWindow(g_Window, (int)io.MousePos.x, (int)io.MousePos.y);
@@ -277,6 +330,10 @@ static void ImGui_ImplSDL2_UpdateMousePosAndButtons()
     if (SDL_GetWindowFlags(g_Window) & SDL_WINDOW_INPUT_FOCUS)
         io.MousePos = ImVec2((float)mx, (float)my);
 #endif
+	
+#endif
+
+	}
 }
 
 static void ImGui_ImplSDL2_UpdateMouseCursor()

@@ -24,6 +24,17 @@ Config::Config(std::string inifile){
 	
 	CSimpleIniA::TNamesDepend values;
 	
+	
+	showhidden = ini->GetBoolValue("Main", "showhidden");
+	tmpshowhidden = showhidden;
+	
+	touchenable = ini->GetBoolValue("Main", "touchenable");
+	tmptouchenable = touchenable;
+	
+	playeswipeseek = ini->GetLongValue("Main", "playeswipeseek");
+	tmpplayeswipeseek = playeswipeseek;
+	
+	
 	longseek = ini->GetLongValue("Main", "longseek");
 	shortseek = ini->GetLongValue("Main", "shortseek");
 	if(longseek == 0)longseek = 60;
@@ -52,7 +63,21 @@ Config::Config(std::string inifile){
 	if(subfontsize == 0)subfontsize = 55;
 	tmpsubfontsize = subfontsize;
 	
-	
+	std::string fontcolorstring = "#FFFFFF";
+	const char* fontcolorpv;
+	fontcolorpv = ini->GetValue("Main", "subfontcolor");
+	if(fontcolorpv!= nullptr){
+		fontcolorstring = fontcolorpv;
+	}
+	if(fontcolorstring == ""){
+		fontcolorstring = "#FFFFFF";
+	}
+	int tmpcolors[3];
+	sscanf(fontcolorstring.c_str(),"#%02X%02X%02X",&tmpcolors[0],&tmpcolors[1],&tmpcolors[2]);
+	tmpsubfontcolor[0] = subfontcolor[0] = (float)tmpcolors[0]/255.0f;
+	tmpsubfontcolor[1] = subfontcolor[1] = (float)tmpcolors[1]/255.0f;
+	tmpsubfontcolor[2] = subfontcolor[2] = (float)tmpcolors[2]/255.0f;
+	tmpsubfontcolor[3] = subfontcolor[3] = 1.0f;
 	
 	const char* deintpv;
 	deintpv = ini->GetValue("Main", "deinterlace");
@@ -98,6 +123,7 @@ Config::Config(std::string inifile){
 	if(getEnigma() != ""){
 		topmenu.push_back("Enigma2");
 	}
+	topmenu.push_back("Playlist");
 	topmenu.push_back("Settings");
 	topmenu.push_back("Info");
 	topmenu.push_back("Exit");
@@ -145,6 +171,38 @@ std::string Config::getEnigma(){
 	}
 	return pv;
 	
+}
+
+bool Config::getshowHidden(bool tmpvalue){
+	if(tmpvalue){
+		return tmpshowhidden;
+	}
+	return showhidden; 
+}
+
+void Config::setshowHidden(bool val){
+	tmpshowhidden = val;
+}
+
+bool Config::getTouchEnable(bool tmpvalue){
+	if(tmpvalue){
+		return tmptouchenable;
+	}
+	return touchenable; 
+}
+void Config::setTouchEnable(bool val){
+	tmptouchenable = val;
+}
+
+int Config::getPlayerSwipeSeek(bool tmpvalue){
+	if(tmpvalue){
+		return tmpplayeswipeseek;
+	}
+	return playeswipeseek; 
+}
+
+void Config::setPlayerSwipeSeek(int val){
+	tmpplayeswipeseek = val;
 }
 
 int Config::getLongSeek(bool tmpvalue){
@@ -200,6 +258,28 @@ void Config::setSubFontSize(int val){
 	tmpsubfontsize = val;
 }
 
+float * Config::getSubFontColor(bool tmpvalue){
+	if(tmpvalue){
+		return tmpsubfontcolor;
+	}
+	return subfontcolor; 
+}
+std::string Config::getSubFontColorHex(bool tmpvalue){
+	char subfontcstr[32];
+	if(tmpvalue){
+		sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)(tmpsubfontcolor[0]*255.0f),(unsigned int)(tmpsubfontcolor[1]*255.0f),(unsigned int)(tmpsubfontcolor[2]*255.0f));
+		return std::string(subfontcstr);
+	}
+	sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)(subfontcolor[0]*255.0f),(unsigned int)(subfontcolor[1]*255.0f),(unsigned int)(subfontcolor[2]*255.0f));
+	return std::string(subfontcstr);	
+}
+void Config::setSubFontColor(float  *_color){
+	tmpsubfontcolor[0] = _color[0];
+	tmpsubfontcolor[1] = _color[1];
+	tmpsubfontcolor[2] = _color[2];
+}
+
+
 void Config::setDeinterlace(int value){
 	tmpdeint = value;
 }
@@ -244,6 +324,11 @@ void Config::setResumeStopPerc(int value){
 }
 
 void Config::saveSettings(){
+	
+	
+	showhidden = tmpshowhidden;
+	touchenable = tmptouchenable;
+	playeswipeseek = tmpplayeswipeseek;
 	longseek = tmplongseek;
 	shortseek = tmpshortseek;
 	usealang = tmpusealang;
@@ -253,6 +338,21 @@ void Config::saveSettings(){
 	
 	startresumeperc = tmpstartresumeperc;
 	stopresumeperc = tmpstopresumeperc;
+	
+	subfontcolor[0] = tmpsubfontcolor[0];
+	subfontcolor[1] = tmpsubfontcolor[1];
+	subfontcolor[2] = tmpsubfontcolor[2];
+	
+	
+	ini->Delete("Main", "showhidden");
+	ini->SetBoolValue("Main", "showhidden",showhidden,NULL,false);
+	
+	
+	ini->Delete("Main", "touchenable");
+	ini->SetBoolValue("Main", "touchenable",touchenable,NULL,false);
+	
+	ini->Delete("Main", "playeswipeseek");
+	ini->SetLongValue("Main", "playeswipeseek",playeswipeseek,NULL,false);
 	
 	ini->Delete("Main", "shortseek");
 	ini->SetLongValue("Main", "shortseek", shortseek, NULL, false);
@@ -268,6 +368,10 @@ void Config::saveSettings(){
 	ini->Delete("Main", "subfontsize");
 	ini->SetLongValue("Main", "subfontsize", subfontsize, NULL, false);
 	
+	ini->Delete("Main", "subfontcolor");
+	char subfontcstr[32];
+	sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)subfontcolor[0]*255,(unsigned int)subfontcolor[1]*255,(unsigned int)subfontcolor[2]*255);
+	ini->SetValue("Main", "subfontcolor", subfontcstr);
 	
 	std::vector<std::string> deintopts = {"no","yes","auto"};
 	ini->Delete("Main", "deinterlace");

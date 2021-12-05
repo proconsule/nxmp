@@ -17,17 +17,7 @@ namespace GUI {
 	const int JOYSTICK_EXTENDED_DEAD_ZONE = 32726;
 	
 	
-	enum SDL_KEYS {
-		SDL_KEY_A, SDL_KEY_B, SDL_KEY_X, SDL_KEY_Y,
-		SDL_KEY_LSTICK, SDL_KEY_RSTICK,
-		SDL_KEY_L, SDL_KEY_R,
-		SDL_KEY_ZL, SDL_KEY_ZR,
-		SDL_KEY_PLUS, SDL_KEY_MINUS,
-		SDL_KEY_DLEFT, SDL_KEY_DUP, SDL_KEY_DRIGHT, SDL_KEY_DDOWN,
-		SDL_KEY_LSTICK_LEFT, SDL_KEY_LSTICK_UP, SDL_KEY_LSTICK_RIGHT, SDL_KEY_LSTICK_DOWN,
-		SDL_KEY_RSTICK_LEFT, SDL_KEY_RSTICK_UP, SDL_KEY_RSTICK_RIGHT, SDL_KEY_RSTICK_DOWN,
-		SDL_KEY_SL_LEFT, SDL_KEY_SR_LEFT, SDL_KEY_SL_RIGHT, SDL_KEY_SR_RIGHT
-	};
+	
 	
 	static void on_mpv_events(void *ctx)
 	{
@@ -157,12 +147,82 @@ namespace GUI {
 						sdlevent.jbutton.button = SDL_KEY_MINUS;
 						SDL_PushEvent(&sdlevent);
 					}
+					if(keycode == SDLK_t){
+						for(int i=0;i<playlist->getPlaylist().size();i++){
+							printf("Name: %s uri %s\n",playlist->getPlaylist()[i].name.c_str(),playlist->getPlaylist()[i].fulluri.c_str());
+						}
+					}
 					if(keycode == SDLK_e){
 						
 					}
 					
+					
 				}
+				else if( event.type == SDL_MOUSEBUTTONDOWN  )
+                {
+					if( event.button.button == SDL_BUTTON_RIGHT) {
+						isMouseSelection = true;
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_FINGERDOWN ;
+						sdlevent.tfinger.x = event.motion.x/1280.0f;
+						sdlevent.tfinger.y = event.motion.y/720.0f;
+						startMousex = event.motion.x;
+						startMousey = event.motion.y;
+						SDL_PushEvent(&sdlevent);
+					}
+				}
+				else if( event.type == SDL_MOUSEMOTION )
+                {
+					if( isMouseSelection) {
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_FINGERMOTION ;
+						sdlevent.tfinger.x = event.motion.x/1280.0f;
+						sdlevent.tfinger.y = event.motion.y/720.0f;
+						float startfloatMousex = startMousex/1280.0f;
+						float startfloatMousey = startMousey/720.0f;
+						sdlevent.tfinger.dx = sdlevent.tfinger.x-startfloatMousex;
+						sdlevent.tfinger.dy = sdlevent.tfinger.y-startfloatMousey;
+						
+						SDL_PushEvent(&sdlevent);
+					}
+					
+				}
+				else if( event.type == SDL_MOUSEBUTTONUP  )
+                {
+					if( event.button.button == SDL_BUTTON_RIGHT) {
+						isMouseSelection = false;
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_FINGERUP ;
+						sdlevent.tfinger.x = event.motion.x/1280.0f;
+						sdlevent.tfinger.y = event.motion.y/720.0f;
+						startMousex = 0;
+						startMousey = 0;
+						SDL_PushEvent(&sdlevent);
+						
+					}
+				}
+				
+				
+				
 #endif
+				if( event.type == SDL_FINGERDOWN && configini->getTouchEnable(false) )
+				{
+					TOUCHCONTROLS::fingerDown(&event);
+				
+				}
+				
+				else if( event.type == SDL_FINGERMOTION && configini->getTouchEnable(false))
+				{
+					TOUCHCONTROLS::fingerMotion(&event);
+					
+				}
+				
+				else if( event.type == SDL_FINGERUP && configini->getTouchEnable(false))
+				{
+					TOUCHCONTROLS::fingerUp(&event);
+					
+				}
+
 				if(event.type == SDL_JOYAXISMOTION){
 					if( event.jaxis.axis == 3 ) {
 						if( event.jaxis.value > JOYSTICK_DEAD_ZONE ) {
@@ -187,10 +247,7 @@ namespace GUI {
 						}
 						
 					}
-					
-					//Uint8 axis = event.axis;
-					
-					
+				
 				}
 				
 				if (event.type == SDL_JOYBUTTONDOWN) {
@@ -258,6 +315,15 @@ namespace GUI {
 					}
 					
 					if (button == SDL_KEY_DLEFT){
+						if((item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER) && item.popupstate == POPUP_STATE_NONE){
+							if(item.selectionstate == FILE_SELECTION_CHECKBOX){
+								item.focus = true;
+								item.selectionstate = FILE_SELECTION_NONE;
+							}else if(item.selectionstate == FILE_SELECTION_NONE){
+								item.selectionstate = FILE_SELECTION_CHECKBOX;
+								item.focus = true;
+							}
+						}
 						
 					}
 					
@@ -292,6 +358,13 @@ namespace GUI {
 							libmpv->seek(libmpv->getPosition() + configini->getShortSeek(false),item.playershowcontrols);
 						
 						}
+						if(item.state == MENU_STATE_PLAYLISTBROWSER){
+							if(item.playlistitemHighlighted+1 < playlist->getPlaylist().size()){
+								playlist->moveForw(item.playlistitemHighlighted);
+								item.playlistUpdateHovered = true;
+								item.playlistnewHoverIdx = item.playlistitemHighlighted+1;
+							}
+						}
 						
 					}
 					if (button == SDL_KEY_L){
@@ -299,9 +372,21 @@ namespace GUI {
 							libmpv->seek(libmpv->getPosition() - configini->getShortSeek(false),item.playershowcontrols);
 						
 						}
+						if(item.state == MENU_STATE_PLAYLISTBROWSER){
+							if(item.playlistitemHighlighted-1 >= 0){
+								playlist->moveBack(item.playlistitemHighlighted);
+								item.playlistUpdateHovered = true;
+								item.playlistnewHoverIdx = item.playlistitemHighlighted-1;
+							}
+						}
 						
 					}
 					if (button == SDL_KEY_X){
+						
+						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER){
+							item.popupstate = POPUP_STATE_STARTPLAYLIST;
+						}
+						
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
 								item.playershowcontrols=false;
@@ -331,7 +416,7 @@ namespace GUI {
 								localdir = nullptr;
 							}
 #ifdef __SWITCH__
-							if(usbmounter != nullptr && libmpv->Stopped()){
+							if(usbmounter != nullptr && libmpv->Stopped() && !usbmounter->haveIteminPlaylist()){
 								delete usbmounter;
 								usbmounter = nullptr;
 							}
@@ -344,6 +429,14 @@ namespace GUI {
 								delete httpdir;
 								httpdir = nullptr;
 							}
+							if(sshdir != nullptr){
+								delete sshdir;
+								sshdir = nullptr;
+							}
+							if(sambadir != nullptr){
+								delete sambadir;
+								sambadir = nullptr;
+							}
 							if(enigma2 != nullptr){
 								delete enigma2;
 								enigma2 = nullptr;
@@ -351,7 +444,11 @@ namespace GUI {
 							item.networkselect = true;
 							item.first_item = true;
 							item.state = MENU_STATE_HOME;
-							item.usbpath = "";
+#ifdef __SWITCH__
+							if(usbmounter != nullptr && usbmounter->haveIteminPlaylist()){
+								usbmounter->setBasePath("");
+							}
+#endif
 							
 						}
 										
@@ -374,23 +471,34 @@ namespace GUI {
 							httpdir->DirList(httpdir->getCurrPath(),Utility::getMediaExtensions());
 							
 						}
+						if(item.state == MENU_STATE_SSHBROWSER){
+							item.first_item = true;
+							sshdir->backDir();
+							sshdir->DirList(sshdir->getCurrPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							
+						}
+						if(item.state == MENU_STATE_SAMBABROWSER){
+							item.first_item = true;
+							sambadir->backDir();
+							sambadir->DirList(sambadir->getCurrPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							
+						}
 						
 						if(item.state == MENU_STATE_USB){
-							if(item.usbbasepath != ""){
+#ifdef __SWITCH__							
+							if(usbmounter->getBasePath() != ""){
 								item.first_item = true;
-								if(item.usbpath != item.usbbasepath){
-									item.usbpath = item.usbpath.substr(0, item.usbpath.find_last_of("\\/"));
-									if(item.usbpath == "")item.usbpath=item.usbbasepath;
-								}
+								usbmounter->backPath();
+								usbmounter->DirList(usbmounter->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 								
-								item.usbfileentries = FS::getDirList(item.usbpath.c_str(),true,Utility::getMediaExtensions());
 							}
+#endif
 						}
 						
 						if(item.state == MENU_STATE_FILEBROWSER){
 							item.first_item = true;
 							localdir->backPath();
-							localdir->DirList(localdir->getCurrentPath(),true,Utility::getMediaExtensions());
+							localdir->DirList(localdir->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
 						
@@ -422,7 +530,12 @@ namespace GUI {
 								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 							}
 							else if(item.rightmenustate == PLAYER_RIGHT_MENU_SUB){
-								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+								if(item.popupstate == POPUP_STATE_SUBFONTCOLOR){
+									item.popupstate = POPUP_STATE_NONE;
+									configini->setSubFontColor(configini->getSubFontColor(false));
+								}else{
+									item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+								}
 							}
 							else if(item.rightmenustate == PLAYER_AUDIOEQ){
 								item.rightmenustate = PLAYER_RIGHT_MENU_AUDIO;
@@ -449,7 +562,7 @@ namespace GUI {
 					if (mp_event->event_id == MPV_EVENT_NONE)
 						break;
 					if (mp_event->event_id == MPV_EVENT_LOG_MESSAGE) {
-						mpv_event_log_message *msg = (mpv_event_log_message *) mp_event->data;
+						//mpv_event_log_message *msg = (mpv_event_log_message *) mp_event->data;
 						continue;
 					}
 					if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
@@ -490,12 +603,30 @@ namespace GUI {
 								sqlitedb->writeResume(libmpv->getFileInfo()->path,libmpv->getFileInfo()->playbackInfo.position);
 							}else{
 								if(eof->reason != MPV_END_FILE_REASON_EOF){
-									sqlitedb->deleteResume(libmpv->getFileInfo()->path);
+									if(100-libmpv->getFileInfoPerc() < configini->getResumeStopPerc(false))
+									sqlitedb->markCompleted(libmpv->getFileInfo()->path);
 								}
 							}
+							
 							if(eof->reason == MPV_END_FILE_REASON_EOF){
 								printf("FILE EOF\n");
-								sqlitedb->deleteResume(libmpv->getFileInfo()->path);
+								sqlitedb->markCompleted(libmpv->getFileInfo()->path);
+							}
+							
+						}
+						if(eof->reason == MPV_END_FILE_REASON_EOF){
+							printf("FILE EOF\n");
+							if(playlist->getPlaylist().size() >0){
+								if(playlist->getCurrIdx() < playlist->getPlaylist().size()-1){
+									Playlist::playlist_struct nextfile = playlist->getNext();
+									libmpv->loadFile(nextfile.fulluri);
+									if(configini->getDbActive(true)){
+										libmpv->getFileInfo()->resume = sqlitedb->getResume(nextfile.fulluri);
+										if(libmpv->getFileInfo()->resume>0){
+											item.popupstate = POPUP_STATE_RESUME;
+										}
+									}
+								}
 							}
 						}
 						printf("END PLAY FILE\n");
@@ -557,21 +688,48 @@ namespace GUI {
 			switch (item.state) {
 				case MENU_STATE_HOME:
 					Windows::MainMenuWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_DBUPDATED){
+						Popups::DBUpdatedPopup();
+					}
 					break;
 				case MENU_STATE_FILEBROWSER:
 					Windows::FileBrowserWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
+						Popups::PlaylistStartPlaylist();
+					}
 					break;
 				case MENU_STATE_USB:
 					Windows::USBBrowserWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
+						Popups::PlaylistStartPlaylist();
+					}
 					break;
 				case MENU_STATE_NETWORKBROWSER:
 					Windows::NetworkWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_FTPBROWSER:
 					Windows::FtpWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
+						Popups::PlaylistStartPlaylist();
+					}
 					break;
 				case MENU_STATE_HTTPBROWSER:
 					Windows::HttpWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
+						Popups::PlaylistStartPlaylist();
+					}
+					break;
+				case MENU_STATE_SSHBROWSER:
+					Windows::SSHWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
+						Popups::PlaylistStartPlaylist();
+					}
+					break;
+				case MENU_STATE_SAMBABROWSER:
+					Windows::SambaWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
+						Popups::PlaylistStartPlaylist();
+					}
 					break;
 				case MENU_STATE_ENIGMABROWSER:
 					Windows::EnigmaWindow(&item.focus, &item.first_item);
@@ -581,6 +739,9 @@ namespace GUI {
 					if(item.popupstate == POPUP_STATE_SAVE_SETTINGS){
 						Popups::SaveSettingsPopup();
 					}
+					break;
+				case MENU_STATE_PLAYLISTBROWSER:
+					Windows::PlaylistWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_INFO:
 					Windows::InfoMenuWindow(&item.focus, &item.first_item);
@@ -646,6 +807,9 @@ namespace GUI {
 					break;
 				case PLAYER_RIGHT_MENU_SUB:
 					playerWindows::RightHomeSub(&item.rightmenu_focus,&item.rightmenu_first_item);
+					if(item.popupstate == POPUP_STATE_SUBFONTCOLOR){
+						Popups::SubFontColorPopup();
+					}
 					break;
 				case PLAYER_RIGHT_MENU_SHADERMANIA:
 					playerWindows::RightHomeShaderMania();
@@ -691,6 +855,10 @@ namespace GUI {
 	}
 
 	int RenderLoop(void) {
+		if(dbUpdated){
+			item.popupstate = POPUP_STATE_DBUPDATED;
+		}
+		item.first_item = true;
 #ifdef __SWITCH__
 		while (!renderloopdone && appletMainLoop())
 #endif
@@ -707,4 +875,17 @@ namespace GUI {
 	}
 
 }	
-					
+
+
+
+#ifdef _WIN32
+bool isMouseSelection = false;
+int startMousex = 0;
+int startMousey = 0;
+#endif
+
+/*
+float swipex = 0.0;
+float swipey = 0.0;
+float fingersum = 0;
+*/				

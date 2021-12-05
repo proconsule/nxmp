@@ -13,6 +13,7 @@
 #include "playerwindows.h"
 #include "libmpv.h"
 #include "config.h"
+#include "playlist.h"
 #include "remotefs.h"
 #include "localfiles.h"
 #include "SimpleIni.h"
@@ -25,7 +26,12 @@
 #include "Enigma2.h"
 #include "HTTPDir.h"
 #include "FTPDir.h"
+#include "sshDir.h"
+#include "sambaDir.h"
 
+#include "imgui_impl_sdl.h"
+
+#include "touchcontrols.h"
 #include "shaderMania.h"
 
 
@@ -36,12 +42,19 @@ enum MENU_STATES {
 	MENU_STATE_NETWORKBROWSER,
 	MENU_STATE_FTPBROWSER,
 	MENU_STATE_HTTPBROWSER,
+	MENU_STATE_SSHBROWSER,
+	MENU_STATE_SAMBABROWSER,
 	MENU_STATE_ENIGMABROWSER,
+	MENU_STATE_PLAYLISTBROWSER,
 	MENU_STATE_INFO,
-//    MENU_STATE_OPTIONS,
 	MENU_STATE_SETTINGS,
 	MENU_STATE_PLAYER,
 	MENU_STATE_PLAYERCACHING
+};
+
+enum FILE_SELECTION_STATES {
+	FILE_SELECTION_NONE,
+	FILE_SELECTION_CHECKBOX
 };
 
 enum PLAYER_STATES {
@@ -52,7 +65,11 @@ enum PLAYER_STATES {
 enum APP_POPUP_STATES {
 	POPUP_STATE_NONE,
 	POPUP_STATE_SAVE_SETTINGS,
-	POPUP_STATE_RESUME
+	POPUP_STATE_RESUME,
+	POPUP_STATE_ADDQUEUE,
+	POPUP_STATE_STARTPLAYLIST,
+	POPUP_STATE_SUBFONTCOLOR,
+	POPUP_STATE_DBUPDATED
 };
 
 enum PLAYER_RIGHT_MENU_STATES {
@@ -82,13 +99,14 @@ enum PLAYER_CONTROL_STATES {
 typedef struct {
     MENU_STATES state = MENU_STATE_HOME;
 	MENU_STATES laststate = MENU_STATE_FILEBROWSER;
+	FILE_SELECTION_STATES selectionstate = FILE_SELECTION_NONE;
 	PLAYER_RIGHT_MENU_STATES rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
 	PLAYER_STATES playerstate = PLAYER_STATE_VIDEO;
 	PLAYER_CONTROL_STATES playercontrolstate = PLAYER_CONTROL_STATE_NONE;
 	APP_POPUP_STATES popupstate = POPUP_STATE_NONE;
 	int selected = 0;
-	std::string usbpath = "";
-	std::string usbbasepath = "";
+	//std::string usbpath = "";
+	//std::string usbbasepath = "";
 	std::vector<FS::FileEntry> usbfileentries;
 	
 	std::vector<networkSource> networksources;
@@ -102,6 +120,8 @@ typedef struct {
 	
 	bool first_item;
 	bool focus;
+	int fileHoveredidx = 0;
+	
 	
 	bool rightmenu_first_item;
 	bool rightmenu_focus;
@@ -109,6 +129,9 @@ typedef struct {
 	bool showVolume = false;
 	float VolumeHide = 0.0;
 	
+	int playlistitemHighlighted = 0;
+	bool playlistUpdateHovered = false;
+	int playlistnewHoverIdx = 0;
     
 } MenuItem;
 
@@ -120,6 +143,8 @@ extern libMpv *libmpv;
 extern localFs *localdir;
 extern HTTPDir *httpdir;
 extern FTPDir *ftpdir;
+extern sshDir *sshdir;
+extern sambaDir *sambadir;
 #ifdef __SWITCH__
 extern USBMounter *usbmounter;
 #endif
@@ -139,11 +164,15 @@ extern Enigma2 *enigma2;
 extern Config *configini;
 extern EQPreset *eqpreset;
 extern SQLiteDB *sqlitedb;
+extern bool dbUpdated;
+
+extern Playlist *playlist;
 
 extern Tex SdCardTexture;
 extern Tex UsbTexture;
 extern Tex NetworkTexture;
 extern Tex Enigma2Texture;
+extern Tex PlaylistTexture;
 extern Tex InfoTexture;
 extern Tex SettingsTexture;
 
@@ -153,6 +182,8 @@ extern Tex FileTexture;
 
 extern Tex FTPTexture;
 extern Tex HTTPTexture;
+extern Tex SFTPTexture;
+extern Tex SMBTexture;
 
 extern Tex FFMPEGTexture;
 extern Tex MPVTexture;
@@ -175,8 +206,31 @@ extern ImFont* fontSmall;
 
 extern shaderMania* shadermania;
 
+#ifdef _WIN32
+extern bool isMouseSelection;
+extern int startMousex;
+extern int startMousey;
+#endif
+
+/*
+extern float swipex;
+extern float swipey;
+extern float fingersum;
+*/
 
 namespace GUI {
+	
+	enum SDL_KEYS {
+		SDL_KEY_A, SDL_KEY_B, SDL_KEY_X, SDL_KEY_Y,
+		SDL_KEY_LSTICK, SDL_KEY_RSTICK,
+		SDL_KEY_L, SDL_KEY_R,
+		SDL_KEY_ZL, SDL_KEY_ZR,
+		SDL_KEY_PLUS, SDL_KEY_MINUS,
+		SDL_KEY_DLEFT, SDL_KEY_DUP, SDL_KEY_DRIGHT, SDL_KEY_DDOWN,
+		SDL_KEY_LSTICK_LEFT, SDL_KEY_LSTICK_UP, SDL_KEY_LSTICK_RIGHT, SDL_KEY_LSTICK_DOWN,
+		SDL_KEY_RSTICK_LEFT, SDL_KEY_RSTICK_UP, SDL_KEY_RSTICK_RIGHT, SDL_KEY_RSTICK_DOWN,
+		SDL_KEY_SL_LEFT, SDL_KEY_SR_LEFT, SDL_KEY_SL_RIGHT, SDL_KEY_SR_RIGHT
+	};
 	
 	void initMpv();
 	void HandleEvents();

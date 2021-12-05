@@ -1,7 +1,9 @@
 #include "localFs.h"
 
-localFs::localFs(std::string _path){
+
+localFs::localFs(std::string _path,Playlist * _playlist){
 	currentpath = _path;
+	playlist = _playlist;
 }
 
 localFs::~localFs(){
@@ -14,6 +16,16 @@ std::string localFs::getCurrentPath(){
 
 std::vector<FS::FileEntry> localFs::getCurrList(){
 	return currentlist;
+}
+
+void localFs::clearChecked(){
+	for(int i=0;i<currentlist.size();i++){
+		currentlist[i].checked = false;
+	}
+}
+
+bool *localFs::checked(int pos){
+	return &currentlist[pos].checked;
 }
 
 void localFs::DirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions) {
@@ -41,7 +53,8 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 					FS::FileEntry file;
 					file.name = ent->d_name;
 					file.path = FS::removeLastSlash(path) + "/" + file.name;
-
+					file.checked = playlist->isPresent(file.name,file.path);
+					
 					struct stat st{};
 					if (stat(file.path.c_str(), &st) == 0) {
 						file.size = (size_t) st.st_size;

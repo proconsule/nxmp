@@ -13,7 +13,7 @@ namespace Windows {
         if (ImGui::Begin("USB Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
 #ifdef __SWITCH__
             ImGui::SetNextWindowFocus();
-            if(item.usbpath == ""){
+            if(usbmounter->getBasePath() == ""){
 				float total_w = ImGui::GetContentRegionAvail().x;
 				float total_h = ImGui::GetContentRegionAvail().y;
 				if (ImGui::BeginListBox("USB Browser Menu",ImVec2(total_w, total_h))){
@@ -24,9 +24,9 @@ namespace Windows {
 						std::string itemid = "##" + std::to_string(n);
 						ImGui::SameLine();
 						if (ImGui::Selectable(itemid.c_str(), selected == n,0, ImVec2(0, 60))){
-							item.usbpath = thislist[n].mount_point + std::string("/");
-							item.usbbasepath = item.usbpath;
-							item.usbfileentries = FS::getDirList(item.usbpath.c_str(),true,Utility::getMediaExtensions());
+							//item.usbpath = thislist[n].mount_point + std::string("/");
+							usbmounter->setBasePath(thislist[n].mount_point + std::string("/"));
+							usbmounter->DirList(usbmounter->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							triggerselect = true;
 						}
 						ImGui::SameLine();
@@ -64,7 +64,7 @@ namespace Windows {
 					bool triggerselect = false;
 					int total_w = ImGui::GetContentRegionAvail().x;
 					static int selected = -1;	
-					std::vector<FS::FileEntry> thislist = item.usbfileentries;
+					std::vector<FS::FileEntry> thislist = usbmounter->getCurrList();
 					for (unsigned int n = 0; n < thislist.size(); n++){
 						if(thislist[n].type == FS::FileEntryType::Directory){
 							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
@@ -72,31 +72,65 @@ namespace Windows {
 							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
-						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
 						std::string itemid = "##" + std::to_string(n);
-						if (ImGui::Selectable(itemid.c_str(), selected == n)){
-							
+						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							if(thislist[n].type == FS::FileEntryType::Directory){
-								item.usbpath = item.usbfileentries[n].path;
-								item.usbfileentries = FS::getDirList(item.usbpath.c_str(),true,Utility::getMediaExtensions());
-								triggerselect = true;
-							}else if(thislist[n].type == FS::FileEntryType::File){
-								item.laststate = item.state;
-								libmpv->loadFile(thislist[n].path);
-								if(configini->getDbActive(true)){
-									libmpv->getFileInfo()->resume = sqlitedb->getResume(thislist[n].path);
-									if(libmpv->getFileInfo()->resume>0){
-										item.popupstate = POPUP_STATE_RESUME;
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+								if (ImGui::Selectable(itemid.c_str(), selected == n)){
+									triggerselect = true;
+									usbmounter->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+								}
+							}else{
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
+								std::string checkitemid = "##check" + std::to_string(n);
+								if(thislist[n].type != FS::FileEntryType::Directory){
+									if(ImGui::Checkbox(checkitemid.c_str(), usbmounter->checked(n))){
+										if(*usbmounter->checked(n)){
+											playlist->appendFile(thislist[n].name,thislist[n].path);
+										} else {
+											playlist->removeFile(thislist[n].name,thislist[n].path);
+										}
+									}
+								}
+							}
+							
+						}else {
+							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+							
+							if (ImGui::Selectable(itemid.c_str(), selected == n)){
+								
+								if(thislist[n].type == FS::FileEntryType::Directory){
+									usbmounter->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									triggerselect = true;
+								}else if(thislist[n].type == FS::FileEntryType::File){
+									item.laststate = item.state;
+									libmpv->loadFile(thislist[n].path);
+									if(configini->getDbActive(true)){
+										libmpv->getFileInfo()->resume = sqlitedb->getResume(thislist[n].path);
+										if(libmpv->getFileInfo()->resume>0){
+											item.popupstate = POPUP_STATE_RESUME;
+										}
 									}
 								}
 							}
 						}
 						ImGui::SameLine();
-						ImGui::Text("%s",thislist[n].name.c_str());
+						ImVec4 textcolor = ImVec4(1.0f,1.0f,1.0f,1.0f);
+						if(sqlitedb != nullptr){
+							int dbfilestatus = sqlitedb->getFileDbStatus(thislist[n].path);
+							if(dbfilestatus == 2){
+								textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
+							}
+							if(dbfilestatus == 1){
+								textcolor = ImVec4(0.0f,1.0f,1.0f,1.0f);
+							}
+							
+						}
+						ImGui::TextColored(textcolor,"%s",thislist[n].name.c_str());
 						
 						if(thislist[n].type == FS::FileEntryType::File){
 							ImGui::SameLine(total_w-150);
-							ImGui::Text("%s",Utility::humanSize(thislist[n].size).c_str());
+							ImGui::TextColored(textcolor,"%s",Utility::humanSize(thislist[n].size).c_str());
 						}
 					
 					
@@ -112,7 +146,9 @@ namespace Windows {
 					if(triggerselect == true){
 						*first_item = true;
 					}
-				}	
+				}
+				//ImGuiContext& g = *GImGui;
+				//ImGui::NavMoveRequestTryWrapping(g.CurrentWindow, ImGuiNavMoveFlags_LoopY);
 				ImGui::EndListBox();	
 			}
 #endif

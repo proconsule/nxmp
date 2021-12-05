@@ -74,6 +74,8 @@ namespace Windows {
 					}
 				}
 			}
+			//ImGuiContext& g = *GImGui;
+			//ImGui::NavMoveRequestTryWrapping(g.CurrentWindow, ImGuiNavMoveFlags_LoopY);
 			ImGui::EndListBox();
 		}
 		Windows::ExitWindow();

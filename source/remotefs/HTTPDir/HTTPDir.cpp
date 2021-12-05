@@ -119,6 +119,16 @@ std::vector<FS::FileEntry> HTTPDir::getCurrList(){
 	return currentlist;
 }
 
+void HTTPDir::clearChecked(){
+	for(int i=0;i<currentlist.size();i++){
+		currentlist[i].checked = false;
+	}
+}
+
+bool *HTTPDir::checked(int pos){
+	return &currentlist[pos].checked;
+}
+
 void HTTPDir::backDir(){
 	if(currentpath == basepath)return;
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));

@@ -115,10 +115,10 @@ USBMounter::~USBMounter(){
 	usbHsFsExit();
 }
 
-USBMounter::USBMounter(){
+USBMounter::USBMounter(Playlist *_playlist){
 	Result rc;
     
-
+	playlist = _playlist;
     printf("usbInit\n");
 	rc = usbHsFsInitialize(0);
 	if (R_FAILED(rc))
@@ -136,6 +136,102 @@ USBMounter::USBMounter(){
 
 void usbInit() {
 
+}
+
+void USBMounter::DirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions) {
+
+		currentpath = path;
+		currentlist.clear();
+		struct dirent *ent;
+		DIR *dir;
+
+		if (!path.empty()) {
+			if ((dir = opendir(path.c_str())) != nullptr) {
+				while ((ent = readdir(dir)) != nullptr) {
+					if ((path == "/" || strlen(ent->d_name) == 1) && ent->d_name[0] == '.') {
+						continue;
+					}
+					if ((path == "/" || strlen(ent->d_name) == 2) && ent->d_name[0] == '.' && ent->d_name[1] == '.') {
+						continue;
+					}
+					if (!showHidden && ent->d_name[0] == '.') {
+						if (strlen(ent->d_name) != 2 && ent->d_name[1] != '.') {
+							continue;
+						}
+					}
+
+					FS::FileEntry file;
+					file.name = ent->d_name;
+					file.path = FS::removeLastSlash(path) + "/" + file.name;
+					file.checked = playlist->isPresent(file.name,file.path);
+					
+					struct stat st{};
+					if (stat(file.path.c_str(), &st) == 0) {
+						file.size = (size_t) st.st_size;
+						file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
+					}
+					if(file.type == FS::FileEntryType::File){
+						bool isMediafile = false;
+						for (auto &ext : extensions) {
+							if (Utility::endsWith(file.name, ext, false)) {
+								isMediafile = true;
+							}
+						}
+						if(isMediafile){
+							currentlist.push_back(file);
+						}
+					}else if(file.type == FS::FileEntryType::Directory){
+						currentlist.push_back(file);
+					}
+
+				}
+			
+				closedir(dir);
+				std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
+			}
+		}
+
+	}
+	
+std::string USBMounter::getCurrentPath(){
+	return currentpath;
+}
+
+std::string USBMounter::getBasePath(){
+	return basepath;
+}
+
+void USBMounter::setBasePath(std::string _basepath){
+	basepath = _basepath;
+}
+
+std::vector<FS::FileEntry> USBMounter::getCurrList(){
+	return currentlist;
+}
+
+void USBMounter::clearChecked(){
+	for(int i=0;i<currentlist.size();i++){
+		currentlist[i].checked = false;
+	}
+}
+
+bool *USBMounter::checked(int pos){
+	return &currentlist[pos].checked;
+}
+
+void USBMounter::backPath(){
+		currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
+		if(currentpath == "")currentpath = "/";
+
+}
+
+bool USBMounter::haveIteminPlaylist(){
+	for(int i=0;i<playlist->getPlaylist().size();i++){
+		if(Utility::startWith(playlist->getPlaylist()[i].fulluri,"ums",false)){
+			return true;
+		}
+	}
+	return false;
 }
 
 #endif

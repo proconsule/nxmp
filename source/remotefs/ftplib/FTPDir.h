@@ -7,10 +7,11 @@
 #include "localfiles.h"
 #include "utils.h"
 #include "ftplib.h"
+#include "playlist.h"
 
 class FTPDir{
 public:
-	FTPDir(std::string _url);
+	FTPDir(std::string _url,Playlist *_playlist);
 	~FTPDir();
 	void DirList(std::string path,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
@@ -20,6 +21,8 @@ public:
 	std::string getCurrPath();
 	std::string getBasePath();
 	
+	bool *checked(int pos);
+	void clearChecked();
 	
 private:
 	std::string url;
@@ -27,6 +30,7 @@ private:
 	std::string basepath;
 	std::vector<FS::FileEntry> currentlist;
 	netbuf *ftp_con = nullptr;
+	Playlist *playlist;
 
 };
 

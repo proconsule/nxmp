@@ -1,10 +1,11 @@
 #include "FTPDir.h"
 
-FTPDir::FTPDir(std::string _url){
+FTPDir::FTPDir(std::string _url,Playlist *_playlist){
 	url = _url;	
 	urlschema thisurl = Utility::parseUrl(url);
 	basepath = thisurl.path;
 	currpath = basepath;
+	playlist = _playlist;
 }
 
 FTPDir::~FTPDir(){
@@ -16,7 +17,6 @@ void FTPDir::DirList(std::string path,const std::vector<std::string> &extensions
 	FtpInit();
 	urlschema thisurl = Utility::parseUrl(url);
 	currentlist.clear();
-	//std::vector<FS::FileEntry> retvector;
 	if(thisurl.port == "")thisurl.port = "21";
 	std::string ftphost = thisurl.server+std::string(":")+thisurl.port;
 	if (!FtpConnect(ftphost.c_str(), &ftp_con)) {
@@ -29,11 +29,14 @@ void FTPDir::DirList(std::string path,const std::vector<std::string> &extensions
 		}else{
 			currpath = path;
 			currentlist = FtpDirList(path.c_str(), ftp_con,extensions);
+			for(int i=0;i<currentlist.size();i++){
+				std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + currentlist[i].path + currentlist[i].name;
+				currentlist[i].checked = playlist->isPresent(currentlist[i].name,currentlist[i].path);					
+			}
 			FtpQuit(ftp_con);
 			
 		}
 	}
-	//return retvector;
 }
 
 std::string FTPDir::getUrl(){
@@ -50,6 +53,16 @@ std::string FTPDir::getBasePath(){
 
 std::vector<FS::FileEntry> FTPDir::getCurrList(){
 	return currentlist;
+}
+
+void FTPDir::clearChecked(){
+	for(int i=0;i<currentlist.size();i++){
+		currentlist[i].checked = false;
+	}
+}
+
+bool *FTPDir::checked(int pos){
+	return &currentlist[pos].checked;
 }
 
 void FTPDir::backDir(){

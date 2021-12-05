@@ -7,6 +7,8 @@
 #include <vector>
 #include <threads.h>
 #include <usbhsfs.h>
+#include "localfiles.h"
+#include "playlist.h"
 
 
 
@@ -21,14 +23,26 @@ int usbThread(void *arg);
 
 class USBMounter{
 public:
-	USBMounter();
+	USBMounter(Playlist *_playlist);
 	~USBMounter();
 	std::vector<usb_devices> mounted_devs;
 	
+	void setBasePath(std::string _basepath);
+	std::string getBasePath();
+	std::string getCurrentPath();
+	void backPath();
+	std::vector<FS::FileEntry> getCurrList();
+	void DirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
+	void clearChecked();
+	bool *checked(int pos);
 	
+	bool haveIteminPlaylist();
 	
 private:
-	
+	Playlist * playlist;
+	std::string basepath = "";
+	std::string currentpath = "";
+	std::vector<FS::FileEntry> currentlist;
 	
 };
 

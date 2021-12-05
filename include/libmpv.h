@@ -77,6 +77,7 @@ public:
 	void setSubDelay(double value,bool osd);
 	void setSubPos(int value,bool osd);
 	void setSubFontSize(int value,bool osd);
+	void setSubFontColor(std::string hexcolor);
 	
 	void setDeinterlace(int value);
 	

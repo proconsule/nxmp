@@ -99,6 +99,16 @@ namespace Utility{
 		return ret;
 	}
 	
+	bool startWith(const std::string &str, const std::string &value, bool sensitive) {
+		if (sensitive) {
+			return str.compare(0, value.length(), value) == 0;
+		} else {
+			std::string str_low = toLower(str);
+			std::string val_low = toLower(value);
+			return str_low.compare(0, val_low.length(), val_low) == 0;
+		}
+	}
+	
 	bool endsWith(const std::string &value, const std::string &ending, bool sensitive) {
 		if (ending.size() > value.size()) return false;
 		if (sensitive) {
