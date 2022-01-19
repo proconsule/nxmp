@@ -72,7 +72,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lssh2 -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnx -lz
+LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lssh2 -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lnx -lz
 
 
 
