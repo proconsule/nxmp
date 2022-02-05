@@ -41,7 +41,7 @@ namespace playerWindows{
 		rightmenuposX = item.rightmenu_startpos;
 		if(item.rightmenu_startpos>1080)item.rightmenu_startpos-=10;
 		playerWindows::SetupRightWindow();
-		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Image","Audio","Subtitle","ShaderMania"};
+		std::vector<std::string> topmenu  = {"Tracks","Chapters","Interpolation","Aspect Ratio","Image","Audio","Subtitle","ShaderMania","Anime4K v4.0.1"};
 		if (ImGui::Begin("Right Menu Home", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
 			if (ImGui::BeginListBox("Right Menu Home List",ImVec2(1280.0f, 720.0f))){
@@ -53,6 +53,9 @@ namespace playerWindows{
 						}
 						if(topmenu[n] == "Chapters"){
 							item.rightmenustate = PLAYER_RIGHT_MENU_CHAPTERS;
+						}
+						if(topmenu[n] == "Interpolation"){
+							item.rightmenustate = PLAYER_RIGHT_MENU_INTERPOLATION;
 						}
 						if(topmenu[n] == "Aspect Ratio"){
 							item.rightmenustate = PLAYER_RIGHT_MENU_ARATIO;
@@ -68,6 +71,9 @@ namespace playerWindows{
 						}
 						if(topmenu[n] == "ShaderMania"){
 							item.rightmenustate = PLAYER_RIGHT_MENU_SHADERMANIA;
+						}
+						if(topmenu[n] == "Anime4K v4.0.1"){
+							item.rightmenustate = PLAYER_RIGHT_MENU_ANIME4K;
 						}
 					}
 				}
@@ -243,6 +249,98 @@ namespace playerWindows{
 		playerWindows::ExitWindow();
 	}
 	
+	//Used For 1080p screens with less powerful GPUs:
+	//https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md
+		void RightHomeAnime4K(bool *focus, bool *first_item){
+		playerWindows::SetupRightWindow();
+		std::vector<std::string> topmenu  = {"Mode A (Fast)","Mode B (Fast)","Mode C (Fast)","Mode A+A (Fast)","Mode B+B (Fast)","Mode C+A (Fast)","Show Info","Disabled"};
+		if (ImGui::Begin("Right Menu ARatio", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::SetNextWindowFocus();
+			if (ImGui::BeginListBox("Aspect Ratio",ImVec2(200.0f, 720.0f))){
+				for (unsigned int n = 0; n < topmenu.size(); n++){
+					static int selected = -1;
+					if (ImGui::Selectable(topmenu[n].c_str(), selected == n)){
+						if(n==0){
+						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Restore_CNN_M.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode A (Fast)\"");
+							}
+						if(n==1){
+						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Restore_CNN_Soft_M.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode B (Fast)\"");
+  
+						}
+						if(n==2){
+						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Upscale_Denoise_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode C (Fast)\"");
+  
+						}
+						if(n==3){
+						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Restore_CNN_M.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_Restore_CNN_S.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode A+A (Fast)\"");
+   
+						}
+						if(n==4){
+						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Restore_CNN_Soft_M.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Restore_CNN_Soft_S.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode B+B (Fast)\"");
+   
+						}
+						if(n==5){
+						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Upscale_Denoise_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Restore_CNN_S.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode C+A (Fast)\"");
+   
+						}
+						if(n==6){
+						mpv_command_string(libmpv->getHandle(), "show-text \"Shaders: ${glsl-shaders}\"");
+						}
+						if(n==7){
+						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders clr \"\"; show-text \"Anime4K Disabled\"");
+						}
+					}
+				}
+				if (*first_item) {
+					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
+					*first_item = false;
+				}
+				ImGui::EndListBox();
+			}
+		}
+		playerWindows::ExitWindow();
+	}
+
+	void RightHomeInterpolation(bool *focus, bool *first_item){
+		playerWindows::SetupRightWindow();
+		std::vector<std::string> topmenu  = {"Enable/Disable","Catmull-Rom","Mitchell","Bicubic","OverSample"};
+		if (ImGui::Begin("Right Menu ARatio", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::SetNextWindowFocus();
+			if (ImGui::BeginListBox("Aspect Ratio",ImVec2(200.0f, 720.0f))){
+				for (unsigned int n = 0; n < topmenu.size(); n++){
+					static int selected = -1;
+					if (ImGui::Selectable(topmenu[n].c_str(), selected == n)){
+						if(n==0){
+							mpv_command_string(libmpv->getHandle(), "cycle-values video-sync display-resample audio ; cycle-values interpolation yes no ; show-text \"Interpolation: ${interpolation} (${tscale})\"");
+	
+						}
+						if(n==1){
+							mpv_command_string(libmpv->getHandle(), "set tscale \"catmull_rom\" ; show-text \"Interpolation: ${interpolation} (${tscale})\"");
+	
+						}
+						if(n==2){
+							mpv_command_string(libmpv->getHandle(), "set tscale \"mitchell\" ; show-text \"Interpolation: ${interpolation} (${tscale})\"");
+	
+						}
+						if(n==3){
+						mpv_command_string(libmpv->getHandle(), "set tscale \"bicubic\" ; show-text \"Interpolation: ${interpolation} (${tscale})\"");
+	
+						}
+						if(n==4){
+						mpv_command_string(libmpv->getHandle(), "set tscale \"oversample\" ; show-text \"Interpolation: ${interpolation} (${tscale})\"");
+	
+						}
+					}
+				}
+				if (*first_item) {
+					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
+					*first_item = false;
+				}
+				ImGui::EndListBox();
+			}
+		}
+		playerWindows::ExitWindow();
+	}
 	void RightHomeARatio(bool *focus, bool *first_item){
 		playerWindows::SetupRightWindow();
 		std::vector<std::string> topmenu  = {"Default","16:9","16:10","4:3","Custom Ratio"};

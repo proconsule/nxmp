@@ -558,6 +558,12 @@ namespace GUI {
 							else if(item.rightmenustate == PLAYER_RIGHT_MENU_CHAPTERS){
 								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_INTERPOLATION){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_ANIME4K){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
 							else if(item.rightmenustate == PLAYER_RIGHT_MENU_ARATIO){
 								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 							}
@@ -864,6 +870,12 @@ namespace GUI {
 				case PLAYER_RIGHT_MENU_CHAPTERS:
 					playerWindows::RightChapterWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;
+				case PLAYER_RIGHT_MENU_INTERPOLATION:
+					playerWindows::RightHomeInterpolation(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_ANIME4K:
+					playerWindows::RightHomeAnime4K(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;	
 				case PLAYER_RIGHT_MENU_ARATIO:
 					playerWindows::RightHomeARatio(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;
