@@ -1,6 +1,10 @@
 #ifndef NXMP_FTPDIR_H
 #define NXMP_FTPDIR_H
 
+#include "platforms.h"
+
+#ifdef NXMP_NETWORKSUPPORT
+
 #include <string>
 #include <vector>
 
@@ -34,4 +38,5 @@ private:
 
 };
 
+#endif
 #endif

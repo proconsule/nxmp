@@ -1,26 +1,8 @@
 #include "Enigma2.h"
+#ifdef NXMP_ENIGMASUPPORT
 #include "utils.h"
 
-static size_t
-WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
-{
-  size_t realsize = size * nmemb;
-  struct MemoryStruct *mem = (struct MemoryStruct *)userp;
- 
-  char *ptr = (char *)realloc(mem->memory, mem->size + realsize + 1);
-  if(!ptr) {
-    /* out of memory! */
-    printf("not enough memory (realloc returned NULL)\n");
-    return 0;
-  }
- 
-  mem->memory = ptr;
-  memcpy(&(mem->memory[mem->size]), contents, realsize);
-  mem->size += realsize;
-  mem->memory[mem->size] = 0;
- 
-  return realsize;
-}
+
 
 string urlencode(string s)
 {
@@ -46,31 +28,6 @@ string urlencode(string s)
     return string(v.cbegin(), v.cend());
 }
 
-
-void Enigma2::curlDownload(char * url ,MemoryStruct * chunk){
-	
-	CURL *curl_handle;
-	CURLcode res;
-	chunk->memory = (char *)malloc(1);  
-	chunk->size = 0; 
-	curl_global_init(CURL_GLOBAL_ALL);
-	curl_handle = curl_easy_init();
-	curl_easy_setopt(curl_handle, CURLOPT_URL, url);
-	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)chunk);
-	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-	res = curl_easy_perform(curl_handle);
-	if(res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_perform() failed: %s\n",
-        curl_easy_strerror(res));
-	}
-	else {
-		
-		
-	}
-	curl_easy_cleanup(curl_handle);
-	curl_global_cleanup();
-}
 
 
 vector<EnigmaServices> Enigma2::parseBouquet(char * data){
@@ -109,7 +66,10 @@ void Enigma2::m3uParser(char * url){
 	m3uurl.append("/web/services.m3u?bRef=");
 	m3uurl.append(urlencode(url));
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
-	curlDownload((char *)m3uurl.c_str(),chunk);
+	//curlDownload((char *)m3uurl.c_str(),chunk);
+	
+	curlDownloader * curldownloader = new curlDownloader();
+	curldownloader->Download((char *)m3uurl.c_str(),chunk);
 	
 	
 	string s = chunk->memory;
@@ -136,8 +96,8 @@ void Enigma2::m3uParser(char * url){
 	epguurl.append("/web/epgnow?bRef=");
 	epguurl.append(urlencode(url));
 	MemoryStruct *chunk2 = (MemoryStruct *)malloc(sizeof(MemoryStruct));
-	curlDownload((char *)epguurl.c_str(),chunk2);
-	
+	curldownloader->Download((char *)epguurl.c_str(),chunk2);
+	 
 	XMLDocument doc;
 	doc.Parse( chunk2->memory );
 	XMLElement * pRootElement = doc.RootElement();
@@ -181,7 +141,8 @@ bool Enigma2::getServices(){
 	downurl.append(":");
 	downurl.append(e2schema.port);
 	downurl.append("/web/getservices");
-	curlDownload((char *)downurl.c_str(),chunk);
+	curlDownloader * curldownloader = new curlDownloader();
+	curldownloader->Download((char *)downurl.c_str(),chunk);
 	e2services =  parseBouquet(chunk->memory);
 	free(chunk->memory);
 	free(chunk);
@@ -204,4 +165,5 @@ void Enigma2::backToTop(){
 Enigma2::Enigma2(std::string _url){
 	enigmaurl = _url;
 }
- 
+
+#endif

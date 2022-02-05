@@ -429,6 +429,12 @@ namespace playerWindows{
 				if(ImGui::DragInt("Volume", &drag_volume, 0.5f, 0, 200, "%d", ImGuiSliderFlags_NoInput)){
 					libmpv->setVolume(drag_volume,item.playershowcontrols);
 				}
+				
+				bool audionrombool = libmpv->getAudioNormalize();
+				if(ImGui::Checkbox("Normalize", &audionrombool)){
+					libmpv->setAudioNormalize(audionrombool);
+				}
+				
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Audio Delay", NULL, true).x) * 0.5f);
 				ImGui::Text("Audio Delay");
 				if(ImGui::DragFloat("Audio Delay", &drag_audiodelay, 0.100f, -5.0f, 5.0f, "%.3f", ImGuiSliderFlags_NoInput)){
@@ -447,6 +453,7 @@ namespace playerWindows{
 					drag_audiodelay = 0.0f;
 					libmpv->setVolume(drag_volume,false);
 					libmpv->setAudioDelay(drag_audiodelay,false);
+					libmpv->setAudioNormalize(false);
 				}
 		}
 		playerWindows::ExitWindow();

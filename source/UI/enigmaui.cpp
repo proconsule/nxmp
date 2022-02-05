@@ -8,6 +8,7 @@
 
 
 namespace Windows {
+#ifdef NXMP_ENIGMASUPPORT
     void EnigmaWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
@@ -80,4 +81,5 @@ namespace Windows {
 		}
 		Windows::ExitWindow();
 	}
+#endif
 }

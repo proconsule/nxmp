@@ -1,5 +1,7 @@
 #include "FTPDir.h"
 
+#ifdef NXMP_NETWORKSUPPORT
+
 FTPDir::FTPDir(std::string _url,Playlist *_playlist){
 	url = _url;	
 	urlschema thisurl = Utility::parseUrl(url);
@@ -72,3 +74,5 @@ void FTPDir::backDir(){
 	currpath = FS::removeLastSlash(currpath);
 	currpath = currpath.substr(0, currpath.find_last_of("/"));
 }
+
+#endif

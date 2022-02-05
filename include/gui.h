@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <SDL.h>
+#include "platforms.h"
 #ifdef __SWITCH__
 #include <switch.h>
 #endif
@@ -22,12 +23,22 @@
 #include "remotefs.h"
 #include "localFs.h"
 #include "utils.h"
+#ifdef NXMP_USBSUPPORT
 #include "usbfs.h"
+#endif
+#ifdef NXMP_ENIGMASUPPORT
 #include "Enigma2.h"
+#endif
+#ifdef NXMP_NETWORKSUPPORT
 #include "HTTPDir.h"
 #include "FTPDir.h"
 #include "sshDir.h"
 #include "sambaDir.h"
+#include "nfsDir.h"
+#endif
+#ifdef NXMP_UPNPSUPPORT
+#include "NX-UPNP.h"
+#endif
 
 #include "imgui_impl_sdl.h"
 
@@ -44,6 +55,8 @@ enum MENU_STATES {
 	MENU_STATE_HTTPBROWSER,
 	MENU_STATE_SSHBROWSER,
 	MENU_STATE_SAMBABROWSER,
+	MENU_STATE_NFSBROWSER,
+	MENU_STATE_UPNPBROWSER,
 	MENU_STATE_ENIGMABROWSER,
 	MENU_STATE_PLAYLISTBROWSER,
 	MENU_STATE_INFO,
@@ -137,17 +150,30 @@ typedef struct {
 
 
 extern SDL_Window *window;
+#ifdef _WIN32
+extern bool fullscreen;
+#endif
 extern MenuItem item;
 
 extern libMpv *libmpv;
 extern localFs *localdir;
+#ifdef NXMP_NETWORKSUPPORT
 extern HTTPDir *httpdir;
 extern FTPDir *ftpdir;
 extern sshDir *sshdir;
 extern sambaDir *sambadir;
-#ifdef __SWITCH__
+extern nfsDir *nfsdir;
+#endif
+#ifdef NXMP_UPNPSUPPORT
+extern NXUPnP *nxupnp;
+#endif
+#ifdef NXMP_USBSUPPORT
 extern USBMounter *usbmounter;
 #endif
+#ifdef NXMP_ENIGMASUPPORT
+extern Enigma2 *enigma2;
+#endif
+
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
 
@@ -158,8 +184,6 @@ extern int __fbo_one;
 extern bool renderloopdone;
 
 extern std::string nxmpTitle;
-
-extern Enigma2 *enigma2;
 
 extern Config *configini;
 extern EQPreset *eqpreset;
@@ -184,6 +208,8 @@ extern Tex FTPTexture;
 extern Tex HTTPTexture;
 extern Tex SFTPTexture;
 extern Tex SMBTexture;
+extern Tex NFSTexture;
+extern Tex UPNPTexture;
 
 extern Tex FFMPEGTexture;
 extern Tex MPVTexture;

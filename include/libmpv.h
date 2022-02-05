@@ -84,6 +84,9 @@ public:
 	void setLoop(bool val);
 	bool getLoop();
 	
+	void setAudioNormalize(bool val);
+	bool getAudioNormalize();
+	
 	void getfileInfo();
 	
 	void setShader(std::string _filename);
@@ -108,6 +111,7 @@ private:
 	fileInfo * fileinfo = nullptr;
 	
 	bool loop = false;
+	bool audionorm = false;
 	int volume = 100;
 	int tmpvolume = 100;
 	

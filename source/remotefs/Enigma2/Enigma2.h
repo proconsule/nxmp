@@ -1,9 +1,13 @@
 #ifndef NXMP_ENIGMA2_H
 #define NXMP_ENIGMA2_H
 
+#include "platforms.h"
+
+#ifdef NXMP_ENIGMASUPPORT
+
 #include <cstdlib>
 #include <cstring>
-#include <curl/curl.h>
+#include "curldownloader.h"
 #include <iostream>
 #include <vector>
 #include <regex>
@@ -12,10 +16,6 @@
 using namespace std;
 using namespace tinyxml2;
 
-struct MemoryStruct {
-  char *memory;
-  size_t size;
-};
 
 struct epgStruct{
 	string title;
@@ -45,7 +45,7 @@ public:
 	string enigma2ip;
 	vector<EnigmaServices> parseBouquet(char * data);
 	void m3uParser(char * url);
-	void curlDownload(char * url ,MemoryStruct * chunk);
+	//void curlDownload(char * url ,MemoryStruct * chunk);
 	
 	void backToTop();
 	EnigmaServices getCurrBouquet();
@@ -64,4 +64,5 @@ public:
 	
 };
 
+#endif
 #endif

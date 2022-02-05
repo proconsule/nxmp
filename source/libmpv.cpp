@@ -605,6 +605,26 @@ bool libMpv::getLoop(){
 	return loop;
 }
 
+void libMpv::setAudioNormalize(bool val){
+	if(val){
+		std::string cmd = "no-osd af add @dynaudnorm:dynaudnorm=f=75:g=25:p=0.5";
+		mpv_command_string(handle, cmd.c_str());
+		audionorm = val;
+		
+		
+	}else{
+		std::string cmd = "no-osd af remove @dynaudnorm";
+		mpv_command_string(handle, cmd.c_str());
+		audionorm = val;
+	}
+}
+
+bool libMpv::getAudioNormalize(){
+	return audionorm;
+}
+	
+	
+
 void libMpv::setShader(std::string _filename){
 	std::string command = std::string("no-osd change-list glsl-shaders set ") + _filename;
 	mpv_command_string(handle,command.c_str());

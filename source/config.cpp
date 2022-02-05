@@ -113,16 +113,23 @@ Config::Config(std::string inifile){
 	
 	
 	topmenu.push_back("Local Files");
+#ifdef NXMP_USBSUPPORT
 	topmenu.push_back("USB");
-	
+#endif
+#ifdef NXMP_NETWORKSUPPORT
 	ini->GetAllValues("Network", "source", values);
 	if(getNetworks().size() != 0){
 		topmenu.push_back("Network");
 	}
-	
+#endif
+#ifdef NXMP_UPNPSUPPORT
+	topmenu.push_back("UPNP");
+#endif
+#ifdef NXMP_ENIGMASUPPORT
 	if(getEnigma() != ""){
 		topmenu.push_back("Enigma2");
 	}
+#endif
 	topmenu.push_back("Playlist");
 	topmenu.push_back("Settings");
 	topmenu.push_back("Info");

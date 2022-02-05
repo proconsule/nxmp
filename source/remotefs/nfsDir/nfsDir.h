@@ -1,12 +1,10 @@
-#ifndef NXMP_SSHDIR_H
-#define NXMP_SSHDIR_H
+#ifndef NXMP_NFSDIR_H
+#define NXMP_NFSDIR_H
 
 #include "platforms.h"
 
 #ifdef NXMP_NETWORKSUPPORT
 
-#include <libssh2.h>
-#include <libssh2_sftp.h>
 #include <string>
 #include <vector>
 #include <stdio.h>
@@ -14,9 +12,11 @@
 #include "localfiles.h"
 #include "playlist.h"
 
-class sshDir{
+
+
+class nfsDir{
 public:
-	sshDir(std::string _url,Playlist * _playlist);
+	nfsDir(std::string _url,Playlist * _playlist);
 	
 	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
@@ -35,6 +35,7 @@ private:
 	std::string basepath = "";
 	std::string currentpath = "";
 	Playlist *playlist;
+	
 };
 
 #endif

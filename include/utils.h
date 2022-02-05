@@ -43,6 +43,7 @@ namespace Utility{
 	urlschema parseUrl(std::string url); 
 	bool compare(const remotefs_entry &a, const remotefs_entry &b);
 	bool TxtLoadFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height);
+	bool TxtLoadFromMemory(unsigned char* data,size_t image_size, GLuint* out_texture, int* out_width, int* out_height);
 	std::string toLower(const std::string &str);
 	std::string toUpper(const std::string &str);
 	bool endsWith(const std::string &value, const std::string &ending, bool sensitive);

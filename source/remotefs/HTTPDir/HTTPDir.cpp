@@ -1,5 +1,7 @@
 #include "HTTPDir.h"
 
+#ifdef NXMP_NETWORKSUPPORT
+
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
   size_t realsize = size * nmemb;
@@ -134,3 +136,5 @@ void HTTPDir::backDir(){
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/")+1);
 }
+
+#endif
