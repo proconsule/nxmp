@@ -3,7 +3,6 @@
 
 #ifdef NXMP_SWITCH
 #include <switch.h>
-#include "SwitchSys.h"
 #endif
 
 
@@ -39,9 +38,11 @@
 #include "playlist.h"
 
 #include "shaderMania.h"
-
+#include "SwitchSys.h"
 
 #define NDEBUG 1
+
+using namespace c2d;
 
 static bool init();
 
@@ -430,12 +431,8 @@ if (hosversionBefore(8, 0, 0)) {
     }
 
     printf("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
-           SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
-        stock_cpu_clock_temp = SwitchSys::stock_cpu_clock;
-        stock_gpu_clock_temp = SwitchSys::stock_gpu_clock;
-        stock_emc_clock_temp = SwitchSys::stock_emc_clock;
-
-	maxClock();
+    SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
+	//SwitchSys::maxClock();
 #endif
 
 	GUI::initMpv();
@@ -444,7 +441,7 @@ if (hosversionBefore(8, 0, 0)) {
 	printf("Ending Render Loop\n");
 
 #ifdef __SWITCH__
-	defaultClock(stock_cpu_clock_temp, stock_gpu_clock_temp, stock_emc_clock_temp);                 
+	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
 #endif
 
 	delete libmpv;
