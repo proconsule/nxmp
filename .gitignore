@@ -1,3 +1,4 @@
 build/
 build-win32/
 nxmp.*
+compile.bat
