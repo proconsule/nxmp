@@ -38,6 +38,13 @@ libMpv::libMpv(const std::string &configDir) {
 		std::string alangstring = Utility::getLanguages()[configini->getAlang(false)].lang3 + std::string(",") + Utility::getLanguages()[configini->getAlang(false)].lang2 + std::string(",eng,en");
 		mpv_set_option_string(handle, "alang", alangstring.c_str());
 	}
+
+	//Slang
+	if(configini->getUseSlang(false)){
+		std::string slangstring = Utility::getLanguages()[configini->getSlang(false)].lang3 + std::string(",") + Utility::getLanguages()[configini->getSlang(false)].lang2 + std::string(",eng,en");
+		mpv_set_option_string(handle, "slang", slangstring.c_str());
+	}
+	//End Slang
 #ifdef _WIN32
 	mpv_set_option_string(handle, "hwdec", "auto-copy");
 #endif

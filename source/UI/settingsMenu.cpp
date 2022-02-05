@@ -113,6 +113,38 @@ namespace Windows {
 				if(!alangbool){
 					ImGui::EndDisabled();
 				}
+
+				//Slang
+				ImGui::Dummy(ImVec2(0.0f,10.0f));
+				bool slangbool = configini->getUseSlang(true);
+				if(ImGui::Checkbox("Use Auto Subtitles Language", &slangbool)){
+					configini->setUseSlang(slangbool);
+				}
+				
+				if(!slangbool){
+					ImGui::BeginDisabled();
+				}
+
+
+				const char* combo_preview_value_2 = Utility::getLanguages()[configini->getSlang(true)].lang3.c_str();  // Pass in the preview value visible before opening the combo (it could be anything)
+				ImGui::PushItemWidth(300);
+				if (ImGui::BeginCombo("Subtitles Language", combo_preview_value_2, 0))
+				{	
+					for (int n = 0; n < Utility::getLanguages().size(); n++)
+					{
+						const bool is_selected = (configini->getSlang(true) == n);
+						if (ImGui::Selectable(Utility::getLanguages()[n].lang3.c_str(), is_selected))
+							configini->setSlang(n);
+
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+				if(!slangbool){
+					ImGui::EndDisabled();
+				}
+				//End Slang
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
 				ImGui::Text("Subtitle");
 				ImGui::Separator();
@@ -261,6 +293,9 @@ namespace Windows {
 				configini->setLongSeek(configini->getLongSeek(false));
 				configini->setShortSeek(configini->getShortSeek(false));
 				configini->setAlang(configini->getAlang(false));
+				//Slang
+				configini->setSlang(configini->getSlang(false));
+				//end Slang
 				configini->setSubFontSize(configini->getSubFontSize(false));
 				configini->setSubFontColor(configini->getSubFontColor(false));
 				configini->setDbActive(configini->getDeinterlace(false));

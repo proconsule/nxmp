@@ -5,11 +5,13 @@
 
 #include "gui.h"
 #include "localfiles.h"
-
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include "SwitchSys.h"
+
+using namespace c2d;
 
 MenuItem item;
 
@@ -44,6 +46,20 @@ namespace GUI {
 		}else{
 			const char *cmd[] = {"show-text", "Masterlock Disabled","2000", NULL};
 			mpv_command_async(libmpv->getHandle(), 0, cmd);
+		}
+		
+	}
+
+	void toggleOC(){
+		item.clockoc = !item.clockoc;
+		if(item.clockoc){
+			const char *cmd[] = {"show-text", "Overclock Enabled","2000", NULL};
+			mpv_command_async(libmpv->getHandle(), 0, cmd);
+			SwitchSys::maxClock();
+		}else{
+			const char *cmd[] = {"show-text", "Overclock Disabled","2000", NULL};
+			mpv_command_async(libmpv->getHandle(), 0, cmd);
+			SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
 		}
 		
 	}
@@ -345,6 +361,11 @@ namespace GUI {
 							toggleMasterLock();
 						}
 					}
+					if (button == SDL_KEY_LSTICK){
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
+							toggleOC();
+						}
+					}
 					if (button == SDL_KEY_MINUS){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							item.state = item.laststate;
@@ -556,6 +577,12 @@ namespace GUI {
 								item.rightmenustate = PLAYER_RIGHT_MENU_TRACKS;
 							}
 							else if(item.rightmenustate == PLAYER_RIGHT_MENU_CHAPTERS){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_INTERPOLATION){
+								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+							}
+							else if(item.rightmenustate == PLAYER_RIGHT_MENU_ANIME4K){
 								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 							}
 							else if(item.rightmenustate == PLAYER_RIGHT_MENU_ARATIO){
@@ -864,6 +891,12 @@ namespace GUI {
 				case PLAYER_RIGHT_MENU_CHAPTERS:
 					playerWindows::RightChapterWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;
+				case PLAYER_RIGHT_MENU_INTERPOLATION:
+					playerWindows::RightHomeInterpolation(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
+				case PLAYER_RIGHT_MENU_ANIME4K:
+					playerWindows::RightHomeAnime4K(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;	
 				case PLAYER_RIGHT_MENU_ARATIO:
 					playerWindows::RightHomeARatio(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;

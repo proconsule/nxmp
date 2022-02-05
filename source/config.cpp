@@ -58,6 +58,23 @@ Config::Config(std::string inifile){
 	
 	alang = Utility::getLanguagesIdx(alangstring);
 	tmpalang = alang;
+
+	//Slang
+	useslang = ini->GetBoolValue("Main", "useslang");
+	tmpuseslang = useslang;
+	const char* slangpv;
+	slangpv = ini->GetValue("Main", "slang");
+	std::string slangstring = "eng";
+	if(slangpv!= nullptr){
+		slangstring = slangpv;
+	}
+	if(slangstring == ""){
+		slangstring = "eng";
+	}
+	
+	slang = Utility::getLanguagesIdx(slangstring);
+	tmpslang = slang;
+	//endSlang
 	
 	subfontsize = ini->GetLongValue("Main", "subfontsize");
 	if(subfontsize == 0)subfontsize = 55;
@@ -254,6 +271,30 @@ void Config::setAlang(int lang){
 	tmpalang = lang;
 }
 
+//Slang
+bool Config::getUseSlang(bool tmpvalue){
+	if(tmpvalue){
+		return tmpuseslang;
+	}
+	return useslang;
+}
+void Config::setUseSlang(bool _val){
+	tmpuseslang = _val;
+}
+
+int Config::getSlang(bool tmpvalue){
+	if(tmpvalue){
+		return tmpslang;
+	}
+	return slang; 
+}
+
+void Config::setSlang(int lang){
+	tmpslang = lang;
+}
+//end Slang
+
+
 int Config::getSubFontSize(bool tmpvalue){
 	if(tmpvalue){
 		return tmpsubfontsize;
@@ -339,6 +380,9 @@ void Config::saveSettings(){
 	longseek = tmplongseek;
 	shortseek = tmpshortseek;
 	usealang = tmpusealang;
+	//slang
+	useslang = tmpuseslang;
+	//end slang
 	subfontsize = tmpsubfontsize;
 	deint = tmpdeint;
 	dbactive = tmpdbactive;
@@ -372,6 +416,14 @@ void Config::saveSettings(){
 	ini->Delete("Main", "alang");
 	ini->SetValue("Main", "alang", Utility::getLanguages()[tmpalang].lang3.c_str());
 	
+	//slang
+	ini->Delete("Main", "useslang");
+	ini->SetBoolValue("Main", "useslang", useslang, NULL, false);
+	
+	ini->Delete("Main", "slang");
+	ini->SetValue("Main", "slang", Utility::getLanguages()[tmpslang].lang3.c_str());
+	//end slang
+
 	ini->Delete("Main", "subfontsize");
 	ini->SetLongValue("Main", "subfontsize", subfontsize, NULL, false);
 	

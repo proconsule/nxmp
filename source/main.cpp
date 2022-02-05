@@ -38,9 +38,11 @@
 #include "playlist.h"
 
 #include "shaderMania.h"
-
+#include "SwitchSys.h"
 
 #define NDEBUG 1
+
+using namespace c2d;
 
 static bool init();
 
@@ -412,10 +414,36 @@ int main(int argc,char *argv[]){
 	
 #endif	
 	
+#ifdef __SWITCH__
+
+if (hosversionBefore(8, 0, 0)) {
+        if (R_SUCCEEDED(pcvInitialize())) {
+            SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
+            SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
+            SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
+        }
+    } else {
+        if (R_SUCCEEDED(clkrstInitialize())) {
+            SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
+            SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
+            SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
+        }
+    }
+
+    printf("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
+    SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
+	//SwitchSys::maxClock();
+#endif
+
 	GUI::initMpv();
 	
 	GUI::RenderLoop();
 	printf("Ending Render Loop\n");
+
+#ifdef __SWITCH__
+	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
+#endif
+
 	delete libmpv;
 	libmpv = nullptr;
 	printf("Ending MPV\n");
@@ -474,6 +502,11 @@ int main(int argc,char *argv[]){
 	printf("Exit Services\n");
 	
 #ifdef NXMP_SWITCH
+	if (hosversionBefore(8, 0, 0)) {
+    pcvExit();
+    } else {
+    clkrstExit();
+    }
 	ncmExit();
 	plExit();
 	romfsExit();
