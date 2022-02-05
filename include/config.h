@@ -39,6 +39,13 @@ public:
 	void setUseAlang(bool _val);
 	int getAlang(bool tmpvalue);
 	void setAlang(int lang);
+
+	//Slang
+	bool getUseSlang(bool tmpvalue);
+	void setUseSlang(bool _val);
+	int getSlang(bool tmpvalue);
+	void setSlang(int lang);
+    //End Slang
 	
 	int getSubFontSize(bool tmpvalue);
 	void setSubFontSize(int val);
@@ -85,6 +92,14 @@ private:
 	
 	int tmpalang;
 	int alang;
+	
+	//Slang
+	bool tmpuseslang;
+	bool useslang;
+	
+	int tmpslang;
+	int slang;
+    //End Slang
 	
 	int tmpsubfontsize;
 	int subfontsize;
