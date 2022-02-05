@@ -1,6 +1,10 @@
 #ifndef NXMP_HTTPDIR_H
 #define NXMP_HTTPDIR_H
 
+#include <platforms.h>
+
+#ifdef NXMP_NETWORKSUPPORT
+
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -41,4 +45,5 @@ private:
 	std::string currentpath = "";
 };
 
+#endif
 #endif

@@ -55,9 +55,16 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 					file.path = FS::removeLastSlash(path) + "/" + file.name;
 					file.checked = playlist->isPresent(file.name,file.path);
 					
+					
+					#ifdef _WIN32
+					struct stat64 st{};
+					if (stat64(file.path.c_str(), &st) == 0) {
+						file.size = (size_t) st.st_size;
+					#else
 					struct stat st{};
 					if (stat(file.path.c_str(), &st) == 0) {
 						file.size = (size_t) st.st_size;
+					#endif
 						file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
 					}
 					if(file.type == FS::FileEntryType::File){

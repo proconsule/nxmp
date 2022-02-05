@@ -1,5 +1,5 @@
-#ifndef NXMP_FTPDIR_H
-#define NXMP_FTPDIR_H
+#ifndef NXMP_NFSDIR_H
+#define NXMP_NFSDIR_H
 
 #include "platforms.h"
 
@@ -7,17 +7,18 @@
 
 #include <string>
 #include <vector>
-
+#include <stdio.h>
+#include <cstring>
 #include "localfiles.h"
-#include "utils.h"
-#include "ftplib.h"
 #include "playlist.h"
 
-class FTPDir{
+
+
+class nfsDir{
 public:
-	FTPDir(std::string _url,Playlist *_playlist);
-	~FTPDir();
-	void DirList(std::string path,const std::vector<std::string> &extensions);
+	nfsDir(std::string _url,Playlist * _playlist);
+	
+	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
 	
 	void backDir();
@@ -29,13 +30,12 @@ public:
 	void clearChecked();
 	
 private:
-	std::string url;
-	std::string currpath;
-	std::string basepath;
 	std::vector<FS::FileEntry> currentlist;
-	netbuf *ftp_con = nullptr;
+	std::string url;
+	std::string basepath = "";
+	std::string currentpath = "";
 	Playlist *playlist;
-
+	
 };
 
 #endif

@@ -1,12 +1,17 @@
-#ifdef __SWITCH__
+
+#include "platforms.h"
+
+#ifdef NXMP_SWITCH
 #include <switch.h>
 #endif
+
 
 #include <stdio.h>
 #include <ctype.h>
 
 #include <SDL.h>
 #include <glad/glad.h>
+
 
 #include "config.h"
 #include "gui.h"
@@ -17,6 +22,9 @@
 #include "FTPDir.h"
 #include "sshDir.h"
 #include "sambaDir.h"
+#include "NX-UPNP.h"
+#include "nfsDir.h"
+
 
 
 
@@ -32,26 +40,43 @@
 #include "shaderMania.h"
 
 
-//#define NDEBUG 1
+#define NDEBUG 1
 
 static bool init();
 
 SDL_Window *window;
+#ifdef NXMP_WIN32
+bool fullscreen = false;
+#endif
+
 SDL_GLContext context;
 libMpv *libmpv = nullptr;
 localFs *localdir = nullptr;
+#ifdef NXMP_NETWORKSUPPORT
 FTPDir *ftpdir = nullptr;
 HTTPDir *httpdir = nullptr;
 sshDir *sshdir = nullptr;
 sambaDir *sambadir = nullptr;
-#ifdef __SWITCH__
+nfsDir *nfsdir = nullptr;
+#endif
+
+#ifdef NXMP_UPNPSUPPORT
+NXUPnP *nxupnp = nullptr;
+#endif
+
+#ifdef NXMP_USBSUPPORT
 USBMounter *usbmounter = nullptr;
 #endif
+
+#ifdef NXMP_ENIGMASUPPORT
+Enigma2 *enigma2 = nullptr;
+#endif
+
 Config *configini = nullptr;
 EQPreset *eqpreset = nullptr;
 SQLiteDB *sqlitedb = nullptr;
 bool dbUpdated = false;
-Enigma2 *enigma2 = nullptr;
+
 Playlist *playlist = nullptr;
 
 uint32_t wakeup_on_mpv_render_update;
@@ -79,6 +104,8 @@ Tex FTPTexture;
 Tex HTTPTexture;
 Tex SFTPTexture;
 Tex SMBTexture;
+Tex NFSTexture;
+Tex UPNPTexture;
 
 Tex FFMPEGTexture;
 Tex MPVTexture;
@@ -101,6 +128,33 @@ shaderMania* shadermania = nullptr;
 const GLuint WIDTH = 1280, HEIGHT = 720;
 
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
+
+void deinitTextures(){
+
+	glDeleteTextures(1, &SdCardTexture.id);
+	glDeleteTextures(1, &UsbTexture.id);
+	glDeleteTextures(1, &NetworkTexture.id);
+	glDeleteTextures(1, &Enigma2Texture.id);
+	glDeleteTextures(1, &FileTexture.id);
+	glDeleteTextures(1, &PlaylistTexture.id);
+	glDeleteTextures(1, &InfoTexture.id);
+	glDeleteTextures(1, &FFMPEGTexture.id);
+	glDeleteTextures(1, &HTTPTexture.id);
+	glDeleteTextures(1, &FTPTexture.id);
+	glDeleteTextures(1, &SFTPTexture.id);
+	glDeleteTextures(1, &SMBTexture.id);
+	glDeleteTextures(1, &MPVTexture.id);
+	glDeleteTextures(1, &ExitTexture.id);
+	glDeleteTextures(1, &NXMPBannerTexture.id);
+	glDeleteTextures(1, &PlayIcon.id);
+	glDeleteTextures(1, &StopIcon.id);
+	glDeleteTextures(1, &PauseIcon.id);
+	glDeleteTextures(1, &MuteIcon.id);
+	glDeleteTextures(1, &VolumeIcon.id);
+	glDeleteTextures(1, &LoopIcon.id);
+	glDeleteTextures(1, &NoLoopIcon.id);
+	
+}
 
 
 static bool init() {
@@ -143,7 +197,7 @@ static bool init() {
     return success;
 }
 
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 int main() {
 	 appletLockExit();
 #else
@@ -151,7 +205,7 @@ int main(int argc,char *argv[]){
 #endif
 
 
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 	socketInitializeDefault();
 #ifdef NDEBUG
 	nxlinkStdio();
@@ -179,7 +233,7 @@ int main(int argc,char *argv[]){
 	shadermania = new shaderMania();
 	
 	
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 	Result ret;
 	if (R_FAILED(ret = romfsInit())) {
 		printf("romfsInit() failed: 0x%x\n", ret);
@@ -207,14 +261,14 @@ int main(int argc,char *argv[]){
         
         ImGui::StyleColorsDark();
 		printf("Init MPV\n");
-		GUI::initMpv();
+		
 		printf("Init SDL\n");
 		ImGui_ImplSDL2_InitForOpenGL(window, context);
         printf("Init OPENGL\n");
 		ImGui_ImplOpenGL3_Init("#version 430 core");
 		
 		
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 		plInitialize(PlServiceType_System);
 		if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {
 			printf("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
@@ -235,16 +289,20 @@ int main(int argc,char *argv[]){
 		int width = 0, height = 0, bpp = 0;
 		ImFontConfig font_cfg;
 		
-		font_cfg.FontDataOwnedByAtlas = false;
+		//font_cfg.FontDataOwnedByAtlas = false;
 		printf("Loading TTF\n");
-#ifdef __SWITCH__
-		io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());
-		fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());
+		
+		
+		
+#ifdef NXMP_SWITCH
+		io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg);
+		fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg);
 #else
-		io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());
-		fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg, io.Fonts->GetGlyphRangesDefault());;
+		io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg);
+		fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg);
 #endif
-		font_cfg.MergeMode = true;
+		//font_cfg.MergeMode = true;
+		//io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg, io.Fonts->GetGlyphRangesJapanese());
 		//io.Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 28.0f, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
 		/*
 		    static const ImWchar ranges[] =
@@ -275,9 +333,12 @@ int main(int argc,char *argv[]){
                 };
 	
 	
-	printf("Loading Extended Chars\n");
+	static ImWchar ranges[] = { 0x1, 0x1FFFF, 0 };
+	font_cfg.OversampleH = font_cfg.OversampleV = 1;
+	font_cfg.MergeMode = true;
+	//printf("Loading Extended Chars\n");
     //io.Fonts->AddFontFromMemoryTTF (fonts_ext.address, fonts_ext.size, 24.0f, &font_cfg, ranges);
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
 	fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
 #else
@@ -292,7 +353,7 @@ int main(int argc,char *argv[]){
 	
 	
 	printf("Loading Textures\n");
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 	Utility::TxtLoadFromFile("romfs:/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
 	Utility::TxtLoadFromFile("romfs:/usb.png",&UsbTexture.id,&UsbTexture.width,&UsbTexture.height);
 	Utility::TxtLoadFromFile("romfs:/network.png",&NetworkTexture.id,&NetworkTexture.width,&NetworkTexture.height);
@@ -307,6 +368,8 @@ int main(int argc,char *argv[]){
 	Utility::TxtLoadFromFile("romfs:/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
 	Utility::TxtLoadFromFile("romfs:/sftp.png",&SFTPTexture.id,&SFTPTexture.width,&SFTPTexture.height);
 	Utility::TxtLoadFromFile("romfs:/smb.png",&SMBTexture.id,&SMBTexture.width,&SMBTexture.height);
+	Utility::TxtLoadFromFile("romfs:/nfs.png",&NFSTexture.id,&NFSTexture.width,&NFSTexture.height);
+	Utility::TxtLoadFromFile("romfs:/upnp.png",&UPNPTexture.id,&UPNPTexture.width,&UPNPTexture.height);
 	Utility::TxtLoadFromFile("romfs:/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
 	Utility::TxtLoadFromFile("romfs:/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
 	Utility::TxtLoadFromFile("romfs:/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
@@ -333,6 +396,8 @@ int main(int argc,char *argv[]){
 	Utility::TxtLoadFromFile("./romfs/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
 	Utility::TxtLoadFromFile("./romfs/sftp.png",&SFTPTexture.id,&SFTPTexture.width,&SFTPTexture.height);
 	Utility::TxtLoadFromFile("./romfs/smb.png",&SMBTexture.id,&SMBTexture.width,&SMBTexture.height);
+	Utility::TxtLoadFromFile("./romfs/nfs.png",&NFSTexture.id,&NFSTexture.width,&NFSTexture.height);
+	Utility::TxtLoadFromFile("./romfs/upnp.png",&UPNPTexture.id,&UPNPTexture.width,&UPNPTexture.height);
 	Utility::TxtLoadFromFile("./romfs/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
 	Utility::TxtLoadFromFile("./romfs/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
 	Utility::TxtLoadFromFile("./romfs/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
@@ -347,26 +412,26 @@ int main(int argc,char *argv[]){
 	
 #endif	
 	
-	printf("Init Enigma2\n");
-	
+	GUI::initMpv();
 	
 	GUI::RenderLoop();
 	printf("Ending Render Loop\n");
 	delete libmpv;
 	libmpv = nullptr;
-	
+	printf("Ending MPV\n");
 	
 	
 	if(localdir != nullptr){
 		delete localdir;
 		localdir = nullptr;
 	}
-#ifdef __SWITCH__
+#ifdef NXMP_USBSUPPORT
 	if(usbmounter != nullptr){
 		delete usbmounter;
 		usbmounter = nullptr;
 	}
 #endif
+#ifdef NXMP_NETWORKSUPPORT
 	if(ftpdir != nullptr){
 		delete ftpdir;
 		ftpdir = nullptr;
@@ -375,10 +440,19 @@ int main(int argc,char *argv[]){
 		delete httpdir;
 		httpdir = nullptr;
 	}
+#endif
+#ifdef NXMP_ENIGMASUPPORT
 	if(enigma2 != nullptr){
 		delete enigma2;
 		enigma2 = nullptr;
 	}
+#endif
+#ifdef NXMP_UPNPSUPPORT
+	if(nxupnp != nullptr){
+		delete nxupnp;
+		nxupnp = nullptr;
+	}
+#endif
 	
 	if(sqlitedb != nullptr){
 		delete sqlitedb;
@@ -389,6 +463,7 @@ int main(int argc,char *argv[]){
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
     SDL_GL_DeleteContext(context);
+	deinitTextures();
     }
     SDL_DestroyWindow(window);
     window = NULL;
@@ -398,7 +473,7 @@ int main(int argc,char *argv[]){
 	
 	printf("Exit Services\n");
 	
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 	ncmExit();
 	plExit();
 	romfsExit();

@@ -13,7 +13,7 @@ namespace Popups{
 				ImGui::Text("Start Playlist?");
 				ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
 				if (ImGui::Button("Yes", button_size)) {
-					if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB ||item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER){
+					if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB ||item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
 						item.popupstate = POPUP_STATE_NONE;
 						Playlist::playlist_struct nextfile = playlist->getPlaylist()[0];
 						libmpv->loadFile(nextfile.fulluri);

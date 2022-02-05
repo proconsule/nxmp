@@ -1,5 +1,7 @@
 #include "sshDir.h"
 
+#ifdef NXMP_NETWORKSUPPORT
+
 #ifdef __SWITCH__
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -225,3 +227,5 @@ void sshDir::backDir(){
 	currentpath = FS::removeLastSlash(currentpath);
 	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
 }
+
+#endif

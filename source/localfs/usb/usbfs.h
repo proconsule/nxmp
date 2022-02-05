@@ -1,6 +1,9 @@
-#ifdef __SWITCH__
 #ifndef NXMP_USBFS_H
 #define NXMP_USBFS_H
+
+#include "platforms.h"
+
+#ifdef NXMP_USBSUPPORT
 
 #include <cstdlib>
 #include <string>

@@ -39,14 +39,14 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	libs/imgui libs/imgui/misc/freetype source source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
+SOURCES		:=	libs/imgui libs/imgui/opengl3 libs/imgui/misc/freetype source source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
 DATA		:=	data
-INCLUDES	:=	libs/simpleini libs/imgui include source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
+INCLUDES	:=	libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
 ROMFS		:=	romfs
 
 VERSION_MAJOR := 0
 VERSION_MINOR := 6
-VERSION_MICRO := 0
+VERSION_MICRO := 1
 
 APP_TITLE     := NXMP
 APP_AUTHOR    := proconsule
@@ -60,7 +60,7 @@ ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 CFLAGS	:=	-g -Wall -Wno-sign-compare -O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
-CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags` -fpermissive
+CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags` -fpermissive -DIMGUI_USE_WCHAR32 -I${PORTLIBS}/include/upnp/
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ $(BUILD_TYPE)
 
@@ -72,7 +72,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lssh2 -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lnx -lz
+LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lssh2 -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lupnp -lixml -lnfs -lnx -lz
 
 
 

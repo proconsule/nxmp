@@ -58,6 +58,11 @@
 #define FTPLIB_CALLBACKARG 4
 #define FTPLIB_CALLBACKBYTES 5
 
+#ifdef _WIN32
+#define __UINT64_MAX 1
+#endif
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

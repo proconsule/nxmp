@@ -1,7 +1,10 @@
 #include <cstdio>
 #include "usbfs.h"
 
-#ifdef __SWITCH__
+
+#include "platforms.h"
+
+#ifdef NXMP_USBSUPPORT
 
 static UEvent *g_statusChangeEvent, g_exitEvent;
 static UsbHsFsDevice *g_usbDevices;

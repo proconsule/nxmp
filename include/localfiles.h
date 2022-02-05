@@ -30,7 +30,7 @@ namespace FS {
 	struct FileEntry{
 		std::string name;
 		std::string path;
-		size_t size = 0;
+		int64_t size = 0;
 		FileEntryType type = FileEntryType::Unknown;
 		bool checked = false;
 	};

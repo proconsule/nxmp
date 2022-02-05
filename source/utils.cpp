@@ -81,6 +81,39 @@ namespace Utility{
 		return true;
 	}
 	
+	bool TxtLoadFromMemory(unsigned char* data,size_t image_size, GLuint* out_texture, int* out_width, int* out_height){
+		int image_width = 0;
+		int image_height = 0;
+		int comp = 0;
+		
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc *)data, image_size, &image_width, &image_height, &comp, 0); 
+		
+		if (image_data == NULL){
+			printf("Failed to load IMG from memory\n");
+			return false;
+		}
+		GLuint id = 0;
+		glGenTextures(1, &id);
+		glBindTexture(GL_TEXTURE_2D, id);
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		
+		
+		if(comp == 3)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+		else if(comp == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+		
+		
+		*out_texture = id;
+		*out_width = image_width;
+		*out_height = image_height;
+		
+		return true;
+	}
+	
 	std::string humanSize(size_t bytes)
 	{
 		std::vector<std::string>suffix = {"B", "KB", "MB", "GB", "TB"};

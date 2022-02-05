@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "platforms.h"
+
 #include "gui.h"
 #include "localfiles.h"
 
@@ -51,7 +53,7 @@ namespace GUI {
 		SDL_Event event;
 			while (SDL_PollEvent(&event)) {
 				ImGui_ImplSDL2_ProcessEvent(&event);
-#ifndef __SWITCH__
+#ifdef NXMP_WIN32
 				if (event.type == SDL_KEYDOWN) {
 					Uint8 keycode = event.key.keysym.sym;
 					//printf("Key code :%d\n",keycode);
@@ -138,6 +140,17 @@ namespace GUI {
 						sdlevent.type = SDL_JOYBUTTONDOWN;
 						sdlevent.jbutton.button = SDL_KEY_RSTICK_DOWN;
 						SDL_PushEvent(&sdlevent);
+					}
+					
+					if(keycode == SDLK_f){
+						if(fullscreen){
+							SDL_SetWindowFullscreen(window,0);
+							fullscreen = false;
+						}else{
+							SDL_SetWindowFullscreen(window,SDL_WINDOW_FULLSCREEN);
+							fullscreen = true;
+						}
+						
 					}
 					
 					
@@ -315,7 +328,7 @@ namespace GUI {
 					}
 					
 					if (button == SDL_KEY_DLEFT){
-						if((item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER) && item.popupstate == POPUP_STATE_NONE){
+						if((item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER) && item.popupstate == POPUP_STATE_NONE){
 							if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 								item.focus = true;
 								item.selectionstate = FILE_SELECTION_NONE;
@@ -383,7 +396,7 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_X){
 						
-						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER){
+						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
 							item.popupstate = POPUP_STATE_STARTPLAYLIST;
 						}
 						
@@ -415,12 +428,13 @@ namespace GUI {
 								delete localdir;
 								localdir = nullptr;
 							}
-#ifdef __SWITCH__
+#ifdef NXMP_USBSUPPORT
 							if(usbmounter != nullptr && libmpv->Stopped() && !usbmounter->haveIteminPlaylist()){
 								delete usbmounter;
 								usbmounter = nullptr;
 							}
 #endif
+#ifdef NXMP_NETWORKSUPPORT
 							if(ftpdir != nullptr){
 								delete ftpdir;
 								ftpdir = nullptr;
@@ -437,14 +451,23 @@ namespace GUI {
 								delete sambadir;
 								sambadir = nullptr;
 							}
+#endif
+#ifdef NXMP_UPNPSUPPORT
+							if(nxupnp != nullptr){
+								delete nxupnp;
+								nxupnp = nullptr;
+							}
+#endif
+#ifdef NXMP_ENIGMASUPPORT
 							if(enigma2 != nullptr){
 								delete enigma2;
 								enigma2 = nullptr;
 							}
+#endif
 							item.networkselect = true;
 							item.first_item = true;
 							item.state = MENU_STATE_HOME;
-#ifdef __SWITCH__
+#ifdef NXMP_USBSUPPORT
 							if(usbmounter != nullptr && usbmounter->haveIteminPlaylist()){
 								usbmounter->setBasePath("");
 							}
@@ -454,11 +477,13 @@ namespace GUI {
 										
 					}
 					if (button == SDL_KEY_B){
+#ifdef NXMP_ENIGMASUPPORT
 						if(item.state == MENU_STATE_ENIGMABROWSER){
 							item.first_item = true;
 							enigma2->backToTop();
 						}
-						
+#endif
+#ifdef NXMP_NETWORKSUPPORT
 						if(item.state == MENU_STATE_FTPBROWSER){
 							item.first_item = true;
 							ftpdir->backDir();
@@ -483,9 +508,25 @@ namespace GUI {
 							sambadir->DirList(sambadir->getCurrPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
-						
+						if(item.state == MENU_STATE_NFSBROWSER){
+							item.first_item = true;
+							nfsdir->backDir();
+							nfsdir->DirList(nfsdir->getCurrPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							
+						}
+#endif
+#ifdef NXMP_UPNPSUPPORT
+						if(item.state == MENU_STATE_UPNPBROWSER){
+							item.first_item = true;
+							if(nxupnp->getSelDevice()>-1){
+								nxupnp->getDevice(nxupnp->getSelDevice())->back();
+							
+								nxupnp->getDevice(nxupnp->getSelDevice())->browseOID();
+							}
+						}
+#endif
 						if(item.state == MENU_STATE_USB){
-#ifdef __SWITCH__							
+#ifdef NXMP_USBSUPPORT							
 							if(usbmounter->getBasePath() != ""){
 								item.first_item = true;
 								usbmounter->backPath();
@@ -584,7 +625,7 @@ namespace GUI {
 					}
 					
 					if (mp_event->event_id == MPV_EVENT_START_FILE) {
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 						appletSetMediaPlaybackState(true);
 #endif					
 						printf("START FILE\n");
@@ -593,7 +634,7 @@ namespace GUI {
 					}
 					//printf("Event id: %d\n",mp_event->event_id);
 					if (mp_event->event_id == MPV_EVENT_END_FILE) {
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 						appletSetMediaPlaybackState(false);
 #endif					
 						struct mpv_event_end_file *eof = (struct mpv_event_end_file *)mp_event->data;
@@ -699,40 +740,70 @@ namespace GUI {
 					}
 					break;
 				case MENU_STATE_USB:
+#ifdef NXMP_USBSUPPORT
 					Windows::USBBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
+#endif
 					break;
 				case MENU_STATE_NETWORKBROWSER:
+#ifdef NXMP_NETWORKSUPPORT
 					Windows::NetworkWindow(&item.focus, &item.first_item);
+#endif
 					break;
 				case MENU_STATE_FTPBROWSER:
+#ifdef NXMP_NETWORKSUPPORT
 					Windows::FtpWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
+#endif
 					break;
 				case MENU_STATE_HTTPBROWSER:
+#ifdef NXMP_NETWORKSUPPORT
 					Windows::HttpWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
+#endif
 					break;
 				case MENU_STATE_SSHBROWSER:
+#ifdef NXMP_NETWORKSUPPORT
 					Windows::SSHWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
+#endif
 					break;
 				case MENU_STATE_SAMBABROWSER:
+#ifdef NXMP_NETWORKSUPPORT
 					Windows::SambaWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
+#endif
+					break;
+				case MENU_STATE_NFSBROWSER:
+#ifdef NXMP_NETWORKSUPPORT
+					Windows::NFSWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
+						Popups::PlaylistStartPlaylist();
+					}
+#endif
+					break;
+				case MENU_STATE_UPNPBROWSER:
+#ifdef NXMP_UPNPSUPPORT
+					Windows::UPNPBrowserWindow(&item.focus, &item.first_item);
+					//if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
+					//	Popups::PlaylistStartPlaylist();
+					//}
+#endif
 					break;
 				case MENU_STATE_ENIGMABROWSER:
+#ifdef NXMP_ENIGMASUPPORT
 					Windows::EnigmaWindow(&item.focus, &item.first_item);
+#endif
 					break;
 				case MENU_STATE_SETTINGS:
 					Windows::SettingsMenuWindow(&item.focus, &item.first_item);
@@ -859,10 +930,10 @@ namespace GUI {
 			item.popupstate = POPUP_STATE_DBUPDATED;
 		}
 		item.first_item = true;
-#ifdef __SWITCH__
+#ifdef NXMP_SWITCH
 		while (!renderloopdone && appletMainLoop())
 #endif
-#ifdef _WIN32
+#ifdef NXMP_WIN32
 		while (!renderloopdone)
 #endif
 		{

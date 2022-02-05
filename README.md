@@ -25,6 +25,7 @@ source=TESTFtp|ftp://user:pass@192.168.1.10:21/path/
 source=TestHTTP|http://192.168.1.10/path/
 source=TestSFTp|sftp://192.168.1.10/path/ (without path it default to home)
 source=TestSamba|smb://192.168.1.10/share/ (share is a share name not a path)
+source=TestNFS|nfs://192.168.1.10/export/
 ```
 
 Enigma2 have syntax
@@ -69,9 +70,10 @@ Thanks to
 -----
 - Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv part)
 - DarkMatterCore for libusbhsfs https://github.com/DarkMatterCore/libusbhsfs (this gives NXMP USB support)
+- Chocola @ GBATemp forum for usage guide and beta testing
+- sashka69 @ GBATemp forum for beta testing
 - bodyXY @ GBATemp forum for banner and icons
 - Godorowski @ GBATemp forum for player UI design and icons
-- Chocola @ GBATemp forum for usage guide and beta testing
 - student @ reboot.ms forum for beta testing
 - docgold @ GBATemp forum for Enigma2 samples and support on decoders
 - tataniko @ GBATemp forum for suggestions and bug hunting

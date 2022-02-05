@@ -38,13 +38,6 @@ libMpv::libMpv(const std::string &configDir) {
 		std::string alangstring = Utility::getLanguages()[configini->getAlang(false)].lang3 + std::string(",") + Utility::getLanguages()[configini->getAlang(false)].lang2 + std::string(",eng,en");
 		mpv_set_option_string(handle, "alang", alangstring.c_str());
 	}
-
-	//Slang
-	if(configini->getUseSlang(false)){
-		std::string slangstring = Utility::getLanguages()[configini->getSlang(false)].lang3 + std::string(",") + Utility::getLanguages()[configini->getSlang(false)].lang2 + std::string(",eng,en");
-		mpv_set_option_string(handle, "slang", slangstring.c_str());
-	}
-	//End Slang
 #ifdef _WIN32
 	mpv_set_option_string(handle, "hwdec", "auto-copy");
 #endif
@@ -611,6 +604,26 @@ void libMpv::setLoop(bool val){
 bool libMpv::getLoop(){
 	return loop;
 }
+
+void libMpv::setAudioNormalize(bool val){
+	if(val){
+		std::string cmd = "no-osd af add @dynaudnorm:dynaudnorm=f=75:g=25:p=0.5";
+		mpv_command_string(handle, cmd.c_str());
+		audionorm = val;
+		
+		
+	}else{
+		std::string cmd = "no-osd af remove @dynaudnorm";
+		mpv_command_string(handle, cmd.c_str());
+		audionorm = val;
+	}
+}
+
+bool libMpv::getAudioNormalize(){
+	return audionorm;
+}
+	
+	
 
 void libMpv::setShader(std::string _filename){
 	std::string command = std::string("no-osd change-list glsl-shaders set ") + _filename;
