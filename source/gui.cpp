@@ -252,7 +252,7 @@ namespace GUI {
 					
 				}
 				else if(event.type == SDL_FINGERUP && !configini->getTouchEnable(false))
-				{	printf("New Focus witch Touch Disabled.\n");
+				{	printf("New Focus with Touch Disabled.\n");
 					ImGui::SetNextWindowFocus();
 				}
 
