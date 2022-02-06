@@ -251,6 +251,10 @@ namespace GUI {
 					TOUCHCONTROLS::fingerUp(&event);
 					
 				}
+				else if(event.type == SDL_FINGERUP && !configini->getTouchEnable(false))
+				{	printf("New Focus witch Touch Disabled.\n");
+					ImGui::SetNextWindowFocus();
+				}
 
 				if(event.type == SDL_JOYAXISMOTION){
 					if( event.jaxis.axis == 3 ) {
