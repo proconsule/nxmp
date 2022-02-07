@@ -181,12 +181,15 @@ namespace GUI {
 						SDL_PushEvent(&sdlevent);
 					}
 					if(keycode == SDLK_t){
-						for(int i=0;i<playlist->getPlaylist().size();i++){
-							printf("Name: %s uri %s\n",playlist->getPlaylist()[i].name.c_str(),playlist->getPlaylist()[i].fulluri.c_str());
-						}
+						Themes *themes = new Themes();
+						themes->setTheme("./themes/test1/");
+						delete themes;
 					}
 					if(keycode == SDLK_e){
-						
+						Themes *themes = new Themes();
+						themes->getThemes();
+						themes->setDefault();
+						delete themes;
 					}
 					
 					
@@ -981,9 +984,33 @@ namespace GUI {
 			HandleEvents();
 			HandleLayers();
 			HandleRender();
+			if(dochangethemefont){
+				changeFontTheme();
+				dochangethemefont = false;
+			}
+			
 		}
 		
 		return 0;	
+	}
+
+	void changeFontTheme(){
+		ImGuiIO &io = ImGui::GetIO();
+		
+		unsigned char *pixels = nullptr;
+		int width = 0, height = 0, bpp = 0;
+		ImFontConfig font_cfg;
+		
+		io.Fonts->Clear();
+		
+		io.Fonts->AddFontFromFileTTF(themefontpath.c_str(), 24.0f,&font_cfg);
+		fontSmall = io.Fonts->AddFontFromFileTTF(themefontpath.c_str(), 16.0f,&font_cfg);
+		
+		io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
+		io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
+		io.Fonts->Build();
+		ImGui_ImplOpenGL3_CreateFontsTexture();
+		
 	}
 
 }	

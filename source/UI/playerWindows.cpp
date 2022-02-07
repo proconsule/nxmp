@@ -829,9 +829,9 @@ namespace playerWindows{
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition-90);
 			if(libmpv->Paused()){
-				ImGui::Image((void*)(intptr_t)PlayIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.PlayIcon.id, ImVec2(60,60));
 			}else{
-				ImGui::Image((void*)(intptr_t)PauseIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.PauseIcon.id, ImVec2(60,60));
 			}
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition+20);
@@ -851,14 +851,14 @@ namespace playerWindows{
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetWindowSize().x-100.0f);
 			if(libmpv->getMute()){
-				ImGui::Image((void*)(intptr_t)MuteIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.MuteIcon.id, ImVec2(60,60));
 			}else{
-				ImGui::Image((void*)(intptr_t)VolumeIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.VolumeIcon.id, ImVec2(60,60));
 			}
 			
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition+20);
-			ImGui::Image((void*)(intptr_t)StopIcon.id, ImVec2(60,60));
+			ImGui::Image((void*)(intptr_t)nxmpicons.StopIcon.id, ImVec2(60,60));
 			ImGui::SameLine();
 			
 			ImGui::SetCursorPosX(centerposition+(centerposition*0.5));
@@ -870,9 +870,9 @@ namespace playerWindows{
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition+(centerposition*0.5));
 			if(libmpv->getLoop()){
-				ImGui::Image((void*)(intptr_t)LoopIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.LoopIcon.id, ImVec2(60,60));
 			}else{
-				ImGui::Image((void*)(intptr_t)NoLoopIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.NoLoopIcon.id, ImVec2(60,60));
 			}
 			ImGui::SameLine();
 			
@@ -958,7 +958,7 @@ namespace playerWindows{
 			ImGui::PopStyleColor(2);
 			ImGui::PopStyleVar();
 			ImGui::SameLine();
-			ImGui::Image((void*)(intptr_t)VolumeIcon.id, ImVec2(25,25));
+			ImGui::Image((void*)(intptr_t)nxmpicons.VolumeIcon.id, ImVec2(25,25));
 			ImGuiContext& g = *GImGui;
 			if(item.VolumeHide +2 < g.Time){
 				item.showVolume = false;

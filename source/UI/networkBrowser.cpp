@@ -31,9 +31,9 @@ namespace Windows {
 				for(unsigned int n=0;n<thislist.size();n++){
 						
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						
@@ -170,9 +170,9 @@ namespace Windows {
 				for(unsigned int n=0;n<thislist.size();n++){
 						
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
@@ -305,9 +305,9 @@ namespace Windows {
 					static int selected = -1;
 					
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
@@ -446,9 +446,9 @@ namespace Windows {
 					static int selected = -1;
 					
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
@@ -588,9 +588,9 @@ namespace Windows {
 					static int selected = -1;
 					
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
@@ -715,19 +715,19 @@ namespace Windows {
 						static int selected = -1;
 						urlschema thisurl = Utility::parseUrl(item.networksources[n].url);
 						if(thisurl.scheme == "ftp"){
-							ImGui::Image((void*)(intptr_t)FTPTexture.id, ImVec2(50,50));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "http"){
-							ImGui::Image((void*)(intptr_t)HTTPTexture.id, ImVec2(50,50));
+							ImGui::Image((void*)(intptr_t)nxmpicons.HTTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "sftp"){
-							ImGui::Image((void*)(intptr_t)SFTPTexture.id, ImVec2(50,50));
+							ImGui::Image((void*)(intptr_t)nxmpicons.SFTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "smb"){
-							ImGui::Image((void*)(intptr_t)SMBTexture.id, ImVec2(50,50));
+							ImGui::Image((void*)(intptr_t)nxmpicons.SMBTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "nfs"){
-							ImGui::Image((void*)(intptr_t)NFSTexture.id, ImVec2(50,50));
+							ImGui::Image((void*)(intptr_t)nxmpicons.NFSTexture.id, ImVec2(50,50));
 						}
 						ImGui::SameLine();
 						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});

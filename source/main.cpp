@@ -76,6 +76,8 @@ USBMounter *usbmounter = nullptr;
 Enigma2 *enigma2 = nullptr;
 #endif
 
+Themes *themes = nullptr;
+
 Config *configini = nullptr;
 EQPreset *eqpreset = nullptr;
 SQLiteDB *sqlitedb = nullptr;
@@ -91,6 +93,15 @@ mpv_render_param params[3];
 int __fbo_one = 1;
 bool renderloopdone = false;
 
+SysIcons nxmpicons;
+
+
+bool dochangethemefont = false;
+std::string themefontpath = "";
+float themefontsize;
+float themefontsmall;
+
+/*
 Tex SdCardTexture;
 Tex NetworkTexture;
 Tex Enigma2Texture;
@@ -124,6 +135,7 @@ Tex MuteIcon;
 Tex VolumeIcon;
 Tex LoopIcon;
 Tex NoLoopIcon;
+*/
 
 ImFont* fontSmall;
 
@@ -135,28 +147,32 @@ std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + 
 
 void deinitTextures(){
 
-	glDeleteTextures(1, &SdCardTexture.id);
-	glDeleteTextures(1, &UsbTexture.id);
-	glDeleteTextures(1, &NetworkTexture.id);
-	glDeleteTextures(1, &Enigma2Texture.id);
-	glDeleteTextures(1, &FileTexture.id);
-	glDeleteTextures(1, &PlaylistTexture.id);
-	glDeleteTextures(1, &InfoTexture.id);
-	glDeleteTextures(1, &FFMPEGTexture.id);
-	glDeleteTextures(1, &HTTPTexture.id);
-	glDeleteTextures(1, &FTPTexture.id);
-	glDeleteTextures(1, &SFTPTexture.id);
-	glDeleteTextures(1, &SMBTexture.id);
-	glDeleteTextures(1, &MPVTexture.id);
-	glDeleteTextures(1, &ExitTexture.id);
-	glDeleteTextures(1, &NXMPBannerTexture.id);
-	glDeleteTextures(1, &PlayIcon.id);
-	glDeleteTextures(1, &StopIcon.id);
-	glDeleteTextures(1, &PauseIcon.id);
-	glDeleteTextures(1, &MuteIcon.id);
-	glDeleteTextures(1, &VolumeIcon.id);
-	glDeleteTextures(1, &LoopIcon.id);
-	glDeleteTextures(1, &NoLoopIcon.id);
+	glDeleteTextures(1, &nxmpicons.SdCardTexture.id);
+	glDeleteTextures(1, &nxmpicons.UsbTexture.id);
+	glDeleteTextures(1, &nxmpicons.NetworkTexture.id);
+	glDeleteTextures(1, &nxmpicons.Enigma2Texture.id);
+	glDeleteTextures(1, &nxmpicons.FileTexture.id);
+	glDeleteTextures(1, &nxmpicons.PlaylistTexture.id);
+	glDeleteTextures(1, &nxmpicons.InfoTexture.id);
+	glDeleteTextures(1, &nxmpicons.FFMPEGTexture.id);
+	glDeleteTextures(1, &nxmpicons.HTTPTexture.id);
+	glDeleteTextures(1, &nxmpicons.FTPTexture.id);
+	glDeleteTextures(1, &nxmpicons.SFTPTexture.id);
+	glDeleteTextures(1, &nxmpicons.SMBTexture.id);
+	glDeleteTextures(1, &nxmpicons.NFSTexture.id);
+	glDeleteTextures(1, &nxmpicons.SettingsTexture.id);
+	glDeleteTextures(1, &nxmpicons.UPNPTexture.id);
+	glDeleteTextures(1, &nxmpicons.MPVTexture.id);
+	glDeleteTextures(1, &nxmpicons.ExitTexture.id);
+	glDeleteTextures(1, &nxmpicons.FolderTexture.id);
+	glDeleteTextures(1, &nxmpicons.NXMPBannerTexture.id);
+	glDeleteTextures(1, &nxmpicons.PlayIcon.id);
+	glDeleteTextures(1, &nxmpicons.StopIcon.id);
+	glDeleteTextures(1, &nxmpicons.PauseIcon.id);
+	glDeleteTextures(1, &nxmpicons.MuteIcon.id);
+	glDeleteTextures(1, &nxmpicons.VolumeIcon.id);
+	glDeleteTextures(1, &nxmpicons.LoopIcon.id);
+	glDeleteTextures(1, &nxmpicons.NoLoopIcon.id);
 	
 }
 
@@ -223,11 +239,6 @@ int main(int argc,char *argv[]){
 	eqpreset = new EQPreset("eqpresets.ini");
 	
 	playlist = new Playlist();
-	
-	
-	//sambaDir * sambadir = new sambaDir("smb://ceco:1@10.34.0.236/Users/",playlist);
-	//sambadir->DirList("Ceco/Games",configini->getshowHidden(false),Utility::getMediaExtensions());
-	//return 0;
 	
 	if(configini->getDbActive(false)){
 		sqlitedb = new SQLiteDB("nxmp.db");
@@ -358,60 +369,60 @@ int main(int argc,char *argv[]){
 	
 	printf("Loading Textures\n");
 #ifdef NXMP_SWITCH
-	Utility::TxtLoadFromFile("romfs:/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
-	Utility::TxtLoadFromFile("romfs:/usb.png",&UsbTexture.id,&UsbTexture.width,&UsbTexture.height);
-	Utility::TxtLoadFromFile("romfs:/network.png",&NetworkTexture.id,&NetworkTexture.width,&NetworkTexture.height);
-	Utility::TxtLoadFromFile("romfs:/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
-	Utility::TxtLoadFromFile("romfs:/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
-	Utility::TxtLoadFromFile("romfs:/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
-	Utility::TxtLoadFromFile("romfs:/playlist.png",&PlaylistTexture.id,&PlaylistTexture.width,&PlaylistTexture.height);
-	Utility::TxtLoadFromFile("romfs:/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
-	Utility::TxtLoadFromFile("romfs:/settings.png",&SettingsTexture.id,&SettingsTexture.width,&SettingsTexture.height);
-	Utility::TxtLoadFromFile("romfs:/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
-	Utility::TxtLoadFromFile("romfs:/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
-	Utility::TxtLoadFromFile("romfs:/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
-	Utility::TxtLoadFromFile("romfs:/sftp.png",&SFTPTexture.id,&SFTPTexture.width,&SFTPTexture.height);
-	Utility::TxtLoadFromFile("romfs:/smb.png",&SMBTexture.id,&SMBTexture.width,&SMBTexture.height);
-	Utility::TxtLoadFromFile("romfs:/nfs.png",&NFSTexture.id,&NFSTexture.width,&NFSTexture.height);
-	Utility::TxtLoadFromFile("romfs:/upnp.png",&UPNPTexture.id,&UPNPTexture.width,&UPNPTexture.height);
-	Utility::TxtLoadFromFile("romfs:/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
-	Utility::TxtLoadFromFile("romfs:/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
-	Utility::TxtLoadFromFile("romfs:/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
-	Utility::TxtLoadFromFile("romfs:/player/play.png",&PlayIcon.id,&PlayIcon.width,&PlayIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/stop.png",&StopIcon.id,&StopIcon.width,&StopIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/pause.png",&PauseIcon.id,&PauseIcon.width,&PauseIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/mute.png",&MuteIcon.id,&MuteIcon.width,&MuteIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/volume.png",&VolumeIcon.id,&VolumeIcon.width,&VolumeIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/loop.png",&LoopIcon.id,&LoopIcon.width,&LoopIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/noloop.png",&NoLoopIcon.id,&NoLoopIcon.width,&NoLoopIcon.height);
+	Utility::TxtLoadFromFile("romfs:/sdcard.png",&nxmpicons.SdCardTexture.id,&nxmpicons.SdCardTexture.width,&nxmpicons.SdCardTexture.height);
+	Utility::TxtLoadFromFile("romfs:/usb.png",&nxmpicons.UsbTexture.id,&nxmpicons.UsbTexture.width,&nxmpicons.UsbTexture.height);
+	Utility::TxtLoadFromFile("romfs:/network.png",&nxmpicons.NetworkTexture.id,&nxmpicons.NetworkTexture.width,&nxmpicons.NetworkTexture.height);
+	Utility::TxtLoadFromFile("romfs:/enigma2.png",&nxmpicons.Enigma2Texture.id,&nxmpicons.Enigma2Texture.width,&nxmpicons.Enigma2Texture.height);
+	Utility::TxtLoadFromFile("romfs:/folder.png",&nxmpicons.FolderTexture.id,&nxmpicons.FolderTexture.width,&nxmpicons.FolderTexture.height);
+	Utility::TxtLoadFromFile("romfs:/file.png",&nxmpicons.FileTexture.id,&nxmpicons.FileTexture.width,&nxmpicons.FileTexture.height);
+	Utility::TxtLoadFromFile("romfs:/playlist.png",&nxmpicons.PlaylistTexture.id,&nxmpicons.PlaylistTexture.width,&nxmpicons.PlaylistTexture.height);
+	Utility::TxtLoadFromFile("romfs:/info.png",&nxmpicons.InfoTexture.id,&nxmpicons.InfoTexture.width,&nxmpicons.InfoTexture.height);
+	Utility::TxtLoadFromFile("romfs:/settings.png",&nxmpicons.SettingsTexture.id,&nxmpicons.SettingsTexture.width,&nxmpicons.SettingsTexture.height);
+	Utility::TxtLoadFromFile("romfs:/ffmpeg.png",&nxmpicons.FFMPEGTexture.id,&nxmpicons.FFMPEGTexture.width,&nxmpicons.FFMPEGTexture.height);
+	Utility::TxtLoadFromFile("romfs:/http.png",&nxmpicons.HTTPTexture.id,&nxmpicons.HTTPTexture.width,&nxmpicons.HTTPTexture.height);
+	Utility::TxtLoadFromFile("romfs:/ftp.png",&nxmpicons.FTPTexture.id,&nxmpicons.FTPTexture.width,&nxmpicons.FTPTexture.height);
+	Utility::TxtLoadFromFile("romfs:/sftp.png",&nxmpicons.SFTPTexture.id,&nxmpicons.SFTPTexture.width,&nxmpicons.SFTPTexture.height);
+	Utility::TxtLoadFromFile("romfs:/smb.png",&nxmpicons.SMBTexture.id,&nxmpicons.SMBTexture.width,&nxmpicons.SMBTexture.height);
+	Utility::TxtLoadFromFile("romfs:/nfs.png",&nxmpicons.NFSTexture.id,&nxmpicons.NFSTexture.width,&nxmpicons.NFSTexture.height);
+	Utility::TxtLoadFromFile("romfs:/upnp.png",&nxmpicons.UPNPTexture.id,&nxmpicons.UPNPTexture.width,&nxmpicons.UPNPTexture.height);
+	Utility::TxtLoadFromFile("romfs:/mpv.png",&nxmpicons.MPVTexture.id,&nxmpicons.MPVTexture.width,&nxmpicons.MPVTexture.height);
+	Utility::TxtLoadFromFile("romfs:/exit.png",&nxmpicons.ExitTexture.id,&nxmpicons.ExitTexture.width,&nxmpicons.ExitTexture.height);
+	Utility::TxtLoadFromFile("romfs:/nxmp-banner.jpg",&nxmpicons.NXMPBannerTexture.id,&nxmpicons.NXMPBannerTexture.width,&nxmpicons.NXMPBannerTexture.height);
+	Utility::TxtLoadFromFile("romfs:/player/play.png",&nxmpicons.PlayIcon.id,&nxmpicons.PlayIcon.width,&nxmpicons.PlayIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/stop.png",&nxmpicons.StopIcon.id,&nxmpicons.StopIcon.width,&nxmpicons.StopIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/pause.png",&nxmpicons.PauseIcon.id,&nxmpicons.PauseIcon.width,&nxmpicons.PauseIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/mute.png",&nxmpicons.MuteIcon.id,&nxmpicons.MuteIcon.width,&nxmpicons.MuteIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/volume.png",&nxmpicons.VolumeIcon.id,&nxmpicons.VolumeIcon.width,&nxmpicons.VolumeIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/loop.png",&nxmpicons.LoopIcon.id,&nxmpicons.LoopIcon.width,&nxmpicons.LoopIcon.height);
+	Utility::TxtLoadFromFile("romfs:/player/noloop.png",&nxmpicons.NoLoopIcon.id,&nxmpicons.NoLoopIcon.width,&nxmpicons.NoLoopIcon.height);
 	
 #else
-	Utility::TxtLoadFromFile("./romfs/sdcard.png",&SdCardTexture.id,&SdCardTexture.width,&SdCardTexture.height);
-	Utility::TxtLoadFromFile("./romfs/usb.png",&UsbTexture.id,&UsbTexture.width,&UsbTexture.height);
-	Utility::TxtLoadFromFile("./romfs/network.png",&NetworkTexture.id,&NetworkTexture.width,&NetworkTexture.height);
-	Utility::TxtLoadFromFile("./romfs/enigma2.png",&Enigma2Texture.id,&Enigma2Texture.width,&Enigma2Texture.height);
-	Utility::TxtLoadFromFile("./romfs/folder.png",&FolderTexture.id,&FolderTexture.width,&FolderTexture.height);
-	Utility::TxtLoadFromFile("./romfs/file.png",&FileTexture.id,&FileTexture.width,&FileTexture.height);
-	Utility::TxtLoadFromFile("./romfs/info.png",&InfoTexture.id,&InfoTexture.width,&InfoTexture.height);
-	Utility::TxtLoadFromFile("./romfs/playlist.png",&PlaylistTexture.id,&PlaylistTexture.width,&PlaylistTexture.height);
-	Utility::TxtLoadFromFile("./romfs/settings.png",&SettingsTexture.id,&SettingsTexture.width,&SettingsTexture.height);
-	Utility::TxtLoadFromFile("./romfs/ffmpeg.png",&FFMPEGTexture.id,&FFMPEGTexture.width,&FFMPEGTexture.height);
-	Utility::TxtLoadFromFile("./romfs/http.png",&HTTPTexture.id,&HTTPTexture.width,&HTTPTexture.height);
-	Utility::TxtLoadFromFile("./romfs/ftp.png",&FTPTexture.id,&FTPTexture.width,&FTPTexture.height);
-	Utility::TxtLoadFromFile("./romfs/sftp.png",&SFTPTexture.id,&SFTPTexture.width,&SFTPTexture.height);
-	Utility::TxtLoadFromFile("./romfs/smb.png",&SMBTexture.id,&SMBTexture.width,&SMBTexture.height);
-	Utility::TxtLoadFromFile("./romfs/nfs.png",&NFSTexture.id,&NFSTexture.width,&NFSTexture.height);
-	Utility::TxtLoadFromFile("./romfs/upnp.png",&UPNPTexture.id,&UPNPTexture.width,&UPNPTexture.height);
-	Utility::TxtLoadFromFile("./romfs/mpv.png",&MPVTexture.id,&MPVTexture.width,&MPVTexture.height);
-	Utility::TxtLoadFromFile("./romfs/exit.png",&ExitTexture.id,&ExitTexture.width,&ExitTexture.height);
-	Utility::TxtLoadFromFile("./romfs/nxmp-banner.jpg",&NXMPBannerTexture.id,&NXMPBannerTexture.width,&NXMPBannerTexture.height);
-	Utility::TxtLoadFromFile("./romfs/player/play.png",&PlayIcon.id,&PlayIcon.width,&PlayIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/stop.png",&StopIcon.id,&StopIcon.width,&StopIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/pause.png",&PauseIcon.id,&PauseIcon.width,&PauseIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/mute.png",&MuteIcon.id,&MuteIcon.width,&MuteIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/volume.png",&VolumeIcon.id,&VolumeIcon.width,&VolumeIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/loop.png",&LoopIcon.id,&LoopIcon.width,&LoopIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/noloop.png",&NoLoopIcon.id,&NoLoopIcon.width,&NoLoopIcon.height);
+	Utility::TxtLoadFromFile("./romfs/sdcard.png",&nxmpicons.SdCardTexture.id,&nxmpicons.SdCardTexture.width,&nxmpicons.SdCardTexture.height);
+	Utility::TxtLoadFromFile("./romfs/usb.png",&nxmpicons.UsbTexture.id,&nxmpicons.UsbTexture.width,&nxmpicons.UsbTexture.height);
+	Utility::TxtLoadFromFile("./romfs/network.png",&nxmpicons.NetworkTexture.id,&nxmpicons.NetworkTexture.width,&nxmpicons.NetworkTexture.height);
+	Utility::TxtLoadFromFile("./romfs/enigma2.png",&nxmpicons.Enigma2Texture.id,&nxmpicons.Enigma2Texture.width,&nxmpicons.Enigma2Texture.height);
+	Utility::TxtLoadFromFile("./romfs/folder.png",&nxmpicons.FolderTexture.id,&nxmpicons.FolderTexture.width,&nxmpicons.FolderTexture.height);
+	Utility::TxtLoadFromFile("./romfs/file.png",&nxmpicons.FileTexture.id,&nxmpicons.FileTexture.width,&nxmpicons.FileTexture.height);
+	Utility::TxtLoadFromFile("./romfs/info.png",&nxmpicons.InfoTexture.id,&nxmpicons.InfoTexture.width,&nxmpicons.InfoTexture.height);
+	Utility::TxtLoadFromFile("./romfs/playlist.png",&nxmpicons.PlaylistTexture.id,&nxmpicons.PlaylistTexture.width,&nxmpicons.PlaylistTexture.height);
+	Utility::TxtLoadFromFile("./romfs/settings.png",&nxmpicons.SettingsTexture.id,&nxmpicons.SettingsTexture.width,&nxmpicons.SettingsTexture.height);
+	Utility::TxtLoadFromFile("./romfs/ffmpeg.png",&nxmpicons.FFMPEGTexture.id,&nxmpicons.FFMPEGTexture.width,&nxmpicons.FFMPEGTexture.height);
+	Utility::TxtLoadFromFile("./romfs/http.png",&nxmpicons.HTTPTexture.id,&nxmpicons.HTTPTexture.width,&nxmpicons.HTTPTexture.height);
+	Utility::TxtLoadFromFile("./romfs/ftp.png",&nxmpicons.FTPTexture.id,&nxmpicons.FTPTexture.width,&nxmpicons.FTPTexture.height);
+	Utility::TxtLoadFromFile("./romfs/sftp.png",&nxmpicons.SFTPTexture.id,&nxmpicons.SFTPTexture.width,&nxmpicons.SFTPTexture.height);
+	Utility::TxtLoadFromFile("./romfs/smb.png",&nxmpicons.SMBTexture.id,&nxmpicons.SMBTexture.width,&nxmpicons.SMBTexture.height);
+	Utility::TxtLoadFromFile("./romfs/nfs.png",&nxmpicons.NFSTexture.id,&nxmpicons.NFSTexture.width,&nxmpicons.NFSTexture.height);
+	Utility::TxtLoadFromFile("./romfs/upnp.png",&nxmpicons.UPNPTexture.id,&nxmpicons.UPNPTexture.width,&nxmpicons.UPNPTexture.height);
+	Utility::TxtLoadFromFile("./romfs/mpv.png",&nxmpicons.MPVTexture.id,&nxmpicons.MPVTexture.width,&nxmpicons.MPVTexture.height);
+	Utility::TxtLoadFromFile("./romfs/exit.png",&nxmpicons.ExitTexture.id,&nxmpicons.ExitTexture.width,&nxmpicons.ExitTexture.height);
+	Utility::TxtLoadFromFile("./romfs/nxmp-banner.jpg",&nxmpicons.NXMPBannerTexture.id,&nxmpicons.NXMPBannerTexture.width,&nxmpicons.NXMPBannerTexture.height);
+	Utility::TxtLoadFromFile("./romfs/player/play.png",&nxmpicons.PlayIcon.id,&nxmpicons.PlayIcon.width,&nxmpicons.PlayIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/stop.png",&nxmpicons.StopIcon.id,&nxmpicons.StopIcon.width,&nxmpicons.StopIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/pause.png",&nxmpicons.PauseIcon.id,&nxmpicons.PauseIcon.width,&nxmpicons.PauseIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/mute.png",&nxmpicons.MuteIcon.id,&nxmpicons.MuteIcon.width,&nxmpicons.MuteIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/volume.png",&nxmpicons.VolumeIcon.id,&nxmpicons.VolumeIcon.width,&nxmpicons.VolumeIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/loop.png",&nxmpicons.LoopIcon.id,&nxmpicons.LoopIcon.width,&nxmpicons.LoopIcon.height);
+	Utility::TxtLoadFromFile("./romfs/player/noloop.png",&nxmpicons.NoLoopIcon.id,&nxmpicons.NoLoopIcon.width,&nxmpicons.NoLoopIcon.height);
 	
 	
 #endif	
@@ -434,7 +445,6 @@ if (hosversionBefore(8, 0, 0)) {
 
     printf("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
     SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
-	//SwitchSys::maxClock();
 #endif
 
 	GUI::initMpv();

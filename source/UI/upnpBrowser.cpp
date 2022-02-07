@@ -60,10 +60,10 @@ namespace Windows {
 					std::vector<upnpres_struct> thislist = nxupnp->getDevice(nxupnp->getSelDevice())->currentlist;
 					for (unsigned int n = 0; n < thislist.size(); n++){
 						if(thislist[n].type == UPNPTYPE::UPNPContainer){
-							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
 							if(thislist[n].albumart.id ==0){
-								ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+								ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 							}else{
 								ImGui::Image((void*)(intptr_t)thislist[n].albumart.id, ImVec2(thislist[n].albumart.width/2,thislist[n].albumart.height/2));
 							}

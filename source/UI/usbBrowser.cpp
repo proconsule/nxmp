@@ -32,7 +32,7 @@ namespace Windows {
 						ImGui::SameLine();
 						float currstartYpos = ImGui::GetCursorPosY();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f);
-						ImGui::Image((void*)(intptr_t)UsbTexture.id, ImVec2(40,40));
+						ImGui::Image((void*)(intptr_t)nxmpicons.UsbTexture.id, ImVec2(40,40));
 						ImGui::SameLine();
 						ImGui::SetCursorPosY(currstartYpos);
 						float currstartXpos = ImGui::GetCursorPosX();
@@ -67,9 +67,9 @@ namespace Windows {
 					std::vector<FS::FileEntry> thislist = usbmounter->getCurrList();
 					for (unsigned int n = 0; n < thislist.size(); n++){
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);

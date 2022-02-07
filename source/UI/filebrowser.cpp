@@ -33,9 +33,9 @@ namespace Windows {
 					static int selected = -1;
 					
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)FolderTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)FileTexture.id, ImVec2(40,40));
+							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);

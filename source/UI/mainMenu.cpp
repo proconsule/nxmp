@@ -16,31 +16,31 @@ namespace Windows {
 				for (unsigned int n = 0; n < topmenu.size(); n++){
 					std::string itemid = "##" + std::to_string(n);
 					if(topmenu[n] == "Local Files"){
-						ImGui::Image((void*)(intptr_t)SdCardTexture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.SdCardTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "USB"){
-						ImGui::Image((void*)(intptr_t)UsbTexture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.UsbTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Network"){
-						ImGui::Image((void*)(intptr_t)NetworkTexture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "UPNP"){
-						ImGui::Image((void*)(intptr_t)UPNPTexture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.UPNPTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Enigma2"){
-						ImGui::Image((void*)(intptr_t)Enigma2Texture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.Enigma2Texture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Playlist"){
-						ImGui::Image((void*)(intptr_t)PlaylistTexture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.PlaylistTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Info"){
-						ImGui::Image((void*)(intptr_t)InfoTexture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.InfoTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Settings"){
-						ImGui::Image((void*)(intptr_t)SettingsTexture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.SettingsTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Exit"){
-						ImGui::Image((void*)(intptr_t)ExitTexture.id, ImVec2(50,50));
+						ImGui::Image((void*)(intptr_t)nxmpicons.ExitTexture.id, ImVec2(50,50));
 					}
 							
 							

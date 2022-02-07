@@ -44,6 +44,7 @@
 
 #include "touchcontrols.h"
 #include "shaderMania.h"
+#include "themes.h"
 
 
 enum MENU_STATES {
@@ -150,6 +151,44 @@ typedef struct {
     
 } MenuItem;
 
+typedef struct {
+	Tex SdCardTexture;
+	Tex UsbTexture;
+	Tex NetworkTexture;
+	Tex Enigma2Texture;
+	Tex PlaylistTexture;
+	Tex InfoTexture;
+	Tex SettingsTexture;
+
+	Tex FolderTexture;
+	Tex FileTexture;
+
+
+	Tex FTPTexture;
+	Tex HTTPTexture;
+	Tex SFTPTexture;
+	Tex SMBTexture;
+	Tex NFSTexture;
+	Tex UPNPTexture;
+
+	Tex FFMPEGTexture;
+	Tex MPVTexture;
+
+	Tex NXMPBannerTexture;
+	Tex ExitTexture;
+
+
+	Tex PlayIcon;
+	Tex PauseIcon;
+	Tex StopIcon;
+	Tex MuteIcon;
+	Tex VolumeIcon;
+	Tex LoopIcon;
+	Tex NoLoopIcon;
+		
+} SysIcons;
+
+
 
 extern SDL_Window *window;
 #ifdef _WIN32
@@ -176,6 +215,7 @@ extern USBMounter *usbmounter;
 extern Enigma2 *enigma2;
 #endif
 
+
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
 
@@ -194,6 +234,9 @@ extern bool dbUpdated;
 
 extern Playlist *playlist;
 
+extern SysIcons nxmpicons;
+
+/*
 extern Tex SdCardTexture;
 extern Tex UsbTexture;
 extern Tex NetworkTexture;
@@ -227,12 +270,22 @@ extern Tex MuteIcon;
 extern Tex VolumeIcon;
 extern Tex LoopIcon;
 extern Tex NoLoopIcon;
-
+*/
 
 
 extern ImFont* fontSmall;
 
 extern shaderMania* shadermania;
+
+
+
+/* theme porp */
+extern bool dochangethemefont;
+extern std::string themefontpath;
+extern float themefontsize;
+extern float themefontsmall;
+
+
 
 #ifdef _WIN32
 extern bool isMouseSelection;
@@ -265,6 +318,9 @@ namespace GUI {
 	void HandleLayers();
 	void HandleRender();
     int RenderLoop(void);
+	
+	void changeFontTheme();
+	
 	
 }
 

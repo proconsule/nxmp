@@ -5,9 +5,12 @@
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
+#include "themes.h"
 
 
 namespace Windows {
+	
+	Themes *themes = nullptr;
 	
     void SettingsMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
@@ -273,6 +276,34 @@ namespace Windows {
 					configini->setPlayerSwipeSeek(touchseekradio);
 				}
 				ImGui::SameLine();
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Themes")) {
+				if(themes == nullptr){
+					themes = new Themes();
+					themes->getThemes();
+				}
+				std::vector<std::string> themescombomenu;
+				themescombomenu.push_back("Default");
+				for(int i=0;i<themes->themeslist.size();i++){
+					themescombomenu.push_back(themes->themeslist[i].name);
+				}
+				if (ImGui::BeginCombo("Themes", NULL, 0)){
+					for (int n = 0; n < themescombomenu.size(); n++)
+					{
+						const bool is_selected = false;
+						if (ImGui::Selectable(themescombomenu[n].c_str(), is_selected)){
+							if(n ==0){
+								themes->setDefault();
+							}else{
+								themes->setTheme(themes->themeslist[n-1].path);
+							}
+						}
+					}
+					ImGui::EndCombo();
+					
+				}
+					
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();
