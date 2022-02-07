@@ -600,11 +600,11 @@ namespace playerWindows{
 						if (ImGui::Selectable(stylemenu[n].c_str(), is_selected)){
 							if(n == 0){
 								ignorestyleidx = 0;
-								mpv_command_string(libmpv->getHandle(),"set sub-ass yes ; no-osd seek -1");
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek -1");
 							}
 							if(n == 1){
 								ignorestyleidx = 1;
-								mpv_command_string(libmpv->getHandle(),"set sub-ass no ; no-osd seek -1");
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass no ; no-osd seek -1");
 							}
 						}
 							
