@@ -555,6 +555,16 @@ void libMpv::setSubFontSize(int value,bool osd){
 	}
 }
 
+void libMpv::setSubBorderSize(int value,bool osd){
+	if(osd){
+		std::string cmd = "set sub-border-size " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set sub-border-size " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
 void libMpv::setSubFontColor(std::string hexcolor){
 	std::string cmd = "no-osd set sub-color '" + hexcolor + std::string("'");
 	mpv_command_string(handle, cmd.c_str());

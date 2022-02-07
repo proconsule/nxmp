@@ -20,6 +20,7 @@ namespace playerWindows{
 	static int drag_gamma = 0;
 	static int drag_hue = 0;
 	static int rotateidx = 0;
+	static int ignorestyleidx = 0;
 	static int shaderidx = 0;
 	
 	
@@ -30,7 +31,8 @@ namespace playerWindows{
 	static int drag_subpos = 100;
 	static float drag_subdelay = 0.0f;
 	static int drag_subfontsize = 55;
-	
+	static int drag_subfontbordersize = 3;
+
 	static int slider_eq[6] = {0,0,0,0,0,0};
 	static char slider_hz[][8] = {"20-200","200-800","800-2K","2K-4K","4K-8K","20K"};
 	static float slider_supereq[18] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
@@ -566,6 +568,35 @@ namespace playerWindows{
 		if (ImGui::Begin("Right Menu Sub", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 				ImGui::PushItemWidth(200-10);
 				auto windowWidth = ImGui::GetWindowSize().x;
+				//ignore styles
+								ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Embedded Styles", NULL, true).x) * 0.5f);
+				ImGui::PushItemWidth(200-10);
+				ImGui::Text("Embedded Styles");
+				std::vector<std::string> stylemenu = {"Activated","Deactivated"};
+				if (ImGui::BeginCombo("Embedded Styles", stylemenu[ignorestyleidx].c_str(), 0))
+				{	
+					for (int n = 0; n < stylemenu.size(); n++)
+					{
+						const bool is_selected = (ignorestyleidx == n);
+						if (ImGui::Selectable(stylemenu[n].c_str(), is_selected)){
+							if(n == 0){
+								ignorestyleidx = 0;
+								mpv_command_string(libmpv->getHandle(),"set sub-ass yes ; show-text \"Embedded Styles: On\" ");
+							}
+							if(n == 1){
+								ignorestyleidx = 1;
+								mpv_command_string(libmpv->getHandle(),"set sub-ass no ; show-text \"Embedded Styles: Off\"");
+							}
+						}
+							
+
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+					ImGui::PopItemWidth();
+				}
+				//end ignore styles
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Audio Delay", NULL, true).x) * 0.5f);
 				ImGui::Text("Sub Delay");
 				if(ImGui::DragFloat("Sub Delay", &drag_subdelay, 0.100f, -5.0f, 5.0f, "%.3f", ImGuiSliderFlags_NoInput)){
@@ -582,7 +613,13 @@ namespace playerWindows{
 				if(ImGui::DragInt("Sub Font Size", &drag_subfontsize, 0.5f, 1, 120, "%d", ImGuiSliderFlags_NoInput)){
 					libmpv->setSubFontSize(drag_subfontsize,item.playershowcontrols);
 				}
-				
+				//bordersize
+				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Sub Border Size", NULL, true).x) * 0.5f);
+				ImGui::Text("Sub Border Size");
+				if(ImGui::DragInt("Sub Border Size", &drag_subfontbordersize, 0.5f, 0, 15, "%d", ImGuiSliderFlags_NoInput)){
+					libmpv->setSubBorderSize(drag_subfontbordersize,item.playershowcontrols);
+				}
+				//endbordersize
 				ImGui::Text("Sub Font Color");
 				float * subcolor = configini->getSubFontColor(true);
 				if(ImGui::ColorButton("##subfontcolor", ImVec4(subcolor[0],subcolor[1],subcolor[2],subcolor[3]), ImGuiColorEditFlags_NoAlpha| ImGuiColorEditFlags_NoPicker|ImGuiColorEditFlags_InputRGB , ImVec2(190, 40))){
@@ -595,6 +632,7 @@ namespace playerWindows{
 					drag_subpos = 100;
 					drag_subdelay = 0.0f;
 					drag_subfontsize = configini->getSubFontSize(false);
+					drag_subfontbordersize = 3;
 					libmpv->setSubPos(drag_subpos,false);
 					libmpv->setSubDelay(drag_subdelay,false);
 					libmpv->setSubFontSize(drag_subfontsize,false);
