@@ -18,14 +18,14 @@ libMpv::libMpv(const std::string &configDir) {
         return;
     }
 	printf("MPV Handle Created\n");
-    mpv_set_option_string(handle, "config", "yes");
-    mpv_set_option_string(handle, "config-dir", configDir.c_str());
-    mpv_set_option_string(handle, "terminal", "yes");
-    mpv_set_option_string(handle, "msg-level", "all=v");
-    mpv_set_option_string(handle, "vd-lavc-threads", "4");
-    mpv_set_option_string(handle, "vd-lavc-skiploopfilter", "all");
-    mpv_set_option_string(handle, "audio-channels", "stereo");
-    mpv_set_option_string(handle, "video-timing-offset", "0");
+	mpv_set_option_string(handle, "config", "yes");
+	mpv_set_option_string(handle, "config-dir", configDir.c_str());
+	mpv_set_option_string(handle, "terminal", "yes");
+	mpv_set_option_string(handle, "msg-level", "all=v");
+	mpv_set_option_string(handle, "vd-lavc-threads", "4");
+	mpv_set_option_string(handle, "vd-lavc-skiploopfilter", "all");
+	mpv_set_option_string(handle, "audio-channels", "stereo");
+	mpv_set_option_string(handle, "video-timing-offset", "0");
 	mpv_set_option_string(handle, "osd-bar-align-y", "0.9");
 	mpv_set_option_string(handle, "fbo-format", "rgba8");
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());
