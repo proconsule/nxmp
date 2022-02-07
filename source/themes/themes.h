@@ -8,6 +8,8 @@ typedef struct {
 	std::string name;
 	std::string author;
 	std::string path;
+	float fontsize;
+	float fontsmallsize;
 } themes_struct;
 
 class Themes{
