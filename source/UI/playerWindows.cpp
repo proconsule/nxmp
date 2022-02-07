@@ -581,11 +581,11 @@ namespace playerWindows{
 						if (ImGui::Selectable(stylemenu[n].c_str(), is_selected)){
 							if(n == 0){
 								ignorestyleidx = 0;
-								mpv_command_string(libmpv->getHandle(),"set sub-ass yes ; show-text \"Embedded Styles: On\" ");
+								mpv_command_string(libmpv->getHandle(),"set sub-ass yes ; no-osd seek -1");
 							}
 							if(n == 1){
 								ignorestyleidx = 1;
-								mpv_command_string(libmpv->getHandle(),"set sub-ass no ; show-text \"Embedded Styles: Off\"");
+								mpv_command_string(libmpv->getHandle(),"set sub-ass no ; no-osd seek -1");
 							}
 						}
 							
@@ -616,7 +616,7 @@ namespace playerWindows{
 				//bordersize
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Sub Border Size", NULL, true).x) * 0.5f);
 				ImGui::Text("Sub Border Size");
-				if(ImGui::DragInt("Sub Border Size", &drag_subfontbordersize, 0.5f, 0, 15, "%d", ImGuiSliderFlags_NoInput)){
+				if(ImGui::DragInt("Sub Border Size", &drag_subfontbordersize, 0.5f, 0, 8, "%d", ImGuiSliderFlags_NoInput)){
 					libmpv->setSubBorderSize(drag_subfontbordersize,item.playershowcontrols);
 				}
 				//endbordersize
