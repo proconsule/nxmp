@@ -668,6 +668,8 @@ namespace playerWindows{
 					drag_subfontbordersize = 3;
 					drag_shadowposition = 1;
 					drag_shadowintensity = 0.25f;
+					ignorestyleidx = 0;
+					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek -1");
 					libmpv->setShadowOffset(drag_shadowposition,false);
 					libmpv->setShadowIntensity(drag_shadowintensity,false);
 					libmpv->setSubBorderSize(drag_subfontbordersize,false);
