@@ -35,6 +35,8 @@ namespace playerWindows{
 	static float drag_subdelay = 0.0f;
 	static int drag_subfontsize = 55;
 	static int drag_subfontbordersize = 3;
+	static int drag_shadowposition = 1;
+	static float drag_shadowintensity = 0.25f;
 
 	static int slider_eq[6] = {0,0,0,0,0,0};
 	static char slider_hz[][8] = {"20-200","200-800","800-2K","2K-4K","4K-8K","20K"};
@@ -637,6 +639,20 @@ namespace playerWindows{
 					libmpv->setSubBorderSize(drag_subfontbordersize,item.playershowcontrols);
 				}
 				//endbordersize
+				//shadowintensity
+				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Shadow Intensity", NULL, true).x) * 0.5f);
+				ImGui::Text("Shadow Intensity");
+				if(ImGui::DragFloat("Shadow Intensity", &drag_shadowintensity, 0.010f, 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_NoInput)){
+					libmpv->setShadowIntensity(drag_shadowintensity,item.playershowcontrols);
+				}
+				//shadowintensity
+				//shadowOffset
+				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Shadow Position", NULL, true).x) * 0.5f);
+				ImGui::Text("Shadow Position");
+				if(ImGui::DragInt("Shadow Position", &drag_shadowposition, 0.5f, 0, 5, "%d", ImGuiSliderFlags_NoInput)){
+					libmpv->setShadowOffset(drag_shadowposition,item.playershowcontrols);
+				}
+				//ShadowOffset
 				ImGui::Text("Sub Font Color");
 				float * subcolor = configini->getSubFontColor(true);
 				if(ImGui::ColorButton("##subfontcolor", ImVec4(subcolor[0],subcolor[1],subcolor[2],subcolor[3]), ImGuiColorEditFlags_NoAlpha| ImGuiColorEditFlags_NoPicker|ImGuiColorEditFlags_InputRGB , ImVec2(190, 40))){
@@ -650,6 +666,11 @@ namespace playerWindows{
 					drag_subdelay = 0.0f;
 					drag_subfontsize = configini->getSubFontSize(false);
 					drag_subfontbordersize = 3;
+					drag_shadowposition = 1;
+					drag_shadowintensity = 0.25f;
+					libmpv->setShadowOffset(drag_shadowposition,false);
+					libmpv->setShadowIntensity(drag_shadowintensity,false);
+					libmpv->setSubBorderSize(drag_subfontbordersize,false);
 					libmpv->setSubPos(drag_subpos,false);
 					libmpv->setSubDelay(drag_subdelay,false);
 					libmpv->setSubFontSize(drag_subfontsize,false);

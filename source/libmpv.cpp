@@ -31,7 +31,10 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());
 	mpv_set_option_string(handle, "volume-max", "200");
 	mpv_set_option_string(handle, "opengl-pbo", "yes");
-	
+	//default Font Style
+	mpv_set_option_string(handle, "sub-border-size", "3");
+	mpv_set_option_string(handle, "sub-shadow-offset", "1");
+	mpv_set_option_string(handle, "sub-shadow-color", "0.0/0.0/0.0/0.25");
 
 	
 	if(configini->getUseAlang(false)){
@@ -565,6 +568,25 @@ void libMpv::setSubBorderSize(int value,bool osd){
 	}
 }
 
+void libMpv::setShadowIntensity(double value,bool osd){
+	if(osd){
+		std::string cmd = "set sub-shadow-color 0.0/0.0/0.0/" + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set sub-shadow-color 0.0/0.0/0.0/" + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
+void libMpv::setShadowOffset(int value,bool osd){
+	if(osd){
+		std::string cmd = "set sub-shadow-offset " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set sub-shadow-offset " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
 void libMpv::setSubFontColor(std::string hexcolor){
 	std::string cmd = "no-osd set sub-color '" + hexcolor + std::string("'");
 	mpv_command_string(handle, cmd.c_str());

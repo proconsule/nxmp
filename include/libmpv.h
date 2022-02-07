@@ -78,6 +78,8 @@ public:
 	void setSubPos(int value,bool osd);
 	void setSubFontSize(int value,bool osd);
 	void setSubBorderSize(int value,bool osd);
+	void setShadowIntensity(double value,bool osd);
+	void setShadowOffset(int value,bool osd);
 	void setSubFontColor(std::string hexcolor);
 	
 	void setDeinterlace(int value);
