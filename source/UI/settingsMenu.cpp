@@ -11,6 +11,7 @@
 namespace Windows {
 	
 	Themes *themes = nullptr;
+	Tex thempreview;
 	
     void SettingsMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
@@ -288,21 +289,50 @@ namespace Windows {
 				for(int i=0;i<themes->themeslist.size();i++){
 					themescombomenu.push_back(themes->themeslist[i].name);
 				}
-				if (ImGui::BeginCombo("Themes", NULL, 0)){
+				int themeprevidx = themes->getThemeIDX(configini->getThemeName(true))+1;
+				const char* combo_themepreview_value = themescombomenu[themeprevidx].c_str();
+				
+				if (ImGui::BeginCombo("Themes", combo_themepreview_value, 0)){
 					for (int n = 0; n < themescombomenu.size(); n++)
 					{
 						const bool is_selected = false;
 						if (ImGui::Selectable(themescombomenu[n].c_str(), is_selected)){
 							if(n ==0){
-								themes->setDefault();
+								configini->setThemeName("Default");
+								//themes->setDefault();
 							}else{
-								themes->setTheme(themes->themeslist[n-1].path);
+								//themes->setTheme(themes->themeslist[n-1].path);
+								configini->setThemeName(themes->themeslist[n-1].name);
 							}
 						}
 					}
 					ImGui::EndCombo();
 					
 				}
+				//ImGui::SameLine(100);
+				if (ImGui::Button("Apply Theme")){
+					if(themeprevidx == 0){
+						themes->setDefault();
+					}else{
+						themes->setTheme(themes->themeslist[themeprevidx-1].path);
+					}
+				}
+				
+				if(themeprevidx == 0){
+					ImGui::Text("Name: %s","Default");
+					ImGui::Text("Author: %s","proconsule/bodyXY");
+					Utility::TxtLoadFromFile("./romfs/preview.jpg",&thempreview.id,&thempreview.width,&thempreview.height);
+								
+				}else{
+					Utility::TxtLoadFromFile(themes->themeslist[themeprevidx-1].path+"preview.jpg",&thempreview.id,&thempreview.width,&thempreview.height);
+								
+					ImGui::Text("Name: %s",themes->themeslist[themeprevidx-1].name.c_str());
+					ImGui::Text("Author: %s",themes->themeslist[themeprevidx-1].author.c_str());
+					
+				}
+				
+				ImGui::Image((void*)(intptr_t)thempreview.id, ImVec2(thempreview.width/2,thempreview.height/2));
+				
 					
 				ImGui::EndTabItem();
 			}
@@ -327,6 +357,9 @@ namespace Windows {
 				//Slang
 				configini->setSlang(configini->getSlang(false));
 				//end Slang
+				
+				configini->setThemeName(configini->getThemeName(false));
+				
 				configini->setSubFontSize(configini->getSubFontSize(false));
 				configini->setSubFontColor(configini->getSubFontColor(false));
 				configini->setDbActive(configini->getDeinterlace(false));

@@ -76,6 +76,15 @@ Config::Config(std::string inifile){
 	tmpslang = slang;
 	//endSlang
 	
+	const char* themenamepv;
+	themenamepv = ini->GetValue("Main", "theme");
+	std::string themenamestring = "Default";
+	if(themenamepv!= nullptr){
+		themenamestring = themenamepv;
+	}
+	themename = themenamestring;
+	tmpthemename = themenamestring;
+	
 	subfontsize = ini->GetLongValue("Main", "subfontsize");
 	if(subfontsize == 0)subfontsize = 55;
 	tmpsubfontsize = subfontsize;
@@ -394,6 +403,8 @@ void Config::saveSettings(){
 	subfontcolor[1] = tmpsubfontcolor[1];
 	subfontcolor[2] = tmpsubfontcolor[2];
 	
+	themename = tmpthemename;
+	
 	
 	ini->Delete("Main", "showhidden");
 	ini->SetBoolValue("Main", "showhidden",showhidden,NULL,false);
@@ -443,8 +454,23 @@ void Config::saveSettings(){
 	ini->SetLongValue("Main", "startresumeperc", startresumeperc, NULL, false);
 	ini->Delete("Main", "stopresumeperc");
 	ini->SetLongValue("Main", "stopresumeperc", stopresumeperc, NULL, false);
+	
+	ini->Delete("Main", "theme");
+	ini->SetValue("Main", "theme", themename.c_str());
+	
 	std::string data;
 	ini->Save(data);
 	ini->SaveFile(inifilePath.c_str());
+}
+
+std::string Config::getThemeName(bool tmpvalue){
+	if(tmpvalue){
+		return tmpthemename;
+	}
+	return themename;
+}
+
+void Config::setThemeName(std::string value){
+	tmpthemename = value;
 }
 

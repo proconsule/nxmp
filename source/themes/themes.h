@@ -19,6 +19,8 @@ public:
 	
 	void getThemes();
 	
+	int getThemeIDX(std::string themename);
+	
 	std::vector<themes_struct> themeslist;
 	
 	

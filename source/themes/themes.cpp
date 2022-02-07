@@ -253,3 +253,12 @@ void Themes::setTheme(std::string themefolder){
 	
 }
 
+int Themes::getThemeIDX(std::string themename){
+	for(int i=0;i<themeslist.size();i++){
+		if(themename == themeslist[i].name){
+			return i;
+		}
+	}
+	return -1;
+}
+

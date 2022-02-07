@@ -426,6 +426,16 @@ int main(int argc,char *argv[]){
 	
 	
 #endif	
+
+	if(configini->getThemeName(false) != "Default"){
+		Themes  *themes = new Themes();
+		themes->getThemes();
+		int themeidx = themes->getThemeIDX(configini->getThemeName(false));
+		if(themeidx >-1){
+			themes->setTheme(themes->themeslist[themeidx].path);
+		}
+		delete themes;
+	}
 	
 #ifdef __SWITCH__
 

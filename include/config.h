@@ -70,6 +70,10 @@ public:
 	std::vector<std::string> topmenu;
 	CSimpleIniA *ini;
 	
+	std::string getThemeName(bool tmpvalue);
+	void setThemeName(std::string value);
+	
+	
 private:
 
 	bool showhidden;
@@ -120,6 +124,9 @@ private:
 	
 	bool tmpdbactive;
 	bool dbactive;
+	
+	std::string themename;
+	std::string tmpthemename;
 	
 	std::string inifilePath;
 };
