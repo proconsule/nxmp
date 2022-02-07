@@ -47,12 +47,17 @@ void Themes::getThemes(){
 						}
 						const char* namepv = ini->GetValue("Theme", "Name");
 						const char* authorpv = ini->GetValue("Theme", "Author");
+						double fontsize =  ini->GetDoubleValue("Theme","FontSize");
+						double smallfontsize =  ini->GetDoubleValue("Theme","FontSmallSize");
+						
 						delete ini;
 						
 						themes_struct tmptheme;
 						tmptheme.name = namepv;
 						tmptheme.author = authorpv;
 						tmptheme.path = dirpath + "/";
+						tmptheme.fontsize = (float)fontsize;
+						tmptheme.fontsmallsize = smallfontsize;
 						themeslist.push_back(tmptheme);
 					}
 				}
@@ -67,26 +72,7 @@ void Themes::getThemes(){
 
 
 void Themes::setDefault(){
-	
-	/*
-	ImGuiIO &io = ImGui::GetIO();
-	(void) io;
-	
-	unsigned char *pixels = nullptr;
-	int width = 0, height = 0, bpp = 0;
-	ImFontConfig font_cfg;
-	
-	static ImWchar ranges[] = { 0x1, 0x1FFFF, 0 };
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	font_cfg.MergeMode = true;
-	
-	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg);
-	fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg);
-	
-	io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
-	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
-	io.Fonts->Build();
-	*/
+
 	
 	dochangethemefont = true;
 #ifdef NXMP_SWITCH
@@ -189,11 +175,28 @@ void Themes::setDefault(){
 
 void Themes::setTheme(std::string themefolder){
 	
+	CSimpleIniA *ini;
+	ini = new CSimpleIniA(true,true);
+	ini->SetUnicode();
+	std::string themeinifile = themefolder + "theme.ini";
+	SI_Error rc = ini->LoadFile(themeinifile.c_str());
+	if(rc<0){
+		delete ini;
+	}
+	const char* namepv = ini->GetValue("Theme", "Name");
+	const char* authorpv = ini->GetValue("Theme", "Author");
+	double fontsize =  ini->GetDoubleValue("Theme","FontSize");
+	double smallfontsize =  ini->GetDoubleValue("Theme","FontSmallSize");
+						
+	delete ini;
 	
 	dochangethemefont = true;
 	themefontpath = themefolder+"font.ttf";
 	themefontsize = 24.0f;
 	themefontsmall = 16.0f;
+	
+	themefontsize = fontsize;
+	themefontsmall = smallfontsize;
 	
 	glDeleteTextures(1, &nxmpicons.SdCardTexture.id);
 	glDeleteTextures(1, &nxmpicons.UsbTexture.id);

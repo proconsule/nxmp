@@ -1003,8 +1003,8 @@ namespace GUI {
 		
 		io.Fonts->Clear();
 		
-		io.Fonts->AddFontFromFileTTF(themefontpath.c_str(), 24.0f,&font_cfg);
-		fontSmall = io.Fonts->AddFontFromFileTTF(themefontpath.c_str(), 16.0f,&font_cfg);
+		io.Fonts->AddFontFromFileTTF(themefontpath.c_str(), themefontsize,&font_cfg);
+		fontSmall = io.Fonts->AddFontFromFileTTF(themefontpath.c_str(), themefontsmall,&font_cfg);
 		
 		io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
 		io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
