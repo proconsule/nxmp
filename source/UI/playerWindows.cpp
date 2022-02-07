@@ -51,7 +51,7 @@ namespace playerWindows{
 		rightmenuposX = item.rightmenu_startpos;
 		if(item.rightmenu_startpos>1080)item.rightmenu_startpos-=10;
 		playerWindows::SetupRightWindow();
-		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Interpolation","Image","Audio","Subtitle","ShaderMania","Anime4K v4.0.1"};
+		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Image","Audio","Subtitle","ShaderMania","Anime4K v4.0.1"};
 		if (ImGui::Begin("Right Menu Home", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
 			if (ImGui::BeginListBox("Right Menu Home List",ImVec2(1280.0f, 720.0f))){
@@ -66,9 +66,6 @@ namespace playerWindows{
 						}
 						if(topmenu[n] == "Aspect Ratio"){
 							item.rightmenustate = PLAYER_RIGHT_MENU_ARATIO;
-						}
-						if(topmenu[n] == "Interpolation"){
-							item.rightmenustate = PLAYER_RIGHT_MENU_INTERPOLATION;
 						}
 						if(topmenu[n] == "Image"){
 							item.rightmenustate = PLAYER_RIGHT_MENU_IMAGE;
@@ -327,64 +324,6 @@ namespace playerWindows{
 		playerWindows::ExitWindow();
 	}
 
-	void RightHomeInterpolation(bool *focus, bool *first_item){
-		playerWindows::SetupRightWindow();
-		if (ImGui::Begin("Right Menu Sub", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
-				ImGui::PushItemWidth(200-10);
-				auto windowWidth = ImGui::GetWindowSize().x;
-				//New interpolation
-				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Interpolation", NULL, true).x) * 0.5f);
-				ImGui::PushItemWidth(200-10);
-				ImGui::Text("Interpolation");
-				std::vector<std::string> intermenu = {"Deactivated","Catmull_Rom","Mitchell","Bicubic","OverSample"};
-				if (ImGui::BeginCombo("Interpolation", intermenu[interpolationidx].c_str(), 0))
-				{	
-					for (int n = 0; n < intermenu.size(); n++)
-					{
-						const bool is_selected = (interpolationidx == n);
-						if (ImGui::Selectable(intermenu[n].c_str(), is_selected)){
-							if(n == 0){
-								interpolationidx = 0;
-								mpv_command_string(libmpv->getHandle(),"set video-sync audio ; set interpolation no ; show-text \"Interpolation: ${interpolation}\nVideoSync: ${video-sync}\"");
-							}
-							if(n == 1){
-								interpolationidx = 1;
-								mpv_command_string(libmpv->getHandle(),"set video-sync display-resample ; set interpolation yes ; set tscale catmull_rom ; show-text \"Interpolation: ${interpolation}\nMethod: ${tscale}\nVideoSync: ${video-sync}\"");
-							}
-							if(n == 2){
-								interpolationidx = 2;
-								mpv_command_string(libmpv->getHandle(),"set video-sync display-resample ; set interpolation yes ; set tscale mitchell ; show-text \"Interpolation: ${interpolation}\nMethod: ${tscale}\nVideoSync: ${video-sync}\"");
-							}
-							if(n == 3){
-								interpolationidx = 3;
-								mpv_command_string(libmpv->getHandle(),"set video-sync display-resample ; set interpolation yes ; set tscale bicubic ; show-text \"Interpolation: ${interpolation}\nMethod: ${tscale}\nVideoSync: ${video-sync}\"");
-							}
-							if(n == 4){
-								interpolationidx = 4;
-								mpv_command_string(libmpv->getHandle(),"set video-sync display-resample ; set interpolation yes ; set tscale oversample ; show-text \"Interpolation: ${interpolation}\nMethod: ${tscale}\nVideoSync: ${video-sync}\"");
-							}
-						}
-							
-
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-					ImGui::PopItemWidth();
-				}
-				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
-				if(ImGui::Button("Reset to Default")){
-				interpolationidx = 0;
-				mpv_command_string(libmpv->getHandle(),"set video-sync audio ; set interpolation no ; show-text \"Interpolation: ${interpolation}\nVideoSync: ${video-sync}\"");
-							
-				}
-				//end new interpolation
-				
-				
-		}
-		playerWindows::ExitWindow();
-
-	}
 	void RightHomeARatio(bool *focus, bool *first_item){
 		playerWindows::SetupRightWindow();
 		std::vector<std::string> topmenu  = {"Default","16:9","16:10","4:3","Custom Ratio"};
@@ -534,6 +473,47 @@ namespace playerWindows{
 					}
 					ImGui::EndCombo();
 				}
+				//New interpolation
+				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Interpolation", NULL, true).x) * 0.5f);
+				ImGui::PushItemWidth(200-10);
+				ImGui::Text("Interpolation");
+				std::vector<std::string> intermenu = {"No","Catmull_Rom","Mitchell","Bicubic","OverSample"};
+				if (ImGui::BeginCombo("Interpolation", intermenu[interpolationidx].c_str(), 0))
+				{	
+					for (int n = 0; n < intermenu.size(); n++)
+					{
+						const bool is_selected = (interpolationidx == n);
+						if (ImGui::Selectable(intermenu[n].c_str(), is_selected)){
+							if(n == 0){
+								interpolationidx = 0;
+								mpv_command_string(libmpv->getHandle(),"set video-sync audio ; set interpolation no ; show-text \"Interpolation: ${interpolation}\nVideoSync: ${video-sync}\"");
+							}
+							if(n == 1){
+								interpolationidx = 1;
+								mpv_command_string(libmpv->getHandle(),"set video-sync display-resample ; set interpolation yes ; set tscale catmull_rom ; show-text \"Interpolation: ${interpolation}\nMethod: ${tscale}\nVideoSync: ${video-sync}\"");
+							}
+							if(n == 2){
+								interpolationidx = 2;
+								mpv_command_string(libmpv->getHandle(),"set video-sync display-resample ; set interpolation yes ; set tscale mitchell ; show-text \"Interpolation: ${interpolation}\nMethod: ${tscale}\nVideoSync: ${video-sync}\"");
+							}
+							if(n == 3){
+								interpolationidx = 3;
+								mpv_command_string(libmpv->getHandle(),"set video-sync display-resample ; set interpolation yes ; set tscale bicubic ; show-text \"Interpolation: ${interpolation}\nMethod: ${tscale}\nVideoSync: ${video-sync}\"");
+							}
+							if(n == 4){
+								interpolationidx = 4;
+								mpv_command_string(libmpv->getHandle(),"set video-sync display-resample ; set interpolation yes ; set tscale oversample ; show-text \"Interpolation: ${interpolation}\nMethod: ${tscale}\nVideoSync: ${video-sync}\"");
+							}
+						}
+							
+
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+					ImGui::PopItemWidth();
+				}
+				//end new interpolation
 				
 				
 				ImGui::PopItemWidth();
@@ -546,6 +526,8 @@ namespace playerWindows{
 					drag_gamma = 0;
 					drag_hue = 0;
 					rotateidx = 0;
+					interpolationidx = 0;
+					mpv_command_string(libmpv->getHandle(),"set video-sync audio ; set interpolation no ; show-text \"Interpolation: ${interpolation}\nVideoSync: ${video-sync}\"");
 					configini->setDeinterlace(configini->getDeinterlace(false));
 					libmpv->setDeinterlace(configini->getDeinterlace(false));
 					libmpv->setBrightness(drag_hue,false);
