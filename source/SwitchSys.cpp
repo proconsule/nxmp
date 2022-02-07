@@ -2,7 +2,10 @@
 // Created by cpasjuste on 26/11/18.
 //
 
+
 #include "SwitchSys.h"
+#ifdef NXMP_SWITCH
+
 
 using namespace c2d;
 
@@ -117,3 +120,5 @@ void SwitchSys::defaultClock(int stock_cpu_clock_temp,int stock_gpu_clock_temp,i
         printf("restoring cpu speed (old: %i, new: %i)\n",
         clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));
 }
+
+#endif

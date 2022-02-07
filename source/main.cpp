@@ -42,7 +42,9 @@
 
 #define NDEBUG 1
 
+#ifdef NXMP_SWITCH
 using namespace c2d;
+#endif
 
 static bool init();
 

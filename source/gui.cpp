@@ -11,7 +11,10 @@
 #include "imgui_impl_opengl3.h"
 #include "SwitchSys.h"
 
+
+#ifdef NXMP_SWITCH
 using namespace c2d;
+#endif
 
 MenuItem item;
 
@@ -51,6 +54,7 @@ namespace GUI {
 	}
 
 	void toggleOC(){
+#ifdef NXMP_SWITCH
 		item.clockoc = !item.clockoc;
 		if(item.clockoc){
 			const char *cmd[] = {"show-text", "Overclock Enabled","2000", NULL};
@@ -61,7 +65,7 @@ namespace GUI {
 			mpv_command_async(libmpv->getHandle(), 0, cmd);
 			SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
 		}
-		
+#endif
 	}
 	
 	

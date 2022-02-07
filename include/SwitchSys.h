@@ -5,6 +5,11 @@
 
 #ifndef CROSS2D_SWITCH_CLOCKS_H
 #define CROSS2D_SWITCH_CLOCKS_H
+
+#include "platforms.h"
+
+#ifdef NXMP_SWITCH
+
 #include <stdio.h>
 #include <switch.h>
 
@@ -51,5 +56,5 @@ namespace c2d {
         static int stock_emc_clock;
     };
 }
-
+#endif
 #endif //CROSS2D_SWITCH_CLOCKS_H
