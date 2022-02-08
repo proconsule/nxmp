@@ -193,6 +193,9 @@ namespace Popups{
 					setcolor[3] = color.w;
 					configini->setSubFontColor(setcolor);
 					libmpv->setSubFontColor(configini->getSubFontColorHex(true));
+					printf("hey, check this: \n");
+					printf(configini->getSubFontColorHex(true).c_str());
+					printf("\n");
 					item.popupstate = POPUP_STATE_NONE;
 				}
 				ImGui::SameLine();

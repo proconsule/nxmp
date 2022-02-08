@@ -485,19 +485,15 @@ void Config::saveSettings(){
 	ini->Delete("Main", "subfontsize");
 	ini->SetLongValue("Main", "subfontsize", subfontsize, NULL, false);
 	
+	//Fix Save color.
 	ini->Delete("Main", "subfontcolor");
-	char subfontcstr[32];
-	sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)subfontcolor[0]*255,(unsigned int)subfontcolor[1]*255,(unsigned int)subfontcolor[2]*255);
-	ini->SetValue("Main", "subfontcolor", subfontcstr);
+	ini->SetValue("Main", "subfontcolor", getSubFontColorHex(true).c_str());
 	
 	//bordercolor
 	ini->Delete("Main", "subbordercolor");
-	char subfontcstr2[32];
-	sprintf(subfontcstr2,"#%02X%02X%02X",(unsigned int)subbordercolor[0]*255,(unsigned int)subbordercolor[1]*255,(unsigned int)subbordercolor[2]*255);
-	ini->SetValue("Main", "subbordercolor", subfontcstr2);
-	
+	ini->SetValue("Main", "subbordercolor", getSubBorderColorHex(true).c_str());
 	//endbordercolor
-
+    //end Fix Save Color
 	std::vector<std::string> deintopts = {"no","yes","auto"};
 	ini->Delete("Main", "deinterlace");
 	ini->SetValue("Main", "deinterlace", deintopts[deint].c_str());
