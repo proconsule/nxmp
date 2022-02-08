@@ -9,8 +9,7 @@ namespace Windows {
 	inline void SetupMainWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Once);
-		ImGui::PushStyleColor(ImGuiCol_WindowBg,  ImVec4(0.16f, 0.29f, 0.48f, 0.54f));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     };
 	
 	
@@ -22,7 +21,7 @@ namespace Windows {
 
     inline void ExitMainWindow(void) {
         ImGui::End();
-		ImGui::PopStyleColor();
+		//ImGui::PopStyleColor();
         ImGui::PopStyleVar();
     };
 	inline void ExitWindow(void) {

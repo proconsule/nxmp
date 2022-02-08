@@ -435,6 +435,10 @@ int main(int argc,char *argv[]){
 			themes->setTheme(themes->themeslist[themeidx].path);
 		}
 		delete themes;
+	}else{
+		Themes  *themes = new Themes();
+		themes->setDefault();
+		delete themes;
 	}
 	
 #ifdef __SWITCH__
