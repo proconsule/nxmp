@@ -9,8 +9,6 @@
 #endif
 
 #ifdef NXMP_SWITCH
-
-
 using namespace c2d;
 #endif
 
