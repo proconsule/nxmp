@@ -36,6 +36,7 @@ namespace playerWindows{
 	static float drag_subdelay = 0.0f;
 	static int drag_subfontsize = 55;
 	static int drag_subfontbordersize = 3;
+	static float drag_subborderblur = 0.0f;
 	static int drag_shadowposition = 1;
 	static float drag_shadowintensity = 0.25f;
 
@@ -640,10 +641,17 @@ namespace playerWindows{
 					libmpv->setSubBorderSize(drag_subfontbordersize,item.playershowcontrols);
 				}
 				//endbordersize
+				//blursize
+				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Blur Intensity", NULL, true).x) * 0.5f);
+				ImGui::Text("Blur Intensity");
+				if(ImGui::DragFloat("Blur Intensity", &drag_subborderblur, 0.050f, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoInput)){
+					libmpv->setSubBorderBlur(drag_subborderblur,item.playershowcontrols);
+				}
+				//endblursize
 				//shadowintensity
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Shadow Intensity", NULL, true).x) * 0.5f);
 				ImGui::Text("Shadow Intensity");
-				if(ImGui::DragFloat("Shadow Intensity", &drag_shadowintensity, 0.010f, 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_NoInput)){
+				if(ImGui::DragFloat("Shadow Intensity", &drag_shadowintensity, 0.010f, 0.0f, 1.0f, "%.2f", ImGuiSliderFlags_NoInput)){
 					libmpv->setShadowIntensity(drag_shadowintensity,item.playershowcontrols);
 				}
 				//shadowintensity
@@ -669,11 +677,13 @@ namespace playerWindows{
 					drag_subfontbordersize = 3;
 					drag_shadowposition = 1;
 					drag_shadowintensity = 0.25f;
+					drag_subborderblur = 0.0f;
 					ignorestyleidx = 0;
 					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek -1");
 					libmpv->setShadowOffset(drag_shadowposition,false);
 					libmpv->setShadowIntensity(drag_shadowintensity,false);
 					libmpv->setSubBorderSize(drag_subfontbordersize,false);
+					libmpv->setSubBorderBlur(drag_subborderblur,false);
 					libmpv->setSubPos(drag_subpos,false);
 					libmpv->setSubDelay(drag_subdelay,false);
 					libmpv->setSubFontSize(drag_subfontsize,false);

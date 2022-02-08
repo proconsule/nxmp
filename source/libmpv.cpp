@@ -568,6 +568,16 @@ void libMpv::setSubBorderSize(int value,bool osd){
 	}
 }
 
+void libMpv::setSubBorderBlur(double value,bool osd){
+	if(osd){
+		std::string cmd = "set sub-blur " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set sub-blur " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
+
 void libMpv::setShadowIntensity(double value,bool osd){
 	if(osd){
 		std::string cmd = "set sub-shadow-color 0.0/0.0/0.0/" + std::to_string(value);
