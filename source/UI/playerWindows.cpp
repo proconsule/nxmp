@@ -669,6 +669,14 @@ namespace playerWindows{
 				if(ImGui::ColorButton("##subfontcolor", ImVec4(subcolor[0],subcolor[1],subcolor[2],subcolor[3]), ImGuiColorEditFlags_NoAlpha| ImGuiColorEditFlags_NoPicker|ImGuiColorEditFlags_InputRGB , ImVec2(190, 40))){
 					item.popupstate = POPUP_STATE_SUBFONTCOLOR;
 				}
+
+				//bordercolor
+				ImGui::Text("Sub Border Color");
+				float * subcolor2 = configini->getSubBorderColor(true);
+				if(ImGui::ColorButton("##subbordercolor", ImVec4(subcolor2[0],subcolor2[1],subcolor2[2],subcolor2[3]), ImGuiColorEditFlags_NoAlpha| ImGuiColorEditFlags_NoPicker|ImGuiColorEditFlags_InputRGB , ImVec2(190, 40))){
+					item.popupstate = POPUP_STATE_SUBBORDERCOLOR;
+				}
+				//endbordercolor
 				
 				//ImGui::EndDisabled();
 				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
@@ -691,6 +699,10 @@ namespace playerWindows{
 					libmpv->setSubFontSize(drag_subfontsize,false);
 					configini->setSubFontColor(configini->getSubFontColor(false));
 					libmpv->setSubFontColor(configini->getSubFontColorHex(true));
+					//bordercolor
+					configini->setSubBorderColor(configini->getSubBorderColor(false));
+					libmpv->setSubBorderColor(configini->getSubBorderColorHex(true));
+					//endbordercolor
 				}
 		}
 		playerWindows::ExitWindow();

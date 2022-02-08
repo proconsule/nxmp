@@ -104,6 +104,25 @@ Config::Config(std::string inifile){
 	tmpsubfontcolor[1] = subfontcolor[1] = (float)tmpcolors[1]/255.0f;
 	tmpsubfontcolor[2] = subfontcolor[2] = (float)tmpcolors[2]/255.0f;
 	tmpsubfontcolor[3] = subfontcolor[3] = 1.0f;
+
+	//bordercolor
+	
+	std::string fontcolorstring2 = "#000000";
+	const char* fontcolorpv2;
+	fontcolorpv2 = ini->GetValue("Main", "subbordercolor");
+	if(fontcolorpv2!= nullptr){
+		fontcolorstring2 = fontcolorpv2;
+	}
+	if(fontcolorstring2 == ""){
+		fontcolorstring2 = "#000000";
+	}
+	int tmpcolors2[3];
+	sscanf(fontcolorstring2.c_str(),"#%02X%02X%02X",&tmpcolors2[0],&tmpcolors2[1],&tmpcolors2[2]);
+	tmpsubbordercolor[0] = subbordercolor[0] = (float)tmpcolors2[0]/255.0f;
+	tmpsubbordercolor[1] = subbordercolor[1] = (float)tmpcolors2[1]/255.0f;
+	tmpsubbordercolor[2] = subbordercolor[2] = (float)tmpcolors2[2]/255.0f;
+	tmpsubbordercolor[3] = subbordercolor[3] = 1.0f;
+	//endbordercolor
 	
 	const char* deintpv;
 	deintpv = ini->GetValue("Main", "deinterlace");
@@ -336,6 +355,28 @@ void Config::setSubFontColor(float  *_color){
 	tmpsubfontcolor[2] = _color[2];
 }
 
+//bordercolor
+float * Config::getSubBorderColor(bool tmpvalue){
+	if(tmpvalue){
+		return tmpsubbordercolor;
+	}
+	return subbordercolor; 
+}
+std::string Config::getSubBorderColorHex(bool tmpvalue){
+	char subfontcstr2[32];
+	if(tmpvalue){
+		sprintf(subfontcstr2,"#%02X%02X%02X",(unsigned int)(tmpsubbordercolor[0]*255.0f),(unsigned int)(tmpsubbordercolor[1]*255.0f),(unsigned int)(tmpsubbordercolor[2]*255.0f));
+		return std::string(subfontcstr2);
+	}
+	sprintf(subfontcstr2,"#%02X%02X%02X",(unsigned int)(subbordercolor[0]*255.0f),(unsigned int)(subbordercolor[1]*255.0f),(unsigned int)(subbordercolor[2]*255.0f));
+	return std::string(subfontcstr2);	
+}
+void Config::setSubBorderColor(float  *_color){
+	tmpsubbordercolor[0] = _color[0];
+	tmpsubbordercolor[1] = _color[1];
+	tmpsubbordercolor[2] = _color[2];
+}
+//endbordercolor
 
 void Config::setDeinterlace(int value){
 	tmpdeint = value;
@@ -403,6 +444,12 @@ void Config::saveSettings(){
 	subfontcolor[1] = tmpsubfontcolor[1];
 	subfontcolor[2] = tmpsubfontcolor[2];
 	
+	//bordercolor
+	subbordercolor[0] = tmpsubbordercolor[0];
+	subbordercolor[1] = tmpsubbordercolor[1];
+	subbordercolor[2] = tmpsubbordercolor[2];
+	//endbordercolor
+
 	themename = tmpthemename;
 	
 	
@@ -443,6 +490,14 @@ void Config::saveSettings(){
 	sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)subfontcolor[0]*255,(unsigned int)subfontcolor[1]*255,(unsigned int)subfontcolor[2]*255);
 	ini->SetValue("Main", "subfontcolor", subfontcstr);
 	
+	//bordercolor
+	ini->Delete("Main", "subbordercolor");
+	char subfontcstr2[32];
+	sprintf(subfontcstr2,"#%02X%02X%02X",(unsigned int)subbordercolor[0]*255,(unsigned int)subbordercolor[1]*255,(unsigned int)subbordercolor[2]*255);
+	ini->SetValue("Main", "subbordercolor", subfontcstr2);
+	
+	//endbordercolor
+
 	std::vector<std::string> deintopts = {"no","yes","auto"};
 	ini->Delete("Main", "deinterlace");
 	ini->SetValue("Main", "deinterlace", deintopts[deint].c_str());
