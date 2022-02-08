@@ -277,6 +277,10 @@ namespace Windows {
 					configini->setPlayerSwipeSeek(touchseekradio);
 				}
 				ImGui::SameLine();
+				if(ImGui::RadioButton("Swipe Off", &touchseekradio, 2)){
+					configini->setPlayerSwipeSeek(touchseekradio);
+				}
+				ImGui::SameLine();
 				ImGui::EndTabItem();
 			}
 			if (ImGui::BeginTabItem("Themes")) {

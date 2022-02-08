@@ -42,6 +42,9 @@ namespace TOUCHCONTROLS{
 						sdlevent.jbutton.button = GUI::SDL_KEYS::SDL_KEY_ZR;
 						SDL_PushEvent(&sdlevent);
 					}
+					if(configini->getPlayerSwipeSeek(false) == 2){
+						printf("Swipe Off \n");
+					}
 				
 							
 			}else if(swipex<-0.2){
@@ -57,6 +60,9 @@ namespace TOUCHCONTROLS{
 						sdlevent.type = SDL_JOYBUTTONDOWN;
 						sdlevent.jbutton.button = GUI::SDL_KEYS::SDL_KEY_ZL;
 						SDL_PushEvent(&sdlevent);
+					}
+					if(configini->getPlayerSwipeSeek(false) == 2){
+						printf("Swipe Off \n");
 					}
 				
 			}
