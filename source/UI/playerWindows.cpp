@@ -4,9 +4,13 @@
 #include "imgui.h"
 #include "utils.h"
 #include "imgui_internal.h"
+#ifdef NXMP_SWITCH
 #include "SwitchSys.h"
+#endif
 
 #ifdef NXMP_SWITCH
+
+
 using namespace c2d;
 #endif
 
