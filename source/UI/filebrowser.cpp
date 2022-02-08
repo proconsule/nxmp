@@ -87,7 +87,8 @@ namespace Windows {
 								item.fileHoveredidx = n;
 							}
 						}
-						ImVec4 textcolor = ImVec4(1.0f,1.0f,1.0f,1.0f);
+						ImVec4* colors = ImGui::GetStyle().Colors;
+						ImVec4 textcolor = colors[ImGuiCol_Text];
 						if(sqlitedb != nullptr){
 							int dbfilestatus = sqlitedb->getFileDbStatus(thislist[n].path);
 							if(dbfilestatus == 2){

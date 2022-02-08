@@ -95,7 +95,9 @@ namespace Windows {
 							
 						}
 						ImGui::SameLine();
-						ImVec4 textcolor = ImVec4(1.0f,1.0f,1.0f,1.0f);
+						ImVec4* colors = ImGui::GetStyle().Colors;
+						ImVec4 textcolor = colors[ImGuiCol_Text];
+						
 						if(sqlitedb != nullptr){
 							std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + thislist[n].path + thislist[n].name;
 							int dbfilestatus = sqlitedb->getFileDbStatus(openurl);
@@ -234,7 +236,9 @@ namespace Windows {
 							}
 						}
 						ImGui::SameLine();
-						ImVec4 textcolor = ImVec4(1.0f,1.0f,1.0f,1.0f);
+						ImVec4* colors = ImGui::GetStyle().Colors;
+						ImVec4 textcolor = colors[ImGuiCol_Text];
+						
 						if(sqlitedb != nullptr){
 							std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
 							int dbfilestatus = sqlitedb->getFileDbStatus(openurl);
@@ -361,7 +365,9 @@ namespace Windows {
 								item.fileHoveredidx = n;
 							}
 						}
-						ImVec4 textcolor = ImVec4(1.0f,1.0f,1.0f,1.0f);
+						ImVec4* colors = ImGui::GetStyle().Colors;
+						ImVec4 textcolor = colors[ImGuiCol_Text];
+						
 						if(sqlitedb != nullptr){
 							std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + thislist[n].path;
 							int dbfilestatus = sqlitedb->getFileDbStatus(openurl);
@@ -502,7 +508,9 @@ namespace Windows {
 								item.fileHoveredidx = n;
 							}
 						}
-						ImVec4 textcolor = ImVec4(1.0f,1.0f,1.0f,1.0f);
+						ImVec4* colors = ImGui::GetStyle().Colors;
+						ImVec4 textcolor = colors[ImGuiCol_Text];
+						
 						if(sqlitedb != nullptr){
 							std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + thislist[n].path;
 							int dbfilestatus = sqlitedb->getFileDbStatus(openurl);
@@ -644,7 +652,9 @@ namespace Windows {
 								item.fileHoveredidx = n;
 							}
 						}
-						ImVec4 textcolor = ImVec4(1.0f,1.0f,1.0f,1.0f);
+						ImVec4* colors = ImGui::GetStyle().Colors;
+						ImVec4 textcolor = colors[ImGuiCol_Text];
+						
 						if(sqlitedb != nullptr){
 							std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + sambadir->getShare() + std::string("/") + thislist[n].path;
 							int dbfilestatus = sqlitedb->getFileDbStatus(openurl);
