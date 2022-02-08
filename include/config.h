@@ -53,6 +53,12 @@ public:
 	float * getSubFontColor(bool tmpvalue);
 	std::string getSubFontColorHex(bool tmpvalue);
 	void setSubFontColor(float *_color);
+
+	//bordercolor
+	float * getSubBorderColor(bool tmpvalue);
+	std::string getSubBorderColorHex(bool tmpvalue);
+	void setSubBorderColor(float *_color);
+	//endbordercolor
 	
 	int getDeinterlace(bool tmpvalue);
 	void setDeinterlace(int value);
@@ -114,7 +120,10 @@ private:
 	float subfontcolor[4];
 	float tmpsubfontcolor[4];
 	
-	
+	//bordercolor
+	float subbordercolor[4];
+	float tmpsubbordercolor[4];
+	//end bordercolor
 	
 	int tmpstartresumeperc;
 	int tmpstopresumeperc;

@@ -362,6 +362,9 @@ namespace Windows {
 				
 				configini->setSubFontSize(configini->getSubFontSize(false));
 				configini->setSubFontColor(configini->getSubFontColor(false));
+				//bordercolor
+				configini->setSubBorderColor(configini->getSubBorderColor(false));
+				//endbordercolor
 				configini->setDbActive(configini->getDeinterlace(false));
 				
 				

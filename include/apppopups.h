@@ -18,6 +18,7 @@ namespace Popups {
 	void SaveSettingsPopup(void);
 	void ResumePopup(void);
 	void SubFontColorPopup(void);
+    void SubBorderColorPopup(void);
 	void PlaylistStartPlaylist(void);
 	void DBUpdatedPopup(void);
 }

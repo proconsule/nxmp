@@ -82,7 +82,7 @@ public:
 	void setShadowIntensity(double value,bool osd);
 	void setShadowOffset(int value,bool osd);
 	void setSubFontColor(std::string hexcolor);
-	
+	void setSubBorderColor(std::string hexcolor);
 	void setDeinterlace(int value);
 	
 	void setLoop(bool val);

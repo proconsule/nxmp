@@ -134,6 +134,7 @@ void libMpv::loadFile(std::string _path){
 	setLoop(false);
 	setSubFontSize(configini->getSubFontSize(false),false);
 	setSubFontColor(configini->getSubFontColorHex(false));
+	setSubBorderColor(configini->getSubBorderColorHex(false));
 	
 }
 
@@ -605,6 +606,12 @@ void libMpv::setShadowOffset(int value,bool osd){
 }
 void libMpv::setSubFontColor(std::string hexcolor){
 	std::string cmd = "no-osd set sub-color '" + hexcolor + std::string("'");
+	mpv_command_string(handle, cmd.c_str());
+	
+}
+
+void libMpv::setSubBorderColor(std::string hexcolor){
+	std::string cmd = "no-osd set sub-border-color '" + hexcolor + std::string("'");
 	mpv_command_string(handle, cmd.c_str());
 	
 }

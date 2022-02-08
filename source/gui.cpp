@@ -612,6 +612,13 @@ namespace GUI {
 								}else{
 									item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 								}
+							//bordercolor
+								if(item.popupstate == POPUP_STATE_SUBBORDERCOLOR){
+									item.popupstate = POPUP_STATE_NONE;
+									configini->setSubBorderColor(configini->getSubBorderColor(false));
+								}else{
+									item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
+								}
 							}
 							else if(item.rightmenustate == PLAYER_AUDIOEQ){
 								item.rightmenustate = PLAYER_RIGHT_MENU_AUDIO;
@@ -918,6 +925,9 @@ namespace GUI {
 					playerWindows::RightHomeSub(&item.rightmenu_focus,&item.rightmenu_first_item);
 					if(item.popupstate == POPUP_STATE_SUBFONTCOLOR){
 						Popups::SubFontColorPopup();
+					}
+					if(item.popupstate == POPUP_STATE_SUBBORDERCOLOR){
+						Popups::SubBorderColorPopup();
 					}
 					break;
 				case PLAYER_RIGHT_MENU_SHADERMANIA:
