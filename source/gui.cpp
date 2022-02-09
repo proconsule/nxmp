@@ -991,6 +991,15 @@ namespace GUI {
 				changeFontTheme();
 				dochangethemefont = false;
 			}
+
+			#ifdef NXMP_SWITCH
+    		//get if console is docked
+			AppletOperationMode stus=appletGetOperationMode();
+			if (stus == AppletOperationMode_Handheld) 
+			{isHandheld=true;}
+			if (stus == AppletOperationMode_Console) 
+			{isHandheld=false;}
+    		#endif
 			
 		}
 		

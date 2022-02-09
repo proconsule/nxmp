@@ -214,7 +214,7 @@ extern USBMounter *usbmounter;
 #ifdef NXMP_ENIGMASUPPORT
 extern Enigma2 *enigma2;
 #endif
-
+extern bool isHandheld;
 
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
