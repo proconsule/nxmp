@@ -604,11 +604,11 @@ namespace playerWindows{
 						if (ImGui::Selectable(stylemenu[n].c_str(), is_selected)){
 							if(n == 0){
 								ignorestyleidx = 0;
-								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek -0");
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek 0");
 							}
 							if(n == 1){
 								ignorestyleidx = 1;
-								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass no ; no-osd seek -0");
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass no ; no-osd seek 0");
 							}
 						}
 							
@@ -689,7 +689,7 @@ namespace playerWindows{
 					drag_shadowintensity = 0.25f;
 					drag_subborderblur = 0.0f;
 					ignorestyleidx = 0;
-					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek -0");
+					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek 0");
 					libmpv->setShadowOffset(drag_shadowposition,false);
 					libmpv->setShadowIntensity(drag_shadowintensity,false);
 					libmpv->setSubBorderSize(drag_subfontbordersize,false);
