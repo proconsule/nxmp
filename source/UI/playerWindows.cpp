@@ -41,6 +41,7 @@ namespace playerWindows{
 	static float drag_subborderblur = 0.0f;
 	static int drag_shadowposition = 1;
 	static float drag_shadowintensity = 0.25f;
+	static float drag_fontscale = 1.00f;
 
 	static int slider_eq[6] = {0,0,0,0,0,0};
 	static char slider_hz[][8] = {"20-200","200-800","800-2K","2K-4K","4K-8K","20K"};
@@ -591,8 +592,36 @@ namespace playerWindows{
 		if (ImGui::Begin("Right Menu Sub", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 				ImGui::PushItemWidth(200-10);
 				auto windowWidth = ImGui::GetWindowSize().x;
+				if(ImGui::Button("Reset to Default",ImVec2(190, 30))){
+					drag_subpos = 100;
+					drag_subdelay = 0.0f;
+					drag_subfontsize = configini->getSubFontSize(false);
+					drag_subfontbordersize = 3;
+					drag_shadowposition = 1;
+					drag_shadowintensity = 0.25f;
+					drag_subborderblur = 0.0f;
+					ignorestyleidx = 0;
+					drag_fontscale = 1.0f;
+					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek 0");
+					libmpv->setSubScaleSize(drag_fontscale,item.playershowcontrols);
+					libmpv->setShadowOffset(drag_shadowposition,false);
+					libmpv->setShadowIntensity(drag_shadowintensity,false);
+					libmpv->setSubBorderSize(drag_subfontbordersize,false);
+					libmpv->setSubBorderBlur(drag_subborderblur,false);
+					libmpv->setSubPos(drag_subpos,false);
+					libmpv->setSubDelay(drag_subdelay,false);
+					libmpv->setSubFontSize(drag_subfontsize,false);
+					configini->setSubFontColor(configini->getSubFontColor(false));
+					libmpv->setSubFontColor(configini->getSubFontColorHex(true));
+					//bordercolor
+					configini->setSubBorderColor(configini->getSubBorderColor(false));
+					libmpv->setSubBorderColor(configini->getSubBorderColorHex(true));
+					//endbordercolor
+				}
+				ImGui::Separator();
+				ImGui::Dummy(ImVec2(0.0f,1.0f));
 				//ignore styles
-								ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Embedded Styles", NULL, true).x) * 0.5f);
+				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Embedded Styles", NULL, true).x) * 0.5f);
 				ImGui::PushItemWidth(200-10);
 				ImGui::Text("Embedded Styles");
 				std::vector<std::string> stylemenu = {"Activated","Deactivated"};
@@ -636,6 +665,13 @@ namespace playerWindows{
 				if(ImGui::DragInt("Sub Font Size", &drag_subfontsize, 0.5f, 1, 120, "%d", ImGuiSliderFlags_NoInput)){
 					libmpv->setSubFontSize(drag_subfontsize,item.playershowcontrols);
 				}
+				//fontscale
+				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Sub Font Scale", NULL, true).x) * 0.5f);
+				ImGui::Text("Sub Font Scale");
+				if(ImGui::DragFloat("Sub Font Scale", &drag_fontscale, 0.01f, 0.0f, 3.0f, "%.2f", ImGuiSliderFlags_NoInput)){
+				libmpv->setSubScaleSize(drag_fontscale,item.playershowcontrols);
+				}
+				//fontscale
 				//bordersize
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Sub Border Size", NULL, true).x) * 0.5f);
 				ImGui::Text("Sub Border Size");
@@ -679,31 +715,8 @@ namespace playerWindows{
 				//endbordercolor
 				
 				//ImGui::EndDisabled();
-				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
-				if(ImGui::Button("Reset to Default")){
-					drag_subpos = 100;
-					drag_subdelay = 0.0f;
-					drag_subfontsize = configini->getSubFontSize(false);
-					drag_subfontbordersize = 3;
-					drag_shadowposition = 1;
-					drag_shadowintensity = 0.25f;
-					drag_subborderblur = 0.0f;
-					ignorestyleidx = 0;
-					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek 0");
-					libmpv->setShadowOffset(drag_shadowposition,false);
-					libmpv->setShadowIntensity(drag_shadowintensity,false);
-					libmpv->setSubBorderSize(drag_subfontbordersize,false);
-					libmpv->setSubBorderBlur(drag_subborderblur,false);
-					libmpv->setSubPos(drag_subpos,false);
-					libmpv->setSubDelay(drag_subdelay,false);
-					libmpv->setSubFontSize(drag_subfontsize,false);
-					configini->setSubFontColor(configini->getSubFontColor(false));
-					libmpv->setSubFontColor(configini->getSubFontColorHex(true));
-					//bordercolor
-					configini->setSubBorderColor(configini->getSubBorderColor(false));
-					libmpv->setSubBorderColor(configini->getSubBorderColorHex(true));
-					//endbordercolor
-				}
+				//ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
+				
 		}
 		playerWindows::ExitWindow();
 	}
