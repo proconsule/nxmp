@@ -993,12 +993,20 @@ namespace GUI {
 			}
 
 			#ifdef NXMP_SWITCH
-    		//get if console is docked
+    		//rewrite switch state
 			AppletOperationMode stus=appletGetOperationMode();
 			if (stus == AppletOperationMode_Handheld) 
-			{isHandheld=true;}
+			{
+				if (isHandheld == false) 
+				{isHandheld=true;
+				printf("changed to Handheld Mode.\n");
+				}
+			}
 			if (stus == AppletOperationMode_Console) 
-			{isHandheld=false;}
+			{	if (isHandheld == true) 
+				{isHandheld=false;
+				printf("changed to Docked Mode.\n");}
+			}
     		#endif
 			
 		}
