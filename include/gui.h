@@ -46,6 +46,10 @@
 #include "shaderMania.h"
 #include "themes.h"
 
+#define handheldWidth 1280
+#define handheldHeight 720
+#define dockedWidth 1920
+#define dockedHeight 1080
 
 enum MENU_STATES {
 	MENU_STATE_HOME,

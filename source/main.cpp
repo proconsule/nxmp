@@ -46,11 +46,6 @@
 using namespace c2d;
 #endif
 
-#define handheldWidth 1280
-#define handheldHeight 720
-#define dockedWidth 1920
-#define dockedHeight 1080
-
 static bool init();
 
 SDL_Window *window;

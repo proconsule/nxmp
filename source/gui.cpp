@@ -1000,12 +1000,15 @@ namespace GUI {
 				if (isHandheld == false) 
 				{isHandheld=true;
 				printf("changed to Handheld Mode.\n");
+				SDL_SetWindowSize(window, handheldWidth, handheldHeight);
 				}
 			}
 			if (stus == AppletOperationMode_Console) 
 			{	if (isHandheld == true) 
 				{isHandheld=false;
-				printf("changed to Docked Mode.\n");}
+				printf("changed to Docked Mode.\n");
+				SDL_SetWindowSize(window, dockedWidth, dockedHeight);
+				}
 			}
     		#endif
 			
