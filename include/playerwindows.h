@@ -38,7 +38,7 @@ namespace playerWindows{
     };
 
 	inline void SetupAudioEqWindow(void) {
-        ImGui::SetNextWindowPos(ImVec2(277.0f, 480.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowPos(ImVec2(277.0f*multiplyRes, 480.0f*multiplyRes), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(725.0f, 210.0f), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
@@ -47,7 +47,7 @@ namespace playerWindows{
 	
 	inline void SetupAudioPlayerWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
     };

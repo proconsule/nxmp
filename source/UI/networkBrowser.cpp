@@ -720,7 +720,7 @@ namespace Windows {
             ImGui::SetNextWindowFocus();
            
 			if(item.networkselect){
-				if (ImGui::BeginListBox("Network Source Menu",ImVec2(1280.0f, 720.0f))){
+				if (ImGui::BeginListBox("Network Source Menu",ImVec2((1280.0f*multiplyRes), (720.0f*multiplyRes)))){
 					for(unsigned int n=0;n<item.networksources.size();n++){
 						static int selected = -1;
 						urlschema thisurl = Utility::parseUrl(item.networksources[n].url);
