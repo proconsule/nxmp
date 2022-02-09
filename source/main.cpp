@@ -104,7 +104,9 @@ float themefontsmall;
 ImFont* fontSmall;
 
 bool isHandheld=true;
-
+int newResW = 1280;
+int newResH = 720;
+float multiplyRes = 1.0f;
 shaderMania* shadermania = nullptr;
 
 GLuint WIDTH = handheldWidth, HEIGHT = handheldWidth;
@@ -149,10 +151,18 @@ static bool init() {
 	AppletOperationMode stus=appletGetOperationMode();
 	if (stus == AppletOperationMode_Handheld) 
 	{printf("Handheld Mode\n");
-	isHandheld=true;}
+	isHandheld=true;
+	newResW = handheldWidth;
+	newResH = handheldHeight;
+	multiplyRes = 1.0f;
+	}
 	if (stus == AppletOperationMode_Console) 
 	{printf("Docked Mode\n");
-	isHandheld=false;}
+	isHandheld=false;
+	newResW = dockedWidth;
+	newResH = dockedHeight;
+	multiplyRes = 1.5f;
+	}
     #endif
 	
 	
@@ -168,10 +178,8 @@ static bool init() {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        if (isHandheld == true)
-		{WIDTH = handheldWidth; HEIGHT = handheldHeight;}
-		 else
-		 {WIDTH = dockedWidth; HEIGHT = dockedHeight;}
+
+		WIDTH = newResW; HEIGHT = newResH;
         window = SDL_CreateWindow(
                 "[glad] GL with SDL",
                 SDL_WINDOWPOS_CENTERED,

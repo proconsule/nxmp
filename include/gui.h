@@ -218,7 +218,6 @@ extern USBMounter *usbmounter;
 #ifdef NXMP_ENIGMASUPPORT
 extern Enigma2 *enigma2;
 #endif
-extern bool isHandheld;
 
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
@@ -240,6 +239,10 @@ extern Playlist *playlist;
 
 extern SysIcons nxmpicons;
 
+extern int newResW;
+extern int newResH;
+extern float multiplyRes;
+extern bool isHandheld;
 /*
 extern Tex SdCardTexture;
 extern Tex UsbTexture;

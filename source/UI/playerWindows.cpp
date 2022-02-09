@@ -58,7 +58,7 @@ namespace playerWindows{
 		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Image","Audio","Subtitle","ShaderMania"};
 		if (ImGui::Begin("Right Menu Home", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
-			if (ImGui::BeginListBox("Right Menu Home List",ImVec2(1280.0f, 720.0f))){
+			if (ImGui::BeginListBox("Right Menu Home List",ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes))){
 				for (unsigned int n = 0; n < topmenu.size(); n++){
 					static int selected = -1;
 					if (ImGui::Selectable(topmenu[n].c_str(), selected == n)){
@@ -103,7 +103,7 @@ namespace playerWindows{
 		std::vector<std::string> topmenu  = {"Video","Audio","Sub"};
 		if (ImGui::Begin("Right Menu Tracks", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
-			if (ImGui::BeginListBox("Tracks Menu",ImVec2(1280.0f, 720.0f))){
+			if (ImGui::BeginListBox("Tracks Menu",ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes))){
 				for (unsigned int n = 0; n < topmenu.size(); n++){
 					static int selected = -1;
 					if (ImGui::Selectable(topmenu[n].c_str(), selected == n)){
@@ -132,7 +132,7 @@ namespace playerWindows{
 		playerWindows::SetupRightWindow();
 		if (ImGui::Begin("Right Menu Tracks Video", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
-			if (ImGui::BeginListBox("Video Tracks Menu",ImVec2(1280.0f, 720.0f))){
+			if (ImGui::BeginListBox("Video Tracks Menu",ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes))){
 				if(libmpv->getFileInfo() != nullptr){
 				for (unsigned int n = 0; n < libmpv->getFileInfo()->videos.size(); n++){
 					static int selected = -1;
@@ -160,7 +160,7 @@ namespace playerWindows{
 		playerWindows::SetupRightWindow();
 		if (ImGui::Begin("Right Menu Tracks Audio", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
-			if (ImGui::BeginListBox("Audio Tracks Menu",ImVec2(200.0f, 720.0f))){
+			if (ImGui::BeginListBox("Audio Tracks Menu",ImVec2(200.0f, 720.0f*multiplyRes))){
 				if(libmpv->getFileInfo() != nullptr){
 				for (unsigned int n = 0; n < libmpv->getFileInfo()->audios.size(); n++){
 					std::string itemid = "##" + std::to_string(n);
@@ -195,7 +195,7 @@ namespace playerWindows{
 		playerWindows::SetupRightWindow();
 		if (ImGui::Begin("Right Menu Tracks Subs", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
-			if (ImGui::BeginListBox("Sub Tracks Menu",ImVec2(200.0f, 720.0f))){
+			if (ImGui::BeginListBox("Sub Tracks Menu",ImVec2(200.0f, 720.0f*multiplyRes))){
 				if(libmpv->getFileInfo() != nullptr){
 				for (unsigned int n = 0; n < libmpv->getFileInfo()->subtitles.size(); n++){
 					static int selected = -1;
@@ -231,7 +231,7 @@ namespace playerWindows{
 		std::vector<std::string> topmenu  = {"Video","Audio","Sub"};
 		if (ImGui::Begin("Right Menu Chapters", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
-			if (ImGui::BeginListBox("Chapter Menu",ImVec2(200.0f, 720.0f))){
+			if (ImGui::BeginListBox("Chapter Menu",ImVec2(200.0f, 720.0f*multiplyRes))){
 				if(libmpv->getFileInfo() != nullptr){
 				for (unsigned int n = 0; n < libmpv->getFileInfo()->chapters.size(); n++){
 					static int selected = -1;
@@ -333,7 +333,7 @@ namespace playerWindows{
 		std::vector<std::string> topmenu  = {"Default","16:9","16:10","4:3","Custom Ratio"};
 		if (ImGui::Begin("Right Menu ARatio", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
-			if (ImGui::BeginListBox("Aspect Ratio",ImVec2(200.0f, 720.0f))){
+			if (ImGui::BeginListBox("Aspect Ratio",ImVec2(200.0f, 720.0f*multiplyRes))){
 				for (unsigned int n = 0; n < topmenu.size(); n++){
 					static int selected = -1;
 					if (ImGui::Selectable(topmenu[n].c_str(), selected == n)){
