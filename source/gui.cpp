@@ -76,7 +76,6 @@ namespace GUI {
 #ifdef NXMP_WIN32
 				if (event.type == SDL_KEYDOWN) {
 					Uint8 keycode = event.key.keysym.sym;
-					//printf("Key code :%d\n",keycode);
 					if(keycode == SDLK_ESCAPE){
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_JOYBUTTONDOWN;
@@ -1019,16 +1018,9 @@ namespace GUI {
 
 }	
 
-
-
 #ifdef _WIN32
 bool isMouseSelection = false;
 int startMousex = 0;
 int startMousey = 0;
 #endif
-
-/*
-float swipex = 0.0;
-float swipey = 0.0;
-float fingersum = 0;
-*/				
+	

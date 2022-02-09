@@ -101,42 +101,6 @@ std::string themefontpath = "";
 float themefontsize;
 float themefontsmall;
 
-/*
-Tex SdCardTexture;
-Tex NetworkTexture;
-Tex Enigma2Texture;
-Tex PlaylistTexture;
-Tex UsbTexture;
-Tex InfoTexture;
-Tex SettingsTexture;
-
-
-Tex FolderTexture;
-Tex FileTexture;
-
-
-Tex FTPTexture;
-Tex HTTPTexture;
-Tex SFTPTexture;
-Tex SMBTexture;
-Tex NFSTexture;
-Tex UPNPTexture;
-
-Tex FFMPEGTexture;
-Tex MPVTexture;
-
-Tex NXMPBannerTexture;
-Tex ExitTexture;
-
-Tex PlayIcon;
-Tex PauseIcon;
-Tex StopIcon;
-Tex MuteIcon;
-Tex VolumeIcon;
-Tex LoopIcon;
-Tex NoLoopIcon;
-*/
-
 ImFont* fontSmall;
 
 shaderMania* shadermania = nullptr;
@@ -291,20 +255,11 @@ int main(int argc,char *argv[]){
 		}
 #endif
 		printf("Init Fonts\n");
-        //PlFontData standard, fonts_ext;
-		//if (R_FAILED(ret = plGetSharedFontByType(&standard, PlSharedFontType_Standard))) {
-		//	printf("plGetSharedFontByType(PlSharedFontType_Standard) failed: 0x%x\n", ret);
-		//	return ret;
-		//}
-		
-		 //plGetSharedFontByType(&fonts_ext, PlSharedFontType_NintendoExt);
-
-		
+      
 		unsigned char *pixels = nullptr;
 		int width = 0, height = 0, bpp = 0;
 		ImFontConfig font_cfg;
-		
-		//font_cfg.FontDataOwnedByAtlas = false;
+
 		printf("Loading TTF\n");
 		
 		
@@ -316,27 +271,7 @@ int main(int argc,char *argv[]){
 		io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg);
 		fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg);
 #endif
-		//font_cfg.MergeMode = true;
-		//io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg, io.Fonts->GetGlyphRangesJapanese());
-		//io.Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 28.0f, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
-		/*
-		    static const ImWchar ranges[] =
-                {
-                    0xE000, 0xE06B,
-                    0xE070, 0xE07E,
-                    0xE080, 0xE099,
-                    0xE0A0, 0xE0BA,
-                    0xE0C0, 0xE0D6,
-                    0xE0E0, 0xE0F5,
-                    0xE100, 0xE105,
-                    0xE110, 0xE116,
-                    0xE121, 0xE12C,
-                    0xE130, 0xE13C,
-                    0xE140, 0xE14D,
-                    0xE150, 0xE153,
-                    0,
-                };
-		*/		
+		
 			static const ImWchar tmranges[] =
                 {
 					0x2019, 0x2019,
@@ -351,8 +286,7 @@ int main(int argc,char *argv[]){
 	static ImWchar ranges[] = { 0x1, 0x1FFFF, 0 };
 	font_cfg.OversampleH = font_cfg.OversampleV = 1;
 	font_cfg.MergeMode = true;
-	//printf("Loading Extended Chars\n");
-    //io.Fonts->AddFontFromMemoryTTF (fonts_ext.address, fonts_ext.size, 24.0f, &font_cfg, ranges);
+
 #ifdef NXMP_SWITCH
 	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
 	fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
