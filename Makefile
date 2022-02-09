@@ -44,6 +44,8 @@ DATA		:=	data
 INCLUDES	:=	libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 ROMFS		:=	romfs
 
+GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'
+
 VERSION_MAJOR := 0
 VERSION_MINOR := 6
 VERSION_MICRO := 1
@@ -59,7 +61,8 @@ APP_VERSION   := ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 CFLAGS	:=	-g -Wall -Wno-sign-compare -O2 -ffunction-sections \
-			$(ARCH) $(DEFINES)
+			$(ARCH) $(DEFINES) \
+                $(GITREV)
 CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags` -fpermissive -DIMGUI_USE_WCHAR32 -I${PORTLIBS}/include/upnp/
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ $(BUILD_TYPE)
