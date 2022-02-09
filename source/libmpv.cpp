@@ -156,6 +156,8 @@ void libMpv::loadFileLive(std::string _path,std::string _changename){
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);
 	setSubFontSize(configini->getSubFontSize(false),false);
+	setSubFontColor(configini->getSubFontColorHex(false));
+	setSubBorderColor(configini->getSubBorderColorHex(false));
 }
 
 int64_t libMpv::getPosition() {
@@ -564,7 +566,15 @@ void libMpv::setSubFontSize(int value,bool osd){
 		mpv_command_string(handle, cmd.c_str());
 	}
 }
-
+void libMpv::setSubScaleSize(double value,bool osd){
+	if(osd){
+		std::string cmd = "set sub-scale " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}else{
+		std::string cmd = "no-osd set sub-scale " + std::to_string(value);
+		mpv_command_string(handle, cmd.c_str());
+	}
+}
 void libMpv::setSubBorderSize(int value,bool osd){
 	if(osd){
 		std::string cmd = "set sub-border-size " + std::to_string(value);

@@ -77,6 +77,7 @@ public:
 	void setSubDelay(double value,bool osd);
 	void setSubPos(int value,bool osd);
 	void setSubFontSize(int value,bool osd);
+	void setSubScaleSize(double value,bool osd);
 	void setSubBorderSize(int value,bool osd);
 	void setSubBorderBlur(double value,bool osd);
 	void setShadowIntensity(double value,bool osd);
