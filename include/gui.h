@@ -243,6 +243,7 @@ extern int newResW;
 extern int newResH;
 extern float multiplyRes;
 extern bool isHandheld;
+extern SDL_GLContext context;
 /*
 extern Tex SdCardTexture;
 extern Tex UsbTexture;
@@ -328,6 +329,7 @@ namespace GUI {
 	
 	void changeFontTheme();
 	
+	void reinit();
 	
 }
 
