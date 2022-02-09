@@ -103,9 +103,13 @@ float themefontsmall;
 
 ImFont* fontSmall;
 
+bool isHandheld=true;
+int newResW = 1280;
+int newResH = 720;
+float multiplyRes = 1.0f;
 shaderMania* shadermania = nullptr;
 
-const GLuint WIDTH = 1280, HEIGHT = 720;
+GLuint WIDTH = handheldWidth, HEIGHT = handheldWidth;
 
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
 
@@ -142,7 +146,27 @@ void deinitTextures(){
 
 
 static bool init() {
-    bool success = true;
+	#ifdef NXMP_SWITCH
+    //get if console is docked
+	AppletOperationMode stus=appletGetOperationMode();
+	if (stus == AppletOperationMode_Handheld) 
+	{printf("Handheld Mode\n");
+	isHandheld=true;
+	newResW = handheldWidth;
+	newResH = handheldHeight;
+	multiplyRes = 1.0f;
+	}
+	if (stus == AppletOperationMode_Console) 
+	{printf("Docked Mode\n");
+	isHandheld=false;
+	newResW = dockedWidth;
+	newResH = dockedHeight;
+	multiplyRes = 1.5f;
+	}
+    #endif
+	
+	
+	bool success = true;
 
 	SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "no");
     if( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0 ){
@@ -155,6 +179,7 @@ static bool init() {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
+		WIDTH = newResW; HEIGHT = newResH;
         window = SDL_CreateWindow(
                 "[glad] GL with SDL",
                 SDL_WINDOWPOS_CENTERED,

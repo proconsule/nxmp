@@ -991,6 +991,32 @@ namespace GUI {
 				changeFontTheme();
 				dochangethemefont = false;
 			}
+
+			#ifdef NXMP_SWITCH
+    		//rewrite switch state
+			AppletOperationMode stus=appletGetOperationMode();
+			if (stus == AppletOperationMode_Handheld) 
+			{
+				if (isHandheld == false) 
+				{isHandheld=true;
+				printf("changed to Handheld Mode.\n");
+				newResW = handheldWidth;
+				newResH = handheldHeight;
+				multiplyRes = 1.0f;
+				SDL_SetWindowSize(window, newResW, newResH);
+				}
+			}
+			if (stus == AppletOperationMode_Console) 
+			{	if (isHandheld == true) 
+				{isHandheld=false;
+				printf("changed to Docked Mode.\n");
+				newResW = dockedWidth;
+				newResH = dockedHeight;
+				multiplyRes = 1.5f;
+				SDL_SetWindowSize(window, newResW, newResH);
+				}
+			}
+    		#endif
 			
 		}
 		

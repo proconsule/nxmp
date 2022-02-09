@@ -46,6 +46,10 @@
 #include "shaderMania.h"
 #include "themes.h"
 
+#define handheldWidth 1280
+#define handheldHeight 720
+#define dockedWidth 1920
+#define dockedHeight 1080
 
 enum MENU_STATES {
 	MENU_STATE_HOME,
@@ -215,7 +219,6 @@ extern USBMounter *usbmounter;
 extern Enigma2 *enigma2;
 #endif
 
-
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
 
@@ -236,6 +239,10 @@ extern Playlist *playlist;
 
 extern SysIcons nxmpicons;
 
+extern int newResW;
+extern int newResH;
+extern float multiplyRes;
+extern bool isHandheld;
 /*
 extern Tex SdCardTexture;
 extern Tex UsbTexture;

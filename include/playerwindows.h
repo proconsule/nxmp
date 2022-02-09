@@ -4,19 +4,22 @@
 #include "imgui.h"
 #include "gui.h"
 
-
+extern int newResW;
+extern int newResH;
+extern float multiplyRes;
+extern bool isHandheld;
 namespace playerWindows{
 	
 	inline void SetupCacheWindow(void){
-		ImGui::SetNextWindowPos(ImVec2(10.0f, 600.0f), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(250.0f, 80.0f), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(10.0f*multiplyRes, 600.0f*multiplyRes), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(250.0f*multiplyRes, 80.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
 	}
 	
 	inline void SetupVolumeWindow(void){
-		ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(200.0f, 50.0f), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(10.0f*multiplyRes, 10.0f*multiplyRes), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(200.0f*multiplyRes, 50.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
@@ -24,8 +27,11 @@ namespace playerWindows{
 	
 	static float rightmenuposX = 1280.0f;
 	inline void SetupRightWindow(void) {
+        if(isHandheld == true)
         ImGui::SetNextWindowPos(ImVec2(rightmenuposX, 0.0f), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(200.0f, 720.0f), ImGuiCond_Once);
+		else
+		ImGui::SetNextWindowPos(ImVec2((rightmenuposX*multiplyRes)+100, 0.0f), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(200.0f, 720.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
 		
@@ -41,14 +47,14 @@ namespace playerWindows{
 	
 	inline void SetupAudioPlayerWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
     };
 	
 	inline void SetupPlayerControlsWindow(void) {
-        ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(1280.0f, 720.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f*multiplyRes), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
