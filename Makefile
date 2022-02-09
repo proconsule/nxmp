@@ -51,7 +51,7 @@ VERSION_MINOR := 6
 VERSION_MICRO := 1
 
 APP_TITLE     := NXMP
-APP_AUTHOR    := proconsule
+APP_AUTHOR    := proconsule and darkxex
 APP_VERSION   := ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}
 
 
