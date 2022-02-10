@@ -211,8 +211,16 @@ int main() {
 	 appletLockExit();
 #else
 int main(int argc,char *argv[]){
+	if(argc>1){
+		if(strcmp(argv[1],"-d") == 0){
+			isHandheld=false;
+			newResW = dockedWidth;
+			newResH = dockedHeight;
+			multiplyRes = 1.5f;
+		}
+	}
 #endif
-
+	
 
 #ifdef NXMP_SWITCH
 	socketInitializeDefault();
