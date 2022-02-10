@@ -6,11 +6,13 @@
 #include "localfiles.h"
 #include "Enigma2.h"
 #include "themes.h"
+#include "updater.h"
 
 
 namespace Windows {
 	
 	Themes *themes = nullptr;
+	Updater *updater = nullptr;
 	Tex thempreview;
 	
     void SettingsMenuWindow(bool *focus, bool *first_item) {
@@ -338,6 +340,36 @@ namespace Windows {
 				ImGui::Image((void*)(intptr_t)thempreview.id, ImVec2(thempreview.width/2,thempreview.height/2));
 				
 					
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Updates")) {
+				if(updater == nullptr){
+					updater = new Updater();
+					updater->fetchReleases();
+				}
+				
+				bool lastprerelease = false;
+				bool laststablerelease = false;
+				gitrelease_struct gitprerelease;
+				gitrelease_struct gitstablerelease;
+				
+				
+				for(int i=0;i<updater->getReleases().size();i++){
+					if(lastprerelease && laststablerelease)break;
+					if(updater->getReleases()[i].prerelease && !lastprerelease){
+						lastprerelease = true;
+						gitprerelease = updater->getReleases()[i];
+					}
+					if(!updater->getReleases()[i].prerelease && !laststablerelease){
+						laststablerelease = true;
+						gitstablerelease = updater->getReleases()[i];
+					}
+				}
+				
+				ImGui::Text("LAST Nightly: %s",gitprerelease.tagname.c_str());
+				ImGui::Text("LAST Stable: %s",gitstablerelease.tagname.c_str());
+				
+				
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();

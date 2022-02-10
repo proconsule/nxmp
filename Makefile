@@ -39,9 +39,9 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	libs/imgui libs/imgui/opengl3 libs/imgui/misc/freetype source source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
+SOURCES		:=	libs/imgui libs/imgui/opengl3 libs/imgui/misc/freetype source source/updater source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 DATA		:=	data
-INCLUDES	:=	libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
+INCLUDES	:=	libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 ROMFS		:=	romfs
 
 GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'
@@ -75,7 +75,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lssh2 -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lnx -lz
+LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lssh2 -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lnx -ljansson -lz
 
 
 
