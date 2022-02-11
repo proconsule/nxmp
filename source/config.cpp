@@ -445,6 +445,9 @@ void Config::saveSettings(){
 	//slang
 	useslang = tmpuseslang;
 	//end slang
+
+	useoc = tmpuseoc;
+
 	subfontsize = tmpsubfontsize;
 	deint = tmpdeint;
 	dbactive = tmpdbactive;
@@ -493,6 +496,9 @@ void Config::saveSettings(){
 	ini->Delete("Main", "slang");
 	ini->SetValue("Main", "slang", Utility::getLanguages()[tmpslang].lang3.c_str());
 	//end slang
+
+	ini->Delete("Main", "useoc");
+	ini->SetBoolValue("Main", "useoc", useoc, NULL, false);
 
 	ini->Delete("Main", "subfontsize");
 	ini->SetLongValue("Main", "subfontsize", subfontsize, NULL, false);
