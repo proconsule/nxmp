@@ -14,6 +14,7 @@ struct decoderlist_struct{
 };
 
 extern Config *configini;
+extern bool clockoc;
 
 class libMpv{
 public:

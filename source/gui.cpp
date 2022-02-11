@@ -55,8 +55,8 @@ namespace GUI {
 
 	void toggleOC(){
 #ifdef NXMP_SWITCH
-		item.clockoc = !item.clockoc;
-		if(item.clockoc){
+		clockoc = !clockoc;
+		if(clockoc){
 			const char *cmd[] = {"show-text", "Overclock Enabled","2000", NULL};
 			mpv_command_async(libmpv->getHandle(), 0, cmd);
 			SwitchSys::maxClock();
