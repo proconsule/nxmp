@@ -68,6 +68,8 @@ public:
 	
 	bool getMute();
 	void toggleMute();
+
+	void setOcState();
 	
 	void setAudioDelay(double value,bool osd);
 	
