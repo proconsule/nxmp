@@ -109,7 +109,8 @@ void SwitchSys::maxClock()
     SwitchSys::setClock(SwitchSys::Module::Gpu, (int) SwitchSys::GPUClock::Max);
     SwitchSys::setClock(SwitchSys::Module::Emc, (int) SwitchSys::EMCClock::Max);
     printf("setting max cpu speed (old: %i, new: %i)\n",
-    clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));}
+    clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));
+}
 
 void SwitchSys::defaultClock(int stock_cpu_clock_temp,int stock_gpu_clock_temp,int stock_emc_clock_temp)
 {
