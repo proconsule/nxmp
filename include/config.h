@@ -47,6 +47,9 @@ public:
 	void setSlang(int lang);
     //End Slang
 	
+	bool getUseOc(bool tmpvalue);
+	void setUseOc(bool _val);
+
 	int getSubFontSize(bool tmpvalue);
 	void setSubFontSize(int val);
 	
@@ -110,6 +113,9 @@ private:
 	int tmpslang;
 	int slang;
     //End Slang
+
+	bool tmpuseoc;
+	bool useoc;
 	
 	int tmpsubfontsize;
 	int subfontsize;

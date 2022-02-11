@@ -104,21 +104,22 @@ bool SwitchSys::setClock(const SwitchSys::Module &module, int hz) {
 }
 
 void SwitchSys::maxClock()
-{ int clock_old = SwitchSys::getClock(SwitchSys::Module::Cpu);
-        SwitchSys::setClock(SwitchSys::Module::Cpu, (int) SwitchSys::CPUClock::Max);
-        SwitchSys::setClock(SwitchSys::Module::Gpu, (int) SwitchSys::GPUClock::Max);
-        SwitchSys::setClock(SwitchSys::Module::Emc, (int) SwitchSys::EMCClock::Max);
-        printf("setting max cpu speed (old: %i, new: %i)\n",
-        clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));}
+{   int clock_old = SwitchSys::getClock(SwitchSys::Module::Cpu);
+    SwitchSys::setClock(SwitchSys::Module::Cpu, (int) SwitchSys::CPUClock::Max);
+    SwitchSys::setClock(SwitchSys::Module::Gpu, (int) SwitchSys::GPUClock::Max);
+    SwitchSys::setClock(SwitchSys::Module::Emc, (int) SwitchSys::EMCClock::Max);
+    printf("setting max cpu speed (old: %i, new: %i)\n",
+    clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));
+}
 
 void SwitchSys::defaultClock(int stock_cpu_clock_temp,int stock_gpu_clock_temp,int stock_emc_clock_temp)
 {
-        int clock_old = SwitchSys::getClock(SwitchSys::Module::Cpu);
-        SwitchSys::setClock(SwitchSys::Module::Cpu, (int) stock_cpu_clock_temp);
-        SwitchSys::setClock(SwitchSys::Module::Gpu, (int) stock_gpu_clock_temp);
-        SwitchSys::setClock(SwitchSys::Module::Emc, (int) stock_emc_clock_temp);
-        printf("restoring cpu speed (old: %i, new: %i)\n",
-        clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));
+    int clock_old = SwitchSys::getClock(SwitchSys::Module::Cpu);
+    SwitchSys::setClock(SwitchSys::Module::Cpu, (int) stock_cpu_clock_temp);
+    SwitchSys::setClock(SwitchSys::Module::Gpu, (int) stock_gpu_clock_temp);
+    SwitchSys::setClock(SwitchSys::Module::Emc, (int) stock_emc_clock_temp);
+    printf("restoring cpu speed (old: %i, new: %i)\n",
+    clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));
 }
 
 #endif
