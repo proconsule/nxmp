@@ -76,6 +76,9 @@ Config::Config(std::string inifile){
 	tmpslang = slang;
 	//endSlang
 	
+	useoc = ini->GetBoolValue("Main", "useoc");
+	tmpuseoc = useoc;
+
 	const char* themenamepv;
 	themenamepv = ini->GetValue("Main", "theme");
 	std::string themenamestring = "Default";
@@ -322,6 +325,15 @@ void Config::setSlang(int lang){
 }
 //end Slang
 
+bool Config::getUseOc(bool tmpvalue){
+	if(tmpvalue){
+		return tmpuseoc;
+	}
+	return useoc;
+}
+void Config::setUseOc(bool _val){
+	tmpuseoc = _val;
+}
 
 int Config::getSubFontSize(bool tmpvalue){
 	if(tmpvalue){
