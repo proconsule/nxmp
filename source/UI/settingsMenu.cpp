@@ -49,7 +49,13 @@ namespace Windows {
 							io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
 						}
 					}
-					
+					ImGui::Dummy(ImVec2(0.0f,30.0f));
+					ImGui::Text("OverClock");
+					ImGui::Separator();
+					bool ocdefault = configini->getUseOc(true);
+					if(ImGui::Checkbox("OverClock at Startup", &ocdefault)){
+						configini->setUseOc(ocdefault);	
+					}
 					
 					ImGui::EndTabItem();
 				}

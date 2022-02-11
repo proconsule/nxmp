@@ -137,7 +137,7 @@ typedef struct {
 	int playershowcontrols = false;
 	int playershowstats = false;
 	bool masterlock = false;
-	bool clockoc = false;
+	
 	bool first_item;
 	bool focus;
 	int fileHoveredidx = 0;
@@ -243,6 +243,7 @@ extern int newResW;
 extern int newResH;
 extern float multiplyRes;
 extern bool isHandheld;
+extern bool clockoc;
 extern SDL_GLContext context;
 /*
 extern Tex SdCardTexture;

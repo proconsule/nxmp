@@ -135,7 +135,7 @@ void libMpv::loadFile(std::string _path){
 	setSubFontSize(configini->getSubFontSize(false),false);
 	setSubFontColor(configini->getSubFontColorHex(false));
 	setSubBorderColor(configini->getSubBorderColorHex(false));
-	
+	setOcState();
 }
 
 void libMpv::loadFileLive(std::string _path,std::string _changename){
@@ -158,6 +158,26 @@ void libMpv::loadFileLive(std::string _path,std::string _changename){
 	setSubFontSize(configini->getSubFontSize(false),false);
 	setSubFontColor(configini->getSubFontColorHex(false));
 	setSubBorderColor(configini->getSubBorderColorHex(false));
+	setOcState();
+}
+
+void libMpv::setOcState()
+{	
+	if(configini->getUseOc(false))
+	{printf("\nOC Enabled\n");
+	#ifdef NXMP_SWITCH	
+	clockoc = true;					
+	SwitchSys::maxClock();
+	#endif
+	}
+	else
+	{printf("\nOC Disabled\n");
+	#ifdef NXMP_SWITCH	
+	clockoc = false;					
+	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
+	#endif
+	
+	}
 }
 
 int64_t libMpv::getPosition() {
@@ -191,6 +211,10 @@ void libMpv::Stop() {
 	clearShader();
 	const char *cmd[] = {"stop",  NULL};
 	mpv_command_async(handle, 0, cmd);
+	#ifdef NXMP_SWITCH	
+	clockoc = false;					
+	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
+	#endif
 }
 	
 void libMpv::seek(double position,bool osd) {
@@ -700,15 +724,13 @@ bool libMpv::getAudioNormalize(){
 void libMpv::setShader(std::string _filename){
 	std::string command = std::string("no-osd change-list glsl-shaders set ") + _filename;
 	mpv_command_string(handle,command.c_str());
-	#ifdef NXMP_SWITCH						
+	#ifdef NXMP_SWITCH	
+	clockoc = true;					
 	SwitchSys::maxClock();
 	#endif
 }
 void libMpv::clearShader(){
 	mpv_command_string(handle,"no-osd change-list glsl-shaders clr \"\"");
-	#ifdef NXMP_SWITCH
-	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
-	#endif
 }
 
 void libMpv::resetFileInfo(){

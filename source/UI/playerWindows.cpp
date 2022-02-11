@@ -980,6 +980,10 @@ namespace playerWindows{
 						if (ImGui::Selectable(itemid.c_str(), is_selected)){
 							
 							if(n == 0){
+								#ifdef NXMP_SWITCH
+								clockoc = false;
+								SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
+								#endif
 								libmpv->clearShader();
 							}else{
 								printf("PATH: %s\n",shadermania->getCurrList()[n].path.c_str());

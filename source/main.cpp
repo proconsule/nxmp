@@ -103,7 +103,8 @@ float themefontsmall;
 
 ImFont* fontSmall;
 
-bool isHandheld=true;
+bool isHandheld = true;
+bool clockoc = false;
 int newResW = 1280;
 int newResH = 720;
 float multiplyRes = 1.0f;
@@ -427,6 +428,7 @@ if (hosversionBefore(8, 0, 0)) {
     printf("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
     SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
 #endif
+
 
 	GUI::initMpv();
 	

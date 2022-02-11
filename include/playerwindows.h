@@ -53,7 +53,10 @@ namespace playerWindows{
     };
 	
 	inline void SetupPlayerControlsWindow(void) {
-        ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f*multiplyRes), ImGuiCond_Once);
+		if (isHandheld == true)
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f), ImGuiCond_Once);
+		else
+		ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f*multiplyRes + 45), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);

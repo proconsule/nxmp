@@ -14,6 +14,7 @@ struct decoderlist_struct{
 };
 
 extern Config *configini;
+extern bool clockoc;
 
 class libMpv{
 public:
@@ -67,6 +68,8 @@ public:
 	
 	bool getMute();
 	void toggleMute();
+
+	void setOcState();
 	
 	void setAudioDelay(double value,bool osd);
 	
