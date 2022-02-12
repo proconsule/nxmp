@@ -70,7 +70,7 @@ FAQ
 
 Thanks to
 -----
-- Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv part)
+- Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv and Overclock part)
 - DarkMatterCore for libusbhsfs https://github.com/DarkMatterCore/libusbhsfs (this gives NXMP USB support)
 - Chocola @ GBATemp forum for usage guide and beta testing
 - sashka69 @ GBATemp forum for beta testing
