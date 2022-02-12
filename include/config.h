@@ -8,6 +8,29 @@
 
 #include "SimpleIni.h"
 
+
+typedef struct{
+	bool showhidden;
+	bool touchenable;
+	int playeswipeseek;
+	int shortseek;
+	int longseek;
+	bool usealang;
+	int alang;
+	bool useslang;
+	int slang;
+    bool useoc;
+	int subfontsize;
+	int deint;
+	float subfontcolor[4];
+	float subbordercolor[4];
+	int startresumeperc;
+	int stopresumeperc;
+	bool dbactive;
+	std::string themename;
+}nxmpconfig_struct;
+
+
 struct networkSource{
 	std::string name;
 	std::string url;
@@ -84,64 +107,9 @@ public:
 	
 	
 private:
-
-	bool showhidden;
-	bool tmpshowhidden;
-
-	bool touchenable;
-	bool tmptouchenable;
 	
-	int playeswipeseek;
-	int tmpplayeswipeseek;
-
-	int shortseek;
-	int longseek;
-	
-	int tmpshortseek;
-	int tmplongseek;
-	
-	bool tmpusealang;
-	bool usealang;
-	
-	int tmpalang;
-	int alang;
-	
-	//Slang
-	bool tmpuseslang;
-	bool useslang;
-	
-	int tmpslang;
-	int slang;
-    //End Slang
-
-	bool tmpuseoc;
-	bool useoc;
-	
-	int tmpsubfontsize;
-	int subfontsize;
-	
-	int tmpdeint;
-	int deint;
-	
-	float subfontcolor[4];
-	float tmpsubfontcolor[4];
-	
-	//bordercolor
-	float subbordercolor[4];
-	float tmpsubbordercolor[4];
-	//end bordercolor
-	
-	int tmpstartresumeperc;
-	int tmpstopresumeperc;
-	int startresumeperc;
-	int stopresumeperc;
-	
-	
-	bool tmpdbactive;
-	bool dbactive;
-	
-	std::string themename;
-	std::string tmpthemename;
+	nxmpconfig_struct nxmpconfig;
+	nxmpconfig_struct nxmptmpconfig;
 	
 	std::string inifilePath;
 };

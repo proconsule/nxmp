@@ -24,28 +24,22 @@ Config::Config(std::string inifile){
 	
 	CSimpleIniA::TNamesDepend values;
 	
-	
-	showhidden = ini->GetBoolValue("Main", "showhidden");
-	tmpshowhidden = showhidden;
-	
-	touchenable = ini->GetBoolValue("Main", "touchenable");
-	tmptouchenable = touchenable;
-	
-	playeswipeseek = ini->GetLongValue("Main", "playeswipeseek");
-	tmpplayeswipeseek = playeswipeseek;
-	
-	
-	longseek = ini->GetLongValue("Main", "longseek");
-	shortseek = ini->GetLongValue("Main", "shortseek");
-	if(longseek == 0)longseek = 60;
-	if(shortseek == 0)shortseek = 10;
-	
-	tmplongseek = longseek;
-	tmpshortseek = shortseek;
-	
 
-	usealang = ini->GetBoolValue("Main", "usealang");
-	tmpusealang = usealang;
+	
+	nxmpconfig.showhidden = ini->GetBoolValue("Main", "showhidden");
+	
+	nxmpconfig.touchenable = ini->GetBoolValue("Main", "touchenable");
+	
+	nxmpconfig.playeswipeseek = ini->GetLongValue("Main", "playeswipeseek");
+	
+	
+	nxmpconfig.longseek = ini->GetLongValue("Main", "longseek");
+	nxmpconfig.shortseek = ini->GetLongValue("Main", "shortseek");
+	if(nxmpconfig.longseek == 0)nxmpconfig.longseek = 60;
+	if(nxmpconfig.shortseek == 0)nxmpconfig.shortseek = 10;
+	
+	
+	nxmpconfig.usealang = ini->GetBoolValue("Main", "usealang");
 	const char* alangpv;
 	alangpv = ini->GetValue("Main", "alang");
 	std::string alangstring = "eng";
@@ -56,12 +50,11 @@ Config::Config(std::string inifile){
 		alangstring = "eng";
 	}
 	
-	alang = Utility::getLanguagesIdx(alangstring);
-	tmpalang = alang;
-
+	nxmpconfig.alang = Utility::getLanguagesIdx(alangstring);
+	
 	//Slang
-	useslang = ini->GetBoolValue("Main", "useslang");
-	tmpuseslang = useslang;
+	nxmpconfig.useslang = ini->GetBoolValue("Main", "useslang");
+	
 	const char* slangpv;
 	slangpv = ini->GetValue("Main", "slang");
 	std::string slangstring = "eng";
@@ -72,25 +65,22 @@ Config::Config(std::string inifile){
 		slangstring = "eng";
 	}
 	
-	slang = Utility::getLanguagesIdx(slangstring);
-	tmpslang = slang;
+	nxmpconfig.slang = Utility::getLanguagesIdx(slangstring);
 	//endSlang
 	
-	useoc = ini->GetBoolValue("Main", "useoc");
-	tmpuseoc = useoc;
-
+	nxmpconfig.useoc = ini->GetBoolValue("Main", "useoc");
+	
 	const char* themenamepv;
 	themenamepv = ini->GetValue("Main", "theme");
 	std::string themenamestring = "Default";
 	if(themenamepv!= nullptr){
 		themenamestring = themenamepv;
 	}
-	themename = themenamestring;
-	tmpthemename = themenamestring;
+	nxmpconfig.themename = themenamestring;
 	
-	subfontsize = ini->GetLongValue("Main", "subfontsize");
-	if(subfontsize == 0)subfontsize = 55;
-	tmpsubfontsize = subfontsize;
+	nxmpconfig.subfontsize = ini->GetLongValue("Main", "subfontsize");
+	if(nxmpconfig.subfontsize == 0)nxmpconfig.subfontsize = 55;
+	
 	
 	std::string fontcolorstring = "#FFFFFF";
 	const char* fontcolorpv;
@@ -103,10 +93,10 @@ Config::Config(std::string inifile){
 	}
 	int tmpcolors[3];
 	sscanf(fontcolorstring.c_str(),"#%02X%02X%02X",&tmpcolors[0],&tmpcolors[1],&tmpcolors[2]);
-	tmpsubfontcolor[0] = subfontcolor[0] = (float)tmpcolors[0]/255.0f;
-	tmpsubfontcolor[1] = subfontcolor[1] = (float)tmpcolors[1]/255.0f;
-	tmpsubfontcolor[2] = subfontcolor[2] = (float)tmpcolors[2]/255.0f;
-	tmpsubfontcolor[3] = subfontcolor[3] = 1.0f;
+	nxmpconfig.subfontcolor[0] = (float)tmpcolors[0]/255.0f;
+	nxmpconfig.subfontcolor[1] = (float)tmpcolors[1]/255.0f;
+	nxmpconfig.subfontcolor[2] = (float)tmpcolors[2]/255.0f;
+	nxmpconfig.subfontcolor[3] = 1.0f;
 
 	//bordercolor
 	
@@ -121,10 +111,10 @@ Config::Config(std::string inifile){
 	}
 	int tmpcolors2[3];
 	sscanf(fontcolorstring2.c_str(),"#%02X%02X%02X",&tmpcolors2[0],&tmpcolors2[1],&tmpcolors2[2]);
-	tmpsubbordercolor[0] = subbordercolor[0] = (float)tmpcolors2[0]/255.0f;
-	tmpsubbordercolor[1] = subbordercolor[1] = (float)tmpcolors2[1]/255.0f;
-	tmpsubbordercolor[2] = subbordercolor[2] = (float)tmpcolors2[2]/255.0f;
-	tmpsubbordercolor[3] = subbordercolor[3] = 1.0f;
+	nxmpconfig.subbordercolor[0] = (float)tmpcolors2[0]/255.0f;
+	nxmpconfig.subbordercolor[1] = (float)tmpcolors2[1]/255.0f;
+	nxmpconfig.subbordercolor[2] = (float)tmpcolors2[2]/255.0f;
+	nxmpconfig.subbordercolor[3] = 1.0f;
 	//endbordercolor
 	
 	const char* deintpv;
@@ -137,27 +127,25 @@ Config::Config(std::string inifile){
 		deintstring = "no";
 	}
 	
-	if(deintstring == "no")tmpdeint = 0;
-	if(deintstring == "yes")tmpdeint = 1;
-	if(deintstring == "auto")tmpdeint = 2;
-	deint = tmpdeint;
+	if(deintstring == "no")nxmpconfig.deint = 0;
+	if(deintstring == "yes")nxmpconfig.deint = 1;
+	if(deintstring == "auto")nxmpconfig.deint = 2;
 	
 	
 	const char* usedbpv;
 	usedbpv = ini->GetValue("Main", "usedb");
-	dbactive = false;
+	nxmpconfig.dbactive = false;
 	if(usedbpv!= nullptr){
 		std::string usebdstring = usedbpv;
-		if(usebdstring == "yes")dbactive=true;
+		if(usebdstring == "yes")nxmpconfig.dbactive=true;
 	}
-	tmpdbactive = dbactive;
 	
-	startresumeperc = ini->GetLongValue("Main", "startresumeperc");
-	stopresumeperc = ini->GetLongValue("Main", "stopresumeperc");
-	if(startresumeperc == 0)startresumeperc = 5;
-	if(stopresumeperc == 0)stopresumeperc = 5;
-	tmpstartresumeperc = startresumeperc;
-	tmpstopresumeperc = stopresumeperc;
+	nxmpconfig.startresumeperc = ini->GetLongValue("Main", "startresumeperc");
+	nxmpconfig.stopresumeperc = ini->GetLongValue("Main", "stopresumeperc");
+	if(nxmpconfig.startresumeperc == 0)nxmpconfig.startresumeperc = 5;
+	if(nxmpconfig.stopresumeperc == 0)nxmpconfig.stopresumeperc = 5;
+	
+	nxmptmpconfig = nxmpconfig;
 	
 	
 	topmenu.push_back("Local Files");
@@ -230,278 +218,260 @@ std::string Config::getEnigma(){
 
 bool Config::getshowHidden(bool tmpvalue){
 	if(tmpvalue){
-		return tmpshowhidden;
+		return nxmptmpconfig.showhidden;
 	}
-	return showhidden; 
+	return nxmpconfig.showhidden; 
 }
 
 void Config::setshowHidden(bool val){
-	tmpshowhidden = val;
+	nxmptmpconfig.showhidden = val;
 }
 
 bool Config::getTouchEnable(bool tmpvalue){
 	if(tmpvalue){
-		return tmptouchenable;
+		return nxmptmpconfig.touchenable;
 	}
-	return touchenable; 
+	return nxmpconfig.touchenable; 
 }
 void Config::setTouchEnable(bool val){
-	tmptouchenable = val;
+	nxmptmpconfig.touchenable = val;
 }
 
 int Config::getPlayerSwipeSeek(bool tmpvalue){
 	if(tmpvalue){
-		return tmpplayeswipeseek;
+		return nxmptmpconfig.playeswipeseek;
 	}
-	return playeswipeseek; 
+	return nxmpconfig.playeswipeseek; 
 }
 
 void Config::setPlayerSwipeSeek(int val){
-	tmpplayeswipeseek = val;
+	nxmptmpconfig.playeswipeseek = val;
 }
 
 int Config::getLongSeek(bool tmpvalue){
 	if(tmpvalue){
-		return tmplongseek;
+		return nxmptmpconfig.longseek;
 	}
-	return longseek; 
+	return nxmpconfig.longseek; 
 }
 
 int Config::getShortSeek(bool tmpvalue){
 	if(tmpvalue){
-		return tmpshortseek;
+		return nxmptmpconfig.shortseek;
 	}
-	return shortseek;
+	return nxmpconfig.shortseek;
 }
 
 void Config::setLongSeek(int seektime){
-	tmplongseek = seektime;
+	nxmptmpconfig.longseek = seektime;
 }
 void Config::setShortSeek(int seektime){
-	tmpshortseek = seektime;
+	nxmptmpconfig.shortseek = seektime;
 }
 
 bool Config::getUseAlang(bool tmpvalue){
 	if(tmpvalue){
-		return tmpusealang;
+		return nxmptmpconfig.usealang;
 	}
-	return usealang;
+	return nxmpconfig.usealang;
 }
 void Config::setUseAlang(bool _val){
-	tmpusealang = _val;
+	nxmptmpconfig.usealang = _val;
 }
 
 int Config::getAlang(bool tmpvalue){
 	if(tmpvalue){
-		return tmpalang;
+		return nxmptmpconfig.alang;
 	}
-	return alang; 
+	return nxmpconfig.alang; 
 }
 
 void Config::setAlang(int lang){
-	tmpalang = lang;
+	nxmptmpconfig.alang = lang;
 }
 
 //Slang
 bool Config::getUseSlang(bool tmpvalue){
 	if(tmpvalue){
-		return tmpuseslang;
+		return nxmptmpconfig.useslang;
 	}
-	return useslang;
+	return nxmpconfig.useslang;
 }
 void Config::setUseSlang(bool _val){
-	tmpuseslang = _val;
+	nxmptmpconfig.useslang = _val;
 }
 
 int Config::getSlang(bool tmpvalue){
 	if(tmpvalue){
-		return tmpslang;
+		return nxmptmpconfig.slang;
 	}
-	return slang; 
+	return nxmpconfig.slang; 
 }
 
 void Config::setSlang(int lang){
-	tmpslang = lang;
+	nxmptmpconfig.slang = lang;
 }
 //end Slang
 
 bool Config::getUseOc(bool tmpvalue){
 	if(tmpvalue){
-		return tmpuseoc;
+		return nxmptmpconfig.useoc;
 	}
-	return useoc;
+	return nxmpconfig.useoc;
 }
 void Config::setUseOc(bool _val){
-	tmpuseoc = _val;
+	nxmptmpconfig.useoc = _val;
 }
 
 int Config::getSubFontSize(bool tmpvalue){
 	if(tmpvalue){
-		return tmpsubfontsize;
+		return nxmptmpconfig.subfontsize;
 	}
-	return subfontsize; 
+	return nxmpconfig.subfontsize; 
 }
 
 void Config::setSubFontSize(int val){
-	tmpsubfontsize = val;
+	nxmptmpconfig.subfontsize = val;
 }
 
 float * Config::getSubFontColor(bool tmpvalue){
 	if(tmpvalue){
-		return tmpsubfontcolor;
+		return nxmptmpconfig.subfontcolor;
 	}
-	return subfontcolor; 
+	return nxmpconfig.subfontcolor; 
 }
 std::string Config::getSubFontColorHex(bool tmpvalue){
 	char subfontcstr[32];
 	if(tmpvalue){
-		sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)(tmpsubfontcolor[0]*255.0f),(unsigned int)(tmpsubfontcolor[1]*255.0f),(unsigned int)(tmpsubfontcolor[2]*255.0f));
+		sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)(nxmptmpconfig.subfontcolor[0]*255.0f),(unsigned int)(nxmptmpconfig.subfontcolor[1]*255.0f),(unsigned int)(nxmptmpconfig.subfontcolor[2]*255.0f));
 		return std::string(subfontcstr);
 	}
-	sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)(subfontcolor[0]*255.0f),(unsigned int)(subfontcolor[1]*255.0f),(unsigned int)(subfontcolor[2]*255.0f));
+	sprintf(subfontcstr,"#%02X%02X%02X",(unsigned int)(nxmpconfig.subfontcolor[0]*255.0f),(unsigned int)(nxmpconfig.subfontcolor[1]*255.0f),(unsigned int)(nxmpconfig.subfontcolor[2]*255.0f));
 	return std::string(subfontcstr);	
 }
 void Config::setSubFontColor(float  *_color){
-	tmpsubfontcolor[0] = _color[0];
-	tmpsubfontcolor[1] = _color[1];
-	tmpsubfontcolor[2] = _color[2];
+	nxmptmpconfig.subfontcolor[0] = _color[0];
+	nxmptmpconfig.subfontcolor[1] = _color[1];
+	nxmptmpconfig.subfontcolor[2] = _color[2];
 }
 
 //bordercolor
 float * Config::getSubBorderColor(bool tmpvalue){
 	if(tmpvalue){
-		return tmpsubbordercolor;
+		return nxmptmpconfig.subbordercolor;
 	}
-	return subbordercolor; 
+	return nxmpconfig.subbordercolor; 
 }
 std::string Config::getSubBorderColorHex(bool tmpvalue){
 	char subfontcstr2[32];
 	if(tmpvalue){
-		sprintf(subfontcstr2,"#%02X%02X%02X",(unsigned int)(tmpsubbordercolor[0]*255.0f),(unsigned int)(tmpsubbordercolor[1]*255.0f),(unsigned int)(tmpsubbordercolor[2]*255.0f));
+		sprintf(subfontcstr2,"#%02X%02X%02X",(unsigned int)(nxmptmpconfig.subbordercolor[0]*255.0f),(unsigned int)(nxmptmpconfig.subbordercolor[1]*255.0f),(unsigned int)(nxmptmpconfig.subbordercolor[2]*255.0f));
 		return std::string(subfontcstr2);
 	}
-	sprintf(subfontcstr2,"#%02X%02X%02X",(unsigned int)(subbordercolor[0]*255.0f),(unsigned int)(subbordercolor[1]*255.0f),(unsigned int)(subbordercolor[2]*255.0f));
+	sprintf(subfontcstr2,"#%02X%02X%02X",(unsigned int)(nxmpconfig.subbordercolor[0]*255.0f),(unsigned int)(nxmpconfig.subbordercolor[1]*255.0f),(unsigned int)(nxmpconfig.subbordercolor[2]*255.0f));
 	return std::string(subfontcstr2);	
 }
 void Config::setSubBorderColor(float  *_color){
-	tmpsubbordercolor[0] = _color[0];
-	tmpsubbordercolor[1] = _color[1];
-	tmpsubbordercolor[2] = _color[2];
+	nxmptmpconfig.subbordercolor[0] = _color[0];
+	nxmptmpconfig.subbordercolor[1] = _color[1];
+	nxmptmpconfig.subbordercolor[2] = _color[2];
 }
 //endbordercolor
 
 void Config::setDeinterlace(int value){
-	tmpdeint = value;
+	nxmptmpconfig.deint = value;
 }
 
 int Config::getDeinterlace(bool tmpvalue){
 	if(tmpvalue){
-		return tmpdeint;
+		return nxmptmpconfig.deint;
 	}
-	return deint; 
+	return nxmpconfig.deint; 
 }
 
 
 bool Config::getDbActive(bool tmpvalue){
 	if(tmpvalue){
-		return tmpdbactive;
+		return nxmptmpconfig.dbactive;
 	}
-	return dbactive; 
+	return nxmpconfig.dbactive; 
 }
 
 void Config::setDbActive(bool value){
-	tmpdbactive = value;
+	nxmptmpconfig.dbactive = value;
 }
 
 int Config::getResumeStartPerc(bool tmpvalue){
 	if(tmpvalue){
-		return tmpstartresumeperc;
+		return nxmptmpconfig.startresumeperc;
 	}
-	return startresumeperc;
+	return nxmpconfig.startresumeperc;
 }
 void Config::setResumeStartPerc(int value){
-	tmpstartresumeperc = value;
+	nxmptmpconfig.startresumeperc = value;
 }
 
 int Config::getResumeStopPerc(bool tmpvalue){
 	if(tmpvalue){
-		return tmpstopresumeperc;
+		return nxmptmpconfig.stopresumeperc;
 	}
-	return stopresumeperc;
+	return nxmpconfig.stopresumeperc;
 }
 void Config::setResumeStopPerc(int value){
-	tmpstopresumeperc = value;
+	nxmptmpconfig.stopresumeperc = value;
+}
+
+std::string Config::getThemeName(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.themename;
+	}
+	return nxmpconfig.themename;
+}
+
+void Config::setThemeName(std::string value){
+	nxmptmpconfig.themename = value;
 }
 
 void Config::saveSettings(){
 	
 	
-	showhidden = tmpshowhidden;
-	touchenable = tmptouchenable;
-	playeswipeseek = tmpplayeswipeseek;
-	longseek = tmplongseek;
-	shortseek = tmpshortseek;
-	usealang = tmpusealang;
-	//slang
-	useslang = tmpuseslang;
-	//end slang
-
-	useoc = tmpuseoc;
-
-	subfontsize = tmpsubfontsize;
-	deint = tmpdeint;
-	dbactive = tmpdbactive;
-	
-	startresumeperc = tmpstartresumeperc;
-	stopresumeperc = tmpstopresumeperc;
-	
-	subfontcolor[0] = tmpsubfontcolor[0];
-	subfontcolor[1] = tmpsubfontcolor[1];
-	subfontcolor[2] = tmpsubfontcolor[2];
-	
-	//bordercolor
-	subbordercolor[0] = tmpsubbordercolor[0];
-	subbordercolor[1] = tmpsubbordercolor[1];
-	subbordercolor[2] = tmpsubbordercolor[2];
-	//endbordercolor
-
-	themename = tmpthemename;
+	nxmpconfig = nxmptmpconfig;
 	
 	
 	ini->Delete("Main", "showhidden");
-	ini->SetBoolValue("Main", "showhidden",showhidden,NULL,false);
+	ini->SetBoolValue("Main", "showhidden",nxmpconfig.showhidden,NULL,false);
 	
 	
 	ini->Delete("Main", "touchenable");
-	ini->SetBoolValue("Main", "touchenable",touchenable,NULL,false);
+	ini->SetBoolValue("Main", "touchenable",nxmpconfig.touchenable,NULL,false);
 	
 	ini->Delete("Main", "playeswipeseek");
-	ini->SetLongValue("Main", "playeswipeseek",playeswipeseek,NULL,false);
+	ini->SetLongValue("Main", "playeswipeseek",nxmpconfig.playeswipeseek,NULL,false);
 	
 	ini->Delete("Main", "shortseek");
-	ini->SetLongValue("Main", "shortseek", shortseek, NULL, false);
+	ini->SetLongValue("Main", "shortseek", nxmpconfig.shortseek, NULL, false);
 	ini->Delete("Main", "longseek");
-	ini->SetLongValue("Main", "longseek", longseek, NULL, false);
+	ini->SetLongValue("Main", "longseek", nxmpconfig.longseek, NULL, false);
 	
 	ini->Delete("Main", "usealang");
-	ini->SetBoolValue("Main", "usealang", usealang, NULL, false);
+	ini->SetBoolValue("Main", "usealang", nxmpconfig.usealang, NULL, false);
 	
 	ini->Delete("Main", "alang");
-	ini->SetValue("Main", "alang", Utility::getLanguages()[tmpalang].lang3.c_str());
+	ini->SetValue("Main", "alang", Utility::getLanguages()[nxmpconfig.alang].lang3.c_str());
 	
 	//slang
 	ini->Delete("Main", "useslang");
-	ini->SetBoolValue("Main", "useslang", useslang, NULL, false);
+	ini->SetBoolValue("Main", "useslang", nxmpconfig.useslang, NULL, false);
 	
 	ini->Delete("Main", "slang");
-	ini->SetValue("Main", "slang", Utility::getLanguages()[tmpslang].lang3.c_str());
+	ini->SetValue("Main", "slang", Utility::getLanguages()[nxmpconfig.slang].lang3.c_str());
 	//end slang
 
 	ini->Delete("Main", "useoc");
-	ini->SetBoolValue("Main", "useoc", useoc, NULL, false);
+	ini->SetBoolValue("Main", "useoc", nxmpconfig.useoc, NULL, false);
 
 	ini->Delete("Main", "subfontsize");
-	ini->SetLongValue("Main", "subfontsize", subfontsize, NULL, false);
+	ini->SetLongValue("Main", "subfontsize", nxmpconfig.subfontsize, NULL, false);
 	
 	//Fix Save color.
 	ini->Delete("Main", "subfontcolor");
@@ -514,32 +484,20 @@ void Config::saveSettings(){
     //end Fix Save Color
 	std::vector<std::string> deintopts = {"no","yes","auto"};
 	ini->Delete("Main", "deinterlace");
-	ini->SetValue("Main", "deinterlace", deintopts[deint].c_str());
+	ini->SetValue("Main", "deinterlace", deintopts[nxmpconfig.deint].c_str());
 	std::vector<std::string> usedbintopts = {"no","yes"};
 	ini->Delete("Main", "usedb");
-	ini->SetValue("Main", "usedb", usedbintopts[dbactive].c_str());
+	ini->SetValue("Main", "usedb", usedbintopts[nxmpconfig.dbactive].c_str());
 	
 	ini->Delete("Main", "startresumeperc");
-	ini->SetLongValue("Main", "startresumeperc", startresumeperc, NULL, false);
+	ini->SetLongValue("Main", "startresumeperc", nxmpconfig.startresumeperc, NULL, false);
 	ini->Delete("Main", "stopresumeperc");
-	ini->SetLongValue("Main", "stopresumeperc", stopresumeperc, NULL, false);
+	ini->SetLongValue("Main", "stopresumeperc", nxmpconfig.stopresumeperc, NULL, false);
 	
 	ini->Delete("Main", "theme");
-	ini->SetValue("Main", "theme", themename.c_str());
+	ini->SetValue("Main", "theme", nxmpconfig.themename.c_str());
 	
 	std::string data;
 	ini->Save(data);
 	ini->SaveFile(inifilePath.c_str());
 }
-
-std::string Config::getThemeName(bool tmpvalue){
-	if(tmpvalue){
-		return tmpthemename;
-	}
-	return themename;
-}
-
-void Config::setThemeName(std::string value){
-	tmpthemename = value;
-}
-
