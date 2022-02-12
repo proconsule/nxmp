@@ -431,7 +431,7 @@ namespace Windows {
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		static unsigned int lastfocus = 0;
 		
-        if (ImGui::Begin("SSH Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+        if (ImGui::Begin("NFS Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
             if(item.popupstate == POPUP_STATE_NONE){
 				ImGui::SetNextWindowFocus();
 			}
@@ -442,7 +442,7 @@ namespace Windows {
 			}
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
-			if (ImGui::BeginListBox("SSH Browser Menu",ImVec2(total_w, total_h))){
+			if (ImGui::BeginListBox("NFS Browser Menu",ImVec2(total_w, total_h))){
 				
 				urlschema thisurl = Utility::parseUrl(nfsdir->getUrl());
 				std::vector<FS::FileEntry> thislist = nfsdir->getCurrList();
