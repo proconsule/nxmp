@@ -575,7 +575,7 @@ namespace Windows {
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		static unsigned int lastfocus = 0;
 		
-        if (ImGui::Begin("SSH Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+        if (ImGui::Begin("SMB Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
             if(item.popupstate == POPUP_STATE_NONE){
 				ImGui::SetNextWindowFocus();
 			}
