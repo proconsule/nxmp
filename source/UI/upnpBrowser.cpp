@@ -53,7 +53,7 @@ namespace Windows {
 				ImGui::EndListBox();	
 			
 			} else {
-				if (ImGui::BeginListBox("USB Browser Menu",ImVec2(total_w, total_h))){
+				if (ImGui::BeginListBox("UPNP Browser Menu",ImVec2(total_w, total_h))){
 					bool triggerselect = false;
 					int total_w = ImGui::GetContentRegionAvail().x;
 					static int selected = -1;	
