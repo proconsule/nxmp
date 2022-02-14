@@ -603,7 +603,7 @@ namespace playerWindows{
 					ignorestyleidx = 0;
 					drag_fontscale = 1.0f;
 					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek 0");
-					libmpv->setSubScaleSize(drag_fontscale,item.playershowcontrols);
+					libmpv->setSubScaleSize(drag_fontscale,false);
 					libmpv->setShadowOffset(drag_shadowposition,false);
 					libmpv->setShadowIntensity(drag_shadowintensity,false);
 					libmpv->setSubBorderSize(drag_subfontbordersize,false);
