@@ -115,7 +115,7 @@ namespace Windows {
 						if(topmenu[n] == "Stream Url"){
 					//i need move this, work in progress.
 						std::string namefile = "Streaming from Url...";
-						std::string received = Utility::KeyboardCall ("Write the Url to start the transmission\n(Fembed, Bitly or Direct URL...)", "");
+						std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, Bitly or Direct URL...)", "");
 						
 						curlDownloader Scraper;
                         
