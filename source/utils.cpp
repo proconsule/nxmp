@@ -426,6 +426,13 @@ namespace Utility{
 		return retpath + std::string("...");
 	}
 	
+	void replace(std::string& subject, const std::string& search, const std::string& replace) {
+	size_t pos = 0;
+	while ((pos = subject.find(search, pos)) != std::string::npos) {
+		subject.replace(pos, search.length(), replace);
+		pos += replace.length();
+	}
+}
 //testing keyboard
 #ifdef __SWITCH__
 SwkbdTextCheckResult Keyboard_ValidateText(char *string, size_t size) {

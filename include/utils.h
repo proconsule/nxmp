@@ -58,6 +58,7 @@ namespace Utility{
 	std::vector<lang_code_struct> getLanguages();
 	int getLanguagesIdx(std::string lang);
 
+	void replace(std::string& subject, const std::string& search,const std::string& replace);
 	std::string KeyboardCall (std::string hint="", std::string text="");
 	std::string ltrim(const std::string &s);
 	std::string rtrim(const std::string &s);

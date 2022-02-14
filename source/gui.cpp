@@ -292,7 +292,9 @@ namespace GUI {
 				if (event.type == SDL_JOYBUTTONDOWN) {
 					
 					Uint8 button = event.jbutton.button;
-					if (button == SDL_KEY_PLUS && !item.masterlock)
+					//I changed the close to the minus button, because the Keyboard applet uses the + by default to confirm, 
+					//and if you press + to confirm it conflicts with this, and as a result the app crashes
+					if (button == SDL_KEY_MINUS && !item.masterlock)
 						renderloopdone = true;
 					
 					

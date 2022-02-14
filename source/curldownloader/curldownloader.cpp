@@ -22,6 +22,12 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
   return realsize;
 }
 
+static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+}
+
 curlDownloader::curlDownloader(){
 	
 }
@@ -49,6 +55,31 @@ void curlDownloader::Download(char * url ,MemoryStruct * chunk){
 	}
 	curl_easy_cleanup(curl_handle);
 	curl_global_cleanup();
+}
+
+std::string curlDownloader::scrapeHtml(std::string myurl, std::string postcode, bool needpost)
+{
+	 CURL *curl;
+  CURLcode res;
+  std::string readBuffer;
+
+  curl = curl_easy_init();
+  if(curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
+	if (needpost == true)
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postcode.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36");
+    res = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+
+    std::cout << readBuffer << std::endl;
+  }
+	return readBuffer;
 }
 
 SOAPcurlDownloader::SOAPcurlDownloader(){
