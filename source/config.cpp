@@ -152,6 +152,7 @@ Config::Config(std::string inifile){
 #ifdef NXMP_USBSUPPORT
 	topmenu.push_back("USB");
 #endif
+	topmenu.push_back("Stream Url");
 #ifdef NXMP_NETWORKSUPPORT
 	ini->GetAllValues("Network", "source", values);
 	if(getNetworks().size() != 0){

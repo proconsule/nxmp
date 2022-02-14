@@ -6,7 +6,6 @@
 #include "localfiles.h"
 #include "Enigma2.h"
 
-
 namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupMainWindow();
@@ -32,6 +31,9 @@ namespace Windows {
 					}
 					else if(topmenu[n] == "Playlist"){
 						ImGui::Image((void*)(intptr_t)nxmpicons.PlaylistTexture.id, ImVec2(50,50));
+					}
+					else if(topmenu[n] == "Stream Url"){
+						ImGui::Image((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Info"){
 						ImGui::Image((void*)(intptr_t)nxmpicons.InfoTexture.id, ImVec2(50,50));
@@ -108,6 +110,13 @@ namespace Windows {
 						}
 						if(topmenu[n] == "Exit"){
 							renderloopdone = true;
+						}
+						if(topmenu[n] == "Stream Url"){
+							//i need move this, work in progress.
+						std::string received = Utility::KeyboardCall ("Write the URL of the Video Stream", "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+						
+						if(received.find("http") != std::string::npos)
+							libmpv->loadFile(received);
 						}
 					}
 					ImGui::SameLine();
