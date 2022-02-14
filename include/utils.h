@@ -6,13 +6,17 @@
 #include <sstream>    
 #include <iomanip>
 #include <regex>
-/*
-#include <switch.h>
-*/
 #include <remotefs.h>
 
 #include <glad/glad.h>
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <malloc.h>
 
 typedef struct {
     GLuint id = 0;
@@ -53,7 +57,9 @@ namespace Utility{
 	std::string str_tolower(std::string s);
 	std::vector<lang_code_struct> getLanguages();
 	int getLanguagesIdx(std::string lang);
-	
+
+	void replace(std::string& subject, const std::string& search,const std::string& replace);
+	std::string KeyboardCall (std::string hint="", std::string text="");
 	std::string ltrim(const std::string &s);
 	std::string rtrim(const std::string &s);
 	std::string trim(const std::string &s);

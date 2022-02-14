@@ -5,7 +5,7 @@
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
-
+#include "curldownloader.h"
 
 namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
@@ -32,6 +32,9 @@ namespace Windows {
 					}
 					else if(topmenu[n] == "Playlist"){
 						ImGui::Image((void*)(intptr_t)nxmpicons.PlaylistTexture.id, ImVec2(50,50));
+					}
+					else if(topmenu[n] == "Stream Url"){
+						ImGui::Image((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Info"){
 						ImGui::Image((void*)(intptr_t)nxmpicons.InfoTexture.id, ImVec2(50,50));
@@ -109,6 +112,33 @@ namespace Windows {
 						if(topmenu[n] == "Exit"){
 							renderloopdone = true;
 						}
+						if(topmenu[n] == "Stream Url"){
+					//i need move this, work in progress.
+						std::string namefile = "Streaming from Url...";
+						std::string received = Utility::KeyboardCall ("Write the URL of the Video Stream", "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4");
+						
+						curlDownloader Scraper;
+						
+						if (received.find("https://www.fembed.com/v/") != std::string::npos || received.find("https://embedsito.com/v/") != std::string::npos)
+						{
+						namefile = "Streaming from Fembed...";
+						Utility::replace(received,"https://www.fembed.com/v/","https://www.fembed.com/api/source/");
+						Utility::replace(received,"https://embedsito.com/v/","https://www.fembed.com/api/source/");
+						std::string htmlcode = Scraper.scrapeHtml(received, "", true);
+                       
+						int tempValue1 = htmlcode.rfind("https:");
+						int tempValue2 = htmlcode.find("\"",tempValue1);
+						received = htmlcode.substr(tempValue1,tempValue2 - tempValue1);
+						Utility::replace(received,"\\/","/");
+						std::cout << received << std::endl;
+						}
+						
+						if(received.find("http") != std::string::npos)
+						libmpv->loadFileLive(received,namefile.c_str());
+					//i need move this, work in progress.
+						}
+
+
 					}
 					ImGui::SameLine();
 					ImGui::Text("%s",topmenu[n].c_str());

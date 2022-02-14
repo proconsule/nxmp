@@ -425,5 +425,67 @@ namespace Utility{
 		std::string retpath = path.substr(0,len);
 		return retpath + std::string("...");
 	}
+	
+	void replace(std::string& subject, const std::string& search, const std::string& replace) {
+	size_t pos = 0;
+	while ((pos = subject.find(search, pos)) != std::string::npos) {
+		subject.replace(pos, search.length(), replace);
+		pos += replace.length();
+	}
+}
+//testing keyboard
+#ifdef __SWITCH__
+SwkbdTextCheckResult Keyboard_ValidateText(char *string, size_t size) {
+	if (strcmp(string, "") == 0) {
+		strncpy(string, "Please write a URL!", size);
+		return SwkbdTextCheckResult_Bad;
+	}
+
+	return SwkbdTextCheckResult_OK;
+}
+#endif
+std::string KeyboardCall (std::string hint, std::string text){
+	#ifdef __SWITCH__
+	Result ret = 0;
+	SwkbdConfig swkbd;
+	static char input_string[512];
+
+	if (R_FAILED(ret = swkbdCreate(&swkbd, 64))) {
+		swkbdClose(&swkbd);
+		return "";
+	}
+	
+	swkbdConfigMakePresetDefault(&swkbd);
+	swkbdConfigSetInitialCursorPos (&swkbd, 0);
+	swkbdConfigSetOkButtonText(&swkbd,"Buscar");
+	if (hint == "Write the URL of the Video Stream") {
+		swkbdConfigSetHeaderText(&swkbd, "NXMP Stream URL");
+		swkbdConfigSetSubText(&swkbd, "Write the URL of the Video Stream");
+		swkbdConfigSetStringLenMax(&swkbd, 512);
+	}
+
+	if (strlen(hint.c_str()) != 0)
+		swkbdConfigSetGuideText(&swkbd, hint.c_str());
+
+	if (strlen(text.c_str()) != 0)
+		swkbdConfigSetInitialText(&swkbd, text.c_str());
+	
+	swkbdConfigSetTextCheckCallback(&swkbd, Keyboard_ValidateText);
+
+	if (R_FAILED(ret = swkbdShow(&swkbd, input_string, sizeof(input_string)))) {
+		swkbdClose(&swkbd);
+		return "";
+	}
+
+	swkbdClose(&swkbd);
+
+	char *buf = (char*)malloc(512);
+	strcpy(buf, input_string);
+	return std::string(buf);
+	#else
+	return "";
+	#endif
+}
+
 		
 }
