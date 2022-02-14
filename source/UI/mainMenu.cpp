@@ -115,7 +115,7 @@ namespace Windows {
 						if(topmenu[n] == "Stream Url"){
 					//i need move this, work in progress.
 						std::string namefile = "Streaming from Url...";
-						std::string received = Utility::KeyboardCall ("Write the URL of the Video Stream", "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4");
+						std::string received = Utility::KeyboardCall ("Write the URL of the Video Stream", "");
 						
 						curlDownloader Scraper;
 						
