@@ -458,11 +458,10 @@ std::string KeyboardCall (std::string hint, std::string text){
 	swkbdConfigMakePresetDefault(&swkbd);
 	swkbdConfigSetInitialCursorPos (&swkbd, 0);
 	swkbdConfigSetOkButtonText(&swkbd,"Buscar");
-	if (hint == "Write the URL of the Video Stream") {
-		swkbdConfigSetHeaderText(&swkbd, "NXMP Stream URL");
-		swkbdConfigSetSubText(&swkbd, "Write the URL of the Video Stream");
-		swkbdConfigSetStringLenMax(&swkbd, 512);
-	}
+	swkbdConfigSetHeaderText(&swkbd, "NXMP Stream URL");
+	swkbdConfigSetSubText(&swkbd, hint.c_str());
+	swkbdConfigSetStringLenMax(&swkbd, 512);
+	
 
 	if (strlen(hint.c_str()) != 0)
 		swkbdConfigSetGuideText(&swkbd, hint.c_str());
