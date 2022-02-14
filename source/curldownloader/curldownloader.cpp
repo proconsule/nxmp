@@ -82,6 +82,51 @@ std::string curlDownloader::scrapeHtml(std::string myurl, std::string postcode, 
 	return readBuffer;
 }
 
+std::string curlDownloader::getRedirection(std::string myurl)
+{
+CURL *curl;
+  CURLcode res;
+  char *location;
+  long response_code;
+ std::string tempresult = myurl;
+  curl = curl_easy_init();
+  if(curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
+
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36");
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
+ 
+    /* Perform the request, res will get the return code */
+    res = curl_easy_perform(curl);
+    /* Check for errors */
+    if(res != CURLE_OK)
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",
+              curl_easy_strerror(res));
+    else {
+      res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+      if((res == CURLE_OK) &&
+         ((response_code / 100) != 3)) {
+        /* a redirect implies a 3xx response code */
+        fprintf(stderr, "Not a redirect.\n");
+      }
+      else {
+        res = curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &location);
+ 
+        if((res == CURLE_OK) && location) {
+          /* This is the new absolute URL that you could redirect to, even if
+           * the Location: response header may have been a relative URL. */
+          printf("Redirected to: %s\n", location);
+		  tempresult = std::string(location);
+        }
+      }
+    }
+ 
+    /* always cleanup */
+    curl_easy_cleanup(curl);
+  }
+  return tempresult;
+}
+
 SOAPcurlDownloader::SOAPcurlDownloader(){
 	
 	

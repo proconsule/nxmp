@@ -115,13 +115,15 @@ namespace Windows {
 						if(topmenu[n] == "Stream Url"){
 					//i need move this, work in progress.
 						std::string namefile = "Streaming from Url...";
-						std::string received = Utility::KeyboardCall ("Write the URL of the Video Stream", "");
+						std::string received = Utility::KeyboardCall ("Write the Url to start the transmission\n(Fembed, Bitly or Direct URL...)", "");
 						
 						curlDownloader Scraper;
-						
-						if (received.find("https://www.fembed.com/v/") != std::string::npos || received.find("https://embedsito.com/v/") != std::string::npos)
+                        
+						if (received.find("https://www.fembed.com/v/") != std::string::npos || received.find("https://embedsito.com/v/") != std::string::npos || received.find("https://suzihaza.com/v/") != std::string::npos)
 						{
 						namefile = "Streaming from Fembed...";
+
+						Utility::replace(received,"https://suzihaza.com/v/","https://www.fembed.com/api/source/");
 						Utility::replace(received,"https://www.fembed.com/v/","https://www.fembed.com/api/source/");
 						Utility::replace(received,"https://embedsito.com/v/","https://www.fembed.com/api/source/");
 						std::string htmlcode = Scraper.scrapeHtml(received, "", true);
@@ -133,8 +135,15 @@ namespace Windows {
 						std::cout << received << std::endl;
 						}
 						
+
 						if(received.find("http") != std::string::npos)
+						{
+						//if the response from the address does not arrive within 5 seconds, it sends the direct link.
+						received = Scraper.getRedirection(received);
+
+						std::cout << "This: "<< received.c_str() << std::endl;
 						libmpv->loadFileLive(received,namefile.c_str());
+						}
 					//i need move this, work in progress.
 						}
 

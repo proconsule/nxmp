@@ -18,6 +18,7 @@ public:
 	curlDownloader();
 	void Download(char * url ,MemoryStruct * chunk);
 	std::string scrapeHtml (std::string myurl, std::string postcode, bool needpost);
+	std::string getRedirection (std::string myurl);
 	
 };
 
