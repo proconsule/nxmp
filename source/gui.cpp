@@ -378,7 +378,9 @@ namespace GUI {
 							toggleOC();
 						}
 					}
-					if (button == SDL_KEY_MINUS){
+					//exchanged the minus for the plus.
+					//to avoid the crash of the integrated keyboard.
+					if (button == SDL_KEY_PLUS){
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							item.state = item.laststate;
 						}else if(item.state != MENU_STATE_PLAYER && !libmpv->Stopped()){
