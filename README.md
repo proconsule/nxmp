@@ -46,12 +46,12 @@ Buttons Mapping
 - Y Main Menu
 - X show OSD (during playback)
 - R L ZR ZL (seek +/-  during playback)
-- \+ Exit NXMP
+- \- Exit NXMP
 - R Stick Button Toggle Masterlock (during playback, only A button will work)
 - Dpad Right (during playback show/hide right menu)
 - Dpad Down (during playback show/hide player UI)
 - R Stick Up/Down Fast Scroll on file list (Volume Control During Playback)
-- \- Show file selection during playback
+- \+ Show file selection during playback
 
 
 FAQ
