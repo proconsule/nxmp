@@ -172,7 +172,12 @@ namespace GUI {
 						
 					}
 					
-					
+					if(keycode == 43){
+						SDL_Event sdlevent;
+						sdlevent.type = SDL_JOYBUTTONDOWN;
+						sdlevent.jbutton.button = SDL_KEY_PLUS;
+						SDL_PushEvent(&sdlevent);
+					}
 					if(keycode == 45){
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_JOYBUTTONDOWN;
@@ -180,15 +185,10 @@ namespace GUI {
 						SDL_PushEvent(&sdlevent);
 					}
 					if(keycode == SDLK_t){
-						Themes *themes = new Themes();
-						themes->setTheme("./themes/test1/");
-						delete themes;
+						
 					}
 					if(keycode == SDLK_e){
-						Themes *themes = new Themes();
-						themes->getThemes();
-						themes->setDefault();
-						delete themes;
+						
 					}
 					
 					
@@ -199,8 +199,8 @@ namespace GUI {
 						isMouseSelection = true;
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_FINGERDOWN ;
-						sdlevent.tfinger.x = event.motion.x/1280.0f;
-						sdlevent.tfinger.y = event.motion.y/720.0f;
+						sdlevent.tfinger.x = event.motion.x/(float)newResW;
+						sdlevent.tfinger.y = event.motion.y/(float)newResH;
 						startMousex = event.motion.x;
 						startMousey = event.motion.y;
 						SDL_PushEvent(&sdlevent);
@@ -211,10 +211,10 @@ namespace GUI {
 					if( isMouseSelection) {
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_FINGERMOTION ;
-						sdlevent.tfinger.x = event.motion.x/1280.0f;
-						sdlevent.tfinger.y = event.motion.y/720.0f;
-						float startfloatMousex = startMousex/1280.0f;
-						float startfloatMousey = startMousey/720.0f;
+						sdlevent.tfinger.x = event.motion.x/(float)newResW;
+						sdlevent.tfinger.y = event.motion.y/(float)newResH;
+						float startfloatMousex = startMousex/(float)newResW;
+						float startfloatMousey = startMousey/(float)newResH;
 						sdlevent.tfinger.dx = sdlevent.tfinger.x-startfloatMousex;
 						sdlevent.tfinger.dy = sdlevent.tfinger.y-startfloatMousey;
 						
@@ -228,8 +228,8 @@ namespace GUI {
 						isMouseSelection = false;
 						SDL_Event sdlevent;
 						sdlevent.type = SDL_FINGERUP ;
-						sdlevent.tfinger.x = event.motion.x/1280.0f;
-						sdlevent.tfinger.y = event.motion.y/720.0f;
+						sdlevent.tfinger.x = event.motion.x/(float)newResW;
+						sdlevent.tfinger.y = event.motion.y/(float)newResH;
 						startMousex = 0;
 						startMousey = 0;
 						SDL_PushEvent(&sdlevent);
