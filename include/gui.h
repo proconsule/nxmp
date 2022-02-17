@@ -244,6 +244,7 @@ extern int newResH;
 extern float multiplyRes;
 extern bool isHandheld;
 extern bool clockoc;
+extern std::string tempKbUrl;
 extern SDL_GLContext context;
 /*
 extern Tex SdCardTexture;

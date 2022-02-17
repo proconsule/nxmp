@@ -57,7 +57,7 @@ void curlDownloader::Download(char * url ,MemoryStruct * chunk){
 	curl_global_cleanup();
 }
 
-std::string curlDownloader::scrapeHtml(std::string myurl, std::string postcode, bool needpost)
+std::string curlDownloader::scrapeHtml(std::string myurl, std::string postcode, bool needpost, std::string referer, bool needreferer)
 {
 	 CURL *curl;
   CURLcode res;
@@ -68,8 +68,10 @@ std::string curlDownloader::scrapeHtml(std::string myurl, std::string postcode, 
     curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
 	if (needpost == true)
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postcode.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+  if (needreferer == true)
+  curl_easy_setopt(curl, CURLOPT_REFERER, referer.c_str());
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -77,12 +79,11 @@ std::string curlDownloader::scrapeHtml(std::string myurl, std::string postcode, 
     res = curl_easy_perform(curl);
     curl_easy_cleanup(curl);
 
-    std::cout << readBuffer << std::endl;
   }
 	return readBuffer;
 }
 
-std::string curlDownloader::getRedirection(std::string myurl)
+std::string curlDownloader::getRedirection(std::string myurl, std::string postcode, bool needpost, std::string referer, bool needreferer)
 {
 CURL *curl;
   CURLcode res;
@@ -91,10 +92,13 @@ CURL *curl;
  std::string tempresult = myurl;
   curl = curl_easy_init();
   if(curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
-
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36");
-    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
+  curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
+  if (needpost == true)
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postcode.c_str());
+  if (needreferer == true)
+  curl_easy_setopt(curl, CURLOPT_REFERER, referer.c_str());
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36");
+  curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
  
     /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
@@ -121,8 +125,8 @@ CURL *curl;
       }
     }
  
-    /* always cleanup */
-    curl_easy_cleanup(curl);
+  /* always cleanup */
+  curl_easy_cleanup(curl);
   }
   return tempresult;
 }
