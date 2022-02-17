@@ -138,11 +138,11 @@ namespace Windows {
 						std::cout << received << std::endl;
 						}
 						
-						if (received.find("https://jkanime.net/") != std::string::npos)
+						/*if (received.find("https://jkanime.net/") != std::string::npos)
 						{
 						namefile = "Streaming from JKAnime...";
-						//received = Utility::Nozomi_Link(received);
-						}
+						received = Utility::Nozomi_Link(received);
+						}*/
 						
 						if (received.find("https://bit.ly/") != std::string::npos)
 						{//if the response from the address does not arrive within 5 seconds, it sends the direct link.
