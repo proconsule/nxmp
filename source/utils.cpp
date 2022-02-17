@@ -467,7 +467,10 @@ namespace Utility{
 std::string Nozomi_Link(std::string Link){
 	curlDownloader jkObj;
 	std::string jklink = jkObj.scrapeHtml(Link,"",false,"https://jkanime.net/",true);
-	Link = scrapElement(jklink,"https://jkanime.net/um2.php?", "\"");
+	Link = scrapElement(jklink,"https://jkanime.net/jkfembed.php?u=", "\"");
+	replace(Link,"https://jkanime.net/jkfembed.php?u=","https://embedsito.com/v/");
+	return Link;
+	/*Link = scrapElement(jklink,"https://jkanime.net/um2.php?", "\"");
 	std::string codetemp;
 	//Get FirstKey
 	std::string FirstKey = jkObj.scrapeHtml(Link,"",false,"https://jkanime.net/",true);
@@ -488,7 +491,7 @@ std::string Nozomi_Link(std::string Link){
 	ThirdKey = codetemp;
 	//std::cout << "ThirdKey: "<< ThirdKey << std::endl;
 	//return URL
-	return ThirdKey;
+	return ThirdKey;*/
 }
 
 
