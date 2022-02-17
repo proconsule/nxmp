@@ -116,8 +116,8 @@ namespace Windows {
 					//i need move this, work in progress.
 					    
 						std::string namefile = "Streaming from Url...";
-						//std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", tempKbUrl);
-						std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", "https://jkanime.net/koroshi-ai/6/");
+						std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", tempKbUrl);
+						//std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", "https://jkanime.net/koroshi-ai/6/");
 						
 						tempKbUrl = received;
 						curlDownloader Scraper;
