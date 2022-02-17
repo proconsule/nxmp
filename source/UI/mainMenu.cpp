@@ -117,11 +117,20 @@ namespace Windows {
 					    
 						std::string namefile = "Streaming from Url...";
 						std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", tempKbUrl);
-						//std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", "https://jkanime.net/koroshi-ai/6/");
 						
 						tempKbUrl = received;
 						curlDownloader Scraper;
                         
+						if (received.find("https://bit.ly/") != std::string::npos)
+						{//if the response from the address does not arrive within 5 seconds, it sends the direct link.
+						received = Scraper.getRedirection(received,"",false,"",false);}
+
+						if (received.find("https://jkanime.net/") != std::string::npos)
+						{
+						namefile = "Streaming from JKAnime...";
+						received = Utility::Nozomi_Link(received);
+						}
+
 						if (received.find("https://www.fembed.com/v/") != std::string::npos || received.find("https://embedsito.com/v/") != std::string::npos || received.find("https://suzihaza.com/v/") != std::string::npos)
 						{
 						namefile = "Streaming from Fembed...";
@@ -137,16 +146,7 @@ namespace Windows {
 						Utility::replace(received,"\\/","/");
 						std::cout << received << std::endl;
 						}
-						
-						/*if (received.find("https://jkanime.net/") != std::string::npos)
-						{
-						namefile = "Streaming from JKAnime...";
-						received = Utility::Nozomi_Link(received);
-						}*/
-						
-						if (received.find("https://bit.ly/") != std::string::npos)
-						{//if the response from the address does not arrive within 5 seconds, it sends the direct link.
-						received = Scraper.getRedirection(received,"",false,"",false);}
+
 						if(received.find("http") != std::string::npos)
 						{
 						std::cout << "This: "<< received.c_str() << std::endl;
