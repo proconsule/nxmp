@@ -431,8 +431,67 @@ namespace Utility{
 	while ((pos = subject.find(search, pos)) != std::string::npos) {
 		subject.replace(pos, search.length(), replace);
 		pos += replace.length();
+		}
 	}
+	
+	std::string scrapElement(std::string content, std::string get,std::string delim){
+	std::string Element = "";
+	if(content.length() <= 0)
+	{return Element;}
+
+	int val1 = 0, val2 = 0;
+	val1 = content.find(get);
+
+	if (val1 != -1)
+	{
+		std::string elmetTMP;
+		if(delim.length())
+			elmetTMP = delim;
+		else{
+			elmetTMP = content.substr(val1-1, 1);
+			replace(elmetTMP, ">","<");
+			replace(elmetTMP, "{","}");
+			replace(elmetTMP, "[","]");
+			replace(elmetTMP, "(",")");
+		}
+		val2 = content.find(elmetTMP, val1+get.length()+1);
+
+		Element = content.substr(val1, val2 - val1);
+		replace(Element, "\\", "");
+
+		//std::cout << Element << std::endl;
+	}
+	return Element;
+	}
+
+std::string Nozomi_Link(std::string Link){
+	curlDownloader jkObj;
+	std::string jklink = jkObj.scrapeHtml(Link,"",false,"https://jkanime.net/",true);
+	Link = scrapElement(jklink,"https://jkanime.net/um2.php?", "\"");
+	std::string codetemp;
+	//Get FirstKey
+	std::string FirstKey = jkObj.scrapeHtml(Link,"",false,"https://jkanime.net/",true);
+	codetemp = scrapElement(FirstKey,"name=\"data\" value=\"", "\"");
+	replace(codetemp,"name=\"data\" value=\"","");
+	FirstKey = codetemp;
+	//std::cout << "FirstKey: "<< FirstKey << std::endl;
+	//Get SecondKey
+	std::string data = "data=" + FirstKey;
+	std::string SecondKey = jkObj.getRedirection("https://jkanime.net/gsplay/redirect_post.php",data,true,"https://jkanime.net/",true);
+	//std::cout << "Secondkey: "<< SecondKey << std::endl;
+	//Get ThirdKey
+	std::string second = "v=" + SecondKey;
+	replace(second,"https://jkanime.net/gsplay/player.html#","");
+	std::string ThirdKey = jkObj.scrapeHtml("https://jkanime.net/gsplay/api.php",second,true,"https://jkanime.net/",true);
+	codetemp = scrapElement(ThirdKey,"https:", "\"");
+	replace(codetemp,"\\","");
+	ThirdKey = codetemp;
+	//std::cout << "ThirdKey: "<< ThirdKey << std::endl;
+	//return URL
+	return ThirdKey;
 }
+
+
 //testing keyboard
 #ifdef __SWITCH__
 SwkbdTextCheckResult Keyboard_ValidateText(char *string, size_t size) {

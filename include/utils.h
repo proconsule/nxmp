@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <regex>
 #include <remotefs.h>
+#include "curldownloader.h"
 
 #include <glad/glad.h>
 #ifdef __SWITCH__
@@ -59,7 +60,9 @@ namespace Utility{
 	int getLanguagesIdx(std::string lang);
 
 	void replace(std::string& subject, const std::string& search,const std::string& replace);
+	std::string scrapElement(std::string content, std::string get,std::string delim);
 	std::string KeyboardCall (std::string hint="", std::string text="");
+	std::string Nozomi_Link(std::string Link);
 	std::string ltrim(const std::string &s);
 	std::string rtrim(const std::string &s);
 	std::string trim(const std::string &s);
