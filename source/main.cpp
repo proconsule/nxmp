@@ -109,6 +109,7 @@ int newResW = 1280;
 int newResH = 720;
 float multiplyRes = 1.0f;
 float initScale = 1.0f;
+int initSize = 55;
 std::string tempKbUrl = "";
 shaderMania* shadermania = nullptr;
 

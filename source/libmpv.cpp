@@ -132,6 +132,7 @@ void libMpv::loadFile(std::string _path){
 	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);
+	initSize = configini->getSubFontSize(false);
 	setSubFontSize(configini->getSubFontSize(false),false);
 	initScale = configini->getSubFontScale(false);
 	setSubScaleSize(configini->getSubFontScale(false),false);

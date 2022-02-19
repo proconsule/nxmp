@@ -36,7 +36,6 @@ namespace playerWindows{
 	
 	static int drag_subpos = 100;
 	static float drag_subdelay = 0.0f;
-	static int drag_subfontsize = 55;
 	static int drag_subfontbordersize = 3;
 	static float drag_subborderblur = 0.0f;
 	static int drag_shadowposition = 1;
@@ -594,7 +593,7 @@ namespace playerWindows{
 				if(ImGui::Button("Reset to Default",ImVec2(190, 30))){
 					drag_subpos = 100;
 					drag_subdelay = 0.0f;
-					drag_subfontsize = configini->getSubFontSize(false);
+					initSize = configini->getSubFontSize(false);
 					drag_subfontbordersize = 3;
 					drag_shadowposition = 1;
 					drag_shadowintensity = 0.25f;
@@ -610,7 +609,7 @@ namespace playerWindows{
 					libmpv->setSubBorderBlur(drag_subborderblur,false);
 					libmpv->setSubPos(drag_subpos,false);
 					libmpv->setSubDelay(drag_subdelay,false);
-					libmpv->setSubFontSize(drag_subfontsize,false);
+					libmpv->setSubFontSize(initSize,false);
 					configini->setSubFontColor(configini->getSubFontColor(false));
 					libmpv->setSubFontColor(configini->getSubFontColorHex(true));
 					//bordercolor
@@ -662,15 +661,16 @@ namespace playerWindows{
 				//ImGui::BeginDisabled();
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Sub Font Size", NULL, true).x) * 0.5f);
 				ImGui::Text("Sub Font Size");
-				if(ImGui::DragInt("Sub Font Size", &drag_subfontsize, 0.5f, 1, 120, "%d", ImGuiSliderFlags_NoInput)){
-					libmpv->setSubFontSize(drag_subfontsize,item.playershowcontrols);
+				if(ImGui::DragInt("Sub Font Size", &initSize, 0.5f, 1, 120, "%d", ImGuiSliderFlags_NoInput)){
+					configini->setSubFontSize(initSize);
+					libmpv->setSubFontSize(initSize,item.playershowcontrols);
 				}
 				//fontscale
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Sub Font Scale", NULL, true).x) * 0.5f);
 				ImGui::Text("Sub Font Scale");
 				if(ImGui::DragFloat("Sub Font Scale", &initScale, 0.01f, 0.0f, 3.0f, "%.2f", ImGuiSliderFlags_NoInput)){
-				configini->setSubFontScale(initScale);
-				libmpv->setSubScaleSize(initScale,item.playershowcontrols);
+					configini->setSubFontScale(initScale);
+					libmpv->setSubScaleSize(initScale,item.playershowcontrols);
 				}
 				//fontscale
 				//bordersize

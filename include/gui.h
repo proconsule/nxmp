@@ -242,6 +242,7 @@ extern SysIcons nxmpicons;
 extern int newResW;
 extern int newResH;
 extern float multiplyRes;
+extern int initSize;
 extern float initScale;
 extern bool isHandheld;
 extern bool clockoc;
