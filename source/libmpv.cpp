@@ -158,6 +158,7 @@ void libMpv::loadFileLive(std::string _path,std::string _changename){
 	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);
+	initSize = configini->getSubFontSize(false);
 	setSubFontSize(configini->getSubFontSize(false),false);
 	initScale = configini->getSubFontScale(false);
 	setSubScaleSize(configini->getSubFontScale(false),false);
