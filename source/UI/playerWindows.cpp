@@ -41,7 +41,6 @@ namespace playerWindows{
 	static float drag_subborderblur = 0.0f;
 	static int drag_shadowposition = 1;
 	static float drag_shadowintensity = 0.25f;
-	static float drag_fontscale = 1.00f;
 
 	static int slider_eq[6] = {0,0,0,0,0,0};
 	static char slider_hz[][8] = {"20-200","200-800","800-2K","2K-4K","4K-8K","20K"};
@@ -601,9 +600,10 @@ namespace playerWindows{
 					drag_shadowintensity = 0.25f;
 					drag_subborderblur = 0.0f;
 					ignorestyleidx = 0;
-					drag_fontscale = 1.0f;
+					initScale = configini->getSubFontScale(false);
+					
 					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek 0");
-					libmpv->setSubScaleSize(drag_fontscale,false);
+					libmpv->setSubScaleSize(initScale,false);
 					libmpv->setShadowOffset(drag_shadowposition,false);
 					libmpv->setShadowIntensity(drag_shadowintensity,false);
 					libmpv->setSubBorderSize(drag_subfontbordersize,false);
@@ -668,8 +668,9 @@ namespace playerWindows{
 				//fontscale
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Sub Font Scale", NULL, true).x) * 0.5f);
 				ImGui::Text("Sub Font Scale");
-				if(ImGui::DragFloat("Sub Font Scale", &drag_fontscale, 0.01f, 0.0f, 3.0f, "%.2f", ImGuiSliderFlags_NoInput)){
-				libmpv->setSubScaleSize(drag_fontscale,item.playershowcontrols);
+				if(ImGui::DragFloat("Sub Font Scale", &initScale, 0.01f, 0.0f, 3.0f, "%.2f", ImGuiSliderFlags_NoInput)){
+				configini->setSubFontScale(initScale);
+				libmpv->setSubScaleSize(initScale,item.playershowcontrols);
 				}
 				//fontscale
 				//bordersize

@@ -81,7 +81,11 @@ Config::Config(std::string inifile){
 	nxmpconfig.subfontsize = ini->GetLongValue("Main", "subfontsize");
 	if(nxmpconfig.subfontsize == 0)nxmpconfig.subfontsize = 55;
 	
-	
+	//subscale
+	nxmpconfig.subfontscale = ini->GetDoubleValue("Main", "subfontscale");
+	if(nxmpconfig.subfontscale == 0)nxmpconfig.subfontscale = 1.0f;
+	//subscale
+
 	std::string fontcolorstring = "#FFFFFF";
 	const char* fontcolorpv;
 	fontcolorpv = ini->GetValue("Main", "subfontcolor");
@@ -335,6 +339,19 @@ void Config::setSubFontSize(int val){
 	nxmptmpconfig.subfontsize = val;
 }
 
+//subscale
+float Config::getSubFontScale(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.subfontscale;
+	}
+	return nxmpconfig.subfontscale; 
+}
+
+void Config::setSubFontScale(float val){
+	nxmptmpconfig.subfontscale = val;
+}
+//subscale
+
 float * Config::getSubFontColor(bool tmpvalue){
 	if(tmpvalue){
 		return nxmptmpconfig.subfontcolor;
@@ -473,6 +490,10 @@ void Config::saveSettings(){
 
 	ini->Delete("Main", "subfontsize");
 	ini->SetLongValue("Main", "subfontsize", nxmpconfig.subfontsize, NULL, false);
+
+	//subfontscale
+	ini->Delete("Main", "subfontscale");
+	ini->SetDoubleValue("Main", "subfontscale", nxmpconfig.subfontscale, NULL, false);
 	
 	//Fix Save color.
 	ini->Delete("Main", "subfontcolor");

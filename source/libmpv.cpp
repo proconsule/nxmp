@@ -133,6 +133,8 @@ void libMpv::loadFile(std::string _path){
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);
 	setSubFontSize(configini->getSubFontSize(false),false);
+	initScale = configini->getSubFontScale(false);
+	setSubScaleSize(configini->getSubFontScale(false),false);
 	setSubFontColor(configini->getSubFontColorHex(false));
 	setSubBorderColor(configini->getSubBorderColorHex(false));
 	setOcState();
@@ -156,6 +158,8 @@ void libMpv::loadFileLive(std::string _path,std::string _changename){
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);
 	setSubFontSize(configini->getSubFontSize(false),false);
+	initScale = configini->getSubFontScale(false);
+	setSubScaleSize(configini->getSubFontScale(false),false);
 	setSubFontColor(configini->getSubFontColorHex(false));
 	setSubBorderColor(configini->getSubBorderColorHex(false));
 	setOcState();

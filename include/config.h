@@ -21,6 +21,7 @@ typedef struct{
 	int slang;
     bool useoc;
 	int subfontsize;
+	float subfontscale;
 	int deint;
 	float subfontcolor[4];
 	float subbordercolor[4];
@@ -75,7 +76,12 @@ public:
 
 	int getSubFontSize(bool tmpvalue);
 	void setSubFontSize(int val);
-	
+
+	//subscale
+	float getSubFontScale(bool tmpvalue);
+	void setSubFontScale(float val);
+	//endsubscale
+
 	float * getSubFontColor(bool tmpvalue);
 	std::string getSubFontColorHex(bool tmpvalue);
 	void setSubFontColor(float *_color);

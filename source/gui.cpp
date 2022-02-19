@@ -622,6 +622,7 @@ namespace GUI {
 								}else{
 									item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 								}
+							
 							}
 							else if(item.rightmenustate == PLAYER_AUDIOEQ){
 								item.rightmenustate = PLAYER_RIGHT_MENU_AUDIO;
