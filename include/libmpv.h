@@ -16,6 +16,7 @@ struct decoderlist_struct{
 extern Config *configini;
 extern bool clockoc;
 extern float initScale;
+extern int initSize;
 
 class libMpv{
 public:

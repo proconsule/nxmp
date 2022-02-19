@@ -170,14 +170,35 @@ namespace Windows {
 				}
 				ImGui::SameLine(0.0f, spacing);
 				if (ImGui::ArrowButton("##subsizeright", ImGuiDir_Right)) { 
-					if(configini->getSubFontSize(true)+1 <120){
+					if(configini->getSubFontSize(true)+1 <=120){
 						configini->setSubFontSize(configini->getSubFontSize(true)+1);
 					}
 				}
 				ImGui::PopButtonRepeat();
 				ImGui::SameLine();
 				ImGui::Text("%d", configini->getSubFontSize(true));
+				ImGui::Dummy(ImVec2(0.0f,10.0f));
+
+				//SubFontScale
+				ImGui::Text("Sub Font Scale");
+				ImGui::SameLine(220,spacing);
+				ImGui::PushButtonRepeat(true);
+				if (ImGui::ArrowButton("##subsizescaleleft", ImGuiDir_Left)) {
+					if(configini->getSubFontScale(true)-0.01f >0.0f){
+						configini->setSubFontScale(configini->getSubFontScale(true)-0.01f);
+					}
+				}
+				ImGui::SameLine(0.0f, spacing);
+				if (ImGui::ArrowButton("##subsizescaleright", ImGuiDir_Right)) { 
+					if(configini->getSubFontScale(true)+0.01f <=3.0f){
+						configini->setSubFontScale(configini->getSubFontScale(true)+0.01f);
+					}
+				}
+				ImGui::PopButtonRepeat();
+				ImGui::SameLine();
+				ImGui::Text("%.2f", configini->getSubFontScale(true));
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
+				//endSubFontScale
 				ImGui::Text("Video");
 				ImGui::Separator();
 				std::vector<std::string> deintmenu = {"No","Yes","Auto"};
@@ -403,6 +424,7 @@ namespace Windows {
 				configini->setThemeName(configini->getThemeName(false));
 				
 				configini->setSubFontSize(configini->getSubFontSize(false));
+				configini->setSubFontScale(configini->getSubFontScale(false));
 				configini->setSubFontColor(configini->getSubFontColor(false));
 				//bordercolor
 				configini->setSubBorderColor(configini->getSubBorderColor(false));
