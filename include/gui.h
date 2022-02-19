@@ -242,6 +242,7 @@ extern SysIcons nxmpicons;
 extern int newResW;
 extern int newResH;
 extern float multiplyRes;
+extern float initScale;
 extern bool isHandheld;
 extern bool clockoc;
 extern std::string tempKbUrl;

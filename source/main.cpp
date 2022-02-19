@@ -108,6 +108,7 @@ bool clockoc = false;
 int newResW = 1280;
 int newResH = 720;
 float multiplyRes = 1.0f;
+float initScale = 1.0f;
 std::string tempKbUrl = "";
 shaderMania* shadermania = nullptr;
 

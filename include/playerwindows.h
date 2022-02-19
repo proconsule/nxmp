@@ -8,6 +8,7 @@ extern int newResW;
 extern int newResH;
 extern float multiplyRes;
 extern bool isHandheld;
+extern float initScale;
 namespace playerWindows{
 	
 	inline void SetupCacheWindow(void){
