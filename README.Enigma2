@@ -5,10 +5,10 @@ NXMP can play channels from a Enigma2 set-top boxes, it use the OpenWebIF (the H
 
 To connect to a E2 set-top box edit the config.ini with
 
-```
+
 [Enigma2]
 e2address=http://user:pass@192.168.1.10:port/
-```
+
 
 user and pass can be omitted if the web interface doesn't have password
 port also can be omitted if the web interface is on port 80
@@ -16,10 +16,10 @@ port also can be omitted if the web interface is on port 80
 
 for a standard webserver on port 80 with no password the syntax should be
 
-```
+
 [Enigma2]
 e2address=http://192.168.1.10/
-```
+
 
 
 
