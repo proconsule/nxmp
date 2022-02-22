@@ -59,6 +59,12 @@ void Enigma2::m3uParser(char * url){
 	urlschema e2schema = Utility::parseUrl(enigmaurl);
 	string m3uurl =  e2schema.scheme;
 	m3uurl.append("://");
+	if(e2schema.user != ""){
+		m3uurl.append(e2schema.user);
+		m3uurl.append(":");
+		m3uurl.append(e2schema.pass);
+		m3uurl.append("@");
+	}
 	m3uurl.append(e2schema.server);
 	if(e2schema.port == "")e2schema.port="80";
 	m3uurl.append(":");
@@ -89,6 +95,12 @@ void Enigma2::m3uParser(char * url){
 	
 	string epguurl =  e2schema.scheme;
 	epguurl.append("://");
+	if(e2schema.user != ""){
+		epguurl.append(e2schema.user);
+		epguurl.append(":");
+		epguurl.append(e2schema.pass);
+		epguurl.append("@");
+	}
 	epguurl.append(e2schema.server);
 	if(e2schema.port == "")e2schema.port="80";
 	epguurl.append(":");
@@ -136,6 +148,12 @@ bool Enigma2::getServices(){
 	urlschema e2schema = Utility::parseUrl(enigmaurl);
 	string downurl =  e2schema.scheme;
 	downurl.append("://");
+	if(e2schema.user != ""){
+		downurl.append(e2schema.user);
+		downurl.append(":");
+		downurl.append(e2schema.pass);
+		downurl.append("@");
+	}
 	downurl.append(e2schema.server);
 	if(e2schema.port == "")e2schema.port="80";
 	downurl.append(":");
