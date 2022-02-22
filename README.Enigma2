@@ -1,0 +1,26 @@
+From Wikipedia, the free encyclopedia:
+Enigma2 is an application used in Linux-based Digital Video Broadcasting (DVB-S, DVB-C, DVB-T) receivers or TV set-top boxes and Internet Protocol television receivers. It creates graphical user interface to control such devices using a remote control and provides features known from TV sets or smart TVs like tuning available satellite transponders, cable channels and terrestrial television transmitters (according to available tuners), watching a TV or listening a radio program, time shifting, Digital video recorder, streaming media program to other devices (personal computer, mobile phone), etc. Other features are available as plugins – for example Electronic program guide (EPG), Hybrid Broadcast Broadband TV (HbbTV), access to TV archives and movie databases, playback of multimedia files, viewing photos, etc. 
+
+NXMP can play channels from a Enigma2 set-top boxes, it use the OpenWebIF (the HTTP Web Interface) to get channles list, EPG and the streaming link.
+
+To connect to a E2 set-top box edit the config.ini with
+
+```
+[Enigma2]
+e2address=http://user:pass@192.168.1.10:port/
+```
+
+user and pass can be omitted if the web interface doesn't have password
+port also can be omitted if the web interface is on port 80
+
+
+for a standard webserver on port 80 with no password the syntax should be
+
+```
+[Enigma2]
+e2address=http://192.168.1.10/
+```
+
+
+
+

@@ -3,7 +3,7 @@ NXMP
 
 ![Banner](docs/banner.jpg)
 NXMP is a video player for Nintendo Switch based on [MPV](https://mpv.io/).
-NXMP support most popular video format , it support HTTP,FTP,SFTP,Samba streaming and it also support Enigma2 decoders.
+NXMP support most popular video format , it support HTTP,FTP,SFTP,Samba,NFS streaming and it also support Enigma2 decoders.
 
 NXMP is coded by proconsule and darkxex
 
