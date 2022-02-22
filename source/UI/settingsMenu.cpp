@@ -64,7 +64,7 @@ namespace Windows {
 				ImGui::Text("Seek");
 				ImGui::Separator();
 				ImGui::Text("Short Seek Time");
-				ImGui::SameLine(220,spacing);
+				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
 				if (ImGui::ArrowButton("##shortleft", ImGuiDir_Left)) {
 					if(configini->getShortSeek(true)-1 >0){
@@ -80,7 +80,7 @@ namespace Windows {
 				ImGui::Text("%d sec", configini->getShortSeek(true));
 			
 				ImGui::Text("Long Seek Time");
-				ImGui::SameLine(220,spacing);
+				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
 				if (ImGui::ArrowButton("##longleft", ImGuiDir_Left)) {
 					if(configini->getLongSeek(true)-1 >0){
@@ -161,7 +161,7 @@ namespace Windows {
 				ImGui::Text("Subtitle");
 				ImGui::Separator();
 				ImGui::Text("Sub Font Size");
-				ImGui::SameLine(220,spacing);
+				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
 				if (ImGui::ArrowButton("##subsizeleft", ImGuiDir_Left)) {
 					if(configini->getSubFontSize(true)-1 >0){
@@ -181,7 +181,7 @@ namespace Windows {
 
 				//SubFontScale
 				ImGui::Text("Sub Font Scale");
-				ImGui::SameLine(220,spacing);
+				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
 				if (ImGui::ArrowButton("##subsizescaleleft", ImGuiDir_Left)) {
 					if(configini->getSubFontScale(true)-0.01f >0.0f){
@@ -249,8 +249,8 @@ namespace Windows {
 						
 						
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+50);
-						ImGui::Text("Start saving resume info @ ");
-						ImGui::SameLine(300,spacing);
+						ImGui::Text("Start saving resume info:");
+						//ImGui::SameLine(400,spacing);
 						ImGui::PushButtonRepeat(true);
 						if (ImGui::ArrowButton("##resumestartleft", ImGuiDir_Left)) {
 							if(configini->getResumeStartPerc(true)-1 >0){
@@ -266,8 +266,8 @@ namespace Windows {
 						ImGui::Text("%d%%", configini->getResumeStartPerc(true));
 						
 						
-						ImGui::Text("Stop saving resume info @ ");
-						ImGui::SameLine(300,spacing);
+						ImGui::Text("Stop saving resume info:");
+						//ImGui::SameLine(400,spacing);
 						ImGui::PushButtonRepeat(true);
 						if (ImGui::ArrowButton("##resumestopleft", ImGuiDir_Left)) {
 							if(configini->getResumeStopPerc(true)-1 >0){
