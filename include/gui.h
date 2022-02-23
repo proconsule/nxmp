@@ -243,6 +243,7 @@ extern int newResW;
 extern int newResH;
 extern float multiplyRes;
 extern int initSize;
+extern int batteryPorcent;
 extern float initScale;
 extern bool isHandheld;
 extern bool clockoc;

@@ -506,6 +506,17 @@ SwkbdTextCheckResult Keyboard_ValidateText(char *string, size_t size) {
 	return SwkbdTextCheckResult_OK;
 }
 #endif
+#ifdef __SWITCH__
+ u32 GetBatteryPercentage(void) {
+        Result ret = 0;
+        u32 percentage = 0;
+        
+        if (R_FAILED(ret = psmGetBatteryChargePercentage(&percentage)))
+            return -1;
+        
+        return percentage;
+    }
+#endif
 std::string KeyboardCall (std::string hint, std::string text){
 	#ifdef __SWITCH__
 	Result ret = 0;
