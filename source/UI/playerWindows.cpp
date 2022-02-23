@@ -91,9 +91,11 @@ namespace playerWindows{
 					*first_item = false;
 				}
 				//battery
+
 				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -80);
-				ImGui::Text("Battery:");
-				ImGui::Text("%d%c",batteryPorcent,'%');
+				ImGui::Separator();
+				ImGui::Text("Battery");
+				ImGui::ProgressBar((float)batteryPorcent/100, ImVec2(180, 0));
 				//endBattery
 
 				ImGui::EndListBox();
