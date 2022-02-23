@@ -110,6 +110,7 @@ int newResH = 720;
 float multiplyRes = 1.0f;
 float initScale = 1.0f;
 int initSize = 55;
+int batteryPorcent = 0;
 std::string tempKbUrl = "";
 shaderMania* shadermania = nullptr;
 
@@ -255,6 +256,8 @@ int main(int argc,char *argv[]){
 		printf("romfsInit() failed: 0x%x\n", ret);
 		return ret;
 	}
+	if (R_FAILED(ret = psmInitialize()))
+    printf("psmInitialize() failed: 0x%x.\n\n", ret);
 #endif
 	printf("Init GUI\n");
 	if ( init() ) {
@@ -507,6 +510,7 @@ if (hosversionBefore(8, 0, 0)) {
     }
 	ncmExit();
 	plExit();
+	psmExit();
 	romfsExit();
     socketExit();
 	appletUnlockExit();

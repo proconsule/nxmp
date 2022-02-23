@@ -10,6 +10,7 @@ extern float multiplyRes;
 extern bool isHandheld;
 extern float initScale;
 extern int initSize;
+extern int batteryPorcent;
 namespace playerWindows{
 	
 	inline void SetupCacheWindow(void){

@@ -90,9 +90,18 @@ namespace playerWindows{
 					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
 					*first_item = false;
 				}
+				//battery
+
+				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -80);
+				ImGui::Separator();
+				ImGui::Text("Battery");
+				ImGui::ProgressBar((float)batteryPorcent/100, ImVec2(180, 0));
+				//endBattery
+
 				ImGui::EndListBox();
 			}
 			
+		
 		}
 		playerWindows::ExitWindow();
 	}
