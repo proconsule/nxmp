@@ -512,7 +512,7 @@ SwkbdTextCheckResult Keyboard_ValidateText(char *string, size_t size) {
         u32 percentage = 0;
         
         if (R_FAILED(ret = psmGetBatteryChargePercentage(&percentage)))
-            return -1;
+            return 0;
         
         return percentage;
     }
