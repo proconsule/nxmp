@@ -996,9 +996,9 @@ namespace GUI {
 				changeFontTheme();
 				dochangethemefont = false;
 			}
-			#ifdef __SWITCH__
+			
             batteryPorcent = Utility::GetBatteryPercentage();
-			#endif
+			
 
 			#ifdef NXMP_SWITCH
     		//rewrite switch state

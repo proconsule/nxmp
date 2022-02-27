@@ -60,9 +60,7 @@ namespace Utility{
 	int getLanguagesIdx(std::string lang);
 
 	void replace(std::string& subject, const std::string& search,const std::string& replace);
-	#ifdef __SWITCH__
-	u32 GetBatteryPercentage(void);
-	#endif
+	uint32_t GetBatteryPercentage(void);
 	std::string scrapElement(std::string content, std::string get,std::string delim);
 	std::string KeyboardCall (std::string hint="", std::string text="");
 	std::string Nozomi_Link(std::string Link);
