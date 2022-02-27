@@ -7,10 +7,13 @@
 #include "Enigma2.h"
 #include "curldownloader.h"
 
+#include "custom_widgets.h"
+
 namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupMainWindow();
 		std::vector<std::string> topmenu = configini->topmenu;
+		batteryIcon(ImVec2(1200.0f,5.0f),true,35);
 		if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
 				static int selected = -1;					
 				for (unsigned int n = 0; n < topmenu.size(); n++){
@@ -170,8 +173,11 @@ namespace Windows {
 					g.NavDisableMouseHover = true;
 					*first_item = false;
 				}
+				
 		}
+		
 		Windows::ExitMainWindow();
+		
 	}
 }
 		
