@@ -95,8 +95,8 @@ namespace playerWindows{
 				
 				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -40);
 				ImGui::Separator();
-				batteryIcon(ImVec2(rightmenuposX + 15.0f,ImGui::GetWindowSize().y -24),true,batteryPorcent,40,18);
-				ImGui::Text("         %d%%",batteryPorcent);
+				batteryIcon(ImVec2(rightmenuposX + 13.0f,ImGui::GetWindowSize().y -24),true,batteryPorcent,40,18);
+				ImGui::Text("        %d%%",batteryPorcent);
 				
 				//endBattery
 
