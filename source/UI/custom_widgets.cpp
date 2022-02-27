@@ -1,9 +1,10 @@
 #include "custom_widgets.h"
 
-void batteryIcon(ImVec2 pos,bool absolute,uint32_t batlevel){
+void batteryIcon(ImVec2 pos,bool absolute,uint32_t batlevel, float w, float h){
 	
-	ImVec2 iconsize = ImVec2(50.0f, 20.0f);
-	
+	//ImVec2 iconsize = ImVec2(50.0f, 20.0f);
+	ImVec2 iconsize = ImVec2(w, h);
+
 	ImVec2 canvas_p0 = ImGui::GetCursorScreenPos(); 
 	if(absolute){
 		canvas_p0 = pos;
@@ -18,7 +19,16 @@ void batteryIcon(ImVec2 pos,bool absolute,uint32_t batlevel){
 
 	//ImDrawList* draw_list = ImGui::GetWindowDrawList();
 	ImGui::GetForegroundDrawList()->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(0, 0, 0, 255));
+	//green
+	if(batlevel >= 66)
 	ImGui::GetForegroundDrawList()->AddRectFilled(canvas_pnew, batteryfill, IM_COL32(50, 255, 50, 255));
+	//yellow
+	else if(batlevel >= 33 )
+	ImGui::GetForegroundDrawList()->AddRectFilled(canvas_pnew, batteryfill, IM_COL32(255, 204, 0, 255));
+	//red
+	else if(batlevel >= 0 )
+	ImGui::GetForegroundDrawList()->AddRectFilled(canvas_pnew, batteryfill, IM_COL32(204, 51, 0, 255));
+
 	ImGui::GetForegroundDrawList()->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
 	
 	ImGui::GetForegroundDrawList()->AddRectFilled(batteryicon_p0, batteryicon_p1, IM_COL32(255, 255, 255, 255));

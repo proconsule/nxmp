@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "utils.h"
 #include "imgui_internal.h"
+#include "custom_widgets.h"
 #ifdef NXMP_SWITCH
 #include "SwitchSys.h"
 #endif
@@ -91,11 +92,12 @@ namespace playerWindows{
 					*first_item = false;
 				}
 				//battery
-
-				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -80);
+				
+				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -40);
 				ImGui::Separator();
-				ImGui::Text("Battery");
-				ImGui::ProgressBar((float)batteryPorcent/100, ImVec2(180, 0));
+				batteryIcon(ImVec2(rightmenuposX + 15.0f,ImGui::GetWindowSize().y -24),true,batteryPorcent,40,18);
+				ImGui::Text("         %d%%",batteryPorcent);
+				
 				//endBattery
 
 				ImGui::EndListBox();
