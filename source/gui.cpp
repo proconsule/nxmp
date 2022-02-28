@@ -381,10 +381,20 @@ namespace GUI {
 					//exchanged the minus for the plus.
 					//to avoid the crash of the integrated keyboard.
 					if (button == SDL_KEY_PLUS){
-						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
-							item.state = item.laststate;
+						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+							item.savestate = item.laststate;
+							item.state = item.laststate;	
 						}else if(item.state != MENU_STATE_PLAYER && !libmpv->Stopped()){
+							std::cout << std::endl <<" State is?: " << item.state << std::endl;
+							//fix crash
+							if (item.state != item.savestate)
+							{item.state = MENU_STATE_FILEBROWSER;
+							localdir = new localFs(configini->getStartPath(),playlist);
+							localdir->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
+							item.first_item = true;}
+							
 							item.state = MENU_STATE_PLAYER;
+							
 						}
 					}
 					
