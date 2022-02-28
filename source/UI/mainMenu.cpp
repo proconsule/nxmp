@@ -13,6 +13,12 @@ namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupMainWindow();
 		std::vector<std::string> topmenu = configini->topmenu;
+		
+		if(isHandheld == true)
+		batteryIcon(ImVec2(1230.0f,5.0f),true,batteryPorcent,40,20);
+        else
+		batteryIcon(ImVec2(1230.0f*multiplyRes + 20,5.0f),true,batteryPorcent,40,20);
+
 		if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
 				static int selected = -1;					
 				for (unsigned int n = 0; n < topmenu.size(); n++){
