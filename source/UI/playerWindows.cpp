@@ -612,7 +612,7 @@ namespace playerWindows{
 					ignorestyleidx = 0;
 					initScale = configini->getSubFontScale(false);
 					
-					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek 0");
+					mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass-override no ; no-osd seek 0");
 					libmpv->setSubScaleSize(initScale,false);
 					libmpv->setShadowOffset(drag_shadowposition,false);
 					libmpv->setShadowIntensity(drag_shadowintensity,false);
@@ -631,11 +631,11 @@ namespace playerWindows{
 				ImGui::Separator();
 				ImGui::Dummy(ImVec2(0.0f,1.0f));
 				//ignore styles
-				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Embedded Styles", NULL, true).x) * 0.5f);
+				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Styles Override", NULL, true).x) * 0.5f);
 				ImGui::PushItemWidth(200-10);
-				ImGui::Text("Embedded Styles");
-				std::vector<std::string> stylemenu = {"Activated","Deactivated"};
-				if (ImGui::BeginCombo("Embedded Styles", stylemenu[ignorestyleidx].c_str(), 0))
+				ImGui::Text("Styles Override");
+				std::vector<std::string> stylemenu = {"No","Yes","Force","Scale","Strip"};
+				if (ImGui::BeginCombo("Styles Override", stylemenu[ignorestyleidx].c_str(), 0))
 				{	
 					for (int n = 0; n < stylemenu.size(); n++)
 					{
@@ -643,11 +643,23 @@ namespace playerWindows{
 						if (ImGui::Selectable(stylemenu[n].c_str(), is_selected)){
 							if(n == 0){
 								ignorestyleidx = 0;
-								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass yes ; no-osd seek 0");
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass-override no ; no-osd seek 0");
 							}
 							if(n == 1){
 								ignorestyleidx = 1;
-								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass no ; no-osd seek 0");
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass-override yes ; no-osd seek 0");
+							}
+							if(n == 2){
+								ignorestyleidx = 2;
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass-override force ; no-osd seek 0");
+							}
+							if(n == 3){
+								ignorestyleidx = 3;
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass-override scale ; no-osd seek 0");
+							}
+							if(n == 4){
+								ignorestyleidx = 4;
+								mpv_command_string(libmpv->getHandle(),"no-osd set sub-ass-override strip ; no-osd seek 0");
 							}
 						}
 							
