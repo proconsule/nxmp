@@ -60,6 +60,7 @@ namespace Utility{
 	int getLanguagesIdx(std::string lang);
 
 	void replace(std::string& subject, const std::string& search,const std::string& replace);
+	bool GetChargeStatue(void);
 	uint32_t GetBatteryPercentage(void);
 	std::string scrapElement(std::string content, std::string get,std::string delim);
 	std::string KeyboardCall (std::string hint="", std::string text="");
