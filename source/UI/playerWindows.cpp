@@ -984,7 +984,10 @@ namespace playerWindows{
 			ImGui::SetCursorPosX(20);
 			ImGui::Text("%s",timetext);
 			ImGui::PopFont();
-			
+			if(isHandheld == true)
+				batteryIcon(ImVec2(1230.0f,5.0f),true,batteryPorcent,40,20);
+			else
+				batteryIcon(ImVec2(1230.0f*multiplyRes + 20,5.0f),true,batteryPorcent,40,20);
 			
 			
 			

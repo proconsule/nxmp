@@ -506,6 +506,21 @@ SwkbdTextCheckResult Keyboard_ValidateText(char *string, size_t size) {
 	return SwkbdTextCheckResult_OK;
 }
 #endif
+
+bool GetChargeStatue(void) {
+#ifdef _WIN32
+	return true;
+#endif
+#ifdef __SWITCH__
+        Result ret = 0;
+	PsmChargerType chargetype;
+        if (R_FAILED(ret = psmGetChargerType(&chargetype)))
+            return false;
+	if(chargetype >0)return true;
+	return false;
+#endif
+}
+
 uint32_t GetBatteryPercentage(void) {
 #ifdef _WIN32
 	return 50;
