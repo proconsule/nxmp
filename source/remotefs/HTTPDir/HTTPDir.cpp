@@ -68,8 +68,8 @@ void HTTPDir::DirList(std::string path,const std::vector<std::string> &extension
 	std::smatch sm;
 	currentpath = path;
 	
-	
 	std::regex rgxlinks("<a href=\"(.*?)\".*?>(?!Parent Directory)(.*?)<\/a>");
+	
 	while (regex_search(s, sm, rgxlinks))
 	{
 		FS::FileEntry tmpentry;
