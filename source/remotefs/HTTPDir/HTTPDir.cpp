@@ -67,13 +67,9 @@ void HTTPDir::DirList(std::string path,const std::vector<std::string> &extension
 	std::string s = chunk->memory;
 	std::smatch sm;
 	currentpath = path;
-	std::regex rgxdirlist("<h1>Index of");
-	if(!regex_search(s, sm, rgxdirlist)){
-		return;
-	}
 	
-	std::regex rgxlinks("<tr>.*?<td><a href=\"(.*?)\".*?>(?!Parent Directory)(.*?)<\/a>.*?<\/td><\/tr>");
 	
+	std::regex rgxlinks("<a href=\"(.*?)\".*?>(?!Parent Directory)(.*?)<\/a>");
 	while (regex_search(s, sm, rgxlinks))
 	{
 		FS::FileEntry tmpentry;
