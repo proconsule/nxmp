@@ -191,7 +191,7 @@ namespace Windows {
 								
 							}else if (thislist[n].type == FS::FileEntryType::File){
 								
-								std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
+								std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
 								std::string checkitemid = "##check" + std::to_string(n);
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								if(ImGui::Checkbox(checkitemid.c_str(), httpdir->checked(n))){
@@ -219,7 +219,7 @@ namespace Windows {
 								}else if (thislist[n].type == FS::FileEntryType::File){
 									
 										urlschema thisurl = Utility::parseUrl(httpdir->getUrl());
-										std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
+										std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
 										item.laststate = item.state;
 										playlist->clearPlaylist();
 										httpdir->clearChecked();
@@ -240,7 +240,7 @@ namespace Windows {
 						ImVec4 textcolor = colors[ImGuiCol_Text];
 						
 						if(sqlitedb != nullptr){
-							std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
+							std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
 							int dbfilestatus = sqlitedb->getFileDbStatus(openurl);
 							if(dbfilestatus == 2){
 								textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
