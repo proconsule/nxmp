@@ -26,7 +26,7 @@ Network have syntax (you can add as many source as you like)
 source=TESTFtp|ftp://user:pass@192.168.1.10:21/path/
 source=TestHTTP|http://192.168.1.10/path/
 source=TestSFTp|sftp://192.168.1.10/path/ (without path it default to home)
-source=TestSamba|smb://192.168.1.10/share/ (share is a share name not a path)
+source=TestSamba|smb://user:pass@192.168.1.10/share/ (share is a share name not a path)
 source=TestNFS|nfs://192.168.1.10/export/
 ```
 
