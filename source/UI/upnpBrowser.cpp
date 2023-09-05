@@ -7,7 +7,6 @@
 
 
 namespace Windows {
-#ifdef NXMP_UPNPSUPPORT
     void UPNPBrowserWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		if (ImGui::Begin("UPNP Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
@@ -25,7 +24,7 @@ namespace Windows {
 							
 							MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
 							curlDownloader * curldownload = new curlDownloader();
-							curldownload->Download(thislist[n]->iconUrl.c_str(),chunk);
+							curldownload->Download((char *)thislist[n]->iconUrl.c_str(),chunk);
 							Utility::TxtLoadFromMemory(chunk->memory,chunk->size,&thislist[n]->devIcon.id,&thislist[n]->devIcon.width,&thislist[n]->devIcon.height);
 							free(chunk->memory);
 							free(chunk);
@@ -154,5 +153,4 @@ namespace Windows {
 	
 	Windows::ExitWindow();
     }
-#endif
 }

@@ -4,10 +4,11 @@
 #include <vector>
 #include <string>
 #include <SDL.h>
-#include "platforms.h"
-#ifdef __SWITCH__
+
+
 #include <switch.h>
-#endif
+
+
 #include <glad/glad.h>
 #include "appwindows.h"
 #include "apppopups.h"
@@ -16,6 +17,7 @@
 #include "config.h"
 #include "playlist.h"
 #include "remotefs.h"
+#include "networkShareClass.h"
 #include "localfiles.h"
 #include "SimpleIni.h"
 #include "eqpreset.h"
@@ -23,28 +25,31 @@
 #include "remotefs.h"
 #include "localFs.h"
 #include "utils.h"
-#ifdef NXMP_USBSUPPORT
+#include "mtpclass.h"
+#include "stats.h"
+
 #include "usbfs.h"
-#endif
-#ifdef NXMP_ENIGMASUPPORT
+
+
 #include "Enigma2.h"
-#endif
-#ifdef NXMP_NETWORKSUPPORT
+
+
 #include "HTTPDir.h"
 #include "FTPDir.h"
 #include "sshDir.h"
 #include "sambaDir.h"
 #include "nfsDir.h"
-#endif
-#ifdef NXMP_UPNPSUPPORT
+
+
 #include "NX-UPNP.h"
-#endif
+
 
 #include "imgui_impl_sdl.h"
 
 #include "touchcontrols.h"
 #include "shaderMania.h"
 #include "themes.h"
+#include "logger.h"
 
 #define handheldWidth 1280
 #define handheldHeight 720
@@ -56,6 +61,7 @@ enum MENU_STATES {
     MENU_STATE_FILEBROWSER,
 	MENU_STATE_USB,
 	MENU_STATE_NETWORKBROWSER,
+	MENU_STATE_ADDSHARE,
 	MENU_STATE_FTPBROWSER,
 	MENU_STATE_HTTPBROWSER,
 	MENU_STATE_SSHBROWSER,
@@ -64,6 +70,7 @@ enum MENU_STATES {
 	MENU_STATE_UPNPBROWSER,
 	MENU_STATE_ENIGMABROWSER,
 	MENU_STATE_PLAYLISTBROWSER,
+	MENU_STATE_MTPSERVER,
 	MENU_STATE_INFO,
 	MENU_STATE_SETTINGS,
 	MENU_STATE_PLAYER,
@@ -88,7 +95,8 @@ enum APP_POPUP_STATES {
 	POPUP_STATE_STARTPLAYLIST,
 	POPUP_STATE_SUBFONTCOLOR,
 	POPUP_STATE_SUBBORDERCOLOR,
-	POPUP_STATE_DBUPDATED
+	POPUP_STATE_DBUPDATED,
+	POPUP_STATE_NETWORKMENU
 };
 
 enum PLAYER_RIGHT_MENU_STATES {
@@ -125,6 +133,8 @@ typedef struct {
 	PLAYER_STATES playerstate = PLAYER_STATE_VIDEO;
 	PLAYER_CONTROL_STATES playercontrolstate = PLAYER_CONTROL_STATE_NONE;
 	APP_POPUP_STATES popupstate = POPUP_STATE_NONE;
+	bool showstats = false;
+	bool showdecstats = false;
 	int selected = 0;
 	//std::string usbpath = "";
 	//std::string usbbasepath = "";
@@ -196,32 +206,22 @@ typedef struct {
 
 
 extern SDL_Window *window;
-#ifdef _WIN32
-extern bool fullscreen;
-#endif
 extern MenuItem item;
 
 extern libMpv *libmpv;
 extern localFs *localdir;
-#ifdef NXMP_NETWORKSUPPORT
 extern HTTPDir *httpdir;
 extern FTPDir *ftpdir;
 extern sshDir *sshdir;
 extern sambaDir *sambadir;
 extern nfsDir *nfsdir;
-#endif
-#ifdef NXMP_UPNPSUPPORT
 extern NXUPnP *nxupnp;
-#endif
-#ifdef NXMP_USBSUPPORT
 extern USBMounter *usbmounter;
-#endif
-#ifdef NXMP_ENIGMASUPPORT
 extern Enigma2 *enigma2;
-#endif
 
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
+
 
 extern mpv_opengl_fbo fbo;
 extern mpv_render_param params[3];
@@ -234,63 +234,36 @@ extern std::string nxmpTitle;
 extern Config *configini;
 extern EQPreset *eqpreset;
 extern SQLiteDB *sqlitedb;
+extern CMTP *mtp;
+
 extern bool dbUpdated;
 
 extern Playlist *playlist;
 
 extern SysIcons nxmpicons;
 
+extern CStats *nxmpstats;
+
 extern int newResW;
 extern int newResH;
 extern float multiplyRes;
 extern int initSize;
-extern int batteryPorcent;
+extern int batteryPercent;
 extern float initScale;
 extern bool isHandheld;
 extern bool clockoc;
 extern std::string tempKbUrl;
 extern SDL_GLContext context;
-/*
-extern Tex SdCardTexture;
-extern Tex UsbTexture;
-extern Tex NetworkTexture;
-extern Tex Enigma2Texture;
-extern Tex PlaylistTexture;
-extern Tex InfoTexture;
-extern Tex SettingsTexture;
-
-extern Tex FolderTexture;
-extern Tex FileTexture;
-
-
-extern Tex FTPTexture;
-extern Tex HTTPTexture;
-extern Tex SFTPTexture;
-extern Tex SMBTexture;
-extern Tex NFSTexture;
-extern Tex UPNPTexture;
-
-extern Tex FFMPEGTexture;
-extern Tex MPVTexture;
-
-extern Tex NXMPBannerTexture;
-extern Tex ExitTexture;
-
-
-extern Tex PlayIcon;
-extern Tex PauseIcon;
-extern Tex StopIcon;
-extern Tex MuteIcon;
-extern Tex VolumeIcon;
-extern Tex LoopIcon;
-extern Tex NoLoopIcon;
-*/
 
 
 extern ImFont* fontSmall;
 
 extern shaderMania* shadermania;
 
+extern CNetworkShare *NewNetworkShare;
+
+
+extern float currFontsize;
 
 
 /* theme porp */
@@ -336,6 +309,8 @@ namespace GUI {
 	void changeFontTheme();
 	
 	void reinit();
+	
+	void NXMPImage(ImTextureID user_texture_id, const ImVec2& size);
 	
 }
 

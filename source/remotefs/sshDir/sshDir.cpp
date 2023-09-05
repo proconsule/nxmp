@@ -1,17 +1,9 @@
 #include "sshDir.h"
 
-#ifdef NXMP_NETWORKSUPPORT
-
-#ifdef __SWITCH__
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#endif
 
-#ifdef WIN32
-#define __FILESIZE "I64"
-#else
-#define __FILESIZE "llu"
-#endif
+
 
 sshDir::sshDir(std::string _url,Playlist * _playlist){
 	url = _url;	
@@ -22,7 +14,7 @@ sshDir::sshDir(std::string _url,Playlist * _playlist){
 	{
 		basepath.erase(basepath.length()-1);
 	}
-	printf("Base Path = %s\n",basepath.c_str());
+	NXLOG::DEBUGLOG("Base Path = %s\n",basepath.c_str());
 	currentpath = basepath;
 	playlist = _playlist;
 	
@@ -38,26 +30,13 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
     LIBSSH2_SFTP *sftp_session;
     LIBSSH2_SFTP_HANDLE *sftp_handle;
 	
-#ifdef _WIN32
-	WSADATA wsadata;
-	int err;
- 
-	err = WSAStartup(MAKEWORD(2, 0), &wsadata);
-	if(err != 0) {
-		printf("WSAStartup failed with error: %d\n", err);
-
-    }else{
-		printf("WSAStartup ok\n");
-	}
-#endif
-	
 	urlschema thisurl = Utility::parseUrl(url);
 	
 	rc = libssh2_init(0);
 	unsigned long hostaddr;
 	hostaddr = inet_addr(thisurl.server.c_str());
     if(rc != 0) {
-        printf("libssh2 initialization failed (%d)\n", rc);
+        NXLOG::ERRORLOG("libssh2 initialization failed (%d)\n", rc);
     }
 	sock = socket(AF_INET, SOCK_STREAM, 0);
  
@@ -66,30 +45,30 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
     sin.sin_addr.s_addr = hostaddr;
     if(connect(sock, (struct sockaddr*)(&sin),
                sizeof(struct sockaddr_in)) != 0) {
-        printf("failed to connect!\n");
+        NXLOG::ERRORLOG("failed to connect!\n");
     }
 	session = libssh2_session_init();
     if(!session){
-		printf("unable to create session\n");
+		NXLOG::ERRORLOG("unable to create session\n");
 	}
 	rc = libssh2_session_handshake(session, sock);
 
     if(rc) {
-        printf("Failure establishing SSH session: %d\n", rc);
+        NXLOG::ERRORLOG("Failure establishing SSH session: %d\n", rc);
     }
 	//fingerprint = libssh2_hostkey_hash(session, LIBSSH2_HOSTKEY_HASH_SHA1);
 	
 	if(libssh2_userauth_password(session, thisurl.user.c_str(), thisurl.pass.c_str())) {
 
-		printf("\tAuthentication by password failed!\n");
+		NXLOG::ERRORLOG("\tAuthentication by password failed!\n");
 	}
     else {
-		printf("\tAuthentication by password succeeded.\n");
+		NXLOG::DEBUGLOG("\tAuthentication by password succeeded.\n");
 	}
 	
 	sftp_session = libssh2_sftp_init(session);
 	if(!sftp_session) {
-        printf("Unable to init SFTP session\n");
+        NXLOG::ERRORLOG("Unable to init SFTP session\n");
     }
 	
 	libssh2_session_set_blocking(session, 1);
@@ -107,7 +86,7 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
     sftp_handle = libssh2_sftp_opendir(sftp_session, path.c_str());
 	
 	if(!sftp_handle) {
-		printf("Unable to open dir with SFTP\n");
+		NXLOG::ERRORLOG("Unable to open dir with SFTP\n");
 
 	}
 	currentlist.clear();
@@ -180,12 +159,7 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 
     libssh2_session_free(session);
 
- 
-#ifdef _WIN32
-    closesocket(sock);
-#else
     close(sock);
-#endif
     libssh2_exit();
 
 	
@@ -227,5 +201,3 @@ void sshDir::backDir(){
 	currentpath = FS::removeLastSlash(currentpath);
 	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
 }
-
-#endif

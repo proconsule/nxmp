@@ -6,9 +6,10 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include "logger.h"
 
 struct MemoryStruct {
-  char *memory;
+  unsigned char *memory;
   size_t size;
 };
 

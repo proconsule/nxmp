@@ -1,10 +1,6 @@
 #ifndef NXMP_UPNP_H
 #define NXMP_UPNP_H
 
-#include "platforms.h"
-
-#ifdef NXMP_UPNPSUPPORT
-
 #include <stdio.h>
 #include <cstring>
 #include <vector>
@@ -13,18 +9,15 @@
 #include <pthread.h>
 #include <unistd.h>
 
-
-
 #include "curldownloader.h"
 #include "localfiles.h"
 
 #include <sstream>
 #include <tinyxml2.h>
 
-#ifdef __SWITCH__
 #include <switch.h>
 
-#endif
+
 
 using namespace tinyxml2;
 
@@ -100,5 +93,4 @@ private:
 	
 };
 
-#endif
 #endif

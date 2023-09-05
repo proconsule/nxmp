@@ -44,7 +44,7 @@ namespace Windows {
 				}
 				if(item.playlistUpdateHovered){
 					std::string itemid = "##" + std::to_string(item.playlistnewHoverIdx);
-					printf("Set hover id %d\n",item.playlistnewHoverIdx);
+					NXLOG::DEBUGLOG("Set hover id %d\n",item.playlistnewHoverIdx);
 					fflush(stdout);
 					ImGui::SetFocusID(ImGui::GetID((itemid.c_str())), ImGui::GetCurrentWindow());
 					item.playlistUpdateHovered = false;

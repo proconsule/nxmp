@@ -1,18 +1,12 @@
 #ifndef NXMP_NFSDIR_H
 #define NXMP_NFSDIR_H
 
-#include "platforms.h"
-
-#ifdef NXMP_NETWORKSUPPORT
-
 #include <string>
 #include <vector>
 #include <stdio.h>
 #include <cstring>
 #include "localfiles.h"
 #include "playlist.h"
-
-
 
 class nfsDir{
 public:
@@ -38,5 +32,4 @@ private:
 	
 };
 
-#endif
 #endif

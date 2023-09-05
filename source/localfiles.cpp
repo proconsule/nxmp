@@ -17,6 +17,7 @@ namespace FS {
     return str;
 	}
 	
+	
 	bool Sort(const FileEntry &entryA, const FileEntry &entryB) {
 		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
 			return true;
@@ -30,6 +31,7 @@ namespace FS {
 		
 		return false;
 	}
+	
 	
 	std::vector<FileEntry> getDirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions) {
 

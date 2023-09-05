@@ -2,13 +2,17 @@
 #define NXMP_WINDOWS_H
 
 #include "imgui.h"
-#include "platforms.h"
+#include "UIHelpers.h"
 
 extern int newResW;
 extern int newResH;
 extern float multiplyRes;
 extern bool isHandheld;
+
+
 namespace Windows {
+
+	extern int netwinselected;
 	
 	inline void SetupMainWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
@@ -34,31 +38,28 @@ namespace Windows {
     };
 
     void FileBrowserWindow(bool *focus, bool *first_item);
-#ifdef NXMP_USBSUPPORT
 	void USBBrowserWindow(bool *focus, bool *first_item);
-#endif
-#ifdef NXMP_ENIGMASUPPORT
 	void EnigmaWindow(bool *focus, bool *first_item);
-#endif
 	void MainMenuWindow(bool *focus, bool *first_item);
-#ifdef NXMP_NETWORKSUPPORT
+	void ShareAddWindow(bool *focus, bool *first_item);
 	void FtpWindow(bool *focus, bool *first_item);
 	void HttpWindow(bool *focus, bool *first_item);
 	void SSHWindow(bool *focus, bool *first_item);
 	void SambaWindow(bool *focus, bool *first_item);
 	void NFSWindow(bool *focus, bool *first_item);
 	void NetworkWindow(bool *focus, bool *first_item);
-#endif
-#ifdef NXMP_UPNPSUPPORT
+	
 	void UPNPBrowserWindow(bool *focus, bool *first_item);
-#endif
+
 	void InfoMenuWindow(bool *focus, bool *first_item);
 	void VideoWindow(bool *focus, bool *first_item);
 	void SettingsMenuWindow(bool *focus, bool *first_item);
 	
 	void PlaylistWindow(bool *focus, bool *first_item);
-	
+	void MTPServerWindow(bool *focus, bool *first_item);
     
+	
+	
 }
 
 

@@ -2,12 +2,8 @@
 // Created by cpasjuste on 26/11/18.
 //
 
-
 #include "SwitchSys.h"
-#ifdef NXMP_SWITCH
 
-
-using namespace c2d;
 
 int SwitchSys::stock_cpu_clock = 0;
 int SwitchSys::stock_gpu_clock = 0;
@@ -103,12 +99,14 @@ bool SwitchSys::setClock(const SwitchSys::Module &module, int hz) {
     return false;
 }
 
+
+
 void SwitchSys::maxClock()
 {   int clock_old = SwitchSys::getClock(SwitchSys::Module::Cpu);
     SwitchSys::setClock(SwitchSys::Module::Cpu, (int) SwitchSys::CPUClock::Max);
     SwitchSys::setClock(SwitchSys::Module::Gpu, (int) SwitchSys::GPUClock::Max);
     SwitchSys::setClock(SwitchSys::Module::Emc, (int) SwitchSys::EMCClock::Max);
-    printf("setting max cpu speed (old: %i, new: %i)\n",
+    NXLOG::DEBUGLOG("setting max cpu speed (old: %i, new: %i)\n",
     clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));
 }
 
@@ -118,8 +116,7 @@ void SwitchSys::defaultClock(int stock_cpu_clock_temp,int stock_gpu_clock_temp,i
     SwitchSys::setClock(SwitchSys::Module::Cpu, (int) stock_cpu_clock_temp);
     SwitchSys::setClock(SwitchSys::Module::Gpu, (int) stock_gpu_clock_temp);
     SwitchSys::setClock(SwitchSys::Module::Emc, (int) stock_emc_clock_temp);
-    printf("restoring cpu speed (old: %i, new: %i)\n",
+    NXLOG::DEBUGLOG("restoring cpu speed (old: %i, new: %i)\n",
     clock_old, SwitchSys::getClock(SwitchSys::Module::Cpu));
 }
 
-#endif

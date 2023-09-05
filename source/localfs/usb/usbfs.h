@@ -1,15 +1,12 @@
 #ifndef NXMP_USBFS_H
 #define NXMP_USBFS_H
 
-#include "platforms.h"
-
-#ifdef NXMP_USBSUPPORT
-
 #include <cstdlib>
 #include <string>
 #include <vector>
 #include <threads.h>
 #include <usbhsfs.h>
+#include "logger.h"
 #include "localfiles.h"
 #include "playlist.h"
 
@@ -52,5 +49,4 @@ private:
 
 void usbInit();
 
-#endif
 #endif

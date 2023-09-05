@@ -131,7 +131,7 @@ bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event)
         }
     case SDL_TEXTINPUT:
         {
-            io.AddInputCharactersUTF8(event->text.text);
+			io.AddInputCharactersUTF8(event->text.text);
             return true;
         }
     case SDL_KEYDOWN:

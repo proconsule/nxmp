@@ -70,6 +70,8 @@ Config::Config(std::string inifile){
 	
 	nxmpconfig.useoc = ini->GetBoolValue("Main", "useoc");
 	
+	nxmpconfig.hwdec = ini->GetBoolValue("Main", "hwdec",true);
+	
 	const char* themenamepv;
 	themenamepv = ini->GetValue("Main", "theme");
 	std::string themenamestring = "Default";
@@ -153,26 +155,17 @@ Config::Config(std::string inifile){
 	
 	
 	topmenu.push_back("Local Files");
-#ifdef NXMP_USBSUPPORT
 	topmenu.push_back("USB");
-#endif
 	topmenu.push_back("Stream Url");
-#ifdef NXMP_NETWORKSUPPORT
 	ini->GetAllValues("Network", "source", values);
-	if(getNetworks().size() != 0){
-		topmenu.push_back("Network");
-	}
-#endif
-#ifdef NXMP_UPNPSUPPORT
+	topmenu.push_back("Network");
 	topmenu.push_back("UPNP");
-#endif
-#ifdef NXMP_ENIGMASUPPORT
 	if(getEnigma() != ""){
 		topmenu.push_back("Enigma2");
 	}
-#endif
 	topmenu.push_back("Playlist");
 	topmenu.push_back("Settings");
+	//topmenu.push_back("MTP");
 	topmenu.push_back("Info");
 	topmenu.push_back("Exit");
 	
@@ -200,13 +193,8 @@ std::string Config::getStartPath(){
 	const char* pv;
 	pv = ini->GetValue("Main", "startpath");
 	if(pv==nullptr){
-#ifdef __SWITCH__
+
 		return "/switch/nxmp";
-#else
-#ifdef _WIN32
-		return "c:\\";
-#endif
-#endif
 	}
 	return pv;
 }
@@ -326,6 +314,16 @@ bool Config::getUseOc(bool tmpvalue){
 }
 void Config::setUseOc(bool _val){
 	nxmptmpconfig.useoc = _val;
+}
+
+bool Config::getHWDec(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.hwdec;
+	}
+	return nxmpconfig.hwdec;
+}
+void Config::setHWDec(bool _val){
+	nxmptmpconfig.hwdec = _val;
 }
 
 int Config::getSubFontSize(bool tmpvalue){
@@ -450,6 +448,58 @@ void Config::setThemeName(std::string value){
 	nxmptmpconfig.themename = value;
 }
 
+void Config::RefreshNetworkShare(std::vector<networkSource> newnetsources){
+	CSimpleIniA::TNamesDepend values;
+	ini->GetAllValues("Network", "source", values);
+	CSimpleIniA::TNamesDepend::const_iterator it;
+	for (it = values.begin(); it != values.end(); ++it) {
+		networkSource tmpsource;
+		std::string test = it->pItem;
+		ini->Delete("Network", "source",test.c_str());
+	}
+	
+	for(int i=0;i<newnetsources.size();i++){
+		ini->SetValue("Network", "source", std::string(newnetsources[i].name + "|" + newnetsources[i].url).c_str());
+	}
+	
+	ini->SaveFile(inifilePath.c_str());
+	
+}
+
+void Config::addNetworkShare(networkSource netshare){
+	
+	std::vector<networkSource> tmpret;
+	CSimpleIniA::TNamesDepend values;
+	ini->GetAllValues("Network", "source", values);
+	//if(values.size() == 0)return tmpret;
+	CSimpleIniA::TNamesDepend::const_iterator it;
+	
+	for (it = values.begin(); it != values.end(); ++it) {
+		networkSource tmpsource;
+		std::string test = it->pItem;
+		std::vector<std::string> splitted = char_split(test,'|');
+		tmpsource.name = splitted[0];
+		tmpsource.url = splitted[1];
+		tmpret.push_back(tmpsource);
+	}
+	
+	tmpret.push_back(netshare);
+	
+	for (it = values.begin(); it != values.end(); ++it) {
+		networkSource tmpsource;
+		std::string test = it->pItem;
+		ini->Delete("Network", "source",test.c_str());
+	}
+	
+	for(int i=0;i<tmpret.size();i++){
+		ini->SetValue("Network", "source", std::string(tmpret[i].name + "|" + tmpret[i].url).c_str());
+		
+	}
+	
+	ini->SaveFile(inifilePath.c_str());
+
+}
+
 void Config::saveSettings(){
 	
 	
@@ -487,6 +537,9 @@ void Config::saveSettings(){
 
 	ini->Delete("Main", "useoc");
 	ini->SetBoolValue("Main", "useoc", nxmpconfig.useoc, NULL, false);
+	
+	ini->Delete("Main", "hwdec");
+	ini->SetBoolValue("Main", "hwdec", nxmpconfig.hwdec, NULL, false);
 
 	ini->Delete("Main", "subfontsize");
 	ini->SetLongValue("Main", "subfontsize", nxmpconfig.subfontsize, NULL, false);

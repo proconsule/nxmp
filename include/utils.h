@@ -7,17 +7,24 @@
 #include <iomanip>
 #include <regex>
 #include <remotefs.h>
-#include "curldownloader.h"
-
-#include <glad/glad.h>
-#ifdef __SWITCH__
-#include <switch.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
+
+#include <glad/glad.h>
+#include <switch.h>
+
+#include "curldownloader.h"
+
+
+#include "imgui.h"
+
+
+#include "logger.h"
+
+
+
 
 typedef struct {
     GLuint id = 0;
@@ -51,8 +58,10 @@ namespace Utility{
 	bool TxtLoadFromMemory(unsigned char* data,size_t image_size, GLuint* out_texture, int* out_width, int* out_height);
 	std::string toLower(const std::string &str);
 	std::string toUpper(const std::string &str);
+	
 	bool endsWith(const std::string &value, const std::string &ending, bool sensitive);
 	bool startWith(const std::string &str, const std::string &value, bool sensitive);
+	
 	std::vector<std::string> getMediaExtensions();
 	std::string humanSize(size_t bytes);
 	std::string str_tolower(std::string s);
@@ -69,6 +78,7 @@ namespace Utility{
 	std::string rtrim(const std::string &s);
 	std::string trim(const std::string &s);
 	std::string truncateLen(std::string path,int len);
+	void FontLoader(std::string fontpath,float fontSize,ImGuiIO &io,ImFont* fontSmallTmp);
 }
 
 #endif

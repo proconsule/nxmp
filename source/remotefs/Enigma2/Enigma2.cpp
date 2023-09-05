@@ -1,5 +1,4 @@
 #include "Enigma2.h"
-#ifdef NXMP_ENIGMASUPPORT
 #include "utils.h"
 
 
@@ -78,7 +77,7 @@ void Enigma2::m3uParser(char * url){
 	curldownloader->Download((char *)m3uurl.c_str(),chunk);
 	
 	
-	string s = chunk->memory;
+	string s = (char *)chunk->memory;
 	std::regex rgx(".*#EXTINF:[[:print:]]*,([[:print:]]*)\n?#?.*\n(http.+)\n");
     std::smatch matches;
     std::smatch sm;
@@ -111,7 +110,7 @@ void Enigma2::m3uParser(char * url){
 	curldownloader->Download((char *)epguurl.c_str(),chunk2);
 	 
 	XMLDocument doc;
-	doc.Parse( chunk2->memory );
+	doc.Parse( (char *)chunk2->memory );
 	XMLElement * pRootElement = doc.RootElement();
 	if (NULL != pRootElement) {
 		XMLElement * pe2service = pRootElement->FirstChildElement("e2event");
@@ -161,7 +160,7 @@ bool Enigma2::getServices(){
 	downurl.append("/web/getservices");
 	curlDownloader * curldownloader = new curlDownloader();
 	curldownloader->Download((char *)downurl.c_str(),chunk);
-	e2services =  parseBouquet(chunk->memory);
+	e2services =  parseBouquet((char *)chunk->memory);
 	free(chunk->memory);
 	free(chunk);
 	return true;
@@ -183,5 +182,3 @@ void Enigma2::backToTop(){
 Enigma2::Enigma2(std::string _url){
 	enigmaurl = _url;
 }
-
-#endif

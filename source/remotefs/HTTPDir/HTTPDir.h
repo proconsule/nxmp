@@ -1,9 +1,6 @@
 #ifndef NXMP_HTTPDIR_H
 #define NXMP_HTTPDIR_H
 
-#include <platforms.h>
-
-#ifdef NXMP_NETWORKSUPPORT
 
 #include <cstdio>
 #include <string>
@@ -13,6 +10,7 @@
 #include <regex>
 #include <curl/curl.h>
 #include "localfiles.h"
+#include "logger.h"
 
 
 
@@ -45,5 +43,4 @@ private:
 	std::string currentpath = "";
 };
 
-#endif
 #endif

@@ -6,9 +6,83 @@
 #include "localfiles.h"
 #include "Enigma2.h"
 
-
 namespace Windows {
-#ifdef NXMP_NETWORKSUPPORT
+	
+	int netwinselected = -1;
+
+	void ShareAddWindow(bool *focus, bool *first_item){
+		Windows::SetupWindow();
+		if (ImGui::Begin("Add Share", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+           
+            if(item.popupstate == POPUP_STATE_NONE){
+				//ImGui::SetNextWindowFocus();
+			}
+           
+			if (ImGui::BeginMenuBar()) {
+				ImGui::Text("Add Share Menu");
+				ImGui::EndMenuBar();
+			}
+			NewNetworkShare->name = InputSwitchKeyboard("##sharename","Share Name:",NewNetworkShare->name);
+			
+			ImGui::Text("Protocol: ");
+			ImGui::SameLine();
+			ImGui::Combo("##protocombo", (int *)&NewNetworkShare->type, NewNetworkShare->protonames, 5);
+			
+			if(NewNetworkShare->type == 0){
+				NewNetworkShare->httpstring = InputSwitchKeyboard("##httpstring","HTTP String",NewNetworkShare->httpstring);
+			
+			}
+			
+			if(NewNetworkShare->type >= 1){
+				NewNetworkShare->address = InputSwitchKeyboard("##address","IP Address:",NewNetworkShare->address);
+				ImGui::Checkbox("Anonymous", &NewNetworkShare->anon);
+				if(!NewNetworkShare->anon){
+					NewNetworkShare->username = InputSwitchKeyboard("##username","Username:",NewNetworkShare->username);
+					NewNetworkShare->password = InputSwitchKeyboard("##password","Password:",NewNetworkShare->password);
+			
+				}
+				NewNetworkShare->remoteshare = InputSwitchKeyboard("##remoteshare","Remote Path:",NewNetworkShare->remoteshare);
+				if(NewNetworkShare->type == 3){
+					ImGui::Text("Remote share on server (share not path)");
+				}else if(NewNetworkShare->type == 4){
+					ImGui::Text("Remote export on server");
+				}else{
+					ImGui::Text("Remote path on server example: /movie/");
+				}
+				
+			}
+			
+			
+			ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2);
+		ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
+			
+		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+		
+		if(!NewNetworkShare->isValidShare()){
+			 ImGui::BeginDisabled();
+		}
+		
+		if (ImGui::Button("Save")){
+			item.state = MENU_STATE_NETWORKBROWSER;
+			configini->addNetworkShare(NewNetworkShare->GenConfigLine());
+		}
+		if(!NewNetworkShare->isValidShare()){
+			 ImGui::EndDisabled();
+		}
+		ImGui::PopStyleColor(3);
+		ImGui::SameLine(0,50);
+		if (ImGui::Button("Cancel")){
+				
+			item.state = MENU_STATE_NETWORKBROWSER;
+		}
+			
+			
+		}
+		Windows::ExitWindow();
+	}
+
 	void FtpWindow(bool *focus, bool *first_item){
 		Windows::SetupWindow();
 		if (ImGui::Begin("Ftp Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
@@ -31,9 +105,9 @@ namespace Windows {
 				for(unsigned int n=0;n<thislist.size();n++){
 						
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						
@@ -42,13 +116,13 @@ namespace Windows {
 						std::string itemid = "##" + std::to_string(n);
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							if(thislist[n].type == FS::FileEntryType::Directory){
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
 									ftpdir->DirList(thislist[n].path + thislist[n].name,Utility::getMediaExtensions());
 								}
 							}else{
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
 									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + thislist[n].path + thislist[n].name;
@@ -66,7 +140,7 @@ namespace Windows {
 							}
 							
 						}else if(item.selectionstate == FILE_SELECTION_NONE){
-							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
 										
 								if(thislist[n].type == FS::FileEntryType::Directory){
@@ -172,9 +246,9 @@ namespace Windows {
 				for(unsigned int n=0;n<thislist.size();n++){
 						
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
@@ -183,7 +257,7 @@ namespace Windows {
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							
 							if(thislist[n].type == FS::FileEntryType::Directory){
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									item.first_item = true;
 									httpdir->DirList(httpdir->getCurrPath() + thislist[n].path,Utility::getMediaExtensions());
@@ -193,7 +267,7 @@ namespace Windows {
 								
 								std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
 								std::string checkitemid = "##check" + std::to_string(n);
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								if(ImGui::Checkbox(checkitemid.c_str(), httpdir->checked(n))){
 									if(*httpdir->checked(n)){
 										playlist->appendFile(thislist[n].name,openurl);
@@ -207,7 +281,7 @@ namespace Windows {
 							}
 							
 						}else if(item.selectionstate == FILE_SELECTION_NONE){
-							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 					
 							static int selected = -1;
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
@@ -286,7 +360,6 @@ namespace Windows {
 	void SSHWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
-		static unsigned int lastfocus = 0;
 		
         if (ImGui::Begin("SSH Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
             if(item.popupstate == POPUP_STATE_NONE){
@@ -309,21 +382,21 @@ namespace Windows {
 					static int selected = -1;
 					
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							if(thislist[n].type == FS::FileEntryType::Directory){
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
 									sshdir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 							}else{
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
 									if(ImGui::Checkbox(checkitemid.c_str(), sshdir->checked(n))){
@@ -341,7 +414,7 @@ namespace Windows {
 							}
 						}
 						if(item.selectionstate == FILE_SELECTION_NONE){
-							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
 								if(sshdir->getCurrList()[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
@@ -429,7 +502,6 @@ namespace Windows {
 	void NFSWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
-		static unsigned int lastfocus = 0;
 		
         if (ImGui::Begin("NFS Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
             if(item.popupstate == POPUP_STATE_NONE){
@@ -452,21 +524,21 @@ namespace Windows {
 					static int selected = -1;
 					
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							if(thislist[n].type == FS::FileEntryType::Directory){
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
 									nfsdir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 							}else{
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
 									if(ImGui::Checkbox(checkitemid.c_str(), nfsdir->checked(n))){
@@ -484,7 +556,7 @@ namespace Windows {
 							}
 						}
 						if(item.selectionstate == FILE_SELECTION_NONE){
-							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
 								if(nfsdir->getCurrList()[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
@@ -573,7 +645,6 @@ namespace Windows {
 	void SambaWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
-		static unsigned int lastfocus = 0;
 		
         if (ImGui::Begin("SMB Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
             if(item.popupstate == POPUP_STATE_NONE){
@@ -596,21 +667,21 @@ namespace Windows {
 					static int selected = -1;
 					
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							ImGui::Image((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(40,40));
 						}else{
-							ImGui::Image((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(40,40));
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							if(thislist[n].type == FS::FileEntryType::Directory){
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
 									sambadir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 							}else{
-								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
+								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
 									if(ImGui::Checkbox(checkitemid.c_str(), sambadir->checked(n))){
@@ -628,7 +699,7 @@ namespace Windows {
 							}
 						}
 						if(item.selectionstate == FILE_SELECTION_NONE){
-							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40 - ImGui::GetFont()->FontSize) / 2});
+							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
 								if(sambadir->getCurrList()[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
@@ -717,32 +788,46 @@ namespace Windows {
 		
         if (ImGui::Begin("Network Source Selection", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
            
-            ImGui::SetNextWindowFocus();
+            if(item.popupstate == POPUP_STATE_NONE){
+				ImGui::SetNextWindowFocus();
+			}
            
 			if(item.networkselect){
 				if (ImGui::BeginListBox("Network Source Menu",ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes))){
+					GUI::NXMPImage((void*)(intptr_t)nxmpicons.SMBTexture.id, ImVec2(50,50));
+					ImGui::SameLine();
+					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});
+					static int selected = -1;
+					if (ImGui::Selectable("Add Share", selected == 0)){
+						NewNetworkShare = new CNetworkShare();
+						item.state = MENU_STATE_ADDSHARE;
+					}	
+					if(ImGui::IsItemHovered()){
+						netwinselected = -1;
+					}
+					
 					for(unsigned int n=0;n<item.networksources.size();n++){
-						static int selected = -1;
+						
 						urlschema thisurl = Utility::parseUrl(item.networksources[n].url);
 						if(thisurl.scheme == "ftp"){
-							ImGui::Image((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "http"){
-							ImGui::Image((void*)(intptr_t)nxmpicons.HTTPTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.HTTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "sftp"){
-							ImGui::Image((void*)(intptr_t)nxmpicons.SFTPTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.SFTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "smb"){
-							ImGui::Image((void*)(intptr_t)nxmpicons.SMBTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.SMBTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "nfs"){
-							ImGui::Image((void*)(intptr_t)nxmpicons.NFSTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)nxmpicons.NFSTexture.id, ImVec2(50,50));
 						}
 						ImGui::SameLine();
-						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});
+						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 						
-						if (ImGui::Selectable(item.networksources[n].name.c_str(), selected == n)){
+						if (ImGui::Selectable(item.networksources[n].name.c_str(), selected == n+1)){
 							item.first_item = true;		
 							item.networkselect = false;
 							
@@ -771,11 +856,21 @@ namespace Windows {
 								nfsdir->DirList(nfsdir->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
 								item.state = MENU_STATE_NFSBROWSER;
 							}
-							if (selected)
+							
+							if (selected){
+								
 								ImGui::SetItemDefaultFocus();
+							}
+						}
+						if(ImGui::IsItemHovered()){
+								netwinselected = n;
 						}
 								
 					}
+					
+				
+					//netwinselected = selected;
+								
 					if (*first_item) {
                         ImGui::SetFocusID(ImGui::GetID((item.networksources[0].name.c_str())), ImGui::GetCurrentWindow());
                         *first_item = false;
@@ -786,5 +881,4 @@ namespace Windows {
 		}
 		Windows::ExitWindow();
 	}
-#endif
 }

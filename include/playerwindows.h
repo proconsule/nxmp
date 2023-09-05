@@ -13,6 +13,9 @@ extern int initSize;
 extern int batteryPorcent;
 namespace playerWindows{
 	
+	extern float playertextscrollpos;
+	extern bool playertextforwardscroll;
+	
 	inline void SetupCacheWindow(void){
 		ImGui::SetNextWindowPos(ImVec2(10.0f*multiplyRes, 600.0f*multiplyRes), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(250.0f*multiplyRes, 80.0f*multiplyRes), ImGuiCond_Once);
@@ -28,13 +31,21 @@ namespace playerWindows{
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
 	}
 	
+	inline void SetupStatsWindow(void){
+		ImGui::SetNextWindowPos(ImVec2(10.0f*multiplyRes, 10.0f*multiplyRes), ImGuiCond_Once);
+        //ImGui::SetNextWindowSize(ImVec2(200.0f, 50.0f), ImGuiCond_Once);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
+	}
+	
 	static float rightmenuposX = 1280.0f;
 	inline void SetupRightWindow(void) {
         if(isHandheld == true)
         ImGui::SetNextWindowPos(ImVec2(rightmenuposX, 0.0f), ImGuiCond_Always);
 		else
-		ImGui::SetNextWindowPos(ImVec2((rightmenuposX*multiplyRes)+100, 0.0f), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(200.0f, 720.0f*multiplyRes), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2((rightmenuposX*multiplyRes), 0.0f), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(200.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
 		
@@ -59,7 +70,7 @@ namespace playerWindows{
 		if (isHandheld == true)
         ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f), ImGuiCond_Once);
 		else
-		ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f*multiplyRes + 45), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(0.0f, 620.0f*multiplyRes), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
@@ -73,6 +84,12 @@ namespace playerWindows{
     };
 	
 	inline void ExitVolumeWindow(void) {
+        ImGui::End();
+        ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor();
+    };
+	
+	inline void ExitStatsWindow(void) {
         ImGui::End();
         ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor();
@@ -109,6 +126,9 @@ namespace playerWindows{
 	void RightHomeShaderMania();
 	void VolumeWindow();
 	
+	void StatsWindow();
+	void DecodingStatsWindow();
+	void PlayerScrollText(float w,float h,const char* fmt, ...); 
 }
 
 #endif

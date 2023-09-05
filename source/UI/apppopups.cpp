@@ -336,4 +336,72 @@ namespace Popups{
 		Popups::ExitPopup();
 	}
 	
+	void NetMenuPopup(void) {
+		Popups::SetupPopup("Network Menu Popup");
+
+		if (ImGui::BeginPopupModal("Network Menu Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			
+			ImGui::Text("%s",item.networksources[Windows::netwinselected].name.c_str());
+			
+			ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
+			if(Windows::netwinselected == 0){
+				ImGui::BeginDisabled();
+			}
+			if (ImGui::Button("Move Up", button_size))
+            {
+					
+					networkSource v1 = item.networksources[Windows::netwinselected];
+					networkSource v2 = item.networksources[Windows::netwinselected-1];
+					
+					item.networksources[Windows::netwinselected]  = v2;
+					item.networksources[Windows::netwinselected-1]  = v1;
+					configini->RefreshNetworkShare(item.networksources);
+					item.popupstate = POPUP_STATE_NONE;
+					ImGui::CloseCurrentPopup();
+					
+					
+			}
+			if(Windows::netwinselected == 0){
+				ImGui::EndDisabled();
+			}
+			if(Windows::netwinselected == item.networksources.size()-1){
+				ImGui::BeginDisabled();
+			}
+			if (ImGui::Button("Move Down", button_size))
+            {
+					networkSource v1 = item.networksources[Windows::netwinselected];
+					networkSource v2 = item.networksources[Windows::netwinselected+1];
+					
+					item.networksources[Windows::netwinselected]  = v2;
+					item.networksources[Windows::netwinselected+1]  = v1;
+					configini->RefreshNetworkShare(item.networksources);
+					item.popupstate = POPUP_STATE_NONE;
+					ImGui::CloseCurrentPopup();
+			}
+			if(Windows::netwinselected == item.networksources.size()-1){
+				ImGui::EndDisabled();
+			}
+			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+			if (ImGui::Button("Delete", button_size))
+            {	
+				item.networksources.erase(item.networksources.begin() + Windows::netwinselected);
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::PopStyleColor(3);
+			
+			
+			
+			if (ImGui::Button("Exit", button_size))
+			{
+                item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+             }
+			
+		}
+		Popups::ExitPopup();
+	}
+	
 }

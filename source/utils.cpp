@@ -3,6 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+
 namespace Utility{
 	
 	std::string formatTimeShort(double seconds) {
@@ -89,7 +90,7 @@ namespace Utility{
 		unsigned char* image_data = stbi_load_from_memory((const stbi_uc *)data, image_size, &image_width, &image_height, &comp, 0); 
 		
 		if (image_data == NULL){
-			printf("Failed to load IMG from memory\n");
+			NXLOG::ERRORLOG("Failed to load IMG from memory\n");
 			return false;
 		}
 		GLuint id = 0;
@@ -152,6 +153,8 @@ namespace Utility{
 			return std::equal(end_low.rbegin(), end_low.rend(), val_low.rbegin());
 		}
 	}
+	
+	
 	std::string toLower(const std::string &str) {
 		std::string ret = str;
 		std::transform(ret.begin(), ret.end(), ret.begin(),[](unsigned char c) { return std::tolower(c); });
@@ -194,7 +197,11 @@ namespace Utility{
             ".wmv",
 			".flac",
             ".m3u",
-            ".m3u8"
+            ".m3u8",
+			".webm",
+			".jpg",
+			".gif",
+			".png"
     };
 	}
 	
@@ -496,7 +503,7 @@ std::string Nozomi_Link(std::string Link){
 
 
 //testing keyboard
-#ifdef __SWITCH__
+
 SwkbdTextCheckResult Keyboard_ValidateText(char *string, size_t size) {
 	if (strcmp(string, "") == 0) {
 		strncpy(string, "Please write a URL!", size);
@@ -505,38 +512,19 @@ SwkbdTextCheckResult Keyboard_ValidateText(char *string, size_t size) {
 
 	return SwkbdTextCheckResult_OK;
 }
-#endif
 
 bool GetChargeStatue(void) {
-#ifdef _WIN32
-	return true;
-#endif
-#ifdef __SWITCH__
+
         Result ret = 0;
 	PsmChargerType chargetype;
         if (R_FAILED(ret = psmGetChargerType(&chargetype)))
             return false;
 	if(chargetype >0)return true;
 	return false;
-#endif
 }
 
-uint32_t GetBatteryPercentage(void) {
-#ifdef _WIN32
-	return 50;
-#endif
-#ifdef __SWITCH__
-        Result ret = 0;
-        u32 percentage = 0;
-       
-        if (R_FAILED(ret = psmGetBatteryChargePercentage(&percentage)))
-            return 0;
-        
-        return percentage;
-#endif
-    }
+
 std::string KeyboardCall (std::string hint, std::string text){
-	#ifdef __SWITCH__
 	Result ret = 0;
 	SwkbdConfig swkbd;
 	static char input_string[512];
@@ -572,10 +560,37 @@ std::string KeyboardCall (std::string hint, std::string text){
 	char *buf = (char*)malloc(512);
 	strcpy(buf, input_string);
 	return std::string(buf);
-	#else
-	return "";
-	#endif
+	
 }
 
 		
+}
+
+
+void Utility::FontLoader(std::string fontpath,float fontSize,ImGuiIO &io,ImFont* fontSmallTmp){
+	NXLOG::DEBUGLOG("Init Fonts\n");
+      
+	unsigned char *pixels = nullptr;
+	int width = 0, height = 0, bpp = 0;
+	ImFontConfig font_cfg = ImFontConfig();
+		
+	font_cfg.OversampleH = font_cfg.OversampleV = 1;
+	font_cfg.PixelSnapH = true;
+		
+	font_cfg.OversampleH = font_cfg.OversampleV = 1;
+	font_cfg.PixelSnapH = true;
+	NXLOG::DEBUGLOG("Loading TTF\n");
+	
+	font_cfg.OversampleH = font_cfg.OversampleV = 1;
+	
+	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesCyrillic());
+	font_cfg.MergeMode = true;
+	io.Fonts->AddFontFromFileTTF("romfs:/NotoSansCJKjp-Medium.otf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
+	
+	
+	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
+	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bpp);
+	//io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
+	
+	io.Fonts->Build();
 }

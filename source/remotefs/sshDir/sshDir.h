@@ -1,10 +1,6 @@
 #ifndef NXMP_SSHDIR_H
 #define NXMP_SSHDIR_H
 
-#include "platforms.h"
-
-#ifdef NXMP_NETWORKSUPPORT
-
 #include <libssh2.h>
 #include <libssh2_sftp.h>
 #include <string>
@@ -37,5 +33,4 @@ private:
 	Playlist *playlist;
 };
 
-#endif
 #endif

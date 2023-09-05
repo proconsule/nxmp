@@ -11,19 +11,14 @@ namespace TOUCHCONTROLS{
 		swipex = 0.0;
 		swipey = 0.0;
 		fingersum += 1; 
-		//printf("FINGER DOWN %f %f\n", event.tfinger.x, event.tfinger.y);
-		fflush(stdout);
+		
 		
 	}
 	void fingerMotion(SDL_Event *sdlevent){
-#ifdef _WIN32
-		swipex = sdlevent->tfinger.dx;
-		swipey = sdlevent->tfinger.dy;
-#endif
-#ifdef __SWITCH__
+
 		swipex += sdlevent->tfinger.dx;
 		swipey += sdlevent->tfinger.dy;
-#endif
+
 		
 	}
 	void fingerUp(SDL_Event *sdlevent){
@@ -43,7 +38,7 @@ namespace TOUCHCONTROLS{
 						SDL_PushEvent(&sdlevent);
 					}
 					if(configini->getPlayerSwipeSeek(false) == 2){
-						printf("Swipe Off \n");
+						NXLOG::DEBUGLOG("Swipe Off \n");
 					}
 				
 							
@@ -62,12 +57,12 @@ namespace TOUCHCONTROLS{
 						SDL_PushEvent(&sdlevent);
 					}
 					if(configini->getPlayerSwipeSeek(false) == 2){
-						printf("Swipe Off \n");
+						NXLOG::DEBUGLOG("Swipe Off \n");
 					}
 				
 			}
 						
-			printf("FINGER UP ONE FINGER %f %f / %f %f\n", sdlevent->tfinger.x, sdlevent->tfinger.y,swipex,swipey);
+			NXLOG::DEBUGLOG("FINGER UP ONE FINGER %f %f / %f %f\n", sdlevent->tfinger.x, sdlevent->tfinger.y,swipex,swipey);
 						
 		}
 		if(fingersum == 2 && item.state == MENU_STATE_PLAYER){
@@ -96,8 +91,8 @@ namespace TOUCHCONTROLS{
 				SDL_PushEvent(&sdlevent);
 			}
 						
-			printf("FINGER UP TWO FINGER %f %f / %f %f\n", sdlevent->tfinger.x, sdlevent->tfinger.y,swipex,swipey);
-			fflush(stdout);
+			NXLOG::DEBUGLOG("FINGER UP TWO FINGER %f %f / %f %f\n", sdlevent->tfinger.x, sdlevent->tfinger.y,swipex,swipey);
+			
 		}
 		
 		fingersum = 0;

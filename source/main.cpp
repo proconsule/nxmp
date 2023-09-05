@@ -1,22 +1,19 @@
-
-#include "platforms.h"
-
-#ifdef NXMP_SWITCH
 #include <switch.h>
-#endif
-
 
 #include <stdio.h>
 #include <ctype.h>
+#include <utility>
+
+
 
 #include <SDL.h>
 #include <glad/glad.h>
-
 
 #include "config.h"
 #include "gui.h"
 #include "utils.h"
 #include "localfiles.h"
+#include "networkShareClass.h"
 #include "ftplib.h"
 #include "HTTPDir.h"
 #include "FTPDir.h"
@@ -34,56 +31,48 @@
 #include "SimpleIni.h"
 #include "SQLiteDB.h"
 #include "eqpreset.h"
+#include "mtpclass.h"
 
 #include "playlist.h"
 
 #include "shaderMania.h"
 #include "SwitchSys.h"
 
+#include "stats.h"
+#include "logger.h"
+
 #define NDEBUG 1
 
-#ifdef NXMP_SWITCH
-using namespace c2d;
-#endif
 
 static bool init();
 
 SDL_Window *window;
-#ifdef NXMP_WIN32
-bool fullscreen = false;
-#endif
 
 SDL_GLContext context;
 libMpv *libmpv = nullptr;
 localFs *localdir = nullptr;
-#ifdef NXMP_NETWORKSUPPORT
 FTPDir *ftpdir = nullptr;
 HTTPDir *httpdir = nullptr;
 sshDir *sshdir = nullptr;
 sambaDir *sambadir = nullptr;
 nfsDir *nfsdir = nullptr;
-#endif
-
-#ifdef NXMP_UPNPSUPPORT
+CNetworkShare *NewNetworkShare = nullptr;
 NXUPnP *nxupnp = nullptr;
-#endif
-
-#ifdef NXMP_USBSUPPORT
 USBMounter *usbmounter = nullptr;
-#endif
-
-#ifdef NXMP_ENIGMASUPPORT
 Enigma2 *enigma2 = nullptr;
-#endif
+
 
 Themes *themes = nullptr;
 
 Config *configini = nullptr;
 EQPreset *eqpreset = nullptr;
 SQLiteDB *sqlitedb = nullptr;
+CMTP *mtp = nullptr;
 bool dbUpdated = false;
 
 Playlist *playlist = nullptr;
+
+CStats *nxmpstats = nullptr;
 
 uint32_t wakeup_on_mpv_render_update;
 uint32_t wakeup_on_mpv_events;
@@ -110,13 +99,17 @@ int newResH = 720;
 float multiplyRes = 1.0f;
 float initScale = 1.0f;
 int initSize = 55;
-int batteryPorcent = 0;
+int batteryPercent = 0;
 std::string tempKbUrl = "";
 shaderMania* shadermania = nullptr;
+
+float currFontsize = 20.0f; 
 
 GLuint WIDTH = handheldWidth, HEIGHT = handheldWidth;
 
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
+
+
 
 void deinitTextures(){
 
@@ -151,38 +144,54 @@ void deinitTextures(){
 
 
 static bool init() {
-	#ifdef NXMP_SWITCH
-    //get if console is docked
+	//get if console is docked
 	AppletOperationMode stus=appletGetOperationMode();
-	if (stus == AppletOperationMode_Handheld) 
-	{printf("Handheld Mode\n");
-	isHandheld=true;
-	newResW = handheldWidth;
-	newResH = handheldHeight;
-	multiplyRes = 1.0f;
+	appletInitializeGamePlayRecording();
+    appletSetWirelessPriorityMode(AppletWirelessPriorityMode_OptimizedForWlan);
+	
+	extern u32 __nx_applet_type;
+    auto saved_applet_type = std::exchange(__nx_applet_type, AppletType_LibraryApplet);
+
+    nvInitialize();
+    __nx_applet_type = saved_applet_type;
+	
+	if (stus == AppletOperationMode_Handheld) {
+		NXLOG::DEBUGLOG("Handheld Mode\n");
+		isHandheld=true;
+		newResW = handheldWidth;
+		newResH = handheldHeight;
+		multiplyRes = 1.0f;
+		currFontsize = 20.0f;
 	}
-	if (stus == AppletOperationMode_Console) 
-	{printf("Docked Mode\n");
-	isHandheld=false;
-	newResW = dockedWidth;
-	newResH = dockedHeight;
-	multiplyRes = 1.5f;
+	if (stus == AppletOperationMode_Console) {
+		NXLOG::DEBUGLOG("Docked Mode\n");
+		isHandheld=false;
+		newResW = dockedWidth;
+		newResH = dockedHeight;
+		multiplyRes = 1.5f;
+		currFontsize = 30.0f;
 	}
-    #endif
+
 	
 	
 	bool success = true;
-
-	SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "no");
+	NXLOG::DEBUGLOG("INIT SDL");
+    SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "no");
     if( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0 ){
-        printf("%s: SDL could not initialize! SDL Error: %s", __func__, SDL_GetError());
+        NXLOG::ERRORLOG("%s: SDL could not initialize! SDL Error: %s", __func__, SDL_GetError());
         success =  false;
     }
     else {
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		
+		
+	
 
 		WIDTH = newResW; HEIGHT = newResH;
         window = SDL_CreateWindow(
@@ -193,48 +202,39 @@ static bool init() {
                 SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
         );
         if( window == NULL ){
-            printf("%s: Window could not be created! SDL Error: %s", __func__, SDL_GetError());
+            NXLOG::ERRORLOG("%s: Window could not be created! SDL Error: %s", __func__, SDL_GetError());
             success =  false;
         }
         else {
             context = SDL_GL_CreateContext(window);
+			
             if( context == NULL )
             {
-                printf( "%s: OpenGL context could not be created! SDL Error: %s", __func__, SDL_GetError());
+                NXLOG::ERRORLOG( "%s: OpenGL context could not be created! SDL Error: %s", __func__, SDL_GetError());
                 success =  false;
             }
             else {
                 gladLoadGL();
             }
+			SDL_GL_SetSwapInterval(1); 
         }
     }
     return success;
 }
 
-#ifdef NXMP_SWITCH
-int main() {
-	 appletLockExit();
-#else
-int main(int argc,char *argv[]){
-	if(argc>1){
-		if(strcmp(argv[1],"-d") == 0){
-			isHandheld=false;
-			newResW = dockedWidth;
-			newResH = dockedHeight;
-			multiplyRes = 1.5f;
-		}
-	}
-#endif
-	
 
-#ifdef NXMP_SWITCH
+int main() {
+	appletLockExit();
 	socketInitializeDefault();
+	
+	NXLOG::loglevel = 2;
+
 #ifdef NDEBUG
 	nxlinkStdio();
 #endif	
-#endif
+	
 
-	printf("Loading Config\n");
+	NXLOG::DEBUGLOG("Loading Config\n");
 	
 	configini = new Config("config.ini");
 	
@@ -250,16 +250,17 @@ int main(int argc,char *argv[]){
 	shadermania = new shaderMania();
 	
 	
-#ifdef NXMP_SWITCH
+
 	Result ret;
 	if (R_FAILED(ret = romfsInit())) {
-		printf("romfsInit() failed: 0x%x\n", ret);
+		NXLOG::ERRORLOG("romfsInit() failed: 0x%x\n", ret);
 		return ret;
 	}
-	if (R_FAILED(ret = psmInitialize()))
-    printf("psmInitialize() failed: 0x%x.\n\n", ret);
-#endif
-	printf("Init GUI\n");
+	
+	//if (R_FAILED(ret = psmInitialize()))
+	//	printf("psmInitialize() failed: 0x%x.\n\n", ret);
+
+	NXLOG::DEBUGLOG("Init GUI\n");
 	if ( init() ) {
 		
         IMGUI_CHECKVERSION();
@@ -279,241 +280,183 @@ int main(int argc,char *argv[]){
 		io.MouseDrawCursor = false;
         
         ImGui::StyleColorsDark();
-		printf("Init MPV\n");
 		
-		printf("Init SDL\n");
+		NXLOG::DEBUGLOG("Init IMGUI SDL BACKEND\n");
 		ImGui_ImplSDL2_InitForOpenGL(window, context);
-        printf("Init OPENGL\n");
-		ImGui_ImplOpenGL3_Init("#version 430 core");
+        NXLOG::DEBUGLOG("Init IMGUI OPENGL BACKEND\n");
+		const char* glsl_version = "#version 430 core";
 		
+		ImGui_ImplOpenGL3_Init(glsl_version);
 		
-#ifdef NXMP_SWITCH
-		plInitialize(PlServiceType_System);
+		//plInitialize(PlServiceType_System);
 		if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {
-			printf("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
+			NXLOG::ERRORLOG("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
 			return ret;
 		}
-#endif
-		printf("Init Fonts\n");
-      
-		unsigned char *pixels = nullptr;
-		int width = 0, height = 0, bpp = 0;
-		ImFontConfig font_cfg;
+		
+		
+		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,io,fontSmall);
+	
+		NXLOG::DEBUGLOG("Loading Textures\n");
 
-		printf("Loading TTF\n");
+		Utility::TxtLoadFromFile("romfs:/sdcard.png",&nxmpicons.SdCardTexture.id,&nxmpicons.SdCardTexture.width,&nxmpicons.SdCardTexture.height);
+		Utility::TxtLoadFromFile("romfs:/usb.png",&nxmpicons.UsbTexture.id,&nxmpicons.UsbTexture.width,&nxmpicons.UsbTexture.height);
+		Utility::TxtLoadFromFile("romfs:/network.png",&nxmpicons.NetworkTexture.id,&nxmpicons.NetworkTexture.width,&nxmpicons.NetworkTexture.height);
+		Utility::TxtLoadFromFile("romfs:/enigma2.png",&nxmpicons.Enigma2Texture.id,&nxmpicons.Enigma2Texture.width,&nxmpicons.Enigma2Texture.height);
+		Utility::TxtLoadFromFile("romfs:/folder.png",&nxmpicons.FolderTexture.id,&nxmpicons.FolderTexture.width,&nxmpicons.FolderTexture.height);
+		Utility::TxtLoadFromFile("romfs:/file.png",&nxmpicons.FileTexture.id,&nxmpicons.FileTexture.width,&nxmpicons.FileTexture.height);
+		Utility::TxtLoadFromFile("romfs:/playlist.png",&nxmpicons.PlaylistTexture.id,&nxmpicons.PlaylistTexture.width,&nxmpicons.PlaylistTexture.height);
+		Utility::TxtLoadFromFile("romfs:/info.png",&nxmpicons.InfoTexture.id,&nxmpicons.InfoTexture.width,&nxmpicons.InfoTexture.height);
+		Utility::TxtLoadFromFile("romfs:/settings.png",&nxmpicons.SettingsTexture.id,&nxmpicons.SettingsTexture.width,&nxmpicons.SettingsTexture.height);
+		Utility::TxtLoadFromFile("romfs:/ffmpeg.png",&nxmpicons.FFMPEGTexture.id,&nxmpicons.FFMPEGTexture.width,&nxmpicons.FFMPEGTexture.height);
+		Utility::TxtLoadFromFile("romfs:/http.png",&nxmpicons.HTTPTexture.id,&nxmpicons.HTTPTexture.width,&nxmpicons.HTTPTexture.height);
+		Utility::TxtLoadFromFile("romfs:/ftp.png",&nxmpicons.FTPTexture.id,&nxmpicons.FTPTexture.width,&nxmpicons.FTPTexture.height);
+		Utility::TxtLoadFromFile("romfs:/sftp.png",&nxmpicons.SFTPTexture.id,&nxmpicons.SFTPTexture.width,&nxmpicons.SFTPTexture.height);
+		Utility::TxtLoadFromFile("romfs:/smb.png",&nxmpicons.SMBTexture.id,&nxmpicons.SMBTexture.width,&nxmpicons.SMBTexture.height);
+		Utility::TxtLoadFromFile("romfs:/nfs.png",&nxmpicons.NFSTexture.id,&nxmpicons.NFSTexture.width,&nxmpicons.NFSTexture.height);
+		Utility::TxtLoadFromFile("romfs:/upnp.png",&nxmpicons.UPNPTexture.id,&nxmpicons.UPNPTexture.width,&nxmpicons.UPNPTexture.height);
+		Utility::TxtLoadFromFile("romfs:/mpv.png",&nxmpicons.MPVTexture.id,&nxmpicons.MPVTexture.width,&nxmpicons.MPVTexture.height);
+		Utility::TxtLoadFromFile("romfs:/exit.png",&nxmpicons.ExitTexture.id,&nxmpicons.ExitTexture.width,&nxmpicons.ExitTexture.height);
+		Utility::TxtLoadFromFile("romfs:/nxmp-banner.jpg",&nxmpicons.NXMPBannerTexture.id,&nxmpicons.NXMPBannerTexture.width,&nxmpicons.NXMPBannerTexture.height);
+		Utility::TxtLoadFromFile("romfs:/player/play.png",&nxmpicons.PlayIcon.id,&nxmpicons.PlayIcon.width,&nxmpicons.PlayIcon.height);
+		Utility::TxtLoadFromFile("romfs:/player/stop.png",&nxmpicons.StopIcon.id,&nxmpicons.StopIcon.width,&nxmpicons.StopIcon.height);
+		Utility::TxtLoadFromFile("romfs:/player/pause.png",&nxmpicons.PauseIcon.id,&nxmpicons.PauseIcon.width,&nxmpicons.PauseIcon.height);
+		Utility::TxtLoadFromFile("romfs:/player/mute.png",&nxmpicons.MuteIcon.id,&nxmpicons.MuteIcon.width,&nxmpicons.MuteIcon.height);
+		Utility::TxtLoadFromFile("romfs:/player/volume.png",&nxmpicons.VolumeIcon.id,&nxmpicons.VolumeIcon.width,&nxmpicons.VolumeIcon.height);
+		Utility::TxtLoadFromFile("romfs:/player/loop.png",&nxmpicons.LoopIcon.id,&nxmpicons.LoopIcon.width,&nxmpicons.LoopIcon.height);
+		Utility::TxtLoadFromFile("romfs:/player/noloop.png",&nxmpicons.NoLoopIcon.id,&nxmpicons.NoLoopIcon.width,&nxmpicons.NoLoopIcon.height);
 		
-		
-		
-#ifdef NXMP_SWITCH
-		io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg);
-		fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg);
-#else
-		io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg);
-		fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg);
-#endif
-		
-			static const ImWchar tmranges[] =
-                {
-					0x2019, 0x2019,
-                    0x2122, 0x2122,
-					0x2713, 0x2713,
-					0x2714, 0x2714,
-					0x2716, 0x2716,
-					0,
-                };
-	
-	
-	static ImWchar ranges[] = { 0x1, 0x1FFFF, 0 };
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	font_cfg.MergeMode = true;
 
-#ifdef NXMP_SWITCH
-	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
-	fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
-#else
-	io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
-	fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
-#endif
-		
-		
-	io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
-	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
-	io.Fonts->Build();
-	
-	
-	printf("Loading Textures\n");
-#ifdef NXMP_SWITCH
-	Utility::TxtLoadFromFile("romfs:/sdcard.png",&nxmpicons.SdCardTexture.id,&nxmpicons.SdCardTexture.width,&nxmpicons.SdCardTexture.height);
-	Utility::TxtLoadFromFile("romfs:/usb.png",&nxmpicons.UsbTexture.id,&nxmpicons.UsbTexture.width,&nxmpicons.UsbTexture.height);
-	Utility::TxtLoadFromFile("romfs:/network.png",&nxmpicons.NetworkTexture.id,&nxmpicons.NetworkTexture.width,&nxmpicons.NetworkTexture.height);
-	Utility::TxtLoadFromFile("romfs:/enigma2.png",&nxmpicons.Enigma2Texture.id,&nxmpicons.Enigma2Texture.width,&nxmpicons.Enigma2Texture.height);
-	Utility::TxtLoadFromFile("romfs:/folder.png",&nxmpicons.FolderTexture.id,&nxmpicons.FolderTexture.width,&nxmpicons.FolderTexture.height);
-	Utility::TxtLoadFromFile("romfs:/file.png",&nxmpicons.FileTexture.id,&nxmpicons.FileTexture.width,&nxmpicons.FileTexture.height);
-	Utility::TxtLoadFromFile("romfs:/playlist.png",&nxmpicons.PlaylistTexture.id,&nxmpicons.PlaylistTexture.width,&nxmpicons.PlaylistTexture.height);
-	Utility::TxtLoadFromFile("romfs:/info.png",&nxmpicons.InfoTexture.id,&nxmpicons.InfoTexture.width,&nxmpicons.InfoTexture.height);
-	Utility::TxtLoadFromFile("romfs:/settings.png",&nxmpicons.SettingsTexture.id,&nxmpicons.SettingsTexture.width,&nxmpicons.SettingsTexture.height);
-	Utility::TxtLoadFromFile("romfs:/ffmpeg.png",&nxmpicons.FFMPEGTexture.id,&nxmpicons.FFMPEGTexture.width,&nxmpicons.FFMPEGTexture.height);
-	Utility::TxtLoadFromFile("romfs:/http.png",&nxmpicons.HTTPTexture.id,&nxmpicons.HTTPTexture.width,&nxmpicons.HTTPTexture.height);
-	Utility::TxtLoadFromFile("romfs:/ftp.png",&nxmpicons.FTPTexture.id,&nxmpicons.FTPTexture.width,&nxmpicons.FTPTexture.height);
-	Utility::TxtLoadFromFile("romfs:/sftp.png",&nxmpicons.SFTPTexture.id,&nxmpicons.SFTPTexture.width,&nxmpicons.SFTPTexture.height);
-	Utility::TxtLoadFromFile("romfs:/smb.png",&nxmpicons.SMBTexture.id,&nxmpicons.SMBTexture.width,&nxmpicons.SMBTexture.height);
-	Utility::TxtLoadFromFile("romfs:/nfs.png",&nxmpicons.NFSTexture.id,&nxmpicons.NFSTexture.width,&nxmpicons.NFSTexture.height);
-	Utility::TxtLoadFromFile("romfs:/upnp.png",&nxmpicons.UPNPTexture.id,&nxmpicons.UPNPTexture.width,&nxmpicons.UPNPTexture.height);
-	Utility::TxtLoadFromFile("romfs:/mpv.png",&nxmpicons.MPVTexture.id,&nxmpicons.MPVTexture.width,&nxmpicons.MPVTexture.height);
-	Utility::TxtLoadFromFile("romfs:/exit.png",&nxmpicons.ExitTexture.id,&nxmpicons.ExitTexture.width,&nxmpicons.ExitTexture.height);
-	Utility::TxtLoadFromFile("romfs:/nxmp-banner.jpg",&nxmpicons.NXMPBannerTexture.id,&nxmpicons.NXMPBannerTexture.width,&nxmpicons.NXMPBannerTexture.height);
-	Utility::TxtLoadFromFile("romfs:/player/play.png",&nxmpicons.PlayIcon.id,&nxmpicons.PlayIcon.width,&nxmpicons.PlayIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/stop.png",&nxmpicons.StopIcon.id,&nxmpicons.StopIcon.width,&nxmpicons.StopIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/pause.png",&nxmpicons.PauseIcon.id,&nxmpicons.PauseIcon.width,&nxmpicons.PauseIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/mute.png",&nxmpicons.MuteIcon.id,&nxmpicons.MuteIcon.width,&nxmpicons.MuteIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/volume.png",&nxmpicons.VolumeIcon.id,&nxmpicons.VolumeIcon.width,&nxmpicons.VolumeIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/loop.png",&nxmpicons.LoopIcon.id,&nxmpicons.LoopIcon.width,&nxmpicons.LoopIcon.height);
-	Utility::TxtLoadFromFile("romfs:/player/noloop.png",&nxmpicons.NoLoopIcon.id,&nxmpicons.NoLoopIcon.width,&nxmpicons.NoLoopIcon.height);
-	
-#else
-	Utility::TxtLoadFromFile("./romfs/sdcard.png",&nxmpicons.SdCardTexture.id,&nxmpicons.SdCardTexture.width,&nxmpicons.SdCardTexture.height);
-	Utility::TxtLoadFromFile("./romfs/usb.png",&nxmpicons.UsbTexture.id,&nxmpicons.UsbTexture.width,&nxmpicons.UsbTexture.height);
-	Utility::TxtLoadFromFile("./romfs/network.png",&nxmpicons.NetworkTexture.id,&nxmpicons.NetworkTexture.width,&nxmpicons.NetworkTexture.height);
-	Utility::TxtLoadFromFile("./romfs/enigma2.png",&nxmpicons.Enigma2Texture.id,&nxmpicons.Enigma2Texture.width,&nxmpicons.Enigma2Texture.height);
-	Utility::TxtLoadFromFile("./romfs/folder.png",&nxmpicons.FolderTexture.id,&nxmpicons.FolderTexture.width,&nxmpicons.FolderTexture.height);
-	Utility::TxtLoadFromFile("./romfs/file.png",&nxmpicons.FileTexture.id,&nxmpicons.FileTexture.width,&nxmpicons.FileTexture.height);
-	Utility::TxtLoadFromFile("./romfs/info.png",&nxmpicons.InfoTexture.id,&nxmpicons.InfoTexture.width,&nxmpicons.InfoTexture.height);
-	Utility::TxtLoadFromFile("./romfs/playlist.png",&nxmpicons.PlaylistTexture.id,&nxmpicons.PlaylistTexture.width,&nxmpicons.PlaylistTexture.height);
-	Utility::TxtLoadFromFile("./romfs/settings.png",&nxmpicons.SettingsTexture.id,&nxmpicons.SettingsTexture.width,&nxmpicons.SettingsTexture.height);
-	Utility::TxtLoadFromFile("./romfs/ffmpeg.png",&nxmpicons.FFMPEGTexture.id,&nxmpicons.FFMPEGTexture.width,&nxmpicons.FFMPEGTexture.height);
-	Utility::TxtLoadFromFile("./romfs/http.png",&nxmpicons.HTTPTexture.id,&nxmpicons.HTTPTexture.width,&nxmpicons.HTTPTexture.height);
-	Utility::TxtLoadFromFile("./romfs/ftp.png",&nxmpicons.FTPTexture.id,&nxmpicons.FTPTexture.width,&nxmpicons.FTPTexture.height);
-	Utility::TxtLoadFromFile("./romfs/sftp.png",&nxmpicons.SFTPTexture.id,&nxmpicons.SFTPTexture.width,&nxmpicons.SFTPTexture.height);
-	Utility::TxtLoadFromFile("./romfs/smb.png",&nxmpicons.SMBTexture.id,&nxmpicons.SMBTexture.width,&nxmpicons.SMBTexture.height);
-	Utility::TxtLoadFromFile("./romfs/nfs.png",&nxmpicons.NFSTexture.id,&nxmpicons.NFSTexture.width,&nxmpicons.NFSTexture.height);
-	Utility::TxtLoadFromFile("./romfs/upnp.png",&nxmpicons.UPNPTexture.id,&nxmpicons.UPNPTexture.width,&nxmpicons.UPNPTexture.height);
-	Utility::TxtLoadFromFile("./romfs/mpv.png",&nxmpicons.MPVTexture.id,&nxmpicons.MPVTexture.width,&nxmpicons.MPVTexture.height);
-	Utility::TxtLoadFromFile("./romfs/exit.png",&nxmpicons.ExitTexture.id,&nxmpicons.ExitTexture.width,&nxmpicons.ExitTexture.height);
-	Utility::TxtLoadFromFile("./romfs/nxmp-banner.jpg",&nxmpicons.NXMPBannerTexture.id,&nxmpicons.NXMPBannerTexture.width,&nxmpicons.NXMPBannerTexture.height);
-	Utility::TxtLoadFromFile("./romfs/player/play.png",&nxmpicons.PlayIcon.id,&nxmpicons.PlayIcon.width,&nxmpicons.PlayIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/stop.png",&nxmpicons.StopIcon.id,&nxmpicons.StopIcon.width,&nxmpicons.StopIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/pause.png",&nxmpicons.PauseIcon.id,&nxmpicons.PauseIcon.width,&nxmpicons.PauseIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/mute.png",&nxmpicons.MuteIcon.id,&nxmpicons.MuteIcon.width,&nxmpicons.MuteIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/volume.png",&nxmpicons.VolumeIcon.id,&nxmpicons.VolumeIcon.width,&nxmpicons.VolumeIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/loop.png",&nxmpicons.LoopIcon.id,&nxmpicons.LoopIcon.width,&nxmpicons.LoopIcon.height);
-	Utility::TxtLoadFromFile("./romfs/player/noloop.png",&nxmpicons.NoLoopIcon.id,&nxmpicons.NoLoopIcon.width,&nxmpicons.NoLoopIcon.height);
-	
-	
-#endif	
-
-	if(configini->getThemeName(false) != "Default"){
-		Themes  *themes = new Themes();
-		themes->getThemes();
-		int themeidx = themes->getThemeIDX(configini->getThemeName(false));
-		if(themeidx >-1){
-			themes->setTheme(themes->themeslist[themeidx].path);
+		if(configini->getThemeName(false) != "Default"){
+			Themes  *themes = new Themes();
+			themes->getThemes();
+			int themeidx = themes->getThemeIDX(configini->getThemeName(false));
+			if(themeidx >-1){
+				themes->setTheme(themes->themeslist[themeidx].path);
+			}
+			delete themes;
+		}else{
+			Themes  *themes = new Themes();
+			themes->setDefault();
+			delete themes;
 		}
-		delete themes;
-	}else{
-		Themes  *themes = new Themes();
-		themes->setDefault();
-		delete themes;
-	}
-	
-#ifdef __SWITCH__
-
-if (hosversionBefore(8, 0, 0)) {
-        if (R_SUCCEEDED(pcvInitialize())) {
-            SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
-            SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
-            SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
-        }
-    } else {
-        if (R_SUCCEEDED(clkrstInitialize())) {
-            SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
-            SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
-            SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
-        }
-    }
-
-    printf("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
-    SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
-#endif
 
 
-	GUI::initMpv();
-	
-	GUI::RenderLoop();
-	printf("Ending Render Loop\n");
 
-#ifdef __SWITCH__
-	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
-#endif
+		if (hosversionBefore(8, 0, 0)) {
+			if (R_SUCCEEDED(pcvInitialize())) {
+				SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
+				SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
+				SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
+			}
+		} else {
+			if (R_SUCCEEDED(clkrstInitialize())) {
+				SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
+				SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
+				SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
+			}
+		}
 
-	delete libmpv;
-	libmpv = nullptr;
-	printf("Ending MPV\n");
+		NXLOG::DEBUGLOG("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
+		SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
+
+
+		
+		GUI::initMpv();
+
+		int w, h;
+		SDL_GetWindowSize(window, &w, &h);
+		
+		fbo = {
+				.fbo = 0,
+				.w = w,
+				.h = h,
+		};
+		
+
+		params[0] = {MPV_RENDER_PARAM_OPENGL_FBO, &fbo};
+		params[1] = {MPV_RENDER_PARAM_FLIP_Y, &__fbo_one};
+		params[2] = {(mpv_render_param_type)0};
+			
+		
+		nxmpstats = new CStats();
+		nxmpstats->StartThreads();
+		
+		GUI::RenderLoop();
+		NXLOG::DEBUGLOG("Ending Render Loop\n");
+
+
+
+		SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
+
+
+
+		delete libmpv;
+		libmpv = nullptr;
+		NXLOG::DEBUGLOG("Ending MPV\n");
+		
+		
+		if(localdir != nullptr){
+			delete localdir;
+			localdir = nullptr;
+		}
+		if(usbmounter != nullptr){
+			delete usbmounter;
+			usbmounter = nullptr;
+		}
+		if(ftpdir != nullptr){
+			delete ftpdir;
+			ftpdir = nullptr;
+		}
+		if(httpdir != nullptr){
+			delete httpdir;
+			httpdir = nullptr;
+		}
+		if(enigma2 != nullptr){
+			delete enigma2;
+			enigma2 = nullptr;
+		}
+		if(nxupnp != nullptr){
+			delete nxupnp;
+			nxupnp = nullptr;
+		}
+		if(sqlitedb != nullptr){
+			delete sqlitedb;
+			sqlitedb = nullptr;
+		}
 	
-	
-	if(localdir != nullptr){
-		delete localdir;
-		localdir = nullptr;
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplSDL2_Shutdown();
+		ImGui::DestroyContext();
+		SDL_GL_DeleteContext(context);
+		deinitTextures();
+		
 	}
-#ifdef NXMP_USBSUPPORT
-	if(usbmounter != nullptr){
-		delete usbmounter;
-		usbmounter = nullptr;
-	}
-#endif
-#ifdef NXMP_NETWORKSUPPORT
-	if(ftpdir != nullptr){
-		delete ftpdir;
-		ftpdir = nullptr;
-	}
-	if(httpdir != nullptr){
-		delete httpdir;
-		httpdir = nullptr;
-	}
-#endif
-#ifdef NXMP_ENIGMASUPPORT
-	if(enigma2 != nullptr){
-		delete enigma2;
-		enigma2 = nullptr;
-	}
-#endif
-#ifdef NXMP_UPNPSUPPORT
-	if(nxupnp != nullptr){
-		delete nxupnp;
-		nxupnp = nullptr;
-	}
-#endif
+	SDL_DestroyWindow(window);
+	window = NULL;
+	SDL_Quit();
 	
-	if(sqlitedb != nullptr){
-		delete sqlitedb;
-		sqlitedb = nullptr;
+	if(nxmpstats != nullptr){
+		nxmpstats->CloseThreads();
+		delete nxmpstats;
+		nxmpstats = nullptr;
 	}
 	
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
-    SDL_GL_DeleteContext(context);
-	deinitTextures();
-    }
-    SDL_DestroyWindow(window);
-    window = NULL;
-    SDL_Quit();
+	NXLOG::DEBUGLOG("Exit Services\n");
 	
-	
-	
-	printf("Exit Services\n");
-	
-#ifdef NXMP_SWITCH
+
 	if (hosversionBefore(8, 0, 0)) {
-    pcvExit();
+		pcvExit();
     } else {
-    clkrstExit();
+		clkrstExit();
     }
 	ncmExit();
-	plExit();
-	psmExit();
+	//plExit();
+	//psmExit();
 	romfsExit();
     socketExit();
 	appletUnlockExit();
-#endif
+	nvExit();
+
     return 0;	
 }

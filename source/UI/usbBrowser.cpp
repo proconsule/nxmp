@@ -11,7 +11,6 @@ namespace Windows {
         Windows::SetupWindow();
 		
         if (ImGui::Begin("USB Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
-#ifdef __SWITCH__
             ImGui::SetNextWindowFocus();
             if(usbmounter->getBasePath() == ""){
 				float total_w = ImGui::GetContentRegionAvail().x;
@@ -153,7 +152,6 @@ namespace Windows {
 				//ImGui::NavMoveRequestTryWrapping(g.CurrentWindow, ImGuiNavMoveFlags_LoopY);
 				ImGui::EndListBox();	
 			}
-#endif
         }
         Windows::ExitWindow();
     }

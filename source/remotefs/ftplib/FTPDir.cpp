@@ -1,7 +1,5 @@
 #include "FTPDir.h"
 
-#ifdef NXMP_NETWORKSUPPORT
-
 FTPDir::FTPDir(std::string _url,Playlist *_playlist){
 	url = _url;	
 	urlschema thisurl = Utility::parseUrl(url);
@@ -22,11 +20,11 @@ void FTPDir::DirList(std::string path,const std::vector<std::string> &extensions
 	if(thisurl.port == "")thisurl.port = "21";
 	std::string ftphost = thisurl.server+std::string(":")+thisurl.port;
 	if (!FtpConnect(ftphost.c_str(), &ftp_con)) {
-		printf("could not connect to ftp server\n");
+		NXLOG::ERRORLOG("could not connect to ftp server\n");
 	}else{
 									
 		if (!FtpLogin(thisurl.user.c_str(), thisurl.pass.c_str(), ftp_con)) {
-			printf("could not connect to ftp server\n");
+			NXLOG::ERRORLOG("could not connect to ftp server\n");
 			FtpQuit(ftp_con);
 		}else{
 			currpath = path;
@@ -74,5 +72,3 @@ void FTPDir::backDir(){
 	currpath = FS::removeLastSlash(currpath);
 	currpath = currpath.substr(0, currpath.find_last_of("/"));
 }
-
-#endif

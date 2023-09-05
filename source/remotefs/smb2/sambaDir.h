@@ -1,14 +1,8 @@
 #ifndef NXMP_SAMBADIR_H
 #define NXMP_SAMBADIR_H
 
-#include "platforms.h"
-
-#ifdef NXMP_NETWORKSUPPORT
-
 #include <stdint.h>
-#ifdef __SWITCH__
 #include <sys/_types.h>
-#endif
 #include <smb2/smb2.h>
 #include <smb2/libsmb2.h>
 #include <smb2/libsmb2-raw.h>
@@ -44,5 +38,4 @@ private:
 	Playlist *playlist;
 };
 
-#endif
 #endif

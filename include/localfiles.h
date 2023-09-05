@@ -35,6 +35,9 @@ namespace FS {
 		bool checked = false;
 	};
 	
+	
+	
+	
 	std::string removeLastSlash(const std::string &string);
 	FileType GetFileType(const std::string &filename);
 	std::vector<FileEntry> getDirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);

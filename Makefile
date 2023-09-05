@@ -39,16 +39,16 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	libs/imgui libs/imgui/opengl3 libs/imgui/misc/freetype source source/updater source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
+SOURCES		:=	source/logger source/stats libs/imgui libs/imgui/opengl3 libs/imgui/misc/freetype source source/updater source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 DATA		:=	data
-INCLUDES	:=	libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
+INCLUDES	:=	source/logger source/stats libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 ROMFS		:=	romfs
 
 GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'
 
 VERSION_MAJOR := 0
-VERSION_MINOR := 6
-VERSION_MICRO := 3
+VERSION_MINOR := 7
+VERSION_MICRO := 0
 
 APP_TITLE     := NXMP
 APP_AUTHOR    := proconsule and darkxex
@@ -60,22 +60,22 @@ APP_VERSION   := ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -Wno-sign-compare -O2 -ffunction-sections \
+CFLAGS	:=	-g -ggdb -Wall -Wno-sign-compare -O2 -ffunction-sections \
 			$(ARCH) $(DEFINES) \
                 $(GITREV)
-CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags` -fpermissive -DIMGUI_USE_WCHAR32 -I${PORTLIBS}/include/upnp/
+CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags` -I${PORTLIBS}/include/upnp/
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ $(BUILD_TYPE)
 
-CFLAGS  +=      -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) -gdwarf-2 -gstrict-dwarf
+CFLAGS  +=      -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) 
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
-		-DIMGUI_DISABLE_OBSOLETE_FUNCTIONS -DIMGUI_ENABLE_FREETYPE
+CXXFLAGS	:= $(CFLAGS) -std=gnu++17 -fno-rtti -fexceptions -fpermissive -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
+		  -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lmpv -lssh2 -lswscale -lswresample -lavformat -lavfilter -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lnx -ljansson -lz
+LIBS	:=  `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lssh2 -lmpv -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lopenal -lnx -ljansson -lc -lz
 
 
 

@@ -1,11 +1,6 @@
 #include <cstdio>
 #include "usbfs.h"
 
-
-#include "platforms.h"
-
-#ifdef NXMP_USBSUPPORT
-
 static UEvent *g_statusChangeEvent, g_exitEvent;
 static UsbHsFsDevice *g_usbDevices;
 static u32 g_usbDeviceCount;
@@ -16,7 +11,7 @@ static thrd_t g_thread = {0};
 int usbThread(void *arg) {
 	sleep(1);
 	USBMounter * mymounter = (USBMounter *)arg;
-	printf("USB Thread Started\n");
+	NXLOG::DEBUGLOG("USB Thread Started\n");
     (void) arg;
     Result rc = 0;
     int idx = 0;
@@ -25,10 +20,10 @@ int usbThread(void *arg) {
     Waiter status_change_event_waiter = waiterForUEvent(g_statusChangeEvent);
     Waiter exit_event_waiter = waiterForUEvent(&g_exitEvent);
 
-	printf("Started USB Wait Loop\n");
+	NXLOG::DEBUGLOG("Started USB Wait Loop\n");
     while (true) {
         rc = waitMulti(&idx, -1, status_change_event_waiter,exit_event_waiter);
-		printf("USB Mass Storage status change event triggered!\nMounted USB Mass Storage device count: %u.\n\n", g_usbDeviceCount);
+		NXLOG::DEBUGLOG("USB Mass Storage status change event triggered!\nMounted USB Mass Storage device count: %u.\n\n", g_usbDeviceCount);
 		if (R_FAILED(rc)) continue;
         if (g_usbDevices) {
             free(g_usbDevices);
@@ -41,19 +36,19 @@ int usbThread(void *arg) {
 		
 		if (idx == 1)
         {
-            printf("Exit event triggered!\n");
+            NXLOG::DEBUGLOG("Exit event triggered!\n");
             break;
         }
 
 		if (!g_usbDevices)
         {
-            printf("Failed to allocate memory for mounted USB Mass Storage devices buffer!\n\n");
+            NXLOG::ERRORLOG("Failed to allocate memory for mounted USB Mass Storage devices buffer!\n\n");
             continue;
         }
 
 		if (!(listed_device_count = usbHsFsListMountedDevices(g_usbDevices, g_usbDeviceCount)))
         {
-            printf("Failed to list mounted USB Mass Storage devices!\n\n");
+            NXLOG::ERRORLOG("Failed to list mounted USB Mass Storage devices!\n\n");
             continue;
         }
 		
@@ -61,7 +56,7 @@ int usbThread(void *arg) {
         {
             UsbHsFsDevice *device = &(g_usbDevices[i]);
             usb_devices tmpdev;
-            printf("Device #%u:\n" \
+            NXLOG::DEBUGLOG("Device #%u:\n" \
                         "\t- USB interface ID: %d.\n" \
                         "\t- Logical Unit Number: %u.\n" \
                         "\t- Filesystem index: %u.\n" \
@@ -106,9 +101,9 @@ int usbThread(void *arg) {
             usbHsFsUnmountDevice(device, false);
         }
         
-	printf("%u device(s) safely unmounted. You may now disconnect them from the console.\n\n", listed_device_count);
+	NXLOG::DEBUGLOG("%u device(s) safely unmounted. You may now disconnect them from the console.\n\n", listed_device_count);
 
-    printf("usbThread: end\n");
+    NXLOG::DEBUGLOG("usbThread: end\n");
 	return 0;
 }
 
@@ -122,14 +117,14 @@ USBMounter::USBMounter(Playlist *_playlist){
 	Result rc;
     
 	playlist = _playlist;
-    printf("usbInit\n");
+    NXLOG::DEBUGLOG("usbInit\n");
 	rc = usbHsFsInitialize(0);
 	if (R_FAILED(rc))
     {
-        printf("usbHsFsInitialize() failed! (0x%08X).\n", rc);
+        NXLOG::ERRORLOG("usbHsFsInitialize() failed! (0x%08X).\n", rc);
 		
     }
-	printf("usbHsFsInitialize: %u\n", rc);
+	NXLOG::DEBUGLOG("usbHsFsInitialize: %u\n", rc);
 	g_statusChangeEvent = usbHsFsGetStatusChangeUserEvent();
 	usbHsFsSetFileSystemMountFlags(UsbHsFsMountFlags_ShowHiddenFiles | UsbHsFsMountFlags_ReadOnly);
     ueventCreate(&g_exitEvent, true);
@@ -236,5 +231,3 @@ bool USBMounter::haveIteminPlaylist(){
 	}
 	return false;
 }
-
-#endif

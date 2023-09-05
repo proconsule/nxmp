@@ -12,6 +12,7 @@ public:
 	std::string getCurrentPath();
 	void backPath();
 	std::vector<FS::FileEntry> getCurrList();
+	std::vector<FS::FileEntry> getCurrListUnicode();
 	void DirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
 	void clearChecked();
 	bool *checked(int pos);

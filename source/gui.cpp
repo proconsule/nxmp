@@ -1,8 +1,6 @@
 #include <algorithm>
 #include <iostream>
 
-#include "platforms.h"
-
 #include "gui.h"
 #include "localfiles.h"
 #include "imgui.h"
@@ -12,9 +10,6 @@
 #include "SwitchSys.h"
 
 
-#ifdef NXMP_SWITCH
-using namespace c2d;
-#endif
 
 MenuItem item;
 
@@ -23,7 +18,7 @@ namespace GUI {
 	const int JOYSTICK_DEAD_ZONE = 8000;
 	const int JOYSTICK_EXTENDED_DEAD_ZONE = 32726;
 	
-	
+	int wakeup = 0;
 	
 	
 	static void on_mpv_events(void *ctx)
@@ -54,7 +49,7 @@ namespace GUI {
 	}
 
 	void toggleOC(){
-#ifdef NXMP_SWITCH
+
 		clockoc = !clockoc;
 		if(clockoc){
 			const char *cmd[] = {"show-text", "Overclock Enabled","2000", NULL};
@@ -65,181 +60,15 @@ namespace GUI {
 			mpv_command_async(libmpv->getHandle(), 0, cmd);
 			SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
 		}
-#endif
+
 	}
-	
+
 	
 	void HandleEvents(){
 		SDL_Event event;
 			while (SDL_PollEvent(&event)) {
 				ImGui_ImplSDL2_ProcessEvent(&event);
-#ifdef NXMP_WIN32
-				if (event.type == SDL_KEYDOWN) {
-					Uint8 keycode = event.key.keysym.sym;
-					if(keycode == SDLK_ESCAPE){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_PLUS;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == 79){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_DRIGHT;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == 80){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_DLEFT;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == 82){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_DUP;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == 81){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_DDOWN;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == 32){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_A;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_y){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_Y;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_b){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_B;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_a){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_A;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_x){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_X;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_r){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_R;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_l){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_L;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_i){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_RSTICK_UP;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_k){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_RSTICK_DOWN;
-						SDL_PushEvent(&sdlevent);
-					}
-					
-					if(keycode == SDLK_f){
-						if(fullscreen){
-							SDL_SetWindowFullscreen(window,0);
-							fullscreen = false;
-						}else{
-							SDL_SetWindowFullscreen(window,SDL_WINDOW_FULLSCREEN);
-							fullscreen = true;
-						}
-						
-					}
-					
-					if(keycode == 43){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_PLUS;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == 45){
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_JOYBUTTONDOWN;
-						sdlevent.jbutton.button = SDL_KEY_MINUS;
-						SDL_PushEvent(&sdlevent);
-					}
-					if(keycode == SDLK_t){
-						
-					}
-					if(keycode == SDLK_e){
-						
-					}
-					
-					
-				}
-				else if( event.type == SDL_MOUSEBUTTONDOWN  )
-                {
-					if( event.button.button == SDL_BUTTON_RIGHT) {
-						isMouseSelection = true;
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_FINGERDOWN ;
-						sdlevent.tfinger.x = event.motion.x/(float)newResW;
-						sdlevent.tfinger.y = event.motion.y/(float)newResH;
-						startMousex = event.motion.x;
-						startMousey = event.motion.y;
-						SDL_PushEvent(&sdlevent);
-					}
-				}
-				else if( event.type == SDL_MOUSEMOTION )
-                {
-					if( isMouseSelection) {
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_FINGERMOTION ;
-						sdlevent.tfinger.x = event.motion.x/(float)newResW;
-						sdlevent.tfinger.y = event.motion.y/(float)newResH;
-						float startfloatMousex = startMousex/(float)newResW;
-						float startfloatMousey = startMousey/(float)newResH;
-						sdlevent.tfinger.dx = sdlevent.tfinger.x-startfloatMousex;
-						sdlevent.tfinger.dy = sdlevent.tfinger.y-startfloatMousey;
-						
-						SDL_PushEvent(&sdlevent);
-					}
-					
-				}
-				else if( event.type == SDL_MOUSEBUTTONUP  )
-                {
-					if( event.button.button == SDL_BUTTON_RIGHT) {
-						isMouseSelection = false;
-						SDL_Event sdlevent;
-						sdlevent.type = SDL_FINGERUP ;
-						sdlevent.tfinger.x = event.motion.x/(float)newResW;
-						sdlevent.tfinger.y = event.motion.y/(float)newResH;
-						startMousex = 0;
-						startMousey = 0;
-						SDL_PushEvent(&sdlevent);
-						
-					}
-				}
-				
-				
-				
-#endif
+
 				if( event.type == SDL_FINGERDOWN && configini->getTouchEnable(false) )
 				{
 					TOUCHCONTROLS::fingerDown(&event);
@@ -258,7 +87,7 @@ namespace GUI {
 					
 				}
 				else if(event.type == SDL_FINGERUP && !configini->getTouchEnable(false))
-				{	printf("New Focus with Touch Disabled.\n");
+				{	
 					ImGui::SetNextWindowFocus();
 				}
 
@@ -445,6 +274,12 @@ namespace GUI {
 							item.popupstate = POPUP_STATE_STARTPLAYLIST;
 						}
 						
+						if(item.state == MENU_STATE_NETWORKBROWSER){
+							if(Windows::netwinselected != -1){
+								item.popupstate = POPUP_STATE_NETWORKMENU;
+							}
+						}
+						
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 							if(item.playershowcontrols){
 								item.playershowcontrols=false;
@@ -473,13 +308,14 @@ namespace GUI {
 								delete localdir;
 								localdir = nullptr;
 							}
-#ifdef NXMP_USBSUPPORT
 							if(usbmounter != nullptr && libmpv->Stopped() && !usbmounter->haveIteminPlaylist()){
 								delete usbmounter;
 								usbmounter = nullptr;
 							}
-#endif
-#ifdef NXMP_NETWORKSUPPORT
+							if(NewNetworkShare != nullptr){
+								delete NewNetworkShare;
+								NewNetworkShare = nullptr;
+							}
 							if(ftpdir != nullptr){
 								delete ftpdir;
 								ftpdir = nullptr;
@@ -496,39 +332,34 @@ namespace GUI {
 								delete sambadir;
 								sambadir = nullptr;
 							}
-#endif
-#ifdef NXMP_UPNPSUPPORT
 							if(nxupnp != nullptr){
 								delete nxupnp;
 								nxupnp = nullptr;
 							}
-#endif
-#ifdef NXMP_ENIGMASUPPORT
 							if(enigma2 != nullptr){
 								delete enigma2;
 								enigma2 = nullptr;
 							}
-#endif
+							
+							if(mtp != nullptr){
+								delete mtp;
+								mtp = nullptr;
+							}
 							item.networkselect = true;
 							item.first_item = true;
 							item.state = MENU_STATE_HOME;
-#ifdef NXMP_USBSUPPORT
 							if(usbmounter != nullptr && usbmounter->haveIteminPlaylist()){
 								usbmounter->setBasePath("");
 							}
-#endif
 							
 						}
 										
 					}
 					if (button == SDL_KEY_B){
-#ifdef NXMP_ENIGMASUPPORT
 						if(item.state == MENU_STATE_ENIGMABROWSER){
 							item.first_item = true;
 							enigma2->backToTop();
 						}
-#endif
-#ifdef NXMP_NETWORKSUPPORT
 						if(item.state == MENU_STATE_FTPBROWSER){
 							item.first_item = true;
 							ftpdir->backDir();
@@ -559,8 +390,6 @@ namespace GUI {
 							nfsdir->DirList(nfsdir->getCurrPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
-#endif
-#ifdef NXMP_UPNPSUPPORT
 						if(item.state == MENU_STATE_UPNPBROWSER){
 							item.first_item = true;
 							if(nxupnp->getSelDevice()>-1){
@@ -569,16 +398,13 @@ namespace GUI {
 								nxupnp->getDevice(nxupnp->getSelDevice())->browseOID();
 							}
 						}
-#endif
-						if(item.state == MENU_STATE_USB){
-#ifdef NXMP_USBSUPPORT							
+						if(item.state == MENU_STATE_USB){							
 							if(usbmounter->getBasePath() != ""){
 								item.first_item = true;
 								usbmounter->backPath();
 								usbmounter->DirList(usbmounter->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 								
 							}
-#endif
 						}
 						
 						if(item.state == MENU_STATE_FILEBROWSER){
@@ -651,6 +477,7 @@ namespace GUI {
 				if (event.type == wakeup_on_mpv_render_update)
 				{
 					mpv_render_context_update(libmpv->getContext());
+					GUI::wakeup = 1;
 				}
 				if (event.type == wakeup_on_mpv_events)
 				{
@@ -673,26 +500,44 @@ namespace GUI {
 							item.playercontrolstate = PLAYER_CONTROL_STATE_CONTROLS;
 							
 						}else{
+							mpv_observe_property(libmpv->getHandle(), 0, "hwdec-current", MPV_FORMAT_STRING);
+							mpv_observe_property(libmpv->getHandle(), 0, "video-format", MPV_FORMAT_STRING);
 							mpv_observe_property(libmpv->getHandle(), 0, "playback-time", MPV_FORMAT_DOUBLE);
 							mpv_observe_property(libmpv->getHandle(), 0, "duration", MPV_FORMAT_DOUBLE);
 							mpv_observe_property(libmpv->getHandle(), 0, "metadata", MPV_FORMAT_NODE);
+							mpv_observe_property(libmpv->getHandle(), 0, "video-bitrate", MPV_FORMAT_DOUBLE);
+							mpv_observe_property(libmpv->getHandle(), 0, "audio-bitrate", MPV_FORMAT_DOUBLE);
+							mpv_observe_property(libmpv->getHandle(), 0, "estimated-vf-fps", MPV_FORMAT_DOUBLE);
+							mpv_observe_property(libmpv->getHandle(), 0, "vo-drop-frame-count", MPV_FORMAT_INT64);
+							
+							mpv_observe_property(libmpv->getHandle(), 0, "colormatrix", MPV_FORMAT_STRING);
+							
+							
+							mpv_observe_property(libmpv->getHandle(), 0, "video-params", MPV_FORMAT_NODE);
+							mpv_observe_property(libmpv->getHandle(), 0, "audio-params", MPV_FORMAT_NODE);
 							item.playerstate = PLAYER_STATE_VIDEO;
 						}
+						
+						
+							
+						nxmpstats->decodingstats.videodecstats.codec = libmpv->getVideoCodec();
+						
+						if(libmpv->getFileInfo()->audios.size() > 0){
+							nxmpstats->decodingstats.audiodecstats.codec = libmpv->getAudioCodec();
+							
+						}
+						
 					}
 					
 					if (mp_event->event_id == MPV_EVENT_START_FILE) {
-#ifdef NXMP_SWITCH
+
 						appletSetMediaPlaybackState(true);
-#endif					
-						printf("START FILE\n");
 						item.laststate = item.state;
 						item.state = MENU_STATE_PLAYERCACHING;
+						
 					}
-					//printf("Event id: %d\n",mp_event->event_id);
 					if (mp_event->event_id == MPV_EVENT_END_FILE) {
-#ifdef NXMP_SWITCH
 						appletSetMediaPlaybackState(false);
-#endif					
 						struct mpv_event_end_file *eof = (struct mpv_event_end_file *)mp_event->data;
 						libmpv->setLoop(false);
 						if(item.playerstate == PLAYER_STATE_VIDEO  && libmpv->getFileInfo()->playbackInfo.islive == false && sqlitedb != nullptr){
@@ -706,13 +551,11 @@ namespace GUI {
 							}
 							
 							if(eof->reason == MPV_END_FILE_REASON_EOF){
-								printf("FILE EOF\n");
 								sqlitedb->markCompleted(libmpv->getFileInfo()->path);
 							}
 							
 						}
 						if(eof->reason == MPV_END_FILE_REASON_EOF){
-							printf("FILE EOF\n");
 							if(playlist->getPlaylist().size() >0){
 								if(playlist->getCurrIdx() < playlist->getPlaylist().size()-1){
 									Playlist::playlist_struct nextfile = playlist->getNext();
@@ -726,12 +569,11 @@ namespace GUI {
 								}
 							}
 						}
-						printf("END PLAY FILE\n");
 						item.state = item.laststate;
 						item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
 						item.playercontrolstate = PLAYER_CONTROL_STATE_NONE;
 						item.masterlock = false;
-						printf("MENU STATE: %d\n",item.state );
+						
 					}
 					if(mp_event->event_id == MPV_EVENT_PROPERTY_CHANGE){
 						mpv_event_property *prop = (mpv_event_property*)mp_event->data;
@@ -739,7 +581,6 @@ namespace GUI {
 						{
 							if(prop->data == nullptr)continue;
 							mpv_node node = *(mpv_node *)prop->data;
-							printf("Node format %d\n",node.format);
 							if (node.format == MPV_FORMAT_NODE_MAP) {
 								for (int n = 0; n < node.u.list->num; n++) {
 									std::string key = node.u.list->keys[n];
@@ -749,10 +590,90 @@ namespace GUI {
 									if(key == "artist"){
 										libmpv->getFileInfo()->playbackInfo.artist = node.u.list->values[n].u.string;
 									}
-									printf("META KEY %s\n",key.c_str());
 								}
 							}
 						}
+						
+						if(std::string(prop->name) == "video-params") 
+						{
+							if(prop->format == MPV_FORMAT_NODE)
+							{
+								mpv_node node = *(mpv_node *)prop->data;
+								if(node.format == MPV_FORMAT_NODE_MAP)
+								{
+									for(int i = 0; i < node.u.list->num; i++)
+									{
+										if(std::string(node.u.list->keys[i]) == "pixelformat"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_STRING){
+											 nxmpstats->decodingstats.videodecstats.pixelformat = node.u.list->values[i].u.string;
+										 }
+										}
+										if(std::string(node.u.list->keys[i]) == "dw"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_INT64){
+											 nxmpstats->decodingstats.videodecstats.width = node.u.list->values[i].u.int64;
+										 }
+										}
+										if(std::string(node.u.list->keys[i]) == "dh"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_INT64){
+											 nxmpstats->decodingstats.videodecstats.height = node.u.list->values[i].u.int64;
+										 }
+										}
+										else if(std::string(node.u.list->keys[i]) == "hw-pixelformat"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_STRING){
+											 nxmpstats->decodingstats.videodecstats.hwpixelformat = node.u.list->values[i].u.string;
+										 }
+										}
+										
+										else if(std::string(node.u.list->keys[i]) == "colormatrix"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_STRING){
+											 nxmpstats->decodingstats.videodecstats.colormatrix = node.u.list->values[i].u.string;
+										 }
+										}
+										
+										
+										
+									}
+								}
+								
+								//libmpv->getFileInfo()->playbackInfo.position = (int)timepos;
+							}
+						}
+						
+						if(std::string(prop->name) == "audio-params") 
+						{
+							if(prop->format == MPV_FORMAT_NODE)
+							{
+								mpv_node node = *(mpv_node *)prop->data;
+								if(node.format == MPV_FORMAT_NODE_MAP)
+								{
+									for(int i = 0; i < node.u.list->num; i++)
+									{
+										if(std::string(node.u.list->keys[i]) == "samplerate"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_INT64){
+											 nxmpstats->decodingstats.audiodecstats.samplerate = node.u.list->values[i].u.int64;
+										 }
+										}
+										else if(std::string(node.u.list->keys[i]) == "channel-count"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_INT64){
+											 nxmpstats->decodingstats.audiodecstats.channels = node.u.list->values[i].u.int64;
+										 }
+										}
+										else if(std::string(node.u.list->keys[i]) == "samplerate"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_INT64){
+											 nxmpstats->decodingstats.audiodecstats.samplerate = node.u.list->values[i].u.int64;
+										 }
+										}
+										else if(std::string(node.u.list->keys[i]) == "hr-channels"){
+										 if(node.u.list->values[i].format == MPV_FORMAT_STRING){
+											 nxmpstats->decodingstats.audiodecstats.hrchannels = node.u.list->values[i].u.string;
+										 }
+										}
+
+									}
+								}
+							}
+						}
+
 						if(std::string(prop->name) == "playback-time") 
 						{
 							if(prop->format == MPV_FORMAT_DOUBLE)
@@ -769,9 +690,60 @@ namespace GUI {
 								libmpv->getFileInfo()->playbackInfo.duration = timepos;
 							}
 						}
+						if(std::string(prop->name) == "video-bitrate") 
+						{
+							if(prop->format == MPV_FORMAT_DOUBLE)
+							{
+								double bitrateval = *(double *)prop->data;
+								nxmpstats->decodingstats.videodecstats.bitrate = bitrateval;
+							}
+						}
+						if(std::string(prop->name) == "audio-bitrate") 
+						{
+							if(prop->format == MPV_FORMAT_DOUBLE)
+							{
+								double bitrateval = *(double *)prop->data;
+								nxmpstats->decodingstats.audiodecstats.bitrate = bitrateval;
+							}
+						}
+						if(std::string(prop->name) == "estimated-vf-fps") 
+						{
+							if(prop->format == MPV_FORMAT_DOUBLE)
+							{
+								int64_t fpsval = *(double *)prop->data;
+								nxmpstats->decodingstats.videodecstats.fps = fpsval;
+							}
+						}
+						
+						if(std::string(prop->name) == "vo-drop-frame-count") 
+						{
+							if(prop->format == MPV_FORMAT_INT64)
+							{
+								int64_t dropval = *(int64_t *)prop->data;
+								nxmpstats->decodingstats.videodecstats.framedropcount = dropval;
+							}
+						}
+						
+						if(std::string(prop->name) == "video-format") 
+						{
+							if(prop->format == MPV_FORMAT_STRING)
+							{
+								nxmpstats->decodingstats.videodecstats.videoformat = *(char**)prop->data;
+								//nxmpstats->decodingstats.videodecstats.hwdec = hwdecval;
+							}
+						}
+						if(std::string(prop->name) == "hwdec-current") 
+						{
+							if(prop->format == MPV_FORMAT_STRING)
+							{
+								nxmpstats->decodingstats.videodecstats.hwdec = *(char**)prop->data;
+								//nxmpstats->decodingstats.videodecstats.hwdec = hwdecval;
+							}
+						}
+						
 					}
 					if(mp_event->event_id!=22){
-						printf("event: %s %d\n", mpv_event_name(mp_event->event_id),mp_event->event_id);
+						//printf("event: %s %d\n", mpv_event_name(mp_event->event_id),mp_event->event_id);
 					}
 					}
 				}
@@ -796,70 +768,58 @@ namespace GUI {
 					}
 					break;
 				case MENU_STATE_USB:
-#ifdef NXMP_USBSUPPORT
 					Windows::USBBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
-#endif
 					break;
 				case MENU_STATE_NETWORKBROWSER:
-#ifdef NXMP_NETWORKSUPPORT
 					Windows::NetworkWindow(&item.focus, &item.first_item);
-#endif
+					if(item.popupstate == POPUP_STATE_NETWORKMENU){
+						Popups::NetMenuPopup();
+					}
+					break;
+	            case MENU_STATE_ADDSHARE:
+					Windows::ShareAddWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_FTPBROWSER:
-#ifdef NXMP_NETWORKSUPPORT
 					Windows::FtpWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
-#endif
 					break;
 				case MENU_STATE_HTTPBROWSER:
-#ifdef NXMP_NETWORKSUPPORT
 					Windows::HttpWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
-#endif
 					break;
 				case MENU_STATE_SSHBROWSER:
-#ifdef NXMP_NETWORKSUPPORT
 					Windows::SSHWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
-#endif
 					break;
 				case MENU_STATE_SAMBABROWSER:
-#ifdef NXMP_NETWORKSUPPORT
 					Windows::SambaWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
-#endif
 					break;
 				case MENU_STATE_NFSBROWSER:
-#ifdef NXMP_NETWORKSUPPORT
 					Windows::NFSWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
-#endif
 					break;
 				case MENU_STATE_UPNPBROWSER:
-#ifdef NXMP_UPNPSUPPORT
 					Windows::UPNPBrowserWindow(&item.focus, &item.first_item);
 					//if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 					//	Popups::PlaylistStartPlaylist();
 					//}
-#endif
 					break;
 				case MENU_STATE_ENIGMABROWSER:
-#ifdef NXMP_ENIGMASUPPORT
 					Windows::EnigmaWindow(&item.focus, &item.first_item);
-#endif
 					break;
 				case MENU_STATE_SETTINGS:
 					Windows::SettingsMenuWindow(&item.focus, &item.first_item);
@@ -873,10 +833,20 @@ namespace GUI {
 				case MENU_STATE_INFO:
 					Windows::InfoMenuWindow(&item.focus, &item.first_item);
 					break;
+				case MENU_STATE_MTPSERVER:
+					Windows::MTPServerWindow(&item.focus, &item.first_item);
+					break;
 				case MENU_STATE_PLAYERCACHING:
 					playerWindows::CacheWindow();
 					break;
 				case MENU_STATE_PLAYER:
+				
+					if(item.showstats){
+						playerWindows::StatsWindow();	
+					}
+					if(item.showdecstats){
+						playerWindows::DecodingStatsWindow();	
+					}
 					if(item.showVolume){
 						playerWindows::VolumeWindow();
 					}
@@ -920,9 +890,9 @@ namespace GUI {
 				case PLAYER_RIGHT_MENU_CHAPTERS:
 					playerWindows::RightChapterWindow(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;
-				/*case PLAYER_RIGHT_MENU_ANIME4K:
-					playerWindows::RightHomeAnime4K(&item.rightmenu_focus,&item.rightmenu_first_item);
-					break;*/
+				case PLAYER_RIGHT_MENU_ANIME4K:
+					//playerWindows::RightHomeAnime4K(&item.rightmenu_focus,&item.rightmenu_first_item);
+					break;
 				case PLAYER_RIGHT_MENU_ARATIO:
 					playerWindows::RightHomeARatio(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;
@@ -961,27 +931,20 @@ namespace GUI {
 	void HandleRender(){
 		ImGui::Render();
 		ImGuiIO &io = ImGui::GetIO();
+		
 		glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
 		glClearColor(0.00f, 0.00f, 0.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
-	
+		//mpv_render_context_render(libmpv->getContext(), params); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
+         
+		mpv_render_context_render(libmpv->getContext(), params); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
+         
+		 /*
 		SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
 		SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
-
-		{
-			int w, h;
-			SDL_GetWindowSize(window, &w, &h);
-			fbo = {
-				.fbo = 0,
-				.w = w,
-				.h = h,
-			};
-			params[0] = {MPV_RENDER_PARAM_OPENGL_FBO, &fbo};
-			params[1] = {MPV_RENDER_PARAM_FLIP_Y, &__fbo_one};
-			params[2] = {(mpv_render_param_type)0};
-			mpv_render_context_render(libmpv->getContext(), params);
-		}
+		*/
+		
     	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		SDL_GL_SwapWindow(window);
 
@@ -992,51 +955,59 @@ namespace GUI {
 			item.popupstate = POPUP_STATE_DBUPDATED;
 		}
 		item.first_item = true;
-#ifdef NXMP_SWITCH
 		while (!renderloopdone && appletMainLoop())
-#endif
-#ifdef NXMP_WIN32
-		while (!renderloopdone)
-#endif
 		{
 			HandleEvents();
 			HandleLayers();
 			HandleRender();
-			if(dochangethemefont){
-				changeFontTheme();
-				dochangethemefont = false;
+			//if(dochangethemefont){
+			//	changeFontTheme();
+			//	dochangethemefont = false;
+			//}
+			
+			nxmpstats->UpdateStats();
+			if(GUI::wakeup == 0){
+				nxmpstats->UpdateStats();
+				batteryPercent = nxmpstats->batpercentage;
 			}
-			
-            batteryPorcent = Utility::GetBatteryPercentage();
-			
+			GUI::wakeup = 0;
 
-			#ifdef NXMP_SWITCH
     		//rewrite switch state
 			AppletOperationMode stus=appletGetOperationMode();
-			if (stus == AppletOperationMode_Handheld) 
-			{
-				if (isHandheld == false) 
-				{isHandheld=true;
-				printf("changed to Handheld Mode.\n");
-				newResW = handheldWidth;
-				newResH = handheldHeight;
-				multiplyRes = 1.0f;
-				SDL_SetWindowSize(window, newResW, newResH);
-				reinit();
+			if (stus == AppletOperationMode_Handheld) {
+				if (isHandheld == false) {
+					isHandheld=true;
+					NXLOG::DEBUGLOG("changed to Handheld Mode.\n");
+					newResW = handheldWidth;
+					newResH = handheldHeight;
+					multiplyRes = 1.0f;
+					currFontsize = 20.0f;
+					SDL_SetWindowSize(window, newResW, newResH);
+					fbo = {
+						.fbo = 0,
+						.w = newResW,
+						.h = newResH,
+					};
+					reinit();
 				}
 			}
-			if (stus == AppletOperationMode_Console) 
-			{	if (isHandheld == true) 
-				{isHandheld=false;
-				printf("changed to Docked Mode.\n");
-				newResW = dockedWidth;
-				newResH = dockedHeight;
-				multiplyRes = 1.5f;
-				SDL_SetWindowSize(window, newResW, newResH);
-				reinit();
+			if (stus == AppletOperationMode_Console) {
+				if (isHandheld == true) {
+					isHandheld=false;
+					NXLOG::DEBUGLOG("changed to Docked Mode.\n");
+					newResW = dockedWidth;
+					newResH = dockedHeight;
+					multiplyRes = 1.5f;
+					currFontsize = 30.0f;
+					SDL_SetWindowSize(window, newResW, newResH);
+					fbo = {
+						.fbo = 0,
+						.w = newResW,
+						.h = newResH,
+					};
+					reinit();
 				}
 			}
-    		#endif
 			
 		}
 		
@@ -1066,58 +1037,17 @@ namespace GUI {
 		io.MouseDrawCursor = false;
         
         ImGui::StyleColorsDark();
-		printf("Init MPV\n");
+		NXLOG::DEBUGLOG("Init MPV\n");
 		
-		printf("Init SDL\n");
+		NXLOG::DEBUGLOG("Init SDL\n");
 		ImGui_ImplSDL2_InitForOpenGL(window, context);
-        printf("Init OPENGL\n");
-		ImGui_ImplOpenGL3_Init("#version 430 core");
+        NXLOG::DEBUGLOG("Init OPENGL\n");
+		const char* glsl_version = "#version 430 core";
+		ImGui_ImplOpenGL3_Init(glsl_version);
 		
-		printf("Init Fonts\n");
-      
-		unsigned char *pixels = nullptr;
-		int width = 0, height = 0, bpp = 0;
-		ImFontConfig font_cfg;
-
-		printf("Loading TTF\n");
+		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,io,fontSmall);
 		
 		
-		
-#ifdef NXMP_SWITCH
-		io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg);
-		fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg);
-#else
-		io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg);
-		fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg);
-#endif
-		
-			static const ImWchar tmranges[] =
-                {
-					0x2019, 0x2019,
-                    0x2122, 0x2122,
-					0x2713, 0x2713,
-					0x2714, 0x2714,
-					0x2716, 0x2716,
-					0,
-                };
-	
-	
-	static ImWchar ranges[] = { 0x1, 0x1FFFF, 0 };
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	font_cfg.MergeMode = true;
-
-#ifdef NXMP_SWITCH
-	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
-	fontSmall = io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
-#else
-	io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 24.0f,&font_cfg, tmranges);
-	fontSmall = io.Fonts->AddFontFromFileTTF("./romfs/DejaVuSans.ttf", 16.0f,&font_cfg, tmranges);
-#endif
-		
-	io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
-	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
-	io.Fonts->Build();
-
 	if(configini->getThemeName(false) != "Default"){
 		Themes  *themes = new Themes();
 		themes->getThemes();
@@ -1133,30 +1063,14 @@ namespace GUI {
 	}
 
 	}
-	void changeFontTheme(){
-		ImGuiIO &io = ImGui::GetIO();
-		
-		unsigned char *pixels = nullptr;
-		int width = 0, height = 0, bpp = 0;
-		ImFontConfig font_cfg;
-		
-		io.Fonts->Clear();
-		
-		io.Fonts->AddFontFromFileTTF(themefontpath.c_str(), themefontsize,&font_cfg);
-		fontSmall = io.Fonts->AddFontFromFileTTF(themefontpath.c_str(), themefontsmall,&font_cfg);
-		
-		io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
-		io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
-		io.Fonts->Build();
-		ImGui_ImplOpenGL3_CreateFontsTexture();
-		
-	}
-
+	
 }	
 
-#ifdef _WIN32
-bool isMouseSelection = false;
-int startMousex = 0;
-int startMousey = 0;
-#endif
-	
+/*
+static void on_mpv_render_update(void *ctx)
+{
+    // we set the wakeup flag here to enable the mpv_render_context_render path in the main loop.
+    GUI::wakeup = 1;
+}
+*/
+

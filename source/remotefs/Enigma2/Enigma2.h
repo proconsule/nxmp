@@ -1,9 +1,6 @@
 #ifndef NXMP_ENIGMA2_H
 #define NXMP_ENIGMA2_H
 
-#include "platforms.h"
-
-#ifdef NXMP_ENIGMASUPPORT
 
 #include <cstdlib>
 #include <cstring>
@@ -64,5 +61,4 @@ public:
 	
 };
 
-#endif
 #endif

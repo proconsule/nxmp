@@ -13,50 +13,59 @@ namespace Windows {
     void MainMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupMainWindow();
 		std::vector<std::string> topmenu = configini->topmenu;
+		/*
+		if(isHandheld == true){
+			batteryIcon(ImVec2(1230.0f,5.0f),true,batteryPercent,40,20);
+		}
+        else{
+			batteryIcon(ImVec2(1230.0f*multiplyRes + 20,5.0f),true,batteryPercent,40,20);
+		}
+		*/
 		
-		if(isHandheld == true)
-		batteryIcon(ImVec2(1230.0f,5.0f),true,batteryPorcent,40,20);
-        else
-		batteryIcon(ImVec2(1230.0f*multiplyRes + 20,5.0f),true,batteryPorcent,40,20);
-
+		GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,5.0f),true,batteryPercent,40,20,true);
+				
+		
 		if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
 				static int selected = -1;					
 				for (unsigned int n = 0; n < topmenu.size(); n++){
 					std::string itemid = "##" + std::to_string(n);
 					if(topmenu[n] == "Local Files"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.SdCardTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.SdCardTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "USB"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.UsbTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.UsbTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Network"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "UPNP"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.UPNPTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.UPNPTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Enigma2"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.Enigma2Texture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.Enigma2Texture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Playlist"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.PlaylistTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.PlaylistTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Stream Url"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
+					}
+					else if(topmenu[n] == "MTP"){
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.PlaylistTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Info"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.InfoTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.InfoTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Settings"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.SettingsTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.SettingsTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Exit"){
-						ImGui::Image((void*)(intptr_t)nxmpicons.ExitTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.ExitTexture.id, ImVec2(50,50));
 					}
 							
 							
 					ImGui::SameLine();
-					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});
+					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
 								
 					if (ImGui::Selectable(itemid.c_str(), selected == n)){
 						if(topmenu[n] == "Local Files"){
@@ -66,36 +75,25 @@ namespace Windows {
 							item.first_item = true;
 						}
 						if(topmenu[n] == "USB"){
-#ifdef NXMP_USBSUPPORT
 							usbInit();
 							item.state = MENU_STATE_USB;
 							if(usbmounter == nullptr){
 								usbmounter = new USBMounter(playlist);
 							}
-							
-#endif
 						}
 						if(topmenu[n] == "Network"){
-#ifdef NXMP_NETWORKSUPPORT
 							item.networksources.clear();
 							item.networksources = configini->getNetworks();
 							item.state = MENU_STATE_NETWORKBROWSER;
-							item.first_item = true;
-#endif
-									
+							item.first_item = true;								
 						}
 						if(topmenu[n] == "UPNP"){
-#ifdef NXMP_UPNPSUPPORT
-							printf("upnp selected\n");
-							fflush(stdout);
 							nxupnp = new NXUPnP();
 							nxupnp->Discovery();
 							item.state = MENU_STATE_UPNPBROWSER;
 							item.first_item = true;
-#endif
 						}
 						if(topmenu[n] == "Enigma2"){
-#ifdef NXMP_ENIGMASUPPORT
 							enigma2 = new Enigma2(configini->getEnigma());
 							item.first_item = true;
 							if(configini->getEnigma() == ""){
@@ -104,7 +102,6 @@ namespace Windows {
 								enigma2->getServices();
 								item.state = MENU_STATE_ENIGMABROWSER;
 							}
-#endif
 						}
 						if(topmenu[n] == "Settings"){
 							configini->setLongSeek(configini->getLongSeek(false));
@@ -113,6 +110,11 @@ namespace Windows {
 						}
 						if(topmenu[n] == "Playlist"){
 							item.state = MENU_STATE_PLAYLISTBROWSER;
+						}
+						if(topmenu[n] == "MTP"){
+							item.state = MENU_STATE_MTPSERVER;
+							mtp = new CMTP();
+							mtp->StartServer();
 						}
 						if(topmenu[n] == "Info"){
 							item.state = MENU_STATE_INFO;
@@ -167,10 +169,12 @@ namespace Windows {
 					}
 					ImGui::SameLine();
 					ImGui::Text("%s",topmenu[n].c_str());
+					
+					
+					
 				}
+				
 				if (*first_item) {
-					printf("Set Top\n");
-					fflush(stdout);
 					std::string itemid = "##" + std::to_string(0);
 					ImGui::SetFocusID(ImGui::GetID(itemid.c_str()), ImGui::GetCurrentWindow());
 					ImGuiContext& g = *ImGui::GetCurrentContext();

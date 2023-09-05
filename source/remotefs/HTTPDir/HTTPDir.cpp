@@ -1,7 +1,5 @@
 #include "HTTPDir.h"
 
-#ifdef NXMP_NETWORKSUPPORT
-
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
   size_t realsize = size * nmemb;
@@ -10,7 +8,7 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
   char *ptr = (char *)realloc(mem->memory, mem->size + realsize + 1);
   if(!ptr) {
     /* out of memory! */
-    printf("not enough memory (realloc returned NULL)\n");
+    NXLOG::ERRORLOG("not enough memory (realloc returned NULL)\n");
     return 0;
   }
  
@@ -36,7 +34,7 @@ void HTTPDir::curlDownload(char * url ,HTTPMemoryStruct * chunk){
 	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 	res = curl_easy_perform(curl_handle);
 	if(res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_perform() failed: %s\n",
+		NXLOG::ERRORLOG("curl_easy_perform() failed: %s\n",
         curl_easy_strerror(res));
 	}
 	else {
@@ -132,5 +130,3 @@ void HTTPDir::backDir(){
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/")+1);
 }
-
-#endif

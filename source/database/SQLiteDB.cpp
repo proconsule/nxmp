@@ -9,7 +9,7 @@ SQLiteDB::SQLiteDB(std::string _filename){
 	loadOrSaveDb(db,_filename.c_str(),0);
 	
 	if (rc != SQLITE_OK ) {
-		printf("Error Opening DB\n");
+		NXLOG::ERRORLOG("Error Opening DB\n");
 	}
 	char *err_msg = 0;
 	
@@ -44,7 +44,7 @@ SQLiteDB::SQLiteDB(std::string _filename){
 		dbmajor = sqlite3_column_int(res, 0);
 		dbminor = sqlite3_column_int(res, 1);
 		dbmicro = sqlite3_column_int(res, 2);
-		printf("File DB Version %d.%d.%d\n", dbmajor,dbminor,dbmicro);
+		NXLOG::DEBUGLOG("File DB Version %d.%d.%d\n", dbmajor,dbminor,dbmicro);
 		haveversion = true;
     }
 	sqlite3_finalize(res);
@@ -56,7 +56,7 @@ SQLiteDB::SQLiteDB(std::string _filename){
 		
 		if (rc != SQLITE_OK ) {
 			dbcorrupted = true;
-			printf("Error Insert %s\n",err_msg);
+			NXLOG::ERRORLOG("Error Insert %s\n",err_msg);
 			
 		}
 		if( rc == SQLITE_OK){
@@ -72,9 +72,9 @@ SQLiteDB::SQLiteDB(std::string _filename){
 		int checkmicro = VERSION_MICRO-dbmicro;
 		
 		if(checkmajor == 0 && checkminor == 0 && checkmicro == 0){
-			printf("DB Same Version\n");
+			NXLOG::DEBUGLOG("DB Same Version\n");
 		}else{
-			printf("DB Version Mismatch\n");
+			NXLOG::DEBUGLOG("DB Version Mismatch\n");
 			dbUpdated = true;
 			UpdateDB();
 		}
@@ -98,18 +98,18 @@ void SQLiteDB::UpdateDB(){
 	char *err_msg = 0;
 	int rc = sqlite3_exec(db, "DROP TABLE NXMP", 0, 0, &err_msg);
 	if (rc == SQLITE_OK ) {
-		printf("Drop NXMP Version Table\n");
+		NXLOG::DEBUGLOG("Drop NXMP Version Table\n");
 	}
 	char sql[] = "CREATE TABLE IF NOT EXISTS NXMP(major INTEGER, minor INTEGER, micro INTEGER);";
 	rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 	if (rc == SQLITE_OK ) {
-		printf("Create TABLE NXMP\n");
+		NXLOG::DEBUGLOG("Create TABLE NXMP\n");
 	}
 	char sqlquery[64];
 	sprintf(sqlquery,"INSERT INTO NXMP VALUES(%d, %d, %d)",VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO);
 	rc = sqlite3_exec(db, sqlquery, 0, 0, &err_msg);
 	if (rc == SQLITE_OK ) {
-		printf("Update DB Version\n");
+		NXLOG::DEBUGLOG("Update DB Version\n");
 		dbmajor = VERSION_MAJOR;
 		dbminor = VERSION_MINOR;
 		dbmicro = VERSION_MICRO;
@@ -118,7 +118,7 @@ void SQLiteDB::UpdateDB(){
 	sprintf(sqlquery2,"ALTER TABLE FILERESUME ADD COLUMN Completed INTEGER default 0");
 	rc = sqlite3_exec(db, sqlquery2, 0, 0, &err_msg);
 	if (rc == SQLITE_OK ) {
-		printf("Added Completed Column\n");
+		NXLOG::DEBUGLOG("Added Completed Column\n");
 	}
 }
 
@@ -165,10 +165,10 @@ void SQLiteDB::updateCompleted(std::string path){
 	char sqlquery[2048];
 	char *err_msg = 0;
 	sprintf(sqlquery,"UPDATE FILERESUME set Completed = 1,Position = 0 WHERE Path = \"%s\"",path.c_str());
-	printf("UPDATE: %s\n",sqlquery);
+	NXLOG::DEBUGLOG("UPDATE: %s\n",sqlquery);
 	int rc = sqlite3_exec(db, sqlquery, 0, 0, &err_msg);
 	if (rc != SQLITE_OK) {
-		printf("DB Error: %s\n",err_msg);
+		NXLOG::ERRORLOG("DB Error: %s\n",err_msg);
 	}
 }
 
@@ -176,10 +176,10 @@ void SQLiteDB::newCompleted(std::string path){
 	char sqlquery[2048];
 	char *err_msg = 0;
 	sprintf(sqlquery,"INSERT INTO FILERESUME (Path,Position,Completed) VALUES(\"%s\",0,1);",path.c_str());
-	printf("INSERT: %s\n",sqlquery);
+	NXLOG::DEBUGLOG("INSERT: %s\n",sqlquery);
 	int rc = sqlite3_exec(db, sqlquery, 0, 0, &err_msg);
 	if (rc != SQLITE_OK) {
-		printf("DB Error: %s\n",err_msg);
+		NXLOG::ERRORLOG("DB Error: %s\n",err_msg);
 	}
 }
 
@@ -188,10 +188,10 @@ void SQLiteDB::newResume(std::string path,int64_t position){
 	char sqlquery[2048];
 	char *err_msg = 0;
 	sprintf(sqlquery,"INSERT INTO FILERESUME (Path,Position,Completed) VALUES(\"%s\",%ld,0);",path.c_str(),position);
-	printf("INSERT: %s\n",sqlquery);
+	NXLOG::DEBUGLOG("INSERT: %s\n",sqlquery);
 	int rc = sqlite3_exec(db, sqlquery, 0, 0, &err_msg);
 	if (rc != SQLITE_OK) {
-		printf("DB Error: %s\n",err_msg);
+		NXLOG::ERRORLOG("DB Error: %s\n",err_msg);
 	}
 }
 
@@ -199,10 +199,10 @@ void SQLiteDB::updateResume(std::string path,int64_t position){
 	char sqlquery[2048];
 	char *err_msg = 0;
 	sprintf(sqlquery,"UPDATE FILERESUME set Position = %ld,Completed = 0  WHERE Path = \"%s\"",position,path.c_str());
-	printf("UPDATE: %s\n",sqlquery);
+	NXLOG::DEBUGLOG("UPDATE: %s\n",sqlquery);
 	int rc = sqlite3_exec(db, sqlquery, 0, 0, &err_msg);
 	if (rc != SQLITE_OK) {
-		printf("DB Error: %s\n",err_msg);
+		NXLOG::ERRORLOG("DB Error: %s\n",err_msg);
 	}
 }
 
@@ -228,7 +228,7 @@ void SQLiteDB::deleteResume(std::string path){
 		sprintf(sqlquery,"DELETE FROM FILERESUME WHERE Path = \"%s\"",path.c_str());
 		int rc = sqlite3_exec(db, sqlquery, 0, 0, &err_msg);
 		if (rc != SQLITE_OK) {
-			printf("DB Entry Delete Error: %s\n",err_msg);
+			NXLOG::ERRORLOG("DB Entry Delete Error: %s\n",err_msg);
 		}
 	
 	}
@@ -290,11 +290,11 @@ int SQLiteDB::loadOrSaveDb(sqlite3 *pInMemory, const char *zFilename, int isSave
 	   
 	  rc = sqlite3_exec(pFile, "PRAGMA journal_mode=MEMORY;", 0, 0, 0);
 	  if (rc != SQLITE_OK ) {
-		printf("failed to set journal_mode\n");
+		NXLOG::ERRORLOG("failed to set journal_mode\n");
 	  }
 	  rc = sqlite3_exec(pFile, "PRAGMA foreign_keys=ON;", 0, 0, 0);
 	  if (rc != SQLITE_OK ) {
-		printf("failed to set journal_mode\n");
+		NXLOG::ERRORLOG("failed to set journal_mode\n");
 	  }
 
       pFrom = (isSave ? pInMemory : pFile);
@@ -303,14 +303,14 @@ int SQLiteDB::loadOrSaveDb(sqlite3 *pInMemory, const char *zFilename, int isSave
       pBackup = sqlite3_backup_init(pTo, "main", pFrom, "main");
       if (pBackup) {
          int rcstep = sqlite3_backup_step(pBackup, -1);
-		 printf("RC STEP:%d\n",rcstep);
+		 NXLOG::DEBUGLOG("RC STEP:%d\n",rcstep);
          int rcfinish = sqlite3_backup_finish(pBackup);
-		 printf("RC FINISH:%d\n",rcfinish);
+		 NXLOG::DEBUGLOG("RC FINISH:%d\n",rcfinish);
       }
       rc = sqlite3_errcode(pTo);
-	  printf("pTO Errocode %d\n",rc);
+	  NXLOG::DEBUGLOG("pTO Errocode %d\n",rc);
    }else{
-		printf("Error Opening File Database\n");
+		NXLOG::ERRORLOG("Error Opening File Database\n");
    }
 
    (void)sqlite3_close(pFile);

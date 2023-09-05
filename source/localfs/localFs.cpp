@@ -93,7 +93,6 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 	void localFs::backPath(){
 		currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
 		if(currentpath == "")currentpath = "/";
-#ifdef _WIN32
-		if(currentpath == "C:")currentpath = "C:\\";
-#endif
+
 	}
+	

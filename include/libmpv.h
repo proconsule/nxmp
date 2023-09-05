@@ -2,11 +2,14 @@
 #define NXMP_LIBMPVMPV_H
 
 #include <string>
-#include "fileInfo.h"
-#include "config.h"
-
 #include <mpv/client.h>
 #include <mpv/render_gl.h>
+
+#include "fileInfo.h"
+#include "config.h"
+#include "logger.h"
+
+
 
 struct decoderlist_struct{
 	std::string codecname;
@@ -46,8 +49,19 @@ public:
 	
 	int getFileInfoPerc();
 	
+	std::string getHWDec();
 	int64_t getVideoWidth();
 	int64_t getVideoHeight();
+	double getFPS();
+	double getVideoBitrate();
+	double getAudioBitrate();
+	
+	std::string getVideoCodec();
+	
+	
+	std::string getAudioCodec();
+	std::string getAudioSampleRate();
+	std::string getAudioChannels();
 	
 	fileInfo *getFileInfo();
 	
@@ -115,8 +129,8 @@ private:
 
 
 	void resetFileInfo();
-    mpv_handle *handle = nullptr;
-    mpv_render_context *context = nullptr;
+        mpv_handle *handle = nullptr;
+        mpv_render_context *context = nullptr;
 	std::vector<decoderlist_struct> decoderlist;
 	fileInfo * fileinfo = nullptr;
 	

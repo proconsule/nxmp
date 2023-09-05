@@ -1,9 +1,4 @@
 #include "nfsDir.h"
-
-#ifdef _WIN32
-#include <winsock2.h>
-#endif
-
 #include <fcntl.h>
 #include <nfsc/libnfs.h>
 #include <nfsc/libnfs-raw.h>
@@ -17,18 +12,6 @@ struct client {
 };
 
 nfsDir::nfsDir(std::string _url,Playlist * _playlist){
-#ifdef _WIN32
-	WSADATA wsadata;
-	int err;
- 
-	err = WSAStartup(MAKEWORD(2, 0), &wsadata);
-	if(err != 0) {
-		printf("WSAStartup failed with error: %d\n", err);
-
-    }else{
-		printf("WSAStartup ok\n");
-	}
-#endif	
 
 	url = _url;	
 	urlschema thisurl = Utility::parseUrl(url);
@@ -38,7 +21,7 @@ nfsDir::nfsDir(std::string _url,Playlist * _playlist){
 	{
 		basepath.erase(basepath.length()-1);
 	}
-	printf("Base Path = %s\n",basepath.c_str());
+	NXLOG::DEBUGLOG("Base Path = %s\n",basepath.c_str());
 	currentpath = basepath;
 	playlist = _playlist;
 	
@@ -58,17 +41,17 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 	
 	nfs = nfs_init_context();
 	if (nfs == NULL) {
-		printf("failed to init context\n");
+		NXLOG::ERRORLOG("failed to init context\n");
 		goto finished;
 	}
 	
 	_url = nfs_parse_url_dir(nfs, url.c_str());
 	if (_url == NULL) {
-		printf("%s\n", nfs_get_error(nfs));
+		NXLOG::ERRORLOG("%s\n", nfs_get_error(nfs));
 		goto finished;
 	}
 	
-	printf("DIR PATH %s\n",_path.c_str());
+	NXLOG::DEBUGLOG("DIR PATH %s\n",_path.c_str());
 	client.nfsserver = _url->server;
 	client.nfsexport = (char *)_path.c_str();
 	client.is_finished = 0;
@@ -76,7 +59,7 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 	
 	
 	if ((ret = nfs_mount(nfs, client.nfsserver, client.nfsexport)) != 0) {
- 		printf("Failed to mount nfs share : %s\n", nfs_get_error(nfs));
+ 		NXLOG::ERRORLOG("Failed to mount nfs share : %s\n", nfs_get_error(nfs));
 		goto finished;
 	}
 	
@@ -84,7 +67,7 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 
 	ret = nfs_opendir(nfs, "", &nfsdir);
 	if (ret != 0) {
-		printf("Failed to opendir(\"%s\") %s\n", "", nfs_get_error(nfs));
+		NXLOG::ERRORLOG("Failed to opendir(\"%s\") %s\n", "", nfs_get_error(nfs));
 		goto finished;
 	}
 	currentlist.clear();

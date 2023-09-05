@@ -3,13 +3,8 @@
 #include <sstream>
 #include "libmpv.h"
 #include "utils.h"
-#ifdef NXMP_SWITCH
 #include "SwitchSys.h"
-#endif
 
-#ifdef NXMP_SWITCH
-using namespace c2d;
-#endif
 
 bool codecSort(const decoderlist_struct &a, const decoderlist_struct &b) {
 
@@ -20,27 +15,44 @@ libMpv::libMpv(const std::string &configDir) {
 
     handle = mpv_create();
     if (!handle) {
-        printf("Error Create Handle\n");
+        NXLOG::ERRORLOG("MPV Error Create Handle\n");
         return;
     }
-	printf("MPV Handle Created\n");
+	
+	NXLOG::DEBUGLOG("MPV Handle Created\n");
 	mpv_set_option_string(handle, "config", "yes");
 	mpv_set_option_string(handle, "config-dir", configDir.c_str());
 	mpv_set_option_string(handle, "terminal", "yes");
 	mpv_set_option_string(handle, "msg-level", "all=v");
-	mpv_set_option_string(handle, "vd-lavc-threads", "4");
-	mpv_set_option_string(handle, "vd-lavc-skiploopfilter", "all");
+	mpv_set_option_string(handle, "vd-lavc-threads", "3");
+	//mpv_set_option_string(handle, "vd-lavc-skiploopfilter", "all");
 	mpv_set_option_string(handle, "audio-channels", "stereo");
 	mpv_set_option_string(handle, "video-timing-offset", "0");
 	mpv_set_option_string(handle, "osd-bar-align-y", "0.9");
-	mpv_set_option_string(handle, "fbo-format", "rgba8");
+	mpv_set_option_string(handle, "fbo-format", "rgba16f");
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());
 	mpv_set_option_string(handle, "volume-max", "200");
-	mpv_set_option_string(handle, "opengl-pbo", "yes");
+	//mpv_set_option_string(handle, "opengl-pbo", "yes"); // HDR FIX
+	mpv_set_option_string(handle, "vd-lavc-dr", "yes");
 	//default Font Style
 	mpv_set_option_string(handle, "sub-border-size", "3");
 	mpv_set_option_string(handle, "sub-shadow-offset", "1");
 	mpv_set_option_string(handle, "sub-shadow-color", "0.0/0.0/0.0/0.25");
+	
+	
+	
+	//mpv_set_option_string(handle, "interpolation", "no");
+	mpv_set_option_string(handle, "scale", "bilinear");
+
+	
+	mpv_set_option_string(handle, "image-display-duration", "inf");
+	mpv_set_option_string(handle, "hdr-compute-peak", "no");
+	
+
+
+	if(configini->getHWDec(false)){
+		mpv_set_option_string(handle, "hwdec", "tx1-copy");
+	}
 
 	
 	if(configini->getUseAlang(false)){
@@ -54,19 +66,17 @@ libMpv::libMpv(const std::string &configDir) {
 		mpv_set_option_string(handle, "slang", slangstring.c_str());
 	}
 	//End Slang
-#ifdef _WIN32
-	mpv_set_option_string(handle, "hwdec", "auto-copy");
-#endif
+
 	
-	printf("MPV Handle initialize\n");
+	NXLOG::DEBUGLOG("MPV Handle initialize\n");
     int res = mpv_initialize(handle);
     if (res) {
-        printf("libmpv_initialize: %s\n", mpv_error_string(res));
+        NXLOG::ERRORLOG("libmpv_initialize: %s\n", mpv_error_string(res));
         mpv_terminate_destroy(handle);
         return;
     }
 	
-	printf("MPV Init Renderer\n");
+	NXLOG::DEBUGLOG("MPV Init Renderer\n");
 	
 	
 
@@ -79,9 +89,9 @@ libMpv::libMpv(const std::string &configDir) {
 		{MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &mpv_gl_init_params},
 		{(mpv_render_param_type)0}
 	};
-	printf("MPV Init Context\n");
+	NXLOG::DEBUGLOG("MPV Init Context\n");
 	if (mpv_render_context_create(&context, handle, params) < 0) {
-		printf("error: mpv_render_context_create: %s\n", mpv_error_string(res));
+		NXLOG::ERRORLOG("error: mpv_render_context_create: %s\n", mpv_error_string(res));
 		mpv_terminate_destroy(handle);
 		handle = nullptr;
 	}
@@ -113,7 +123,7 @@ libMpv::libMpv(const std::string &configDir) {
 	}
 	
 	std::sort(decoderlist.begin(),decoderlist.end(),codecSort);
-	printf("MPV Init Completed\n");
+	NXLOG::DEBUGLOG("MPV Init Completed\n");
 	
 }
 
@@ -170,19 +180,17 @@ void libMpv::loadFileLive(std::string _path,std::string _changename){
 void libMpv::setOcState()
 {	
 	if(configini->getUseOc(false))
-	{printf("\nOC Enabled\n");
-	#ifdef NXMP_SWITCH	
-	clockoc = true;					
-	SwitchSys::maxClock();
-	#endif
+	{
+		NXLOG::DEBUGLOG("\nOC Enabled\n");
+		clockoc = true;					
+		SwitchSys::maxClock();
 	}
 	else
-	{printf("\nOC Disabled\n");
-	#ifdef NXMP_SWITCH	
-	clockoc = false;					
-	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
-	#endif
-	
+	{
+		NXLOG::DEBUGLOG("\nOC Disabled\n");	
+		clockoc = false;					
+		SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
+
 	}
 }
 
@@ -205,6 +213,25 @@ int libMpv::getFileInfoPerc() {
 	return 0;
 }
 
+double libMpv::getVideoBitrate(){
+	double vbitrate;
+	mpv_get_property(handle, "video-bitrate", MPV_FORMAT_DOUBLE, &vbitrate);
+	return vbitrate;
+}
+
+double libMpv::getAudioBitrate(){
+	double abitrate;
+	mpv_get_property(handle, "audio-bitrate", MPV_FORMAT_DOUBLE, &abitrate);
+	return abitrate;
+}
+
+double libMpv::getFPS(){
+	double myfps;
+	mpv_get_property(handle, "estimated-vf-fps", MPV_FORMAT_DOUBLE, &myfps);
+	return myfps;
+}
+
+
 void libMpv::Pause() {
 	mpv_command_string(handle, "set pause yes");
 }
@@ -215,12 +242,9 @@ void libMpv::Resume() {
 
 void libMpv::Stop() {
 	clearShader();
-	const char *cmd[] = {"stop",  NULL};
-	mpv_command_async(handle, 0, cmd);
-	#ifdef NXMP_SWITCH	
+	mpv_command_string(handle, "stop");
 	clockoc = false;					
 	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
-	#endif
 }
 	
 void libMpv::seek(double position,bool osd) {
@@ -273,6 +297,24 @@ int64_t libMpv::getVideoHeight(){
 	mpv_get_property(handle, "height", MPV_FORMAT_INT64, &ret);
 	return ret;
 }
+
+std::string libMpv::getVideoCodec(){
+	return mpv_get_property_string(handle, "video-codec");
+}
+
+std::string libMpv::getAudioCodec(){
+	return mpv_get_property_string(handle, "audio-codec");
+}
+
+std::string libMpv::getAudioSampleRate(){
+	return mpv_get_property_string(handle, "audio-samplerate");
+}
+
+std::string libMpv::getAudioChannels(){
+	return mpv_get_property_string(handle, "audio-channels");
+}
+
+
 
 void libMpv::getfileInfo() {
 	
@@ -399,7 +441,7 @@ void libMpv::getfileInfo() {
 	}
 	
 	if(fileinfo->videos.size() == 0){
-		printf("AUDIO FILE\n");
+		//printf("AUDIO FILE\n");
 		fflush(stdout);
 	}
 	
@@ -665,10 +707,7 @@ void libMpv::setAudioEQ(int *eqval,bool osd){
 
 
 void libMpv::setAudioSuperEQband(float eqval,int band,bool osd){
-	//char eqstring[1024];
-	//sprintf(eqstring,"no-osd set af superequalizer=1b=%.1f:2b=%.1f:3b=%.1f:4b=%.1f:5b=%.1f:6b=%.1f:7b=%.1f:8b=%.1f:9b=%.1f:10b=%.1f:11b=%.1f:12b=%.1f:13b=%.1f:14b=%.1f:15b=%.1f:16b=%.1f:17b=%.1f",eqval[0],eqval[1],eqval[2],eqval[3],eqval[4],eqval[5],eqval[6],eqval[7],eqval[8],eqval[9],eqval[10],eqval[11],eqval[12],eqval[13],eqval[14],eqval[15],eqval[16]);
-	//mpv_command_string(handle, eqstring);
-
+	
 	char eqstring2[512];
 	sprintf(eqstring2,"superequalizer=%db=%.1f",band+1,eqval);
 	const char *args[] = {"set","af",eqstring2,NULL};
@@ -678,10 +717,7 @@ void libMpv::setAudioSuperEQband(float eqval,int band,bool osd){
 }
 
 void libMpv::setAudioSuperEQ(float *eqval,bool osd){
-	//char eqstring[1024];
-	//sprintf(eqstring,"no-osd set af superequalizer=1b=%.1f:2b=%.1f:3b=%.1f:4b=%.1f:5b=%.1f:6b=%.1f:7b=%.1f:8b=%.1f:9b=%.1f:10b=%.1f:11b=%.1f:12b=%.1f:13b=%.1f:14b=%.1f:15b=%.1f:16b=%.1f:17b=%.1f",eqval[0],eqval[1],eqval[2],eqval[3],eqval[4],eqval[5],eqval[6],eqval[7],eqval[8],eqval[9],eqval[10],eqval[11],eqval[12],eqval[13],eqval[14],eqval[15],eqval[16]);
-	//mpv_command_string(handle, eqstring);
-
+	
 	char eqstring2[1024];
 	sprintf(eqstring2,"superequalizer=1b=%.1f:2b=%.1f:3b=%.1f:4b=%.1f:5b=%.1f:6b=%.1f:7b=%.1f:8b=%.1f:9b=%.1f:10b=%.1f:11b=%.1f:12b=%.1f:13b=%.1f:14b=%.1f:15b=%.1f:16b=%.1f:17b=%.1f",eqval[0],eqval[1],eqval[2],eqval[3],eqval[4],eqval[5],eqval[6],eqval[7],eqval[8],eqval[9],eqval[10],eqval[11],eqval[12],eqval[13],eqval[14],eqval[15],eqval[16]);
 	const char *args[] = {"set","af",eqstring2,NULL};
@@ -730,10 +766,8 @@ bool libMpv::getAudioNormalize(){
 void libMpv::setShader(std::string _filename){
 	std::string command = std::string("no-osd change-list glsl-shaders set ") + _filename;
 	mpv_command_string(handle,command.c_str());
-	#ifdef NXMP_SWITCH	
 	clockoc = true;					
 	SwitchSys::maxClock();
-	#endif
 }
 void libMpv::clearShader(){
 	mpv_command_string(handle,"no-osd change-list glsl-shaders clr \"\"");

@@ -16,8 +16,9 @@ namespace Popups {
     };
     
     inline void ExitPopup(void) {
-        ImGui::EndPopup();
         ImGui::PopStyleVar();
+		ImGui::EndPopup();
+        
     };
 
 	void SaveSettingsPopup(void);
@@ -26,6 +27,8 @@ namespace Popups {
     void SubBorderColorPopup(void);
 	void PlaylistStartPlaylist(void);
 	void DBUpdatedPopup(void);
+	void NetMenuPopup(void);
+	
 }
 
 #endif

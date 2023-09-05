@@ -3,17 +3,14 @@
 // Created by cpasjuste on 26/11/18.
 //
 
-#ifndef CROSS2D_SWITCH_CLOCKS_H
-#define CROSS2D_SWITCH_CLOCKS_H
+#ifndef NXMP_SWITCH_CLOCKS_H
+#define NXMP_SWITCH_CLOCKS_H
 
-#include "platforms.h"
-
-#ifdef NXMP_SWITCH
 
 #include <stdio.h>
 #include <switch.h>
 
-namespace c2d {
+#include "logger.h"
 
     class SwitchSys {
 
@@ -55,6 +52,6 @@ namespace c2d {
         static int stock_gpu_clock;
         static int stock_emc_clock;
     };
-}
-#endif
+
+
 #endif //CROSS2D_SWITCH_CLOCKS_H

@@ -1,4 +1,3 @@
-
 #include "curldownloader.h"
 
 static size_t
@@ -7,10 +6,10 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
   size_t realsize = size * nmemb;
   struct MemoryStruct *mem = (struct MemoryStruct *)userp;
  
-  char *ptr = (char *)realloc(mem->memory, mem->size + realsize + 1);
+  unsigned char *ptr = (unsigned char *)realloc(mem->memory, mem->size + realsize + 1);
   if(!ptr) {
     /* out of memory! */
-    printf("not enough memory (realloc returned NULL)\n");
+    NXLOG::ERRORLOG("not enough memory (realloc returned NULL)\n");
     return 0;
   }
  
@@ -36,7 +35,7 @@ void curlDownloader::Download(char * url ,MemoryStruct * chunk){
 	
 	CURL *curl_handle;
 	CURLcode res;
-	chunk->memory = (char *)malloc(1);  
+	chunk->memory = (unsigned char *)malloc(1);  
 	chunk->size = 0; 
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl_handle = curl_easy_init();
@@ -46,7 +45,7 @@ void curlDownloader::Download(char * url ,MemoryStruct * chunk){
 	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 	res = curl_easy_perform(curl_handle);
 	if(res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_perform() failed: %s\n",
+		NXLOG::ERRORLOG("curl_easy_perform() failed: %s\n",
         curl_easy_strerror(res));
 	}
 	else {
@@ -65,19 +64,19 @@ std::string curlDownloader::scrapeHtml(std::string myurl, std::string postcode, 
 
   curl = curl_easy_init();
   if(curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
-	if (needpost == true)
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postcode.c_str());
-  if (needreferer == true)
-  curl_easy_setopt(curl, CURLOPT_REFERER, referer.c_str());
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36");
-    res = curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
+		curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
+		if (needpost == true)
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postcode.c_str());
+		if (needreferer == true)
+		curl_easy_setopt(curl, CURLOPT_REFERER, referer.c_str());
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36");
+		res = curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
 
   }
 	return readBuffer;
@@ -104,14 +103,14 @@ CURL *curl;
     res = curl_easy_perform(curl);
     /* Check for errors */
     if(res != CURLE_OK)
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",
+      NXLOG::ERRORLOG("curl_easy_perform() failed: %s\n",
               curl_easy_strerror(res));
     else {
       res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
       if((res == CURLE_OK) &&
          ((response_code / 100) != 3)) {
         /* a redirect implies a 3xx response code */
-        fprintf(stderr, "Not a redirect.\n");
+        NXLOG::ERRORLOG("Not a redirect.\n");
       }
       else {
         res = curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &location);
@@ -119,7 +118,7 @@ CURL *curl;
         if((res == CURLE_OK) && location) {
           /* This is the new absolute URL that you could redirect to, even if
            * the Location: response header may have been a relative URL. */
-          printf("Redirected to: %s\n", location);
+          NXLOG::DEBUGLOG("Redirected to: %s\n", location);
 		  tempresult = std::string(location);
         }
       }
@@ -140,13 +139,13 @@ void SOAPcurlDownloader::Download(char * url ,MemoryStruct * chunk, char * OID){
 	struct curl_slist *headerchunk = NULL;
 	CURL *curl_handle;
 	CURLcode res;
-	chunk->memory = (char *)malloc(1);  
+	chunk->memory = (unsigned char *)malloc(1);  
 	chunk->size = 0; 
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl_handle = curl_easy_init();
 	char soapdata[4096];
 	
-	char * soapdatafmt = "<?xml version=\"1.0\"?> \
+	char const * soapdatafmt = "<?xml version=\"1.0\"?> \
 <s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"> \
   <s:Body> \
     <u:Browse xmlns:u=\"urn:schemas-upnp-org:service:ContentDirectory:1\"> \

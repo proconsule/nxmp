@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-#include "platforms.h" 
 
 #include "SimpleIni.h"
 
@@ -20,6 +19,7 @@ typedef struct{
 	bool useslang;
 	int slang;
     bool useoc;
+	bool hwdec = true;
 	int subfontsize;
 	float subfontscale;
 	int deint;
@@ -73,6 +73,9 @@ public:
 	
 	bool getUseOc(bool tmpvalue);
 	void setUseOc(bool _val);
+	
+	bool getHWDec(bool tmpvalue);
+	void setHWDec(bool _val);
 
 	int getSubFontSize(bool tmpvalue);
 	void setSubFontSize(int val);
@@ -110,6 +113,9 @@ public:
 	
 	std::string getThemeName(bool tmpvalue);
 	void setThemeName(std::string value);
+	
+	void addNetworkShare(networkSource netshare);
+	void RefreshNetworkShare(std::vector<networkSource> newnetsources);
 	
 	
 private:

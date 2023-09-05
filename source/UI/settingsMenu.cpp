@@ -57,6 +57,11 @@ namespace Windows {
 						configini->setUseOc(ocdefault);	
 					}
 					
+					bool hwdecdefault = configini->getHWDec(true);
+					if(ImGui::Checkbox("HW Decoder", &hwdecdefault)){
+						configini->setHWDec(hwdecdefault);	
+					}
+					
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Player Settings"))

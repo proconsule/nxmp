@@ -1,17 +1,12 @@
-#include "platforms.h"
 #include "gui.h"
 #include "playerwindows.h"
 #include "imgui.h"
 #include "utils.h"
 #include "imgui_internal.h"
 #include "custom_widgets.h"
-#ifdef NXMP_SWITCH
 #include "SwitchSys.h"
-#endif
 
-#ifdef NXMP_SWITCH
-using namespace c2d;
-#endif
+
 
 namespace playerWindows{
 	
@@ -48,6 +43,14 @@ namespace playerWindows{
 	static char slider_superhz[][6] = {"65","92","131","185","262","370","523","740","1K","1.4K","2K","2.9K","4K","5.9K","8.3K","11K","16K","20K"};
 	
 	static int supereqpresetsidx = 0;
+	
+	
+	float playertextscrollpos = 0.0f;
+	int waitpos = 0;
+	
+	
+	bool playertextforwardscroll = true;
+	bool playertextlaststate = true;
 	
 	
 	void RightHomeWindow(bool *focus, bool *first_item){
@@ -87,19 +90,38 @@ namespace playerWindows{
 						}*/
 					}
 				}
+				ImGui::Checkbox("Show Power Stats", &item.showstats);
 				if (*first_item) {
 					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
 					*first_item = false;
 				}
+				
+				ImGui::Checkbox("Show Decoding Stats", &item.showdecstats);
+				if (*first_item) {
+					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
+					*first_item = false;
+				}
+				
+				if(item.showstats)item.showdecstats=false;
+				
+				
+				
 				//battery
 				
-				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -40);
+				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -40*multiplyRes);
 				ImGui::Separator();
 				if(isHandheld)
-				batteryIcon(ImVec2((rightmenuposX) + 13.0f,ImGui::GetWindowSize().y -24),true,batteryPorcent,40,18);
+				GUI::newbatteryIcon(ImVec2((rightmenuposX*multiplyRes) + 13.0f,ImGui::GetWindowSize().y -24),true,batteryPercent,40,18,true);
 				else
-				batteryIcon(ImVec2((rightmenuposX*multiplyRes) + 113.0f,ImGui::GetWindowSize().y -24),true,batteryPorcent,40,18);
-				ImGui::Text("        %d%%",batteryPorcent);
+				GUI::newbatteryIcon(ImVec2((rightmenuposX*multiplyRes) + 13.0f,ImGui::GetWindowSize().y -24*multiplyRes),true,batteryPercent,40*multiplyRes,18*multiplyRes,true);
+				
+				
+				
+				//if(isHandheld)
+				//batteryIcon(ImVec2((rightmenuposX) + 13.0f,ImGui::GetWindowSize().y -24),true,batteryPercent,40,18);
+				//else
+				//batteryIcon(ImVec2((rightmenuposX*multiplyRes) + 113.0f,ImGui::GetWindowSize().y -24),true,batteryPercent,40,18);
+				//ImGui::Text("        %d%%",batteryPercent);
 				
 				//endBattery
 
@@ -272,74 +294,6 @@ namespace playerWindows{
 		playerWindows::ExitWindow();
 	}
 	
-	//Used For 1080p screens with less powerful GPUs:
-	//https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md
-	/*	void RightHomeAnime4K(bool *focus, bool *first_item){
-		playerWindows::SetupRightWindow();
-		std::vector<std::string> topmenu  = {"Mode A (Fast)","Mode B (Fast)","Mode C (Fast)","Mode A+A (Fast)","Mode B+B (Fast)","Mode C+A (Fast)","Show Info","Disabled"};
-		if (ImGui::Begin("Right Menu ARatio", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::SetNextWindowFocus();
-			if (ImGui::BeginListBox("Aspect Ratio",ImVec2(200.0f, 720.0f))){
-				for (unsigned int n = 0; n < topmenu.size(); n++){
-					static int selected = -1;
-					if (ImGui::Selectable(topmenu[n].c_str(), selected == n)){
-						if(n==0){
-						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Restore_CNN_M.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode A (Fast)\"");
-#ifdef NXMP_SWITCH						
-						SwitchSys::maxClock();
-#endif
-						}
-						if(n==1){
-						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Restore_CNN_Soft_M.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode B (Fast)\"");
-#ifdef NXMP_SWITCH						
-						SwitchSys::maxClock();
-#endif
-						}
-						if(n==2){
-						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Upscale_Denoise_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode C (Fast)\"");
-#ifdef NXMP_SWITCH						
-						SwitchSys::maxClock();
-#endif
-						}
-						if(n==3){
-						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Restore_CNN_M.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_Restore_CNN_S.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode A+A (Fast)\"");
-#ifdef NXMP_SWITCH						
-						SwitchSys::maxClock();
-#endif
-						}
-						if(n==4){
-						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Restore_CNN_Soft_M.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Restore_CNN_Soft_S.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode B+B (Fast)\"");
-#ifdef NXMP_SWITCH						
-						SwitchSys::maxClock();
-#endif
-						}
-						if(n==5){
-						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders set \"./mpv/anime4k/Anime4K_Clamp_Highlights.glsl:./mpv/anime4k/Anime4K_Upscale_Denoise_CNN_x2_M.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x2.glsl:./mpv/anime4k/Anime4K_AutoDownscalePre_x4.glsl:./mpv/anime4k/Anime4K_Restore_CNN_S.glsl:./mpv/anime4k/Anime4K_Upscale_CNN_x2_S.glsl\"; show-text \"Anime4K: Mode C+A (Fast)\"");
-#ifdef NXMP_SWITCH						
-						SwitchSys::maxClock();
-#endif
-						}
-						if(n==6){
-						mpv_command_string(libmpv->getHandle(), "show-text \"Shaders: ${glsl-shaders}\"");
-						}
-						if(n==7){
-						mpv_command_string(libmpv->getHandle(), "no-osd change-list glsl-shaders clr \"\"; show-text \"Anime4K Disabled\"");
-#ifdef NXMP_SWITCH
-						SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
-#endif
-						}
-					}
-				}
-				if (*first_item) {
-					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
-					*first_item = false;
-				}
-				ImGui::EndListBox();
-			}
-		}
-		playerWindows::ExitWindow();
-	}*/
-
 	void RightHomeARatio(bool *focus, bool *first_item){
 		playerWindows::SetupRightWindow();
 		std::vector<std::string> topmenu  = {"Default","16:9","16:10","4:3","Custom Ratio"};
@@ -890,23 +844,23 @@ namespace playerWindows{
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
-			ImGui::ProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPerc(), ImVec2(-1.0f, 10.0f),"");
+			ImGui::ProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPerc(), ImVec2(-1.0f, 10.0f*multiplyRes),"");
 			if (ImGui::IsItemClicked()){
 				ImGuiIO& io = ImGui::GetIO();
 				double barperc = io.MousePos.x*100/1270;
 				int64_t seek_val = (barperc*libmpv->getFileInfo()->playbackInfo.duration/100);
 				libmpv->seek(seek_val,false);
-				printf("Progressbar clicked perc %f %ld\n", barperc, seek_val);
+				NXLOG::DEBUGLOG("Progressbar clicked perc %f %ld\n", barperc, seek_val);
 				fflush(stdout);
 			}
 			ImGui::PopStyleColor(2);
 			ImGui::PopStyleVar();
-			ImGui::SetCursorPosX(centerposition-90);
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+5.0f);
+			ImGui::SetCursorPosX(centerposition-90*multiplyRes);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+5.0f*multiplyRes);
 			
 			
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0,0.0,0.0,0.0));
-			if (ImGui::Selectable("##Play", selected == 0,0,ImVec2(60, 60))){
+			if (ImGui::Selectable("##Play", selected == 0,0,ImVec2(60*multiplyRes, 60*multiplyRes))){
 				if(libmpv->Paused()){
 					libmpv->Resume();
 				}else{
@@ -915,66 +869,67 @@ namespace playerWindows{
 			}
 			ImGui::PopStyleColor();
 			ImGui::SameLine();
-			ImGui::SetCursorPosX(centerposition-90);
+			ImGui::SetCursorPosX(centerposition-90*multiplyRes);
 			if(libmpv->Paused()){
-				ImGui::Image((void*)(intptr_t)nxmpicons.PlayIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.PlayIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}else{
-				ImGui::Image((void*)(intptr_t)nxmpicons.PauseIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.PauseIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}
 			ImGui::SameLine();
-			ImGui::SetCursorPosX(centerposition+20);
+			ImGui::SetCursorPosX(centerposition+20*multiplyRes);
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0,0.0,0.0,0.0));
-			if (ImGui::Selectable("##Stop", selected == 0,0,ImVec2(60, 60))){
+			if (ImGui::Selectable("##Stop", selected == 0,0,ImVec2(60*multiplyRes, 60*multiplyRes))){
 				libmpv->Stop();
 			}
 			ImGui::PopStyleColor();
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetWindowSize().x-100.0f);
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0,0.0,0.0,0.0));
-			if (ImGui::Selectable("##Mute", selected == 0,0,ImVec2(60, 60))){
+			if (ImGui::Selectable("##Mute", selected == 0,0,ImVec2(60*multiplyRes, 60*multiplyRes))){
 				libmpv->toggleMute();
-				printf("MUTE: %d\n",libmpv->getMute());
+				NXLOG::DEBUGLOG("MUTE: %d\n",libmpv->getMute());
 			}
 			ImGui::PopStyleColor();
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetWindowSize().x-100.0f);
 			if(libmpv->getMute()){
-				ImGui::Image((void*)(intptr_t)nxmpicons.MuteIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.MuteIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}else{
-				ImGui::Image((void*)(intptr_t)nxmpicons.VolumeIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.VolumeIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}
 			
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition+20);
-			ImGui::Image((void*)(intptr_t)nxmpicons.StopIcon.id, ImVec2(60,60));
+			ImGui::Image((void*)(intptr_t)nxmpicons.StopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			ImGui::SameLine();
 			
 			ImGui::SetCursorPosX(centerposition+(centerposition*0.5));
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0,0.0,0.0,0.0));
-			if (ImGui::Selectable("##Loop", selected == 0,0,ImVec2(60, 60))){
+			if (ImGui::Selectable("##Loop", selected == 0,0,ImVec2(60*multiplyRes, 60*multiplyRes))){
 				libmpv->setLoop(!libmpv->getLoop());
 			}
 			ImGui::PopStyleColor();
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition+(centerposition*0.5));
 			if(libmpv->getLoop()){
-				ImGui::Image((void*)(intptr_t)nxmpicons.LoopIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.LoopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}else{
-				ImGui::Image((void*)(intptr_t)nxmpicons.NoLoopIcon.id, ImVec2(60,60));
+				ImGui::Image((void*)(intptr_t)nxmpicons.NoLoopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}
 			ImGui::SameLine();
 			
 			ImGui::PushFont(fontSmall);
 			ImGui::SetCursorPosX(20);
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0);
+			
 			if(libmpv->getFileInfo()->playbackInfo.title ==""){
-				ImGui::Text("%s",Utility::truncateLen(FS::getFilefromPath(libmpv->getFileInfo()->path),63).c_str());
+				PlayerScrollText(centerposition-120,40,"%s",FS::getFilefromPath(libmpv->getFileInfo()->path).c_str());
 			}else{
 				if(libmpv->getFileInfo()->playbackInfo.artist ==""){
-					ImGui::Text("%s",Utility::truncateLen(libmpv->getFileInfo()->playbackInfo.title.c_str(),63).c_str());
+					PlayerScrollText(centerposition-120,40,"%s",libmpv->getFileInfo()->playbackInfo.title.c_str());
 				}else{
 					std::string titleandartist = libmpv->getFileInfo()->playbackInfo.title + std::string(" - ") + libmpv->getFileInfo()->playbackInfo.artist;
-					ImGui::Text("%s",Utility::truncateLen(titleandartist,63).c_str());
+					PlayerScrollText(centerposition-120,40,"%s",titleandartist.c_str());
 				}
 			}
 			ImGui::SetCursorPosX(20);
@@ -984,10 +939,7 @@ namespace playerWindows{
 			ImGui::SetCursorPosX(20);
 			ImGui::Text("%s",timetext);
 			ImGui::PopFont();
-			if(isHandheld == true)
-				batteryIcon(ImVec2(1230.0f,5.0f),true,batteryPorcent,40,20);
-			else
-				batteryIcon(ImVec2(1230.0f*multiplyRes + 20,5.0f),true,batteryPorcent,40,20);
+			GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,5.0f),true,batteryPercent,40*multiplyRes,20*multiplyRes,true);
 			
 			
 			
@@ -1016,7 +968,7 @@ namespace playerWindows{
 								#endif
 								libmpv->clearShader();
 							}else{
-								printf("PATH: %s\n",shadermania->getCurrList()[n].path.c_str());
+								NXLOG::DEBUGLOG("PATH: %s\n",shadermania->getCurrList()[n].path.c_str());
 								libmpv->setShader(shadermania->getCurrList()[n].path);
 							}
 							shaderidx = n;
@@ -1062,6 +1014,87 @@ namespace playerWindows{
 		}
 		
 		playerWindows::ExitVolumeWindow();
+	}
+	
+	void StatsWindow(){
+		playerWindows::SetupStatsWindow();
+		if (ImGui::Begin("Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
+			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+			ImGui::Text("CPU %s %s %s %s",nxmpstats->CPU_Hz_c ,nxmpstats->CPU_Usage0,nxmpstats->CPU_Usage1,nxmpstats->CPU_Usage2);
+			ImGui::Text("GPU %s %s",nxmpstats->GPU_Hz_c ,nxmpstats->GPU_Load_c);
+			ImGui::Text("%s",nxmpstats->Battery_c);
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
+			
+		}
+		
+		playerWindows::ExitStatsWindow();
+	}
+	
+	void DecodingStatsWindow(){
+		playerWindows::SetupStatsWindow();
+		if (ImGui::Begin("Decoding Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
+			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+			if(libmpv->getFileInfo()->videos.size()>0){
+				ImGui::Text("Video Codec: %s (%s)",nxmpstats->decodingstats.videodecstats.codec.c_str(),nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("tx1-copy")?"HW":"SW");
+				ImGui::Text("Video Resolution: %dx%d",nxmpstats->decodingstats.videodecstats.width,nxmpstats->decodingstats.videodecstats.height);
+				ImGui::Text("Video Bitrate: %.0f kbps/s",nxmpstats->decodingstats.videodecstats.bitrate/1024.0);
+				ImGui::Text("Pixel Format: %s Color Matrix: %s",nxmpstats->decodingstats.videodecstats.pixelformat.c_str(),nxmpstats->decodingstats.videodecstats.colormatrix.c_str());
+				ImGui::Text("FPS: %.1f Frame drop count: %d",nxmpstats->decodingstats.videodecstats.fps,nxmpstats->decodingstats.videodecstats.framedropcount);
+			}
+			if(libmpv->getFileInfo()->audios.size()>0){
+				ImGui::Separator();
+				ImGui::Text("Audio Codec: %s",nxmpstats->decodingstats.audiodecstats.codec.c_str());
+				ImGui::Text("Audio Bitrate: %.0f kbps/s",nxmpstats->decodingstats.audiodecstats.bitrate/1024.0);
+				ImGui::Text("Audio Sample Rate: %ld Hz",nxmpstats->decodingstats.audiodecstats.samplerate);
+				ImGui::Text("Audio Channels: %s",nxmpstats->decodingstats.audiodecstats.hrchannels.c_str());
+			}
+			
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
+			
+		}
+		
+		playerWindows::ExitStatsWindow();
+	}
+	
+	void PlayerScrollText(float w,float h,const char* fmt, ...){
+		
+		ImGui::BeginChild("##scrolling", ImVec2(w, h), false);
+		va_list args;
+		va_start(args, fmt);
+		ImGui::TextV(fmt, args);
+		va_end(args);
+		
+		float scroll_max_x = ImGui::GetScrollMaxX();
+		if(playertextscrollpos>=scroll_max_x){
+			playertextforwardscroll=false;
+			if(!playertextlaststate==playertextforwardscroll){
+				waitpos = 0;
+			}
+		}else if(playertextscrollpos<=0) {
+			playertextforwardscroll=true;	
+			if(!playertextlaststate==playertextforwardscroll){
+				waitpos = 0;
+			}
+		}
+		if(waitpos <= 60){
+			waitpos++;
+		}else{
+			if(playertextforwardscroll){
+				playertextscrollpos+=0.5;
+			}else{
+				playertextscrollpos-=0.5;
+			}
+		}
+		
+		playertextlaststate = playertextforwardscroll;
+		ImGui::SetScrollX(playertextscrollpos);
+		ImGui::EndChild();
 	}
 
 }

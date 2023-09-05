@@ -13,8 +13,8 @@ void Updater::fetchReleases(){
 	
 	curlDownloader * curldownloader = new curlDownloader();
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
-	curldownloader->Download("https://api.github.com/repos/proconsule/nxmp/releases",chunk);
-	printf(chunk->memory);
+	curldownloader->Download((char const *)"https://api.github.com/repos/proconsule/nxmp/releases",chunk);
+	NXLOG::DEBUGLOG(chunk->memory);
 	
 	
 	json_t *root;
@@ -26,7 +26,7 @@ void Updater::fetchReleases(){
 	
 	if(!root)
 	{
-		printf("error: on line %d: %s\n", error.line, error.text);
+		NXLOG::ERRORLOG("error: on line %d: %s\n", error.line, error.text);
 		json_decref(root);
 		return;
 	}
@@ -43,7 +43,7 @@ void Updater::fetchReleases(){
 		prereleaseobj = json_object_get(data, "prerelease");
 		//prereleaseobj = json_boolean_value(data, "prerelease");
 		assetsobj = json_object_get(data,"assets");
-		printf("TAG: %s\n",json_string_value(tagobj));
+		NXLOG::DEBUGLOG("TAG: %s\n",json_string_value(tagobj));
 		
 		for(int n = 0; n < json_array_size(assetsobj); n++)
 		{
@@ -52,9 +52,9 @@ void Updater::fetchReleases(){
 			json_t *nameobj = json_object_get(dataasset,"name");
 			json_t *downurlobj = json_object_get(dataasset,"browser_download_url");
 			
-			printf("\tName: %s\n",json_string_value(nameobj));
+			NXLOG::DEBUGLOG("\tName: %s\n",json_string_value(nameobj));
                         if(strcmp(json_string_value(nameobj),"nxmp.nro") == 0){
-				printf("\tURL: %s\n",json_string_value(downurlobj));
+				NXLOG::DEBUGLOG("\tURL: %s\n",json_string_value(downurlobj));
 			}
 			gitrelease_struct tmpgitrelease;
 			tmpgitrelease.tagname = json_string_value(tagobj);
