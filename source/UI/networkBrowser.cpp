@@ -26,7 +26,43 @@ namespace Windows {
 			
 			ImGui::Text("Protocol: ");
 			ImGui::SameLine();
-			ImGui::Combo("##protocombo", (int *)&NewNetworkShare->type, NewNetworkShare->protonames, 5);
+			//ImGui::Combo("##protocombo", (int *)&NewNetworkShare->type, NewNetworkShare->protonames, 5);
+			static const char* item_current = NULL;
+			if (ImGui::BeginCombo("##protocombo", item_current, NULL)) // The second parameter is the label previewed before opening the combo.
+			{
+				for (int n = 0; n < IM_ARRAYSIZE(NewNetworkShare->protonames); n++)
+				{
+					bool is_selected = (item_current == NewNetworkShare->protonames[n]);
+					
+					if(NewNetworkShare->protonames[n] == "FTP"){
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(30,30));
+					}
+					if(NewNetworkShare->protonames[n] == "HTTP"){
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.HTTPTexture.id, ImVec2(30,30));
+					}
+					if(NewNetworkShare->protonames[n] == "SMB"){
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.NFSTexture.id, ImVec2(30,30));
+					}
+					if(NewNetworkShare->protonames[n] == "NFS"){
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(30,30));
+					}
+					if(NewNetworkShare->protonames[n] == "SSH"){
+						GUI::NXMPImage((void*)(intptr_t)nxmpicons.SFTPTexture.id, ImVec2(30,30));
+					}
+					
+					ImGui::SameLine();
+								
+					if (ImGui::Selectable(NewNetworkShare->protonames[n], is_selected)){
+						item_current = NewNetworkShare->protonames[n];
+						NewNetworkShare->type = n;
+					}
+						
+					if (is_selected)
+						ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+				}
+				ImGui::EndCombo();
+			}
+			
 			
 			if(NewNetworkShare->type == 0){
 				NewNetworkShare->httpstring = InputSwitchKeyboard("##httpstring","HTTP String",NewNetworkShare->httpstring);
@@ -794,7 +830,7 @@ namespace Windows {
            
 			if(item.networkselect){
 				if (ImGui::BeginListBox("Network Source Menu",ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes))){
-					GUI::NXMPImage((void*)(intptr_t)nxmpicons.SMBTexture.id, ImVec2(50,50));
+					GUI::NXMPImage((void*)(intptr_t)nxmpicons.ShareAddTexture.id, ImVec2(50,50));
 					ImGui::SameLine();
 					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});
 					static int selected = -1;

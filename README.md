@@ -59,7 +59,7 @@ FAQ
 -----
 **Question:** My 4K file dont work? Why?
 
-**Answer** ~~Keep in mind that currently Homebrew apps can't access the HW Decoder, so all is done with CPU, 4K file is too heavy to be decoded~~ **From version 0.7.0 NXMP have HW Decoding for format H264,HEVC,VP9,MPEG2 it can decode up to 4K HDR@30fps
+**Answer** ~~Keep in mind that currently Homebrew apps can't access the HW Decoder, so all is done with CPU, 4K file is too heavy to be decoded~~ **From version 0.7.0 NXMP have HW Decoding for format H264,HEVC,VP9,MPEG2 it can decode up to 4K HDR@30fps**
 
 
 **Q:** What is Enigma2?
@@ -74,7 +74,7 @@ Thanks to
 -----
 - Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv and Overclock part)
 - DarkMatterCore for libusbhsfs https://github.com/DarkMatterCore/libusbhsfs (this gives NXMP USB support)
-- Averne for HW Decoding on Tegra X1 and for all the hints and help (thanks a lot!)
+- Averne for HW Decoding on Tegra X1 https://github.com/averne/FFmpeg and for all the hints and help (thanks a lot!)
 - Chocola @ GBATemp forum for usage guide and beta testing
 - sashka69 @ GBATemp forum for beta testing
 - bodyXY @ GBATemp forum for banner and icons

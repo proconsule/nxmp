@@ -216,7 +216,11 @@ static bool init() {
             else {
                 gladLoadGL();
             }
-			SDL_GL_SetSwapInterval(1); 
+			if(configini->getVSYNC(false)){
+				SDL_GL_SetSwapInterval(1);
+			}else{
+				SDL_GL_SetSwapInterval(0);
+			}
         }
     }
     return success;
@@ -302,6 +306,7 @@ int main() {
 		Utility::TxtLoadFromFile("romfs:/sdcard.png",&nxmpicons.SdCardTexture.id,&nxmpicons.SdCardTexture.width,&nxmpicons.SdCardTexture.height);
 		Utility::TxtLoadFromFile("romfs:/usb.png",&nxmpicons.UsbTexture.id,&nxmpicons.UsbTexture.width,&nxmpicons.UsbTexture.height);
 		Utility::TxtLoadFromFile("romfs:/network.png",&nxmpicons.NetworkTexture.id,&nxmpicons.NetworkTexture.width,&nxmpicons.NetworkTexture.height);
+		Utility::TxtLoadFromFile("romfs:/shareadd.png",&nxmpicons.ShareAddTexture.id,&nxmpicons.ShareAddTexture.width,&nxmpicons.ShareAddTexture.height);
 		Utility::TxtLoadFromFile("romfs:/enigma2.png",&nxmpicons.Enigma2Texture.id,&nxmpicons.Enigma2Texture.width,&nxmpicons.Enigma2Texture.height);
 		Utility::TxtLoadFromFile("romfs:/folder.png",&nxmpicons.FolderTexture.id,&nxmpicons.FolderTexture.width,&nxmpicons.FolderTexture.height);
 		Utility::TxtLoadFromFile("romfs:/file.png",&nxmpicons.FileTexture.id,&nxmpicons.FileTexture.width,&nxmpicons.FileTexture.height);

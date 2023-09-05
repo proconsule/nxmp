@@ -20,6 +20,7 @@ typedef struct{
 	int slang;
     bool useoc;
 	bool hwdec = true;
+	bool vsync = false;
 	int subfontsize;
 	float subfontscale;
 	int deint;
@@ -76,6 +77,9 @@ public:
 	
 	bool getHWDec(bool tmpvalue);
 	void setHWDec(bool _val);
+	
+	bool getVSYNC(bool tmpvalue);
+	void setVSYNC(bool _val);
 
 	int getSubFontSize(bool tmpvalue);
 	void setSubFontSize(int val);

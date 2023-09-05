@@ -81,7 +81,6 @@ void CheckCore2(void *arg) {
 
 void Misc(void*arg) {
 	CStats * ctx = (CStats *)arg;
-	int ret = 0;
 	//Service* psmService = 0;
 	//Result nvCheck = 1;
 	

@@ -56,10 +56,15 @@ namespace Windows {
 					if(ImGui::Checkbox("OverClock at Startup", &ocdefault)){
 						configini->setUseOc(ocdefault);	
 					}
-					
+					ImGui::Text("Misc (Need Restart))");
+					ImGui::Separator();
 					bool hwdecdefault = configini->getHWDec(true);
 					if(ImGui::Checkbox("HW Decoder", &hwdecdefault)){
 						configini->setHWDec(hwdecdefault);	
+					}
+					bool vsyncdefault = configini->getVSYNC(true);
+					if(ImGui::Checkbox("VSYNC", &vsyncdefault)){
+						configini->setVSYNC(vsyncdefault);	
 					}
 					
 					ImGui::EndTabItem();

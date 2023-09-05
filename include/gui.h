@@ -178,7 +178,7 @@ typedef struct {
 	Tex FolderTexture;
 	Tex FileTexture;
 
-
+	Tex ShareAddTexture;
 	Tex FTPTexture;
 	Tex HTTPTexture;
 	Tex SFTPTexture;

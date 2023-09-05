@@ -3,7 +3,6 @@
 #include "imgui.h"
 #include "utils.h"
 #include "imgui_internal.h"
-#include "custom_widgets.h"
 #include "SwitchSys.h"
 
 
@@ -90,13 +89,13 @@ namespace playerWindows{
 						}*/
 					}
 				}
-				ImGui::Checkbox("Show Power Stats", &item.showstats);
+				ImGui::Checkbox("Power Stats", &item.showstats);
 				if (*first_item) {
 					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
 					*first_item = false;
 				}
 				
-				ImGui::Checkbox("Show Decoding Stats", &item.showdecstats);
+				ImGui::Checkbox("Dec Stats", &item.showdecstats);
 				if (*first_item) {
 					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
 					*first_item = false;
@@ -110,20 +109,8 @@ namespace playerWindows{
 				
 				ImGui::SetCursorPosY(ImGui::GetWindowSize().y -40*multiplyRes);
 				ImGui::Separator();
-				if(isHandheld)
-				GUI::newbatteryIcon(ImVec2((rightmenuposX*multiplyRes) + 13.0f,ImGui::GetWindowSize().y -24),true,batteryPercent,40,18,true);
-				else
 				GUI::newbatteryIcon(ImVec2((rightmenuposX*multiplyRes) + 13.0f,ImGui::GetWindowSize().y -24*multiplyRes),true,batteryPercent,40*multiplyRes,18*multiplyRes,true);
 				
-				
-				
-				//if(isHandheld)
-				//batteryIcon(ImVec2((rightmenuposX) + 13.0f,ImGui::GetWindowSize().y -24),true,batteryPercent,40,18);
-				//else
-				//batteryIcon(ImVec2((rightmenuposX*multiplyRes) + 113.0f,ImGui::GetWindowSize().y -24),true,batteryPercent,40,18);
-				//ImGui::Text("        %d%%",batteryPercent);
-				
-				//endBattery
 
 				ImGui::EndListBox();
 			}

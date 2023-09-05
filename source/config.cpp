@@ -71,6 +71,7 @@ Config::Config(std::string inifile){
 	nxmpconfig.useoc = ini->GetBoolValue("Main", "useoc");
 	
 	nxmpconfig.hwdec = ini->GetBoolValue("Main", "hwdec",true);
+	nxmpconfig.vsync = ini->GetBoolValue("Main", "vsync",false);
 	
 	const char* themenamepv;
 	themenamepv = ini->GetValue("Main", "theme");
@@ -326,6 +327,16 @@ void Config::setHWDec(bool _val){
 	nxmptmpconfig.hwdec = _val;
 }
 
+bool Config::getVSYNC(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.vsync;
+	}
+	return nxmpconfig.vsync;
+}
+void Config::setVSYNC(bool _val){
+	nxmptmpconfig.vsync = _val;
+}
+
 int Config::getSubFontSize(bool tmpvalue){
 	if(tmpvalue){
 		return nxmptmpconfig.subfontsize;
@@ -540,6 +551,9 @@ void Config::saveSettings(){
 	
 	ini->Delete("Main", "hwdec");
 	ini->SetBoolValue("Main", "hwdec", nxmpconfig.hwdec, NULL, false);
+	
+	ini->Delete("Main", "vsync");
+	ini->SetBoolValue("Main", "vsync", nxmpconfig.vsync, NULL, false);
 
 	ini->Delete("Main", "subfontsize");
 	ini->SetLongValue("Main", "subfontsize", nxmpconfig.subfontsize, NULL, false);

@@ -71,7 +71,7 @@ namespace Windows {
 		float currstartpos = ImGui::GetCursorPosX();
 		ImGui::Text(data.c_str());
 		ImGui::SetCursorPosX(currstartpos);
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY()-26.0f);
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY()-26.0f*multiplyRes);
 		if (ImGui::Selectable(uuid.c_str(), false)){
 				SwkbdConfig kbd;
 				char tmpoutstr[256] = {0};
@@ -88,7 +88,7 @@ namespace Windows {
 					//swkbdConfigSetOkButtonText(&kbd, "Submit");
 					//swkbdConfigSetLeftOptionalSymbolKey(&kbd, "a");
 					//swkbdConfigSetRightOptionalSymbolKey(&kbd, "b");
-					//swkbdConfigSetHeaderText(&kbd, "Header");
+					swkbdConfigSetHeaderText(&kbd, label.c_str());
 					//swkbdConfigSetSubText(&kbd, "Sub");
 					//swkbdConfigSetGuideText(&kbd, "Guide");
 
