@@ -60,7 +60,7 @@ APP_VERSION   := ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -ggdb -Wall -Wno-sign-compare -O2 -ffunction-sections \
+CFLAGS	:=	-g -ggdb -Wall -Wno-sign-compare -O2 -ffunction-sections -DCXXOPTS_NO_RTTI\
 			$(ARCH) $(DEFINES) \
                 $(GITREV)
 CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags` -I${PORTLIBS}/include/upnp/

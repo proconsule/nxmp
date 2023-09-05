@@ -105,61 +105,6 @@ void Misc(void*arg) {
 			clkrstCloseSession(&session);
 			
 			
-			
-			/*
-			ClkrstSession clkSession;
-			if (R_SUCCEEDED(clkrstOpenSession(&clkSession, PcvModuleId_CpuBus, 3))) {
-				clkrstGetClockRate(&clkSession, &ctx->CPU_Hz);
-				clkrstCloseSession(&clkSession);
-			}
-			if (R_SUCCEEDED(clkrstOpenSession(&clkSession, PcvModuleId_GPU, 3))) {
-				clkrstGetClockRate(&clkSession, &ctx->GPU_Hz);
-				clkrstCloseSession(&clkSession);
-			}
-			if (R_SUCCEEDED(clkrstOpenSession(&clkSession, PcvModuleId_EMC, 3))) {
-				clkrstGetClockRate(&clkSession, &ctx->RAM_Hz);
-				clkrstCloseSession(&clkSession);
-			}
-			*/
-		//}
-		//else if (R_SUCCEEDED(ctx->pcvCheck)) {
-		//	pcvGetClockRate(PcvModule_CpuBus, &ctx->CPU_Hz);
-		//	pcvGetClockRate(PcvModule_GPU, &ctx->GPU_Hz);
-		//	pcvGetClockRate(PcvModule_EMC, &ctx->RAM_Hz);
-		//}
-		
-		/*
-		//Temperatures
-		if (R_SUCCEEDED(tsCheck)) {
-			if (hosversionAtLeast(14,0,0)) {
-				tsGetTemperature(TsLocation_External, &SOC_temperatureC);
-				tsGetTemperature(TsLocation_Internal, &PCB_temperatureC);
-			}
-			else {
-				tsGetTemperatureMilliC(TsLocation_External, &SOC_temperatureC);
-				tsGetTemperatureMilliC(TsLocation_Internal, &PCB_temperatureC);
-			}
-		}
-		if (R_SUCCEEDED(tcCheck)) tcGetSkinTemperatureMilliC(&skin_temperaturemiliC);
-		
-		*/
-		//RAM Memory Used
-		//if (R_SUCCEEDED(ctx->Hinted)) {
-		/*
-			svcGetSystemInfo(&ctx->RAM_Total_application_u, 0, INVALID_HANDLE, 0);
-			svcGetSystemInfo(&ctx->RAM_Total_applet_u, 0, INVALID_HANDLE, 1);
-			svcGetSystemInfo(&ctx->RAM_Total_system_u, 0, INVALID_HANDLE, 2);
-			svcGetSystemInfo(&ctx->RAM_Total_systemunsafe_u, 0, INVALID_HANDLE, 3);
-			svcGetSystemInfo(&ctx->RAM_Used_application_u, 1, INVALID_HANDLE, 0);
-			svcGetSystemInfo(&ctx->RAM_Used_applet_u, 1, INVALID_HANDLE, 1);
-			svcGetSystemInfo(&ctx->RAM_Used_system_u, 1, INVALID_HANDLE, 2);
-			svcGetSystemInfo(&ctx->RAM_Used_systemunsafe_u, 1, INVALID_HANDLE, 3);
-		//}
-		*/
-		/*
-		//Fan
-		if (R_SUCCEEDED(fanCheck)) fanControllerGetRotationSpeedLevel(&g_ICon, &Rotation_SpeedLevel_f);
-		*/
 		
 		//GPU Load
 		if(R_SUCCEEDED(ctx->nvCheck)){
@@ -178,33 +123,28 @@ void Misc(void*arg) {
 
 void CStats::StartThreads() {
 
-/*
+	if(!emuoverrides){
 
-	psmCheck = psmInitialize();
-		if (R_SUCCEEDED(psmCheck)) {
-			psmService = psmGetServiceSession();
-			i2cInitialize();
-			NXLOG::DEBUGLOG("I2C INIT\n");
-	}
+		psmCheck = psmInitialize();
+			if (R_SUCCEEDED(psmCheck)) {
+				psmService = psmGetServiceSession();
+				i2cInitialize();
+				NXLOG::DEBUGLOG("I2C INIT\n");
+		}
 
-	if (R_SUCCEEDED(nvInitialize())){
-		nvCheck = nvOpen(&fd, "/dev/nvhost-ctrl-gpu");
-	}else{
-		NXLOG::ERRORLOG("Cannot Init ctrl-gpu");
-	}
-	
-	if (R_SUCCEEDED(nvMapInit())){
-		nvdecCheck = nvChannelCreate(&nvdecChannel, "/dev/nvhost-nvdec");
-	}else{
-		NXLOG::ERRORLOG("Cannot Init nvhost-nvdec");
-	}
+		if (R_SUCCEEDED(nvInitialize())){
+			nvCheck = nvOpen(&fd, "/dev/nvhost-ctrl-gpu");
+		}else{
+			NXLOG::ERRORLOG("Cannot Init ctrl-gpu");
+		}
+		
+		if (R_SUCCEEDED(nvMapInit())){
+			nvdecCheck = nvChannelCreate(&nvdecChannel, "/dev/nvhost-nvdec");
+		}else{
+			NXLOG::ERRORLOG("Cannot Init nvhost-nvdec");
+		}
 
-	
-*/	
-	
-	
-	
-	
+	}
 	
 	threadCreate(&t0, CheckCore0, this, NULL, 0x1000, 0x3B, 0);
 	threadCreate(&t1, CheckCore1, this, NULL, 0x1000, 0x3B, 1);

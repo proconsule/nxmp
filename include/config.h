@@ -30,6 +30,8 @@ typedef struct{
 	int stopresumeperc;
 	bool dbactive;
 	std::string themename;
+	bool emuoverrides;
+	int loglevel;
 }nxmpconfig_struct;
 
 
@@ -120,6 +122,9 @@ public:
 	
 	void addNetworkShare(networkSource netshare);
 	void RefreshNetworkShare(std::vector<networkSource> newnetsources);
+	
+	bool getEmuOverrides();
+	int getLogLevel();
 	
 	
 private:

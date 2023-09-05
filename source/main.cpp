@@ -4,8 +4,6 @@
 #include <ctype.h>
 #include <utility>
 
-
-
 #include <SDL.h>
 #include <glad/glad.h>
 
@@ -226,16 +224,18 @@ static bool init() {
     return success;
 }
 
-
 int main() {
+	
+	
 	appletLockExit();
 	socketInitializeDefault();
-	
-	NXLOG::loglevel = 2;
 
 #ifdef NDEBUG
 	nxlinkStdio();
 #endif	
+	
+	NXLOG::loglevel = 0;
+	bool emuoverrides = true;
 	
 
 	NXLOG::DEBUGLOG("Loading Config\n");
@@ -250,6 +250,9 @@ int main() {
 		sqlitedb = new SQLiteDB("nxmp.db");
 		dbUpdated = sqlitedb->dbwasUpdated();
 	}
+	
+	emuoverrides = configini->getEmuOverrides();
+	NXLOG::loglevel = configini->getLogLevel();
 	
 	shadermania = new shaderMania();
 	
@@ -385,6 +388,7 @@ int main() {
 			
 		
 		nxmpstats = new CStats();
+		nxmpstats->emuoverrides = emuoverrides;
 		nxmpstats->StartThreads();
 		
 		GUI::RenderLoop();

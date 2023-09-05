@@ -73,6 +73,9 @@ Config::Config(std::string inifile){
 	nxmpconfig.hwdec = ini->GetBoolValue("Main", "hwdec",true);
 	nxmpconfig.vsync = ini->GetBoolValue("Main", "vsync",false);
 	
+	nxmpconfig.emuoverrides = ini->GetBoolValue("Main", "emuoverrides",false);
+	nxmpconfig.loglevel = ini->GetLongValue("Main", "loglevel",0);
+	
 	const char* themenamepv;
 	themenamepv = ini->GetValue("Main", "theme");
 	std::string themenamestring = "Default";
@@ -455,6 +458,15 @@ std::string Config::getThemeName(bool tmpvalue){
 	return nxmpconfig.themename;
 }
 
+bool Config::getEmuOverrides(){
+	return nxmpconfig.emuoverrides;
+}
+
+int Config::getLogLevel(){
+	return nxmpconfig.loglevel;
+}
+
+
 void Config::setThemeName(std::string value){
 	nxmptmpconfig.themename = value;
 }
@@ -585,6 +597,14 @@ void Config::saveSettings(){
 	
 	ini->Delete("Main", "theme");
 	ini->SetValue("Main", "theme", nxmpconfig.themename.c_str());
+	
+	ini->Delete("Main", "emuoverrides");
+	ini->SetBoolValue("Main", "emuoverrides", nxmpconfig.emuoverrides, NULL, false);
+	
+	ini->Delete("Main", "loglevel");
+	ini->SetLongValue("Main", "loglevel", nxmpconfig.loglevel, NULL, false);
+	
+	
 	
 	std::string data;
 	ini->Save(data);
