@@ -838,7 +838,6 @@ namespace playerWindows{
 				int64_t seek_val = (barperc*libmpv->getFileInfo()->playbackInfo.duration/100);
 				libmpv->seek(seek_val,false);
 				NXLOG::DEBUGLOG("Progressbar clicked perc %f %ld\n", barperc, seek_val);
-				fflush(stdout);
 			}
 			ImGui::PopStyleColor(2);
 			ImGui::PopStyleVar();
@@ -886,7 +885,7 @@ namespace playerWindows{
 			}
 			
 			ImGui::SameLine();
-			ImGui::SetCursorPosX(centerposition+20);
+			ImGui::SetCursorPosX(centerposition+20*multiplyRes);
 			ImGui::Image((void*)(intptr_t)nxmpicons.StopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			ImGui::SameLine();
 			
@@ -907,20 +906,20 @@ namespace playerWindows{
 			
 			ImGui::PushFont(fontSmall);
 			ImGui::SetCursorPosX(20);
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0*multiplyRes);
 			
 			if(libmpv->getFileInfo()->playbackInfo.title ==""){
 				PlayerScrollText(centerposition-120,40,"%s",FS::getFilefromPath(libmpv->getFileInfo()->path).c_str());
 			}else{
 				if(libmpv->getFileInfo()->playbackInfo.artist ==""){
-					PlayerScrollText(centerposition-120,40,"%s",libmpv->getFileInfo()->playbackInfo.title.c_str());
+					PlayerScrollText(centerposition-120*multiplyRes,40*multiplyRes,"%s",libmpv->getFileInfo()->playbackInfo.title.c_str());
 				}else{
 					std::string titleandartist = libmpv->getFileInfo()->playbackInfo.title + std::string(" - ") + libmpv->getFileInfo()->playbackInfo.artist;
-					PlayerScrollText(centerposition-120,40,"%s",titleandartist.c_str());
+					PlayerScrollText(centerposition-120*multiplyRes,40*multiplyRes,"%s",titleandartist.c_str());
 				}
 			}
 			ImGui::SetCursorPosX(20);
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY()-40.0f);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()-40.0f*multiplyRes);
 			char timetext[64];
 			sprintf(timetext,"%s - %s",Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.position).c_str(),Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.duration).c_str());
 			ImGui::SetCursorPosX(20);

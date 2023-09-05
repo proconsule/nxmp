@@ -176,22 +176,24 @@ endif
 .PHONY: $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
-all: $(BUILD)
+all: beta
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-ifneq (,$(findstring r,$(MAKEFLAGS)))
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+
+stable:
 	@echo "Stable Release"
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile BUILD_TYPE=-DRELEASE_TYPE=0
-else
-	@echo "Beta Release"
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile BUILD_TYPE=-DRELEASE_TYPE=1
+	$(MAKE) build BUILD_TYPE=-DRELEASE_TYPE=0
 	
-endif
+beta:
+	@echo "Stable Release"
+	$(MAKE) build BUILD_TYPE=-DRELEASE_TYPE=1
 	
+candidate:
+	@echo "Release Candidate"
+	$(MAKE) build BUILD_TYPE=-DRELEASE_TYPE=2
 	
-
-
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
