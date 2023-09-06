@@ -187,7 +187,7 @@ stable:
 	$(MAKE) build BUILD_TYPE=-DRELEASE_TYPE=0
 	
 beta:
-	@echo "Stable Release"
+	@echo "Beta Release"
 	$(MAKE) build BUILD_TYPE=-DRELEASE_TYPE=1
 	
 candidate:
