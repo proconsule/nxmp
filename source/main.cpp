@@ -48,12 +48,16 @@ SDL_Window *window;
 
 SDL_GLContext context;
 libMpv *libmpv = nullptr;
+
+CFileBrowser *filebrowser = nullptr;
+/*
 localFs *localdir = nullptr;
 FTPDir *ftpdir = nullptr;
 HTTPDir *httpdir = nullptr;
 sshDir *sshdir = nullptr;
 sambaDir *sambadir = nullptr;
 nfsDir *nfsdir = nullptr;
+*/
 CNetworkShare *NewNetworkShare = nullptr;
 NXUPnP *nxupnp = nullptr;
 USBMounter *usbmounter = nullptr;
@@ -404,15 +408,21 @@ int main() {
 		libmpv = nullptr;
 		NXLOG::DEBUGLOG("Ending MPV\n");
 		
-		
+		if(filebrowser != nullptr){
+			delete filebrowser;
+			filebrowser = nullptr;
+		}
+		/*
 		if(localdir != nullptr){
 			delete localdir;
 			localdir = nullptr;
 		}
+		*/
 		if(usbmounter != nullptr){
 			delete usbmounter;
 			usbmounter = nullptr;
 		}
+		/*
 		if(ftpdir != nullptr){
 			delete ftpdir;
 			ftpdir = nullptr;
@@ -421,6 +431,7 @@ int main() {
 			delete httpdir;
 			httpdir = nullptr;
 		}
+		*/
 		if(enigma2 != nullptr){
 			delete enigma2;
 			enigma2 = nullptr;

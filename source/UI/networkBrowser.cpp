@@ -128,7 +128,7 @@ namespace Windows {
 			}
            
 			if (ImGui::BeginMenuBar()) {
-				ImGui::Text("current path: %s",ftpdir->getCurrPath().c_str());
+				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
 			}
 			float total_w = ImGui::GetContentRegionAvail().x;
@@ -136,7 +136,7 @@ namespace Windows {
 			if (ImGui::BeginListBox("Ftp Browser Menu",ImVec2(total_w, total_h))){
 				//ImGui::Text("Current Dir: %s\n",item.networklastpath.c_str());
 				int total_w = ImGui::GetContentRegionAvail().x;
-				std::vector<FS::FileEntry> thislist = ftpdir->getCurrList();
+				std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 				bool triggerselect = false;
 				for(unsigned int n=0;n<thislist.size();n++){
 						
@@ -147,7 +147,7 @@ namespace Windows {
 						}
 						ImGui::SameLine();
 						
-						urlschema thisurl = Utility::parseUrl(ftpdir->getUrl());
+						urlschema thisurl = Utility::parseUrl(filebrowser->getUrl());
 						static int selected = -1;
 						std::string itemid = "##" + std::to_string(n);
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
@@ -155,15 +155,15 @@ namespace Windows {
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
-									ftpdir->DirList(thislist[n].path + thislist[n].name,Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path + thislist[n].name,false,Utility::getMediaExtensions());
 								}
 							}else{
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
 									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + thislist[n].path + thislist[n].name;
-									if(ImGui::Checkbox(checkitemid.c_str(), ftpdir->checked(n))){
-										if(*ftpdir->checked(n)){
+									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
+										if(*filebrowser->checked(n)){
 											playlist->appendFile(thislist[n].name,openurl);
 										} else {
 											playlist->removeFile(thislist[n].name,openurl);
@@ -181,14 +181,14 @@ namespace Windows {
 										
 								if(thislist[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
-									ftpdir->DirList(thislist[n].path + thislist[n].name,Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path + thislist[n].name,false,Utility::getMediaExtensions());
 									
 								}else if (thislist[n].type == FS::FileEntryType::File){
 											
 									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + thislist[n].path + thislist[n].name;
 									item.laststate = item.state;
 									playlist->clearPlaylist();
-									ftpdir->clearChecked();
+									filebrowser->clearChecked();
 									libmpv->loadFile(openurl);
 									if(configini->getDbActive(true)){
 										libmpv->getFileInfo()->resume = sqlitedb->getResume(openurl);
@@ -271,14 +271,14 @@ namespace Windows {
 			}
            
 			if (ImGui::BeginMenuBar()) {
-				ImGui::Text("current path: %s",httpdir->getCurrPath().c_str());
+				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
 			}
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			
 			if (ImGui::BeginListBox("Http Browser Menu",ImVec2(total_w, total_h))){
-				std::vector<FS::FileEntry> thislist = httpdir->getCurrList();
+				std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 				for(unsigned int n=0;n<thislist.size();n++){
 						
 						if(thislist[n].type == FS::FileEntryType::Directory){
@@ -289,23 +289,23 @@ namespace Windows {
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);
 						static int selected = -1;
-						urlschema thisurl = Utility::parseUrl(httpdir->getUrl());
+						urlschema thisurl = Utility::parseUrl(filebrowser->getUrl());
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							
 							if(thislist[n].type == FS::FileEntryType::Directory){
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									item.first_item = true;
-									httpdir->DirList(httpdir->getCurrPath() + thislist[n].path,Utility::getMediaExtensions());
+									filebrowser->DirList(filebrowser->getCurrentPath() + thislist[n].path,false,Utility::getMediaExtensions());
 								}
 								
 							}else if (thislist[n].type == FS::FileEntryType::File){
 								
-								std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
+								std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + filebrowser->getCurrentPath() + thislist[n].name;
 								std::string checkitemid = "##check" + std::to_string(n);
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
-								if(ImGui::Checkbox(checkitemid.c_str(), httpdir->checked(n))){
-									if(*httpdir->checked(n)){
+								if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
+									if(*filebrowser->checked(n)){
 										playlist->appendFile(thislist[n].name,openurl);
 									} else {
 										playlist->removeFile(thislist[n].name,openurl);
@@ -324,15 +324,15 @@ namespace Windows {
 										
 								if(thislist[n].type == FS::FileEntryType::Directory){
 									item.first_item = true;
-									httpdir->DirList(httpdir->getCurrPath() + thislist[n].path,Utility::getMediaExtensions());
+									filebrowser->DirList(filebrowser->getCurrentPath() + thislist[n].path,false,Utility::getMediaExtensions());
 										
 								}else if (thislist[n].type == FS::FileEntryType::File){
 									
-										urlschema thisurl = Utility::parseUrl(httpdir->getUrl());
-										std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
+										urlschema thisurl = Utility::parseUrl(filebrowser->getUrl());
+										std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + filebrowser->getCurrentPath() + thislist[n].name;
 										item.laststate = item.state;
 										playlist->clearPlaylist();
-										httpdir->clearChecked();
+										filebrowser->clearChecked();
 										libmpv->loadFile(openurl);
 										libmpv->getFileInfo()->resume = sqlitedb->getResume(openurl);
 										if(libmpv->getFileInfo()->resume>0){
@@ -350,7 +350,7 @@ namespace Windows {
 						ImVec4 textcolor = colors[ImGuiCol_Text];
 						
 						if(sqlitedb != nullptr){
-							std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + httpdir->getCurrPath() + thislist[n].name;
+							std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + filebrowser->getCurrentPath() + thislist[n].name;
 							int dbfilestatus = sqlitedb->getFileDbStatus(openurl);
 							if(dbfilestatus == 2){
 								textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
@@ -403,15 +403,15 @@ namespace Windows {
 			}
             
 			if (ImGui::BeginMenuBar()) {
-				ImGui::Text("current path: %s",sshdir->getCurrPath().c_str());
+				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
 			}
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			if (ImGui::BeginListBox("SSH Browser Menu",ImVec2(total_w, total_h))){
 				
-				urlschema thisurl = Utility::parseUrl(sshdir->getUrl());
-				std::vector<FS::FileEntry> thislist = sshdir->getCurrList();
+				urlschema thisurl = Utility::parseUrl(filebrowser->getUrl());
+				std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 				bool triggerselect = false;
 				for (unsigned int n = 0; n < thislist.size(); n++){
 					
@@ -429,15 +429,15 @@ namespace Windows {
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
-									sshdir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 							}else{
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
-									if(ImGui::Checkbox(checkitemid.c_str(), sshdir->checked(n))){
+									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
 										std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + thislist[n].path;
-										if(*sshdir->checked(n)){
+										if(*filebrowser->checked(n)){
 											playlist->appendFile(thislist[n].name,openurl);
 										} else {
 											playlist->removeFile(thislist[n].name,openurl);
@@ -452,14 +452,14 @@ namespace Windows {
 						if(item.selectionstate == FILE_SELECTION_NONE){
 							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
-								if(sshdir->getCurrList()[n].type == FS::FileEntryType::Directory){
+								if(filebrowser->getCurrList()[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
-									sshdir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 								else{
 									item.laststate = item.state;
 									playlist->clearPlaylist();
-									sshdir->clearChecked();
+									filebrowser->clearChecked();
 									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + thislist[n].path;
 									libmpv->loadFile(openurl);
 									if(configini->getDbActive(true)){
@@ -545,15 +545,15 @@ namespace Windows {
 			}
             
 			if (ImGui::BeginMenuBar()) {
-				ImGui::Text("current path: %s",nfsdir->getCurrPath().c_str());
+				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
 			}
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			if (ImGui::BeginListBox("NFS Browser Menu",ImVec2(total_w, total_h))){
 				
-				urlschema thisurl = Utility::parseUrl(nfsdir->getUrl());
-				std::vector<FS::FileEntry> thislist = nfsdir->getCurrList();
+				urlschema thisurl = Utility::parseUrl(filebrowser->getUrl());
+				std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 				bool triggerselect = false;
 				for (unsigned int n = 0; n < thislist.size(); n++){
 					
@@ -571,15 +571,15 @@ namespace Windows {
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
-									nfsdir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 							}else{
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
-									if(ImGui::Checkbox(checkitemid.c_str(), nfsdir->checked(n))){
+									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
 										std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + thislist[n].path;
-										if(*nfsdir->checked(n)){
+										if(*filebrowser->checked(n)){
 											playlist->appendFile(thislist[n].name,openurl);
 										} else {
 											playlist->removeFile(thislist[n].name,openurl);
@@ -594,14 +594,14 @@ namespace Windows {
 						if(item.selectionstate == FILE_SELECTION_NONE){
 							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
-								if(nfsdir->getCurrList()[n].type == FS::FileEntryType::Directory){
+								if(filebrowser->getCurrList()[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
-									nfsdir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 								else{
 									item.laststate = item.state;
 									playlist->clearPlaylist();
-									nfsdir->clearChecked();
+									filebrowser->clearChecked();
 									std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + thislist[n].path;
 									libmpv->loadFile(openurl);
 									if(configini->getDbActive(true)){
@@ -688,15 +688,15 @@ namespace Windows {
 			}
             
 			if (ImGui::BeginMenuBar()) {
-				ImGui::Text("current path: %s",sambadir->getCurrPath().c_str());
+				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
 			}
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			if (ImGui::BeginListBox("Samba Browser Menu",ImVec2(total_w, total_h))){
 				
-				urlschema thisurl = Utility::parseUrl(sambadir->getUrl());
-				std::vector<FS::FileEntry> thislist = sambadir->getCurrList();
+				urlschema thisurl = Utility::parseUrl(filebrowser->getUrl());
+				std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 				bool triggerselect = false;
 				for (unsigned int n = 0; n < thislist.size(); n++){
 					
@@ -714,15 +714,15 @@ namespace Windows {
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
-									sambadir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 							}else{
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
-									if(ImGui::Checkbox(checkitemid.c_str(), sambadir->checked(n))){
-										std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + sambadir->getShare() + std::string("/") + thislist[n].path;
-										if(*sambadir->checked(n)){
+									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
+										std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + filebrowser->getShare() + std::string("/") + thislist[n].path;
+										if(*filebrowser->checked(n)){
 											playlist->appendFile(thislist[n].name,openurl);
 										} else {
 											playlist->removeFile(thislist[n].name,openurl);
@@ -737,15 +737,15 @@ namespace Windows {
 						if(item.selectionstate == FILE_SELECTION_NONE){
 							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
-								if(sambadir->getCurrList()[n].type == FS::FileEntryType::Directory){
+								if(filebrowser->getCurrList()[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
-									sambadir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 								else{
 									item.laststate = item.state;
 									playlist->clearPlaylist();
-									sambadir->clearChecked();
-									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + sambadir->getShare() + std::string("/") + thislist[n].path;
+									filebrowser->clearChecked();
+									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + filebrowser->getShare() + std::string("/") + thislist[n].path;
 									libmpv->loadFile(openurl);
 									if(configini->getDbActive(true)){
 										libmpv->getFileInfo()->resume = sqlitedb->getResume(openurl);
@@ -763,7 +763,7 @@ namespace Windows {
 						ImVec4 textcolor = colors[ImGuiCol_Text];
 						
 						if(sqlitedb != nullptr){
-							std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + sambadir->getShare() + std::string("/") + thislist[n].path;
+							std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + filebrowser->getShare() + std::string("/") + thislist[n].path;
 							int dbfilestatus = sqlitedb->getFileDbStatus(openurl);
 							if(dbfilestatus == 2){
 								textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
@@ -868,28 +868,28 @@ namespace Windows {
 							item.networkselect = false;
 							
 							if(thisurl.scheme == "http" || thisurl.scheme == "https"){
-								httpdir = new HTTPDir(item.networksources[n].url);
-								httpdir->DirList(httpdir->getBasePath(),Utility::getMediaExtensions());
+								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->DirList(filebrowser->getBasePath(),false,Utility::getMediaExtensions());
 								item.state = MENU_STATE_HTTPBROWSER;
 							}
 							if(thisurl.scheme == "ftp"){
-								ftpdir = new FTPDir(item.networksources[n].url,playlist);
-								ftpdir->DirList(ftpdir->getBasePath(),Utility::getMediaExtensions());	
+								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->DirList(filebrowser->getBasePath(),false,Utility::getMediaExtensions());	
 								item.state = MENU_STATE_FTPBROWSER;
 							}
 							if(thisurl.scheme == "sftp"){
-								sshdir = new sshDir(item.networksources[n].url,playlist);
-								sshdir->DirList(sshdir->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
+								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
 								item.state = MENU_STATE_SSHBROWSER;
 							}
 							if(thisurl.scheme == "smb"){
-								sambadir = new sambaDir(item.networksources[n].url,playlist);
-								sambadir->DirList(sambadir->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
+								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
 								item.state = MENU_STATE_SAMBABROWSER;
 							}
 							if(thisurl.scheme == "nfs"){
-								nfsdir = new nfsDir(item.networksources[n].url,playlist);
-								nfsdir->DirList(nfsdir->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
+								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
 								item.state = MENU_STATE_NFSBROWSER;
 							}
 							

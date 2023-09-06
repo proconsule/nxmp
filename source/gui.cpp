@@ -218,8 +218,8 @@ namespace GUI {
 							//fix crash
 							if (item.state != item.savestate)
 							{item.state = MENU_STATE_FILEBROWSER;
-							localdir = new localFs(configini->getStartPath(),playlist);
-							localdir->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
+							filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
+							filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 							item.first_item = true;}
 							
 							item.state = MENU_STATE_PLAYER;
@@ -304,10 +304,16 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_Y && !item.masterlock){
 						if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER && item.popupstate == POPUP_STATE_NONE){
+							if(filebrowser != nullptr){
+								delete filebrowser;
+								filebrowser = nullptr;
+							}
+							/*
 							if(localdir != nullptr){
 								delete localdir;
 								localdir = nullptr;
 							}
+							*/
 							if(usbmounter != nullptr && libmpv->Stopped() && !usbmounter->haveIteminPlaylist()){
 								delete usbmounter;
 								usbmounter = nullptr;
@@ -316,6 +322,7 @@ namespace GUI {
 								delete NewNetworkShare;
 								NewNetworkShare = nullptr;
 							}
+							/*
 							if(ftpdir != nullptr){
 								delete ftpdir;
 								ftpdir = nullptr;
@@ -332,6 +339,7 @@ namespace GUI {
 								delete sambadir;
 								sambadir = nullptr;
 							}
+							*/
 							if(nxupnp != nullptr){
 								delete nxupnp;
 								nxupnp = nullptr;
@@ -362,32 +370,32 @@ namespace GUI {
 						}
 						if(item.state == MENU_STATE_FTPBROWSER){
 							item.first_item = true;
-							ftpdir->backDir();
-							ftpdir->DirList(ftpdir->getCurrPath(),Utility::getMediaExtensions());
+							filebrowser->backDir();
+							filebrowser->DirList(filebrowser->getCurrentPath(),false,Utility::getMediaExtensions());
 						}
 						
 						if(item.state == MENU_STATE_HTTPBROWSER){
 							item.first_item = true;
-							httpdir->backDir();
-							httpdir->DirList(httpdir->getCurrPath(),Utility::getMediaExtensions());
+							filebrowser->backDir();
+							filebrowser->DirList(filebrowser->getCurrentPath(),false,Utility::getMediaExtensions());
 							
 						}
 						if(item.state == MENU_STATE_SSHBROWSER){
 							item.first_item = true;
-							sshdir->backDir();
-							sshdir->DirList(sshdir->getCurrPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							filebrowser->backDir();
+							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
 						if(item.state == MENU_STATE_SAMBABROWSER){
 							item.first_item = true;
-							sambadir->backDir();
-							sambadir->DirList(sambadir->getCurrPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							filebrowser->backDir();
+							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
 						if(item.state == MENU_STATE_NFSBROWSER){
 							item.first_item = true;
-							nfsdir->backDir();
-							nfsdir->DirList(nfsdir->getCurrPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							filebrowser->backDir();
+							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
 						if(item.state == MENU_STATE_UPNPBROWSER){
@@ -409,8 +417,8 @@ namespace GUI {
 						
 						if(item.state == MENU_STATE_FILEBROWSER){
 							item.first_item = true;
-							localdir->backPath();
-							localdir->DirList(localdir->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							filebrowser->backDir();
+							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
 						

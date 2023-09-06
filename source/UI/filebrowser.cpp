@@ -18,14 +18,14 @@ namespace Windows {
 			}
             
 			if (ImGui::BeginMenuBar()) {
-				ImGui::Text("current path: %s",localdir->getCurrentPath().c_str());
+				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
 			}
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			if (ImGui::BeginListBox("File Browser Menu",ImVec2(total_w, total_h))){
 				
-				std::vector<FS::FileEntry> thislist = localdir->getCurrList();
+				std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 				bool triggerselect = false;
 				for (unsigned int n = 0; n < thislist.size(); n++){
 					
@@ -43,14 +43,14 @@ namespace Windows {
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 								if (ImGui::Selectable(itemid.c_str(), selected == n)){
 									triggerselect = true;
-									localdir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 							}else{
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								std::string checkitemid = "##check" + std::to_string(n);
 								if(thislist[n].type != FS::FileEntryType::Directory){
-									if(ImGui::Checkbox(checkitemid.c_str(), localdir->checked(n))){
-										if(*localdir->checked(n)){
+									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
+										if(*filebrowser->checked(n)){
 											playlist->appendFile(thislist[n].name,thislist[n].path);
 										} else {
 											playlist->removeFile(thislist[n].name,thislist[n].path);
@@ -65,14 +65,14 @@ namespace Windows {
 						if(item.selectionstate == FILE_SELECTION_NONE){
 							ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 							if (ImGui::Selectable(itemid.c_str(), selected == n)){
-								if(localdir->getCurrList()[n].type == FS::FileEntryType::Directory){
+								if(filebrowser->getCurrList()[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
-									localdir->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 								}
 								else{
 									item.laststate = item.state;
 									playlist->clearPlaylist();
-									localdir->clearChecked();
+									filebrowser->clearChecked();
 									libmpv->loadFile(thislist[n].path);
 									if(configini->getDbActive(true)){
 										libmpv->getFileInfo()->resume = sqlitedb->getResume(thislist[n].path);

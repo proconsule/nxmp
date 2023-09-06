@@ -59,8 +59,8 @@ namespace Windows {
 					if (ImGui::Selectable(itemid.c_str(), selected == n)){
 						if(topmenu[n] == "Local Files"){
 							item.state = MENU_STATE_FILEBROWSER;
-							localdir = new localFs(configini->getStartPath(),playlist);
-							localdir->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
+							filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
+							filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 							item.first_item = true;
 						}
 						if(topmenu[n] == "USB"){

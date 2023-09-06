@@ -33,6 +33,8 @@
 
 #include "Enigma2.h"
 
+#include "fileBrowserClass.h"
+
 
 #include "HTTPDir.h"
 #include "FTPDir.h"
@@ -209,12 +211,17 @@ extern SDL_Window *window;
 extern MenuItem item;
 
 extern libMpv *libmpv;
+
+extern CFileBrowser *filebrowser;
+
+/*
 extern localFs *localdir;
 extern HTTPDir *httpdir;
 extern FTPDir *ftpdir;
 extern sshDir *sshdir;
 extern sambaDir *sambadir;
 extern nfsDir *nfsdir;
+*/
 extern NXUPnP *nxupnp;
 extern USBMounter *usbmounter;
 extern Enigma2 *enigma2;
