@@ -474,21 +474,19 @@ namespace Utility{
 std::string Nozomi_Link(std::string Link){
 	curlDownloader jkObj;
 	std::string jklink = jkObj.scrapeHtml(Link,"",false,"https://jkanime.net/",true);
-	Link = scrapElement(jklink,"https://jkanime.net/jkfembed.php?u=", "\"");
-	replace(Link,"https://jkanime.net/jkfembed.php?u=","https://embedsito.com/v/");
-	return Link;
-	/*Link = scrapElement(jklink,"https://jkanime.net/um2.php?", "\"");
+	Link = "https://jkanime.net/" + scrapElement(jklink,"um2.php?", "\"");
+    std::cout << "Secondkey: "<< Link << std::endl;
 	std::string codetemp;
 	//Get FirstKey
 	std::string FirstKey = jkObj.scrapeHtml(Link,"",false,"https://jkanime.net/",true);
 	codetemp = scrapElement(FirstKey,"name=\"data\" value=\"", "\"");
 	replace(codetemp,"name=\"data\" value=\"","");
 	FirstKey = codetemp;
-	//std::cout << "FirstKey: "<< FirstKey << std::endl;
+	std::cout << "FirstKey: "<< FirstKey << std::endl;
 	//Get SecondKey
 	std::string data = "data=" + FirstKey;
 	std::string SecondKey = jkObj.getRedirection("https://jkanime.net/gsplay/redirect_post.php",data,true,"https://jkanime.net/",true);
-	//std::cout << "Secondkey: "<< SecondKey << std::endl;
+	std::cout << "Secondkey: "<< SecondKey << std::endl;
 	//Get ThirdKey
 	std::string second = "v=" + SecondKey;
 	replace(second,"https://jkanime.net/gsplay/player.html#","");
@@ -496,9 +494,9 @@ std::string Nozomi_Link(std::string Link){
 	codetemp = scrapElement(ThirdKey,"https:", "\"");
 	replace(codetemp,"\\","");
 	ThirdKey = codetemp;
-	//std::cout << "ThirdKey: "<< ThirdKey << std::endl;
+	std::cout << "ThirdKey: "<< ThirdKey << std::endl;
 	//return URL
-	return ThirdKey;*/
+	return ThirdKey;
 }
 
 
@@ -523,7 +521,6 @@ bool GetChargeStatue(void) {
 	return false;
 }
 
-
 std::string KeyboardCall (std::string hint, std::string text){
 	Result ret = 0;
 	SwkbdConfig swkbd;
@@ -535,8 +532,8 @@ std::string KeyboardCall (std::string hint, std::string text){
 	}
 	
 	swkbdConfigMakePresetDefault(&swkbd);
-	swkbdConfigSetInitialCursorPos (&swkbd, 0);
-	swkbdConfigSetOkButtonText(&swkbd,"Buscar");
+	swkbdConfigSetInitialCursorPos (&swkbd, 1);
+	swkbdConfigSetOkButtonText(&swkbd,"Search");
 	swkbdConfigSetHeaderText(&swkbd, "NXMP Stream URL");
 	swkbdConfigSetSubText(&swkbd, hint.c_str());
 	swkbdConfigSetStringLenMax(&swkbd, 512);
