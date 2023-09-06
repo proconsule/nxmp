@@ -119,31 +119,24 @@ namespace Windows {
 						
 						tempKbUrl = received;
 						curlDownloader Scraper;
-                        
+                        if (!received.compare("debug"))
+						{
+						}
+
+						if (received.find("https://jk/") != std::string::npos)
+						{
+						Utility::replace(received,"https://jk/","https://jkanime.net/");
+						
+						}
 						if (received.find("https://bit.ly/") != std::string::npos)
 						{//if the response from the address does not arrive within 5 seconds, it sends the direct link.
-						received = Scraper.getRedirection(received,"",false,"",false);}
+						received = Scraper.getRedirection(received,"",false,"",false);
+						}
 
 						if (received.find("https://jkanime.net/") != std::string::npos)
 						{
 						namefile = "Streaming from JKAnime...";
 						received = Utility::Nozomi_Link(received);
-						}
-
-						if (received.find("https://www.fembed.com/v/") != std::string::npos || received.find("https://embedsito.com/v/") != std::string::npos || received.find("https://suzihaza.com/v/") != std::string::npos)
-						{
-						namefile = "Streaming from Fembed...";
-
-						Utility::replace(received,"https://suzihaza.com/v/","https://www.fembed.com/api/source/");
-						Utility::replace(received,"https://www.fembed.com/v/","https://www.fembed.com/api/source/");
-						Utility::replace(received,"https://embedsito.com/v/","https://www.fembed.com/api/source/");
-						std::string htmlcode = Scraper.scrapeHtml(received, "", true, "", false);
-                       
-						int tempValue1 = htmlcode.rfind("https:");
-						int tempValue2 = htmlcode.find("\"",tempValue1);
-						received = htmlcode.substr(tempValue1,tempValue2 - tempValue1);
-						Utility::replace(received,"\\/","/");
-						std::cout << received << std::endl;
 						}
 
 						if(received.find("http") != std::string::npos)

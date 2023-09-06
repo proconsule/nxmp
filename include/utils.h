@@ -25,6 +25,7 @@
 
 
 
+extern std::string tempKbUrl;
 
 typedef struct {
     GLuint id = 0;

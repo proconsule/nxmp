@@ -102,7 +102,7 @@ float multiplyRes = 1.0f;
 float initScale = 1.0f;
 int initSize = 55;
 int batteryPercent = 0;
-std::string tempKbUrl = "";
+std::string tempKbUrl = "https://";
 shaderMania* shadermania = nullptr;
 
 float currFontsize = 20.0f; 
