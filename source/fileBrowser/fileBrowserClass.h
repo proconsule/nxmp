@@ -30,11 +30,16 @@ public:
 	std::string getCurrentPath();
 	std::string getBasePath();
 	std::string getShare();
+	std::string getOpenUrlPart();
 	
 	void clearChecked();
 	bool *checked(int pos);
 	
+	std::string getTitle(); 
 	std::string path;
+
+private:
+	std::string title;
 	
 };
 

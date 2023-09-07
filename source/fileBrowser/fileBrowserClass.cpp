@@ -4,15 +4,21 @@
 		path = _path;
 		if(Utility::startWith(path,"/",false)){
 			mylocal = new localFs(path,_playlist);
+			title = "File Browser";
 		}else if(Utility::startWith(path,"smb",false)){
 			mysamba = new sambaDir(path,_playlist);
+			title = "SMB Browser";
 		}else if(Utility::startWith(path,"sftp",false)){
 			myssh = new sshDir(path,_playlist);
+			title = "SFTP Browser";
 		}else if(Utility::startWith(path,"ftp",false)){
 			myftp = new FTPDir(path,_playlist);
+			title = "FTP Browser";
 		}else if(Utility::startWith(path,"http",false)){
 			myhttp = new HTTPDir(path);
+			title = "HTTP Browser";
 		}else if(Utility::startWith(path,"nfs",false)){
+			title = "NFS Browser";
 			mynfs = new nfsDir(path,_playlist);
 		}
 	}
@@ -108,19 +114,19 @@
 			return mylocal->getCurrentPath();
 		}
 		if(mysamba!= nullptr){
-			mysamba->getCurrPath();
+			return mysamba->getCurrPath();
 		}
 		if(myssh!= nullptr){
-			myssh->getCurrPath();
+			return myssh->getCurrPath();
 		}
 		if(myftp!= nullptr){
-			myftp->getCurrPath();
+			return myftp->getCurrPath();
 		}
 		if(myhttp!= nullptr){
-			myhttp->getCurrPath();
+			return myhttp->getCurrPath();
 		}
 		if(mynfs!= nullptr){
-			mynfs->getCurrPath();
+			return mynfs->getCurrPath();
 		}
 		
 		return "";
@@ -209,6 +215,34 @@
 		}
 		if(mynfs!= nullptr){
 			return mynfs->getUrl();
+		}
+		return "";
+	}
+	
+	std::string CFileBrowser::getTitle(){
+		return title;
+	}
+	
+	std::string CFileBrowser::getOpenUrlPart(){
+		if(mylocal!= nullptr){
+			return "";
+		}
+		urlschema thisurl = Utility::parseUrl(path); 
+		if(mysamba!= nullptr){
+			
+			return thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + getShare() + std::string("/");
+		}
+		if(myssh!= nullptr){
+			return thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server;							
+		}
+		if(myftp!= nullptr){
+			return thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/");
+		}
+		if(myhttp!= nullptr){
+			return thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/");
+		}
+		if(mynfs!= nullptr){
+			return thisurl.scheme + std::string("://") + thisurl.server;
 		}
 		return "";
 	}

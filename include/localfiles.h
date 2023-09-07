@@ -32,10 +32,12 @@ namespace FS {
 		std::string path;
 		int64_t size = 0;
 		FileEntryType type = FileEntryType::Unknown;
+		FsTimeStampRaw timestamp;
 		bool checked = false;
 	};
 	
 	
+	std::string FormatDate(time_t timestamp);
 	
 	
 	std::string removeLastSlash(const std::string &string);

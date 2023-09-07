@@ -6,6 +6,31 @@
 #include "localfiles.h"
 
 namespace FS {
+	
+	std::string FormatDate(time_t timestamp) {
+		char test1[36];
+        strftime(test1, 36, "%Y/%m/%d %H:%M:%S", localtime(timestamp));
+		return std::string(test1);
+    }
+	
+	bool GetTimeStamp(std::string _path, FsTimeStampRaw &timestamp) {
+        struct stat file_stat = { 0 };
+        //std::string full_path = FS::BuildPath(entry);
+
+        if (stat(_path.c_str(), std::addressof(file_stat)) != 0) {
+            NXLOG::ERRORLOG("FS::GetTimeStamp(%s) failed to stat file.\n", _path.c_str());
+            return false;
+        }
+
+        timestamp.is_valid = 1;
+        timestamp.created = file_stat.st_ctime;
+        timestamp.modified = file_stat.st_mtime;
+        timestamp.accessed = file_stat.st_atime;
+		printf("STAT: %lh\r\n",file_stat.st_mtime);
+        return true;
+    }
+	
+	
 	std::string removeLastSlash(const std::string &string) {
 
     std::string str = string;
@@ -70,6 +95,7 @@ namespace FS {
 						file.size = (size_t) st.st_size;
 						file.type = S_ISDIR(st.st_mode) ? FileEntryType::Directory : FileEntryType::File;
 					}
+					GetTimeStamp(file.path,file.timestamp);
 #endif
 					files.push_back(file);
 				}

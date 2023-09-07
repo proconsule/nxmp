@@ -36,6 +36,8 @@ namespace Windows {
         ImGui::End();
         ImGui::PopStyleVar();
     };
+	
+	void UniBrowserWindow(bool *focus, bool *first_item);
 
     void FileBrowserWindow(bool *focus, bool *first_item);
 	void USBBrowserWindow(bool *focus, bool *first_item);

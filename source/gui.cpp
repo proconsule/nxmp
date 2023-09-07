@@ -770,7 +770,8 @@ namespace GUI {
 					}
 					break;
 				case MENU_STATE_FILEBROWSER:
-					Windows::FileBrowserWindow(&item.focus, &item.first_item);
+					//Windows::FileBrowserWindow(&item.focus, &item.first_item);
+					Windows::UniBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
@@ -791,31 +792,31 @@ namespace GUI {
 					Windows::ShareAddWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_FTPBROWSER:
-					Windows::FtpWindow(&item.focus, &item.first_item);
+					Windows::UniBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
 					break;
 				case MENU_STATE_HTTPBROWSER:
-					Windows::HttpWindow(&item.focus, &item.first_item);
+					Windows::UniBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
 					break;
 				case MENU_STATE_SSHBROWSER:
-					Windows::SSHWindow(&item.focus, &item.first_item);
+					Windows::UniBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
 					break;
 				case MENU_STATE_SAMBABROWSER:
-					Windows::SambaWindow(&item.focus, &item.first_item);
+					Windows::UniBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}
 					break;
 				case MENU_STATE_NFSBROWSER:
-					Windows::NFSWindow(&item.focus, &item.first_item);
+					Windows::UniBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
 						Popups::PlaylistStartPlaylist();
 					}

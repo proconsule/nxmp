@@ -115,6 +115,13 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 				tmpentry.size = attrs.filesize;
 			
 			}
+			if (attrs.flags & LIBSSH2_SFTP_ATTR_ACMODTIME) {
+				tmpentry.timestamp.is_valid = 1;
+				tmpentry.timestamp.accessed = attrs.atime;
+				tmpentry.timestamp.modified = attrs.mtime;
+				tmpentry.timestamp.created = 0;
+				//tmpentry.timestamp.created = attrs.ctime;
+			}
 			
 			tmpentry.name = mem;
 			tmpentry.path = path + std::string("/") + std::string(mem);
