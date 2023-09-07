@@ -259,7 +259,7 @@ int main() {
 	NXLOG::loglevel = configini->getLogLevel();
 	
 	shadermania = new shaderMania();
-	
+	NXLOG::loglevel = 2;
 	
 
 	Result ret;

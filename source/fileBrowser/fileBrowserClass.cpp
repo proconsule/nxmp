@@ -229,7 +229,6 @@
 		}
 		urlschema thisurl = Utility::parseUrl(path); 
 		if(mysamba!= nullptr){
-			
 			return thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + getShare() + std::string("/");
 		}
 		if(myssh!= nullptr){
