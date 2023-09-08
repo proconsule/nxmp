@@ -31,7 +31,7 @@ void FTPDir::DirList(std::string path,const std::vector<std::string> &extensions
 			currentlist = FtpDirList(path.c_str(), ftp_con,extensions);
 			for(int i=0;i<currentlist.size();i++){
 				std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + currentlist[i].path + currentlist[i].name;
-				currentlist[i].checked = playlist->isPresent(currentlist[i].name,currentlist[i].path);					
+				currentlist[i].checked = playlist->isPresent(currentlist[i],currentlist[i].path);					
 			}
 			FtpQuit(ftp_con);
 			

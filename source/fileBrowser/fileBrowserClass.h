@@ -32,6 +32,7 @@ public:
 	
 	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
+	std::vector<FS::FileEntry> getChecked();
 	
 	void backDir();
 	std::string getUrl();

@@ -161,7 +161,7 @@ void USBMounter::DirList(const std::string &path,bool showHidden,const std::vect
 					FS::FileEntry file;
 					file.name = ent->d_name;
 					file.path = FS::removeLastSlash(path) + "/" + file.name;
-					file.checked = playlist->isPresent(file.name,file.path);
+					file.checked = playlist->isPresent(file,file.path);
 					
 					struct stat st{};
 					if (stat(file.path.c_str(), &st) == 0) {

@@ -164,9 +164,9 @@ namespace Windows {
 									std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + thislist[n].path + thislist[n].name;
 									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
 										if(*filebrowser->checked(n)){
-											playlist->appendFile(thislist[n].name,openurl);
+											playlist->appendFile(thislist[n],openurl);
 										} else {
-											playlist->removeFile(thislist[n].name,openurl);
+											playlist->removeFile(thislist[n],openurl);
 										}
 									}
 								}
@@ -306,9 +306,9 @@ namespace Windows {
 								ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (40*multiplyRes - ImGui::GetFont()->FontSize - ImGui::GetStyle().FramePadding.y * 2) / 2});
 								if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
 									if(*filebrowser->checked(n)){
-										playlist->appendFile(thislist[n].name,openurl);
+										playlist->appendFile(thislist[n],openurl);
 									} else {
-										playlist->removeFile(thislist[n].name,openurl);
+										playlist->removeFile(thislist[n],openurl);
 									}
 								}		
 							}
@@ -438,9 +438,9 @@ namespace Windows {
 									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
 										std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + thislist[n].path;
 										if(*filebrowser->checked(n)){
-											playlist->appendFile(thislist[n].name,openurl);
+											playlist->appendFile(thislist[n],openurl);
 										} else {
-											playlist->removeFile(thislist[n].name,openurl);
+											playlist->removeFile(thislist[n],openurl);
 										}
 									}
 								}
@@ -580,9 +580,9 @@ namespace Windows {
 									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
 										std::string openurl = thisurl.scheme + std::string("://") + thisurl.server + thislist[n].path;
 										if(*filebrowser->checked(n)){
-											playlist->appendFile(thislist[n].name,openurl);
+											playlist->appendFile(thislist[n],openurl);
 										} else {
-											playlist->removeFile(thislist[n].name,openurl);
+											playlist->removeFile(thislist[n],openurl);
 										}
 									}
 								}
@@ -723,9 +723,9 @@ namespace Windows {
 									if(ImGui::Checkbox(checkitemid.c_str(), filebrowser->checked(n))){
 										std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + filebrowser->getShare() + std::string("/") + thislist[n].path;
 										if(*filebrowser->checked(n)){
-											playlist->appendFile(thislist[n].name,openurl);
+											playlist->appendFile(thislist[n],openurl);
 										} else {
-											playlist->removeFile(thislist[n].name,openurl);
+											playlist->removeFile(thislist[n],openurl);
 										}
 									}
 								}

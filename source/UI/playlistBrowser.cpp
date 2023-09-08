@@ -27,19 +27,20 @@ namespace Windows {
 						std::string itemid = "##" + std::to_string(n);
 						if (ImGui::Selectable(itemid.c_str(), playlist->getCurrIdx() == n)){
 							item.laststate = item.state;
-							Playlist::playlist_struct playitem = playlist->getPlaylistItem(n);
 							playlist->setPlaylistIdx(n);
-							libmpv->loadFile(playitem.fulluri);
-							libmpv->getFileInfo()->resume = sqlitedb->getResume(playitem.fulluri);
-							if(libmpv->getFileInfo()->resume>0){
-								item.popupstate = POPUP_STATE_RESUME;
+							libmpv->loadFile(thislist[n].fulluri);
+							if(sqlitedb != nullptr){
+								libmpv->getFileInfo()->resume = sqlitedb->getResume(thislist[n].fulluri);
+								if(libmpv->getFileInfo()->resume>0){
+									item.popupstate = POPUP_STATE_RESUME;
+								}
 							}
 						}
 						if (ImGui::IsItemHovered()){
 							item.playlistitemHighlighted = n;
 						}
 						ImGui::SameLine();
-						ImGui::Text("%d. %s",n+1,thislist[n].name.c_str());	
+						ImGui::Text("%d. %s",n+1,thislist[n].file.name.c_str());	
 					}
 				}
 				if(item.playlistUpdateHovered){

@@ -22,16 +22,16 @@ void Playlist::clearPlaylist(){
 	currentidx = 0;
 }
 
-void Playlist::appendFile(std::string name,std::string fulluri){
+void Playlist::appendFile(FS::FileEntry myfile,std::string fulluri){
 	Playlist::playlist_struct addentry;
-	addentry.name = name;
+	addentry.file = myfile;
 	addentry.fulluri = fulluri;
 	currplaylist.push_back(addentry);
 }
 
-void Playlist::removeFile(std::string name,std::string fulluri){
+void Playlist::removeFile(FS::FileEntry myfile,std::string fulluri){
 	for(int i=0;i<currplaylist.size();i++){
-		if(currplaylist[i].name == name && currplaylist[i].fulluri == fulluri){
+		if(currplaylist[i].file.name == myfile.name && currplaylist[i].fulluri == fulluri){
 			currplaylist.erase (currplaylist.begin() + i);
 		}
 	}
@@ -77,9 +77,9 @@ void Playlist::moveForw(int eleidx){
 	}
 }
 
-bool Playlist::isPresent(std::string name,std::string fulluri){
+bool Playlist::isPresent(FS::FileEntry myfile,std::string fulluri){
 	for(int i=0;i<currplaylist.size();i++){
-		if(currplaylist[i].name == name && currplaylist[i].fulluri == fulluri){
+		if(currplaylist[i].file.name == myfile.name && currplaylist[i].fulluri == fulluri){
 			return true;
 		}
 	}

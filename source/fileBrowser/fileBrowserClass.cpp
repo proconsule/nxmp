@@ -277,3 +277,14 @@
 			mynfs->DirList(mynfs->getCurrPath(),currshowHidden,Utility::getMediaExtensions());
 		}
 	}
+	
+	std::vector<FS::FileEntry> CFileBrowser::getChecked(){
+		std::vector<FS::FileEntry> retvector;
+		std::vector<FS::FileEntry> mycurrlist = getCurrList();
+		for(int i=0;i<mycurrlist.size();i++){
+			if(mycurrlist[i].checked)retvector.push_back(mycurrlist[i]);
+		}
+		
+		return retvector;
+		
+	}

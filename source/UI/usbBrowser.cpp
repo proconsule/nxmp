@@ -85,9 +85,9 @@ namespace Windows {
 								if(thislist[n].type != FS::FileEntryType::Directory){
 									if(ImGui::Checkbox(checkitemid.c_str(), usbmounter->checked(n))){
 										if(*usbmounter->checked(n)){
-											playlist->appendFile(thislist[n].name,thislist[n].path);
+											playlist->appendFile(thislist[n],thislist[n].path);
 										} else {
-											playlist->removeFile(thislist[n].name,thislist[n].path);
+											playlist->removeFile(thislist[n],thislist[n].path);
 										}
 									}
 								}
