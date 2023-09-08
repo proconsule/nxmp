@@ -413,14 +413,14 @@ namespace Popups{
 			
 			ImGui::Text("%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
 			
-			ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
+			ImVec2 button_size(ImGui::GetFontSize() * 10.0f, 0.0f);
 			
-			if (ImGui::Button("Sort Ascending (A-Z)", button_size))
+			if (ImGui::Button("Sort Ascending (A-Z)"))
 			{
                 filebrowser->setSordOrder(0);
 				item.popupstate = POPUP_STATE_NONE;
             }
-			if (ImGui::Button("Sort Descending (Z-A)", button_size))
+			if (ImGui::Button("Sort Descending (Z-A)"))
 			{
                 filebrowser->setSordOrder(1);
 				item.popupstate = POPUP_STATE_NONE;
@@ -429,7 +429,7 @@ namespace Popups{
 			if(filebrowser->getChecked().size()==0){
 				ImGui::BeginDisabled();
 			}
-			if (ImGui::Button("Add Selection to Playlist", button_size))
+			if (ImGui::Button("Add Selection to Playlist"))
 			{
 				std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
                 for(int i=0;i<selectionlist.size();i++){
@@ -440,9 +440,7 @@ namespace Popups{
 			if(filebrowser->getChecked().size()==0){
 				ImGui::EndDisabled();
 			}
-			
-			
-			
+
 			if (ImGui::Button("Exit", button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;

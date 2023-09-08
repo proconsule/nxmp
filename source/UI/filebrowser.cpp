@@ -55,9 +55,6 @@ namespace Windows {
 	void UniBrowserWindow(bool *focus, bool *first_item) {
 		 Windows::SetupWindow();
 		 if (ImGui::Begin(filebrowser->getTitle().c_str(), nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
-            //if(item.popupstate == POPUP_STATE_NONE){
-			//	ImGui::SetNextWindowFocus();
-			//}
             
 			if (ImGui::BeginMenuBar()) {
 				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
@@ -88,11 +85,7 @@ namespace Windows {
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							if(thislist[n].type != FS::FileEntryType::Directory){
 								if(ImGui::Checkbox(itemid.c_str(), filebrowser->checked(n))){
-									//if(*filebrowser->checked(n)){
-									//	playlist->appendFile(thislist[n].name,filebrowser->getOpenUrlPart()+thislist[n].path);
-									//} else {
-									//	playlist->removeFile(thislist[n].name,filebrowser->getOpenUrlPart()+thislist[n].path);
-									//}
+									
 								}
 								ImGui::SameLine();
 							}
