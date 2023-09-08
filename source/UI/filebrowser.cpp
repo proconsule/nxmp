@@ -70,7 +70,7 @@ namespace Windows {
 			
 			
 			if (ImGui::BeginTable("table1", 3)){
-				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, 850.0f*multiplyRes); // Default to 100.0f
+				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (950.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
 				ImGui::TableSetupColumn("size", ImGuiTableColumnFlags_WidthFixed, 130.0f*multiplyRes); // Default to 200.0f
 				ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed,200.f*multiplyRes);       // Default to auto
            
@@ -126,7 +126,7 @@ namespace Windows {
 					}
 					ImGui::SameLine();
 					if(item.fileHoveredidx == n){
-						BrowserScrollText(850.0f*multiplyRes,30.0f*multiplyRes,"%s",thislist[n].name.c_str());
+						BrowserScrollText((950.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes,30.0f*multiplyRes,"%s",thislist[n].name.c_str());
 					}else{
 						ImGui::TextColored(textcolor,"%s",thislist[n].name.c_str());
 					}
@@ -142,8 +142,8 @@ namespace Windows {
 					ImGui::TableSetColumnIndex(2);
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
 					
-					if(thislist[n].timestamp.is_valid){
-						std::string strdate = Utility::formatTimeStamp(thislist[n].timestamp.modified);
+					if(thislist[n].is_valid){
+						std::string strdate = Utility::formatTimeStamp(thislist[n].modified);
 						ImVec2 textSize = ImGui::CalcTextSize(strdate.c_str());
 						ImGui::TextColored(textcolor,"%s",strdate.c_str());
 					}
@@ -282,8 +282,8 @@ namespace Windows {
 						if(thislist[n].type == FS::FileEntryType::File){
 							
 							ImGui::NextColumn();
-							if(thislist[n].timestamp.is_valid){
-								std::string strdate = Utility::formatTimeStamp(thislist[n].timestamp.modified);
+							if(thislist[n].is_valid){
+								std::string strdate = Utility::formatTimeStamp(thislist[n].modified);
 								ImVec2 textSize = ImGui::CalcTextSize(strdate.c_str());
 								//ImGui::SameLine(total_w-150-textSize.x);
 								ImGui::TextColored(textcolor,"%s",strdate.c_str());

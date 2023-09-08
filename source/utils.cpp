@@ -6,10 +6,12 @@
 
 namespace Utility{
 	
-	std::string formatTimeStamp(uint64_t timestamp){
-		std::ostringstream oss;
-		oss << std::put_time(localtime(&timestamp), "%d/%m/%Y %H:%M:%S");
-		return oss.str();
+	std::string formatTimeStamp(time_t timestamp){
+		
+		struct tm* timeStruct = localtime((const time_t *)&timestamp);
+		char test1[36];
+		strftime(test1, 36, "%d/%m/%Y %H:%M:%S", timeStruct);
+		return std::string(test1);
 	}
 	
 	std::string formatTimeShort(double seconds) {

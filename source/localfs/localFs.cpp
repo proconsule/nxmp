@@ -56,17 +56,18 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 					file.checked = playlist->isPresent(file.name,file.path);
 					
 					
-					#ifdef _WIN32
-					struct stat64 st{};
-					if (stat64(file.path.c_str(), &st) == 0) {
-						file.size = (size_t) st.st_size;
-					#else
-					struct stat st{};
+					
+					struct stat st{0};
 					if (stat(file.path.c_str(), &st) == 0) {
 						file.size = (size_t) st.st_size;
-					#endif
 						file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
+						file.is_valid = 0;
+						file.created = (time_t)st.st_ctime;
+						file.modified = (time_t)st.st_mtime;
+						file.accessed = (time_t)st.st_atime;
 					}
+					
+					
 					if(file.type == FS::FileEntryType::File){
 						bool isMediafile = false;
 						for (auto &ext : extensions) {
@@ -84,7 +85,13 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 				}
 			
 				closedir(dir);
-				std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
+				if(sortOrder == 0){
+					std::sort(currentlist.begin(), currentlist.end(), FS::SortAsc);
+				}
+				if(sortOrder == 1){
+					std::sort(currentlist.begin(), currentlist.end(), FS::SortDesc);
+				}
+				
 			}
 		}
 

@@ -4,20 +4,25 @@
 #include <filesystem>
 
 #include "localfiles.h"
+#include <switch.h>
 
 namespace FS {
 	
 	std::string FormatDate(time_t timestamp) {
 		char test1[36];
-        strftime(test1, 36, "%Y/%m/%d %H:%M:%S", localtime(&timestamp));
+		time_t posixtime = (time_t)timestamp;
+		struct tm *t = gmtime(&posixtime);
+        strftime(test1, 36, "%Y/%m/%d %H:%M:%S", t);
 		return std::string(test1);
     }
 	
-	bool GetTimeStamp(std::string _path, FsTimeStampRaw &timestamp) {
+	
+	bool GetTimeStamp(std::string _path, FsTimeStampRaw *timestamp) {
+		/*
         struct stat file_stat = { 0 };
         //std::string full_path = FS::BuildPath(entry);
 
-        if (stat(_path.c_str(), std::addressof(file_stat)) != 0) {
+        if (stat(_path.c_str(),&file_stat) != 0) {
             NXLOG::ERRORLOG("FS::GetTimeStamp(%s) failed to stat file.\n", _path.c_str());
             return false;
         }
@@ -27,6 +32,15 @@ namespace FS {
         timestamp.modified = file_stat.st_mtime;
         timestamp.accessed = file_stat.st_atime;
 		return true;
+		*/
+		FsFileSystem sdmc;
+		fsOpenSdCardFileSystem(&sdmc);
+        fsFsGetFileTimeStampRaw(&sdmc, _path.c_str(), timestamp);
+		fsFsClose(&sdmc);
+		
+		
+		
+		
     }
 	
 	
@@ -39,6 +53,33 @@ namespace FS {
     }
 
     return str;
+	}
+	
+	bool SortAsc(const FileEntry &entryA, const FileEntry &entryB){
+		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
+			return true;
+		else if (!(entryA.type == FileEntryType::Directory) && (entryB.type == FileEntryType::Directory))
+			return false;
+		else {
+			if (strcasecmp(entryA.name.c_str(), entryB.name.c_str()) < 0)
+				return true;
+					
+		}
+		
+		return false;
+	}
+	bool SortDesc(const FileEntry &entryA, const FileEntry &entryB){
+		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
+			return true;
+		else if (!(entryA.type == FileEntryType::Directory) && (entryB.type == FileEntryType::Directory))
+			return false;
+		else {
+			if (strcasecmp(entryA.name.c_str(), entryB.name.c_str()) > 0)
+				return true;
+					
+		}
+		
+		return false;
 	}
 	
 	
@@ -83,19 +124,17 @@ namespace FS {
 					FileEntry file;
 					file.name = ent->d_name;
 					file.path = removeLastSlash(path) + "/" + file.name;
-#if 0
+/*
 					auto *dirSt = (fsdev_dir_t *) dir->dirData->dirStruct;
 					FsDirectoryEntry *entry = &dirSt->entry_data[dirSt->index];
 					file.type = entry->type == ENTRYTYPE_DIR ? FileEntryType::Directory : FileEntryType::File;
 					file.size = entry->fileSize;
-#else
+*/
 					struct stat st{};
 					if (stat(file.path.c_str(), &st) == 0) {
 						file.size = (size_t) st.st_size;
 						file.type = S_ISDIR(st.st_mode) ? FileEntryType::Directory : FileEntryType::File;
 					}
-					GetTimeStamp(file.path,file.timestamp);
-#endif
 					files.push_back(file);
 				}
 			

@@ -10,6 +10,14 @@
 
 #include "utils.h"
 
+
+enum FILESORTORDER{
+	FSASCENDINGORDER = 0,
+	FSDESCENDINGORDER,
+	
+	
+};
+
 class CFileBrowser{
 public:
 	CFileBrowser(std::string _path,Playlist * _playlist);
@@ -35,8 +43,14 @@ public:
 	void clearChecked();
 	bool *checked(int pos);
 	
+	void setSordOrder(int myorder);
+	
 	std::string getTitle(); 
 	std::string path;
+	
+	int sortOrder = FSASCENDINGORDER;
+	bool currshowHidden = false;
+	
 
 private:
 	std::string title;

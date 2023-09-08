@@ -1,4 +1,7 @@
 #include "fileBrowserClass.h"
+	
+	
+
 
 	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist){
 		path = _path;
@@ -45,6 +48,7 @@
 	}
 	
 	void CFileBrowser::DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions){
+		currshowHidden = showHidden;
 		if(mylocal!= nullptr){
 			mylocal->DirList(path,showHidden,extensions);
 		}
@@ -244,4 +248,32 @@
 			return thisurl.scheme + std::string("://") + thisurl.server;
 		}
 		return "";
+	}
+	
+	void CFileBrowser::setSordOrder(int myorder){
+		sortOrder = myorder;
+		if(mylocal!= nullptr){
+			mylocal->sortOrder = sortOrder;
+			mylocal->DirList(mylocal->getCurrentPath(),currshowHidden,Utility::getMediaExtensions());
+		}
+		if(mysamba!= nullptr){
+			mysamba->sortOrder = sortOrder;
+			mysamba->DirList(mysamba->getCurrPath(),currshowHidden,Utility::getMediaExtensions());
+		}
+		if(myssh!= nullptr){
+			myssh->sortOrder = sortOrder;
+			myssh->DirList(myssh->getCurrPath(),currshowHidden,Utility::getMediaExtensions());
+		}
+		if(myftp!= nullptr){
+			myftp->sortOrder = sortOrder;
+			//myftp->DirList(myftp->getCurrPath(),Utility::getMediaExtensions());
+		}
+		if(myhttp!= nullptr){
+			myhttp->sortOrder = sortOrder;
+			myhttp->DirList(myhttp->getCurrPath(),Utility::getMediaExtensions());
+		}
+		if(mynfs!= nullptr){
+			mynfs->sortOrder = sortOrder;
+			mynfs->DirList(mynfs->getCurrPath(),currshowHidden,Utility::getMediaExtensions());
+		}
 	}

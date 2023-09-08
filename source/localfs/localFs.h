@@ -16,6 +16,8 @@ public:
 	void DirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
 	void clearChecked();
 	bool *checked(int pos);
+	
+	int sortOrder = 0;
 
 private:
 	Playlist * playlist;

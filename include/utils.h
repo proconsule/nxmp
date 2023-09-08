@@ -51,7 +51,7 @@ namespace Utility{
 		std::string lang3;
 	};
 	
-	std::string formatTimeStamp(uint64_t timestamp);
+	std::string formatTimeStamp(time_t timestamp);
 	std::string formatTimeShort(double seconds);
 	urlschema parseUrl(std::string url); 
 	bool compare(const remotefs_entry &a, const remotefs_entry &b);

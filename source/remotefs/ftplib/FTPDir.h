@@ -25,6 +25,8 @@ public:
 	bool *checked(int pos);
 	void clearChecked();
 	
+	int sortOrder=0;
+	
 private:
 	std::string url;
 	std::string currpath;

@@ -27,12 +27,16 @@ namespace FS {
 		Directory = 2
 	};
 	
+	
 	struct FileEntry{
 		std::string name;
 		std::string path;
 		int64_t size = 0;
 		FileEntryType type = FileEntryType::Unknown;
-		FsTimeStampRaw timestamp;
+		int is_valid=0;
+		time_t modified;
+		time_t accessed;
+		time_t created;
 		bool checked = false;
 	};
 	
@@ -45,6 +49,8 @@ namespace FS {
 	std::vector<FileEntry> getDirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
 	std::string backPath(std::string path);
 	bool Sort(const FileEntry &entryA, const FileEntry &entryB);
+	bool SortAsc(const FileEntry &entryA, const FileEntry &entryB);
+	bool SortDesc(const FileEntry &entryA, const FileEntry &entryB);
 	std::string getFilefromPath(std::string path);
 }
 

@@ -85,8 +85,12 @@ void HTTPDir::DirList(std::string path,const std::vector<std::string> &extension
 		s = sm.suffix();
 	}
 	free(chunk->memory);
-	std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
-				
+	if(sortOrder == 0){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortAsc);
+	}
+	if(sortOrder == 1){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortDesc);
+	}			
 	currentlist.erase(
 		std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {
 			for (auto &ext : extensions) {

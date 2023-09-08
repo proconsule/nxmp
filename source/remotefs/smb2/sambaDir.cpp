@@ -123,7 +123,13 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 				currentlist.push_back(tmpentry);
         }
 	
-	std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
+	//std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
+	if(sortOrder == 0){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortAsc);
+	}
+	if(sortOrder == 1){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortDesc);
+	}
 				
 	currentlist.erase(
 		std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {

@@ -28,6 +28,7 @@ namespace Popups {
 	void PlaylistStartPlaylist(void);
 	void DBUpdatedPopup(void);
 	void NetMenuPopup(void);
+	void FileContextPopup(void);
 	
 }
 

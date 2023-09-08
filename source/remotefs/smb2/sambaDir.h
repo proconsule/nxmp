@@ -29,6 +29,8 @@ public:
 	bool *checked(int pos);
 	void clearChecked();
 	
+	int sortOrder=0;
+	
 private:
 	std::vector<FS::FileEntry> currentlist;
 	std::string url;

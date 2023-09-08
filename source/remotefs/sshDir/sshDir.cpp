@@ -116,10 +116,10 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 			
 			}
 			if (attrs.flags & LIBSSH2_SFTP_ATTR_ACMODTIME) {
-				tmpentry.timestamp.is_valid = 1;
-				tmpentry.timestamp.accessed = attrs.atime;
-				tmpentry.timestamp.modified = attrs.mtime;
-				tmpentry.timestamp.created = 0;
+				tmpentry.is_valid = 1;
+				tmpentry.accessed = attrs.atime;
+				tmpentry.modified = attrs.mtime;
+				tmpentry.created = 0;
 				//tmpentry.timestamp.created = attrs.ctime;
 			}
 			
@@ -145,7 +145,13 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
     } while(1);
 	
 	
-	std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
+	//std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
+	if(sortOrder == 0){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortAsc);
+	}
+	if(sortOrder == 1){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortDesc);
+	}
 				
 	currentlist.erase(
 		std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {

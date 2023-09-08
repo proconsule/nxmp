@@ -404,4 +404,37 @@ namespace Popups{
 		Popups::ExitPopup();
 	}
 	
+	
+	void FileContextPopup(void) {
+		Popups::SetupPopup("File Context Menu Popup");
+
+		if (ImGui::BeginPopupModal("File Context Menu Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			
+			
+			ImGui::Text("%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
+			
+			ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
+			if (ImGui::Button("Sort Ascending (A-Z)", button_size))
+			{
+                filebrowser->setSordOrder(0);
+				item.popupstate = POPUP_STATE_NONE;
+            }
+			if (ImGui::Button("Sort Descending (Z-A)", button_size))
+			{
+                filebrowser->setSordOrder(1);
+				item.popupstate = POPUP_STATE_NONE;
+            }
+			
+			
+			
+			if (ImGui::Button("Exit", button_size))
+			{
+                item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+            }
+			
+		}
+		Popups::ExitPopup();
+	}
+	
 }

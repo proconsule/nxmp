@@ -271,7 +271,7 @@ namespace GUI {
 					if (button == SDL_KEY_X){
 						
 						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
-							item.popupstate = POPUP_STATE_STARTPLAYLIST;
+							item.popupstate = POPUP_STATE_FILECONTEXTMENU;
 						}
 						
 						if(item.state == MENU_STATE_NETWORKBROWSER){
@@ -770,10 +770,9 @@ namespace GUI {
 					}
 					break;
 				case MENU_STATE_FILEBROWSER:
-					//Windows::FileBrowserWindow(&item.focus, &item.first_item);
 					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
-						Popups::PlaylistStartPlaylist();
+					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
+						Popups::FileContextPopup();
 					}
 					break;
 				case MENU_STATE_USB:
@@ -799,26 +798,26 @@ namespace GUI {
 					break;
 				case MENU_STATE_HTTPBROWSER:
 					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
-						Popups::PlaylistStartPlaylist();
+					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
+						Popups::FileContextPopup();
 					}
 					break;
 				case MENU_STATE_SSHBROWSER:
 					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
-						Popups::PlaylistStartPlaylist();
+					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
+						Popups::FileContextPopup();
 					}
 					break;
 				case MENU_STATE_SAMBABROWSER:
 					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
-						Popups::PlaylistStartPlaylist();
+					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
+						Popups::FileContextPopup();
 					}
 					break;
 				case MENU_STATE_NFSBROWSER:
 					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
-						Popups::PlaylistStartPlaylist();
+					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
+						Popups::FileContextPopup();
 					}
 					break;
 				case MENU_STATE_UPNPBROWSER:
