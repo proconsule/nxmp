@@ -17,8 +17,8 @@ void FTPDir::DirList(std::string path,const std::vector<std::string> &extensions
 	FtpInit();
 	urlschema thisurl = Utility::parseUrl(url);
 	currentlist.clear();
-	if(thisurl.port == "")thisurl.port = "21";
-	std::string ftphost = thisurl.server+std::string(":")+thisurl.port;
+	//if(thisurl.port == "")thisurl.port = "21";
+	std::string ftphost = thisurl.server+std::string(":")+ (thisurl.port.empty() ? "22" : thisurl.port);
 	if (!FtpConnect(ftphost.c_str(), &ftp_con)) {
 		NXLOG::ERRORLOG("could not connect to ftp server\n");
 	}else{
@@ -29,10 +29,10 @@ void FTPDir::DirList(std::string path,const std::vector<std::string> &extensions
 		}else{
 			currpath = path;
 			currentlist = FtpDirList(path.c_str(), ftp_con,extensions);
-			for(int i=0;i<currentlist.size();i++){
-				std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + currentlist[i].path + currentlist[i].name;
-				currentlist[i].checked = playlist->isPresent(currentlist[i],currentlist[i].path);					
-			}
+			//for(int i=0;i<currentlist.size();i++){
+				//std::string openurl = thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + currentlist[i].path + currentlist[i].name;
+				//currentlist[i].checked = playlist->isPresent(currentlist[i],currentlist[i].path);					
+			//}
 			FtpQuit(ftp_con);
 			
 		}

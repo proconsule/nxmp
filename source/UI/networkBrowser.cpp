@@ -55,6 +55,7 @@ namespace Windows {
 					if (ImGui::Selectable(NewNetworkShare->protonames[n], is_selected)){
 						item_current = NewNetworkShare->protonames[n];
 						NewNetworkShare->type = n;
+						NewNetworkShare->port = NewNetworkShare->protodefports[n];
 					}
 						
 					if (is_selected)
@@ -71,6 +72,11 @@ namespace Windows {
 			
 			if(NewNetworkShare->type >= 1){
 				NewNetworkShare->address = InputSwitchKeyboard("##address","IP Address:",NewNetworkShare->address);
+				if(NewNetworkShare->type ==3 || NewNetworkShare->type ==4){
+					
+				}else{
+					NewNetworkShare->port = std::stoi(InputSwitchKeyboard("##port","Port:",std::to_string(NewNetworkShare->port)));
+				}
 				ImGui::Checkbox("Anonymous", &NewNetworkShare->anon);
 				if(!NewNetworkShare->anon){
 					NewNetworkShare->username = InputSwitchKeyboard("##username","Username:",NewNetworkShare->username);

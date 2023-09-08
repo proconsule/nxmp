@@ -5,6 +5,7 @@ CNetworkShare::CNetworkShare(){
 	
 	name = "New Share 1";
 	anon = true;
+	port = 0;
 }
 
 CNetworkShare::~CNetworkShare(){
@@ -42,7 +43,7 @@ networkSource CNetworkShare::GenConfigLine(){
 		if(anon){
 			urlstring = "ftp://" + address + remoteshare;
 		}else{
-			urlstring = "ftp://"+ username+":" + password + "@" + address + remoteshare;
+			urlstring = "ftp://"+ username+":" + password + "@" + address + ":" + std::to_string(port) + remoteshare;
 		}
 		
 		tmpret.url = urlstring;
@@ -55,7 +56,7 @@ networkSource CNetworkShare::GenConfigLine(){
 		if(anon){
 			urlstring = "sftp://" + address + remoteshare;
 		}else{
-			urlstring = "sftp://"+ username+":" + password + "@" + address + remoteshare;
+			urlstring = "sftp://"+ username+":" + password + "@" + address + ":" + std::to_string(port) + remoteshare;
 		}
 		
 		tmpret.url = urlstring;

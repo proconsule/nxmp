@@ -41,7 +41,7 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 	sock = socket(AF_INET, SOCK_STREAM, 0);
  
     sin.sin_family = AF_INET;
-    sin.sin_port = htons(22);
+    sin.sin_port = htons(thisurl.port.empty() ? 22 : std::stoi(thisurl.port));
     sin.sin_addr.s_addr = hostaddr;
     if(connect(sock, (struct sockaddr*)(&sin),
                sizeof(struct sockaddr_in)) != 0) {

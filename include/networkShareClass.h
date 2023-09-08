@@ -16,6 +16,7 @@ public:
 	bool isValidShare();
 	
 	char const *protonames[5] = {"HTTP","FTP","SSH","SMB","NFS"};
+	int protodefports[5] = {80,21,22,0,0};
 
 	std::string name = "";
 	unsigned int type;
