@@ -413,14 +413,14 @@ namespace Popups{
 			
 			ImGui::Text("%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
 			
-			ImVec2 button_size(ImGui::GetFontSize() * 10.0f, 0.0f);
+			ImVec2 button_size(ImGui::GetFontSize() * 13.0f, 0.0f);
 			
-			if (ImGui::Button("Sort Ascending (A-Z)"))
+			if (ImGui::Button("Sort Ascending (A-Z)",button_size))
 			{
                 filebrowser->setSordOrder(0);
 				item.popupstate = POPUP_STATE_NONE;
             }
-			if (ImGui::Button("Sort Descending (Z-A)"))
+			if (ImGui::Button("Sort Descending (Z-A)",button_size))
 			{
                 filebrowser->setSordOrder(1);
 				item.popupstate = POPUP_STATE_NONE;
@@ -429,7 +429,7 @@ namespace Popups{
 			if(filebrowser->getChecked().size()==0){
 				ImGui::BeginDisabled();
 			}
-			if (ImGui::Button("Add Selection to Playlist"))
+			if (ImGui::Button("Add Selection to Playlist",button_size))
 			{
 				std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
                 for(int i=0;i<selectionlist.size();i++){
@@ -441,6 +441,65 @@ namespace Popups{
 				ImGui::EndDisabled();
 			}
 
+			if (ImGui::Button("Exit", button_size))
+			{
+                item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+            }
+			
+		}
+		Popups::ExitPopup();
+	}
+	
+	void PlaylistContextPopup(void) {
+		Popups::SetupPopup("Playlist Menu Popup");
+
+		if (ImGui::BeginPopupModal("Playlist Menu Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			
+			
+			ImVec2 button_size(ImGui::GetFontSize() * 10.0f, 0.0f);
+			
+			if (ImGui::Button("Start Playlist",button_size))
+			{
+				ImGui::CloseCurrentPopup();
+				item.popupstate = POPUP_STATE_NONE;
+				libmpv->loadFile(playlist->getPlaylist()[playlist->getCurrIdx()].fulluri);
+				if(sqlitedb != nullptr){
+					libmpv->getFileInfo()->resume = sqlitedb->getResume(playlist->getPlaylist()[playlist->getCurrIdx()].fulluri);
+					if(libmpv->getFileInfo()->resume>0){
+						item.popupstate = POPUP_STATE_RESUME;
+					}
+				}
+                
+            }
+			
+			if(item.playlistitemHighlighted<= 0){
+				ImGui::BeginDisabled();
+			}
+			if (ImGui::Button("Move Up Element",button_size))
+			{
+                playlist->moveBack(item.playlistitemHighlighted);
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+            }
+			if(item.playlistitemHighlighted<= 0){
+				ImGui::EndDisabled();
+			}
+			
+			if(item.playlistitemHighlighted >= playlist->getPlaylist().size()-1){
+				ImGui::BeginDisabled();
+			}
+			if (ImGui::Button("Move Down",button_size))
+			{
+                playlist->moveForw(item.playlistitemHighlighted);
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+            }
+			if(item.playlistitemHighlighted >= playlist->getPlaylist().size()-1){
+				ImGui::EndDisabled();
+			}
+			
+		
 			if (ImGui::Button("Exit", button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;

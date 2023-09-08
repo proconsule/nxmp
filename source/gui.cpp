@@ -274,6 +274,12 @@ namespace GUI {
 							item.popupstate = POPUP_STATE_FILECONTEXTMENU;
 						}
 						
+						if(item.state == MENU_STATE_PLAYLISTBROWSER){
+							if(playlist->getPlaylist().size()>0){
+								item.popupstate = POPUP_STATE_PLAYLISTCONTEXTMENU;
+							}
+						}
+						
 						if(item.state == MENU_STATE_NETWORKBROWSER){
 							if(Windows::netwinselected != -1){
 								item.popupstate = POPUP_STATE_NETWORKMENU;
@@ -837,6 +843,9 @@ namespace GUI {
 					break;
 				case MENU_STATE_PLAYLISTBROWSER:
 					Windows::PlaylistWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_PLAYLISTCONTEXTMENU){
+						Popups::PlaylistContextPopup();
+					}
 					break;
 				case MENU_STATE_INFO:
 					Windows::InfoMenuWindow(&item.focus, &item.first_item);
