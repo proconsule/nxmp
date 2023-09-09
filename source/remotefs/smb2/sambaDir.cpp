@@ -65,7 +65,7 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 	
 	NXLOG::DEBUGLOG("SMBURL: %s %s\n",share.c_str(),path.c_str());
 	
-	if (smb2_connect_share(smb2, myurl->server, myurl->share, myurl->user) < 0) {
+	if (smb2_connect_share(smb2, myurl->server, myurl->share, NULL) < 0) {
 		NXLOG::ERRORLOG("smb2_connect_share failed. %s\n", smb2_get_error(smb2));
 		return;
 	}

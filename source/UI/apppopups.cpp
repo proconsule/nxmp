@@ -413,7 +413,7 @@ namespace Popups{
 			
 			ImGui::Text("%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
 			
-			ImVec2 button_size(ImGui::GetFontSize() * 13.0f, 0.0f);
+			ImVec2 button_size(ImGui::CalcTextSize(" Add Checked to Playlist ").x, 0.0f);
 			
 			if (ImGui::Button("Sort Ascending (A-Z)",button_size))
 			{
@@ -429,7 +429,7 @@ namespace Popups{
 			if(filebrowser->getChecked().size()==0){
 				ImGui::BeginDisabled();
 			}
-			if (ImGui::Button("Add Selection to Playlist",button_size))
+			if (ImGui::Button("Add Checked to Playlist",button_size))
 			{
 				std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
                 for(int i=0;i<selectionlist.size();i++){

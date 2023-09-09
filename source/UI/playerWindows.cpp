@@ -108,9 +108,6 @@ namespace playerWindows{
 				
 				ImGui::PushStyleColor(ImGuiCol_Button, green);
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, green_hover);
-				//ImGui::PushStyleColor(ImGuiCol_FrameBg, offgreen);
-				//ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, offgreen_hover);
-				
 				
 				ImVec4 color = ImGui::GetStyleColorVec4(ImGuiCol_Text);
 				ImVec4 colorMark = color;

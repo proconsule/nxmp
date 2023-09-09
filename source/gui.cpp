@@ -370,10 +370,19 @@ namespace GUI {
 										
 					}
 					if (button == SDL_KEY_B){
+						
+						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
+							
+							item.first_item = true;
+							filebrowser->backDir();
+							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							
+						}
 						if(item.state == MENU_STATE_ENIGMABROWSER){
 							item.first_item = true;
 							enigma2->backToTop();
 						}
+						/*
 						if(item.state == MENU_STATE_FTPBROWSER){
 							item.first_item = true;
 							filebrowser->backDir();
@@ -404,6 +413,7 @@ namespace GUI {
 							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
+						*/
 						if(item.state == MENU_STATE_UPNPBROWSER){
 							item.first_item = true;
 							if(nxupnp->getSelDevice()>-1){
@@ -420,13 +430,14 @@ namespace GUI {
 								
 							}
 						}
-						
+						/*
 						if(item.state == MENU_STATE_FILEBROWSER){
 							item.first_item = true;
 							filebrowser->backDir();
 							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
+						*/
 						
 						if(item.state == MENU_STATE_PLAYER || item.state == MENU_STATE_PLAYERCACHING){
 							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
