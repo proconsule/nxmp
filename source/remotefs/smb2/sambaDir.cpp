@@ -29,6 +29,7 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 	struct smb2dirent *ent;
 
 	urlschema thisurl = Utility::parseUrl(url);
+	if(thisurl.user.empty())thisurl.user = "Guest";
 	currentlist.clear();
 	
 	
@@ -57,9 +58,9 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 	fflush(stdout);
 	char const *search = ":";
 	char * token = strtok((char *)myurl->user, search);
-	smb2_set_user(smb2,token); 
+	smb2_set_user(smb2,thisurl.user.c_str()); 
 	token = strtok(NULL, search);
-	smb2_set_password(smb2,token); 
+	smb2_set_password(smb2,thisurl.pass.c_str()); 
 	
 	smb2_set_security_mode(smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
 	
