@@ -82,7 +82,7 @@ namespace Windows {
 						ImGui::TableSetColumnIndex(0);
 						std::string itemid = "##" + std::to_string(n);
 						
-						ImGui::Dummy(ImVec2(0,30));
+						ImGui::Dummy(ImVec2(0,ImGui::CalcTextSize("A").y + ImGui::GetStyle().FramePadding.y * 2));
 						ImGui::SameLine();
 						
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
@@ -94,6 +94,7 @@ namespace Windows {
 							}
 							
 						}
+						
 						if(thislist[n].type == FS::FileEntryType::Directory){
 							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(30,30));
 						}else{
@@ -122,6 +123,10 @@ namespace Windows {
 									}
 								}
 							}
+						}else{
+							ImGui::Dummy(ImVec2(0,ImGui::CalcTextSize("A").y + ImGui::GetStyle().FramePadding.y * 2));
+							ImGui::SameLine();
+						
 						}
 						if (ImGui::IsItemHovered()){
 							if(item.fileHoveredidx != n){
