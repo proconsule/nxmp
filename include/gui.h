@@ -61,7 +61,8 @@
 enum MENU_STATES {
 	MENU_STATE_HOME,
     MENU_STATE_FILEBROWSER,
-	MENU_STATE_USB,
+	MENU_STATE_USB_MOUNT,
+	MENU_STATE_USB_BROWSER,
 	MENU_STATE_NETWORKBROWSER,
 	MENU_STATE_ADDSHARE,
 	MENU_STATE_FTPBROWSER,
@@ -225,7 +226,7 @@ extern sambaDir *sambadir;
 extern nfsDir *nfsdir;
 */
 extern NXUPnP *nxupnp;
-extern USBMounter *usbmounter;
+//extern USBMounter *usbmounter;
 extern Enigma2 *enigma2;
 
 extern uint32_t wakeup_on_mpv_render_update;

@@ -167,25 +167,33 @@ void USBMounter::DirList(const std::string &path,bool showHidden,const std::vect
 					if (stat(file.path.c_str(), &st) == 0) {
 						file.size = (size_t) st.st_size;
 						file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
+						file.is_valid = 1;
+						file.created = (time_t)st.st_ctime;
+						file.modified = (time_t)st.st_mtime;
+						file.accessed = (time_t)st.st_atime;
 					}
-					if(file.type == FS::FileEntryType::File){
-						bool isMediafile = false;
-						for (auto &ext : extensions) {
-							if (Utility::endsWith(file.name, ext, false)) {
-								isMediafile = true;
-							}
-						}
-						if(isMediafile){
-							currentlist.push_back(file);
-						}
-					}else if(file.type == FS::FileEntryType::Directory){
-						currentlist.push_back(file);
-					}
-
+					
+					currentlist.push_back(file);
+					
 				}
+				
 			
 				closedir(dir);
-				std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
+				if(sortOrder == 0){
+					std::sort(currentlist.begin(), currentlist.end(), FS::SortAsc);
+				}
+				if(sortOrder == 1){
+					std::sort(currentlist.begin(), currentlist.end(), FS::SortDesc);
+				}
+				currentlist.erase(
+					std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {
+						for (auto &ext : extensions) {
+							if (Utility::endsWith(file.name, ext, false)) {
+								return false;
+							}
+						}
+						return file.type == FS::FileEntryType::File;
+				}), currentlist.end());
 			}
 		}
 

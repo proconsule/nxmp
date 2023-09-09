@@ -6,6 +6,49 @@
 
 namespace Popups{
 	
+	float pupuptextscrollpos = 0.0f;
+	int popuptextwaitpos = 0;
+	
+	
+	bool pupuptextforwardscroll = true;
+	bool pupuptextlaststate = true;
+	
+	void PopupScrollText(float w,float h,const char* fmt, ...){
+		
+		ImGui::BeginChild("###scrollable", ImVec2(w, h), false);
+		va_list args;
+		va_start(args, fmt);
+		ImGui::TextV(fmt, args);
+		va_end(args);
+		
+		float scroll_max_x = ImGui::GetScrollMaxX();
+		if(pupuptextscrollpos>=scroll_max_x){
+			pupuptextforwardscroll=false;
+			if(!pupuptextlaststate==pupuptextforwardscroll){
+				popuptextwaitpos = 0;
+			}
+		}else if(pupuptextscrollpos<=0) {
+			pupuptextforwardscroll=true;	
+			if(!pupuptextlaststate==pupuptextforwardscroll){
+				popuptextwaitpos = 0;
+			}
+		}
+		if(popuptextwaitpos <= 60){
+			popuptextwaitpos++;
+		}else{
+			if(pupuptextforwardscroll){
+				pupuptextscrollpos+=0.5;
+			}else{
+				pupuptextscrollpos-=0.5;
+			}
+		}
+		
+		pupuptextlaststate = pupuptextforwardscroll;
+		ImGui::SetScrollX(pupuptextscrollpos);
+		ImGui::EndChild();
+	}
+	
+	
 	void PlaylistStartPlaylist(void) {
 		Popups::SetupPopup("Playlist Start");
 		if (ImGui::BeginPopupModal("Playlist Start", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -13,7 +56,7 @@ namespace Popups{
 				ImGui::Text("Start Playlist?");
 				ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
 				if (ImGui::Button("Yes", button_size)) {
-					if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB ||item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
+					if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB_BROWSER ||item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
 						item.popupstate = POPUP_STATE_NONE;
 						Playlist::playlist_struct nextfile = playlist->getPlaylist()[0];
 						libmpv->loadFile(nextfile.fulluri);
@@ -411,36 +454,66 @@ namespace Popups{
 		if (ImGui::BeginPopupModal("File Context Menu Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
 			
-			ImGui::Text("%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
+			ImVec2 button_size(400.0f, 0.0f);
+			std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
 			
-			ImVec2 button_size(ImGui::CalcTextSize(" Add Checked to Playlist ").x, 0.0f);
+			if(selectionlist.size()!=0){
+				std::string outstring = "";
+				for(int i=0;i<selectionlist.size();i++){
+					outstring = outstring + selectionlist[i].name + " ";
+				}
+				PopupScrollText(500.0f,30.0f,"%s",outstring.c_str());
+			}else{
+				PopupScrollText(500.0f,30.0f,"%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
+				
+			
+			}
+			
+			
+			float alignment = 0.5f;
+			
+			float size = 400.0f + ImGui::GetStyle().FramePadding.x * 2.0f;
+			float avail = ImGui::GetContentRegionAvail().x;
+
+			float off = (avail - size) * alignment;
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
 			
 			if (ImGui::Button("Sort Ascending (A-Z)",button_size))
 			{
                 filebrowser->setSordOrder(0);
 				item.popupstate = POPUP_STATE_NONE;
             }
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
 			if (ImGui::Button("Sort Descending (Z-A)",button_size))
 			{
                 filebrowser->setSordOrder(1);
 				item.popupstate = POPUP_STATE_NONE;
             }
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if(filebrowser->getChecked().size()==0){
-				ImGui::BeginDisabled();
-			}
-			if (ImGui::Button("Add Checked to Playlist",button_size))
-			{
-				std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
-                for(int i=0;i<selectionlist.size();i++){
-					playlist->appendFile(selectionlist[i],filebrowser->getOpenUrlPart()+selectionlist[i].path);
+			if(selectionlist.size()!=0){
+				if (ImGui::Button("Add Checked to Playlist",button_size))
+				{
+					
+					for(int i=0;i<selectionlist.size();i++){
+						playlist->appendFile(selectionlist[i],filebrowser->getOpenUrlPart()+selectionlist[i].path);
+					}
+					item.popupstate = POPUP_STATE_NONE;
 				}
-				item.popupstate = POPUP_STATE_NONE;
-            }
-			if(filebrowser->getChecked().size()==0){
-				ImGui::EndDisabled();
+			}else{
+				if (ImGui::Button("Add File to Playlist",button_size))
+				{
+					playlist->appendFile(filebrowser->getCurrList()[item.fileHoveredidx],filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path);
+				}
 			}
-
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
 			if (ImGui::Button("Exit", button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;

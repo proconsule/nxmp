@@ -1192,6 +1192,8 @@ std::vector<FS::FileEntry> FtpDirList(const char *p, netbuf *nControl,const std:
 			tmpentry.path=path;
 			tmpentry.type = fp.flagtrycwd == 1 ? FS::FileEntryType::Directory : FS::FileEntryType::File;
 			tmpentry.size = fp.size;
+			tmpentry.is_valid = 1;
+			tmpentry.modified = fp.mtime;
 			files.push_back(tmpentry);
 			
 			

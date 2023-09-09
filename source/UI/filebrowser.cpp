@@ -334,4 +334,57 @@ namespace Windows {
         }
         Windows::ExitWindow();
     }
+	
+	void USBMountWindow(bool *focus, bool *first_item){
+		Windows::SetupWindow();
+		
+        if (ImGui::Begin("USB Mount", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+            ImGui::SetNextWindowFocus();
+            	float total_w = ImGui::GetContentRegionAvail().x;
+				float total_h = ImGui::GetContentRegionAvail().y;
+				if (ImGui::BeginListBox("USB Browser Menu",ImVec2(total_w, total_h))){
+					bool triggerselect = false;
+					static int selected = -1;	
+					//std::vector<usb_devices> thislist = usbmounter->mounted_devs;
+					std::vector<usb_devices> thislist = filebrowser->getUsbDev();
+					for (unsigned int n = 0; n < thislist.size(); n++){
+						std::string itemid = "##" + std::to_string(n);
+						ImGui::SameLine();
+						if (ImGui::Selectable(itemid.c_str(), selected == n,0, ImVec2(0, 60))){
+							//item.usbpath = thislist[n].mount_point + std::string("/");
+							filebrowser->setBasePath(thislist[n].mount_point + std::string("/"));
+							filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							triggerselect = true;
+							item.state = MENU_STATE_USB_BROWSER;
+						}
+						ImGui::SameLine();
+						float currstartYpos = ImGui::GetCursorPosY();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f);
+						ImGui::Image((void*)(intptr_t)nxmpicons.UsbTexture.id, ImVec2(40,40));
+						ImGui::SameLine();
+						ImGui::SetCursorPosY(currstartYpos);
+						float currstartXpos = ImGui::GetCursorPosX();
+						std::string devname = Utility::trim(thislist[n].name)  + std::string(" -> ") + thislist[n].mount_point;
+						ImGui::Text("%s",devname.c_str());
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY()-30.0f);
+						ImGui::SetCursorPosX(currstartXpos);
+						ImGui::Text("%s %s",thislist[n].fstype.c_str(),Utility::humanSize(thislist[n].capacity).c_str());
+						
+					
+						if (selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					if (*first_item) {
+						std::string itemid = "##" + std::to_string(0);
+						ImGui::SetFocusID(ImGui::GetID(itemid.c_str()), ImGui::GetCurrentWindow());
+						*first_item = false;
+					}
+					if(triggerselect == true){
+						*first_item = true;
+					}
+				}	
+				ImGui::EndListBox();	
+        }
+        Windows::ExitWindow();
+	}
 }

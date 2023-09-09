@@ -7,6 +7,7 @@
 #include "ftpDir.h"
 #include "httpDir.h"
 #include "nfsDir.h"
+#include "usbfs.h"
 
 #include "utils.h"
 
@@ -20,7 +21,7 @@ enum FILESORTORDER{
 
 class CFileBrowser{
 public:
-	CFileBrowser(std::string _path,Playlist * _playlist);
+	CFileBrowser(std::string _path,Playlist * _playlist,bool isUSB = false);
 	~CFileBrowser();
 	
 	localFs *mylocal= nullptr;
@@ -29,6 +30,7 @@ public:
 	nfsDir *mynfs = nullptr;
 	FTPDir *myftp = nullptr;
 	HTTPDir *myhttp = nullptr;
+	USBMounter *myusb = nullptr;
 	
 	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
@@ -41,6 +43,8 @@ public:
 	std::string getShare();
 	std::string getOpenUrlPart();
 	
+	void setBasePath(std::string _basepath);
+	
 	void clearChecked();
 	bool *checked(int pos);
 	
@@ -52,6 +56,7 @@ public:
 	int sortOrder = FSASCENDINGORDER;
 	bool currshowHidden = false;
 	
+	std::vector<usb_devices> getUsbDev();
 
 private:
 	std::string title;

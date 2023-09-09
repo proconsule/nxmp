@@ -38,6 +38,8 @@ public:
 	
 	bool haveIteminPlaylist();
 	
+	int sortOrder=0;
+	
 private:
 	Playlist * playlist;
 	std::string basepath = "";

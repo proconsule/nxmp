@@ -38,9 +38,10 @@ namespace Windows {
     };
 	
 	void UniBrowserWindow(bool *focus, bool *first_item);
+	void USBMountWindow(bool *focus, bool *first_item);
 
     void FileBrowserWindow(bool *focus, bool *first_item);
-	void USBBrowserWindow(bool *focus, bool *first_item);
+	//void USBBrowserWindow(bool *focus, bool *first_item);
 	void EnigmaWindow(bool *focus, bool *first_item);
 	void MainMenuWindow(bool *focus, bool *first_item);
 	void ShareAddWindow(bool *focus, bool *first_item);

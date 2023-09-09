@@ -185,7 +185,7 @@ namespace GUI {
 					}
 					
 					if (button == SDL_KEY_DLEFT){
-						if((item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER) && item.popupstate == POPUP_STATE_NONE){
+						if((item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB_BROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER) && item.popupstate == POPUP_STATE_NONE){
 							if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 								item.focus = true;
 								item.selectionstate = FILE_SELECTION_NONE;
@@ -270,7 +270,7 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_X){
 						
-						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_USB || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
+						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_USB_BROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
 							item.popupstate = POPUP_STATE_FILECONTEXTMENU;
 						}
 						
@@ -320,10 +320,10 @@ namespace GUI {
 								localdir = nullptr;
 							}
 							*/
-							if(usbmounter != nullptr && libmpv->Stopped() && !usbmounter->haveIteminPlaylist()){
-								delete usbmounter;
-								usbmounter = nullptr;
-							}
+							//if(usbmounter != nullptr && libmpv->Stopped() && !usbmounter->haveIteminPlaylist()){
+							//	delete usbmounter;
+							//	usbmounter = nullptr;
+							//}
 							if(NewNetworkShare != nullptr){
 								delete NewNetworkShare;
 								NewNetworkShare = nullptr;
@@ -362,20 +362,24 @@ namespace GUI {
 							item.networkselect = true;
 							item.first_item = true;
 							item.state = MENU_STATE_HOME;
-							if(usbmounter != nullptr && usbmounter->haveIteminPlaylist()){
-								usbmounter->setBasePath("");
-							}
+							//if(usbmounter != nullptr && usbmounter->haveIteminPlaylist()){
+							//	usbmounter->setBasePath("");
+							//}
 							
 						}
 										
 					}
 					if (button == SDL_KEY_B){
 						
-						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
+						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER|| item.state == MENU_STATE_USB_BROWSER){
+							if(item.popupstate != POPUP_STATE_NONE){
+								item.popupstate = POPUP_STATE_NONE;
+							}else{
+								item.first_item = true;
+								filebrowser->backDir();
+								filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
-							item.first_item = true;
-							filebrowser->backDir();
-							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+							}
 							
 						}
 						if(item.state == MENU_STATE_ENIGMABROWSER){
@@ -422,13 +426,23 @@ namespace GUI {
 								nxupnp->getDevice(nxupnp->getSelDevice())->browseOID();
 							}
 						}
-						if(item.state == MENU_STATE_USB){							
+						/*
+						if(item.state == MENU_STATE_USB_BROWSER){	
+							item.first_item = true;
+							filebrowser->backDir();
+							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+								
+						}
+						*/
+						if(item.state == MENU_STATE_USB_MOUNT){
+/*							
 							if(usbmounter->getBasePath() != ""){
 								item.first_item = true;
-								usbmounter->backPath();
+								usbmounter->backDir();
 								usbmounter->DirList(usbmounter->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
-								
+						
 							}
+							*/		
 						}
 						/*
 						if(item.state == MENU_STATE_FILEBROWSER){
@@ -792,11 +806,14 @@ namespace GUI {
 						Popups::FileContextPopup();
 					}
 					break;
-				case MENU_STATE_USB:
-					Windows::USBBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
-						Popups::PlaylistStartPlaylist();
+				case MENU_STATE_USB_BROWSER:
+					Windows::UniBrowserWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
+						Popups::FileContextPopup();
 					}
+					break;
+				case MENU_STATE_USB_MOUNT:
+					Windows::USBMountWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_NETWORKBROWSER:
 					Windows::NetworkWindow(&item.focus, &item.first_item);

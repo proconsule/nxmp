@@ -65,10 +65,9 @@ namespace Windows {
 						}
 						if(topmenu[n] == "USB"){
 							usbInit();
-							item.state = MENU_STATE_USB;
-							if(usbmounter == nullptr){
-								usbmounter = new USBMounter(playlist);
-							}
+							item.state = MENU_STATE_USB_MOUNT;
+							filebrowser = new CFileBrowser("",playlist,true);
+							
 						}
 						if(topmenu[n] == "Network"){
 							item.networksources.clear();

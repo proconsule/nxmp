@@ -5,7 +5,7 @@
 #include "utils.h"
 #include "localfiles.h"
 
-
+/*
 namespace Windows {
     void USBBrowserWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
@@ -156,3 +156,4 @@ namespace Windows {
         Windows::ExitWindow();
     }
 }
+*/

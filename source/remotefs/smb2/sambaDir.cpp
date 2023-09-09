@@ -120,7 +120,13 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 				}else{
 					tmpentry.path = ent->name;
 				}
+				
 				tmpentry.size = ent->st.smb2_size;
+				tmpentry.is_valid = 1;
+				tmpentry.modified = (time_t)ent->st.smb2_mtime;
+				tmpentry.accessed = (time_t)ent->st.smb2_atime;
+				tmpentry.created = (time_t)ent->st.smb2_ctime;
+				
 				currentlist.push_back(tmpentry);
         }
 	

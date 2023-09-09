@@ -3,26 +3,32 @@
 	
 
 
-	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist){
-		path = _path;
-		if(Utility::startWith(path,"/",false)){
-			mylocal = new localFs(path,_playlist);
-			title = "File Browser";
-		}else if(Utility::startWith(path,"smb",false)){
-			mysamba = new sambaDir(path,_playlist);
-			title = "SMB Browser";
-		}else if(Utility::startWith(path,"sftp",false)){
-			myssh = new sshDir(path,_playlist);
-			title = "SFTP Browser";
-		}else if(Utility::startWith(path,"ftp",false)){
-			myftp = new FTPDir(path,_playlist);
-			title = "FTP Browser";
-		}else if(Utility::startWith(path,"http",false)){
-			myhttp = new HTTPDir(path);
-			title = "HTTP Browser";
-		}else if(Utility::startWith(path,"nfs",false)){
-			title = "NFS Browser";
-			mynfs = new nfsDir(path,_playlist);
+	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist,bool isUSB){
+		
+		if(isUSB){
+			title = "USB Browser";
+			myusb = new USBMounter(_playlist);
+		}else{
+			path = _path;
+			if(Utility::startWith(path,"/",false)){
+				mylocal = new localFs(path,_playlist);
+				title = "File Browser";
+			}else if(Utility::startWith(path,"smb",false)){
+				mysamba = new sambaDir(path,_playlist);
+				title = "SMB Browser";
+			}else if(Utility::startWith(path,"sftp",false)){
+				myssh = new sshDir(path,_playlist);
+				title = "SFTP Browser";
+			}else if(Utility::startWith(path,"ftp",false)){
+				myftp = new FTPDir(path,_playlist);
+				title = "FTP Browser";
+			}else if(Utility::startWith(path,"http",false)){
+				myhttp = new HTTPDir(path);
+				title = "HTTP Browser";
+			}else if(Utility::startWith(path,"nfs",false)){
+				title = "NFS Browser";
+				mynfs = new nfsDir(path,_playlist);
+			}
 		}
 	}
 	
@@ -44,6 +50,9 @@
 		}
 		if(mynfs!= nullptr){
 			delete mynfs;
+		}
+		if(myusb!= nullptr){
+			delete myusb;
 		}
 	}
 	
@@ -67,6 +76,9 @@
 		if(mynfs!= nullptr){
 			mynfs->DirList(path,showHidden,extensions);
 		}
+		if(myusb!= nullptr){
+			myusb->DirList(path,showHidden,extensions);
+		}
 	}
 	
 	void CFileBrowser::backDir(){
@@ -88,6 +100,9 @@
 		if(mynfs!= nullptr){
 			mynfs->backDir();
 		}
+		if(myusb!= nullptr){
+			myusb->backPath();
+		}
 	}
 	
 	std::vector<FS::FileEntry> CFileBrowser::getCurrList(){
@@ -108,6 +123,9 @@
 		}
 		if(mynfs!= nullptr){
 			return mynfs->getCurrList();
+		}
+		if(myusb!= nullptr){
+			return myusb->getCurrList();
 		}
 		std::vector<FS::FileEntry> retnull;
 		return retnull;
@@ -132,6 +150,9 @@
 		if(mynfs!= nullptr){
 			return mynfs->getCurrPath();
 		}
+		if(myusb!= nullptr){
+			return myusb->getCurrentPath();
+		}
 		
 		return "";
 	}
@@ -155,6 +176,9 @@
 		if(mynfs!= nullptr){
 			mynfs->clearChecked();
 		}
+		if(myusb!= nullptr){
+			return myusb->clearChecked();
+		}
 	}
 	
 	bool *CFileBrowser::checked(int pos){
@@ -176,6 +200,12 @@
 		if(mynfs!= nullptr){
 			return (bool *)mynfs->checked(pos);
 		}
+		if(mynfs!= nullptr){
+			return (bool *)mynfs->checked(pos);
+		}
+		if(myusb!= nullptr){
+			return (bool *)myusb->checked(pos);
+		}
 		return (bool *)false;
 	}
 	
@@ -194,6 +224,9 @@
 		}
 		if(mynfs!= nullptr){
 			return mynfs->getBasePath();
+		}
+		if(myusb!= nullptr){
+			return myusb->getBasePath();
 		}
 		return "";
 	}
@@ -281,6 +314,10 @@
 			mynfs->sortOrder = sortOrder;
 			mynfs->DirList(mynfs->getCurrPath(),currshowHidden,Utility::getMediaExtensions());
 		}
+		if(myusb!= nullptr){
+			myusb->sortOrder = sortOrder;
+			myusb->DirList(myusb->getCurrentPath(),currshowHidden,Utility::getMediaExtensions());
+		}
 	}
 	
 	std::vector<FS::FileEntry> CFileBrowser::getChecked(){
@@ -292,4 +329,17 @@
 		
 		return retvector;
 		
+	}
+	
+	
+	void CFileBrowser::setBasePath(std::string _basepath){
+		if(myusb != nullptr){
+			myusb->setBasePath(_basepath);
+		}
+	}
+	
+	std::vector<usb_devices> CFileBrowser::getUsbDev(){
+		if(myusb != nullptr){
+			return myusb->mounted_devs;
+		}
 	}
