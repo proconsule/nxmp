@@ -472,7 +472,12 @@ namespace Popups{
 				}
                 
             }
-			
+			if (ImGui::Button("Set as Startring element",button_size))
+			{
+                playlist->setPlaylistIdx(item.playlistitemHighlighted);
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+            }
 			if(item.playlistitemHighlighted<= 0){
 				ImGui::BeginDisabled();
 			}
@@ -499,7 +504,13 @@ namespace Popups{
 				ImGui::EndDisabled();
 			}
 			
-		
+			if (ImGui::Button("Remove Element",button_size))
+			{
+                playlist->RemoveElement(item.playlistitemHighlighted);
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+            }
+			
 			if (ImGui::Button("Exit", button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;

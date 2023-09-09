@@ -4,6 +4,8 @@
 #include "utils.h"
 #include "imgui_internal.h"
 #include "SwitchSys.h"
+#include "imgui_toggle.h"
+#include "imgui_toggle_presets.h"
 
 
 
@@ -51,6 +53,11 @@ namespace playerWindows{
 	bool playertextforwardscroll = true;
 	bool playertextlaststate = true;
 	
+	bool decstashoverd = false;
+	bool powerstashoverd = false;
+	
+	
+	
 	
 	void RightHomeWindow(bool *focus, bool *first_item){
 		rightmenuposX = item.rightmenu_startpos;
@@ -89,17 +96,60 @@ namespace playerWindows{
 						}*/
 					}
 				}
-				ImGui::Checkbox("Power Stats", &item.showstats);
+				
+				//ImGui::Checkbox("Power Stats", &item.showstats);
+				//ImGui::Checkbox("Dec Stats", &item.showdecstats);
+				const ImVec4 green(0.16f, 0.66f, 0.45f, 1.0f);
+				const ImVec4 green_hover(0.0f, 1.0f, 0.57f, 1.0f);
+				const ImVec4 offgreen(0.31f, 0.39f, 0.52f, 1.0f);
+				const ImVec4 offgreen_hover(0.48f, 0.57f, 0.70f, 1.0f);
+				
+				
+				
+				ImGui::PushStyleColor(ImGuiCol_Button, green);
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, green_hover);
+				//ImGui::PushStyleColor(ImGuiCol_FrameBg, offgreen);
+				//ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, offgreen_hover);
+				
+				
+				ImVec4 color = ImGui::GetStyleColorVec4(ImGuiCol_Text);
+				ImVec4 colorMark = color;
+				color.w *= 1.0f;
+				
+				if(powerstashoverd){
+					ImGui::PushStyleColor(ImGuiCol_FrameBg, offgreen_hover);
+				}
+				ImGui::Toggle("Power Stats", &item.showstats);
+				if(powerstashoverd){
+					ImGui::PopStyleColor();
+				}
+				
+				if(ImGui::IsItemHovered()){
+					powerstashoverd = true;
+				}else{
+					powerstashoverd	 = false;
+				}
+				
+				if(decstashoverd){
+					ImGui::PushStyleColor(ImGuiCol_FrameBg, offgreen_hover);
+				}
+				ImGui::Toggle("Dec Stats", &item.showdecstats);
+				if(decstashoverd){
+					ImGui::PopStyleColor();
+				}
+				if(ImGui::IsItemHovered()){
+					decstashoverd = true;
+				}else{
+					decstashoverd = false;
+				}
+				
+				ImGui::PopStyleColor(2);
+				
 				if (*first_item) {
 					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
 					*first_item = false;
 				}
 				
-				ImGui::Checkbox("Dec Stats", &item.showdecstats);
-				if (*first_item) {
-					ImGui::SetFocusID(ImGui::GetID(topmenu[0].c_str()), ImGui::GetCurrentWindow());
-					*first_item = false;
-				}
 				
 				if(item.showstats)item.showdecstats=false;
 				

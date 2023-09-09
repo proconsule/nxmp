@@ -26,6 +26,7 @@ public:
 	playlist_struct getPlaylistItem(int pos);
 	void setPlaylistIdx(int pos);
 	
+	void RemoveElement(int pos);
 	void moveBack(int eleidx);
 	void moveForw(int eleidx);
 	

@@ -55,6 +55,10 @@ Playlist::playlist_struct Playlist::getPlaylistItem(int pos){
 	return currplaylist[pos];
 }
 
+void Playlist::RemoveElement(int pos){
+	currplaylist.erase(currplaylist.begin()+pos);
+}
+
 void Playlist::setPlaylistIdx(int pos){
 	if(pos >=0 && pos < currplaylist.size()){
 		currentidx = pos;

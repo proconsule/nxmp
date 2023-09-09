@@ -82,6 +82,9 @@ namespace Windows {
 						ImGui::TableSetColumnIndex(0);
 						std::string itemid = "##" + std::to_string(n);
 						
+						ImGui::Dummy(ImVec2(0,30));
+						ImGui::SameLine();
+						
 						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 							if(thislist[n].type != FS::FileEntryType::Directory){
 								if(ImGui::Checkbox(itemid.c_str(), filebrowser->checked(n))){

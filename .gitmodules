@@ -1,3 +1,6 @@
 [submodule "libs/simpleini"]
 	path = libs/simpleini
 	url = https://github.com/brofield/simpleini
+[submodule "libs/imgui_toggle"]
+	path = libs/imgui_toggle
+	url = https://github.com/cmdwtf/imgui_toggle
