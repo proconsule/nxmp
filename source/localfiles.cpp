@@ -82,6 +82,63 @@ namespace FS {
 		return false;
 	}
 	
+	bool SortDateAsc(const FileEntry &entryA, const FileEntry &entryB){
+		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
+			return true;
+		else if (!(entryA.type == FileEntryType::Directory) && (entryB.type == FileEntryType::Directory))
+			return false;
+		else {
+			if (entryA.modified < entryB.modified)
+				return true;
+					
+		}
+		
+		return false;
+	}
+	
+	bool SortDateDesc(const FileEntry &entryA, const FileEntry &entryB){
+		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
+			return true;
+		else if (!(entryA.type == FileEntryType::Directory) && (entryB.type == FileEntryType::Directory))
+			return false;
+		else {
+			if (entryA.modified > entryB.modified)
+				return true;
+					
+		}
+		
+		return false;
+	}
+	
+	bool SortSizeAsc(const FileEntry &entryA, const FileEntry &entryB){
+		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
+			return true;
+		else if (!(entryA.type == FileEntryType::Directory) && (entryB.type == FileEntryType::Directory))
+			return false;
+		else {
+			if (entryA.size < entryB.size)
+				return true;
+					
+		}
+		
+		return false;
+	}
+	
+	bool SortSizeDesc(const FileEntry &entryA, const FileEntry &entryB){
+		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
+			return true;
+		else if (!(entryA.type == FileEntryType::Directory) && (entryB.type == FileEntryType::Directory))
+			return false;
+		else {
+			if (entryA.size > entryB.size)
+				return true;
+					
+		}
+		
+		return false;
+	}
+	
+	
 	
 	bool Sort(const FileEntry &entryA, const FileEntry &entryB) {
 		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))

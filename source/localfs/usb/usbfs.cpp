@@ -185,6 +185,18 @@ void USBMounter::DirList(const std::string &path,bool showHidden,const std::vect
 				if(sortOrder == FS::FS_NAME_DESCENDINGORDER){
 					std::sort(currentlist.begin(), currentlist.end(), FS::SortNameDesc);
 				}
+				if(sortOrder == FS::FS_DATE_ASCENDINGORDER){
+					std::sort(currentlist.begin(), currentlist.end(), FS::SortDateAsc);
+				}
+				if(sortOrder == FS::FS_DATE_DESCENDINGORDER){
+					std::sort(currentlist.begin(), currentlist.end(), FS::SortDateDesc);
+				}
+				if(sortOrder == FS::FS_SIZE_ASCENDINGORDER){
+					std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeAsc);
+				}
+				if(sortOrder == FS::FS_SIZE_DESCENDINGORDER){
+					std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeDesc);
+				}
 				currentlist.erase(
 					std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {
 						for (auto &ext : extensions) {

@@ -479,20 +479,50 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			
-			if (ImGui::Button("Sort Ascending (A-Z)",button_size))
-			{
-                filebrowser->setSordOrder(0);
-				item.popupstate = POPUP_STATE_NONE;
-            }
+			if(filebrowser->sortOrder == FS::FS_NAME_ASCENDINGORDER){
+				if (ImGui::Button("Sort Descending (Z-A)",button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_NAME_DESCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}else{
+				if (ImGui::Button("Sort Ascending (A-Z)",button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_NAME_ASCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			if(filebrowser->sortOrder == FS::FS_DATE_ASCENDINGORDER){
+				if (ImGui::Button("Sort Descending (Date)",button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_DATE_DESCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}else{
+				if (ImGui::Button("Sort Ascending (Date)",button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_DATE_ASCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			if(filebrowser->sortOrder == FS::FS_SIZE_ASCENDINGORDER){
+				if (ImGui::Button("Sort Descending (Size)",button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_SIZE_DESCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}else{
+				if (ImGui::Button("Sort Ascending (Size)",button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_SIZE_ASCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}
 			
-			if (ImGui::Button("Sort Descending (Z-A)",button_size))
-			{
-                filebrowser->setSordOrder(1);
-				item.popupstate = POPUP_STATE_NONE;
-            }
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
