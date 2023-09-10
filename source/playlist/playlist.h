@@ -13,6 +13,8 @@ public:
 	struct playlist_struct{
 		FS::FileEntry file;
 		std::string fulluri;
+		int64_t duration = 0;
+		bool is_valid = false;
 	};
 
 	Playlist();
@@ -34,9 +36,11 @@ public:
 	playlist_struct getPrev();
 	int getCurrIdx();
 	bool isPresent(FS::FileEntry myfile,std::string fulluri);
+	
+	std::vector<playlist_struct> currplaylist;
 
 private:
-	std::vector<playlist_struct> currplaylist;
+	
 	int currentidx = 0;
 
 };

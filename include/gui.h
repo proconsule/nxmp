@@ -32,6 +32,7 @@
 
 
 #include "Enigma2.h"
+#include "mediaprobe.h"
 
 #include "fileBrowserClass.h"
 
@@ -235,6 +236,8 @@ extern Enigma2 *enigma2;
 extern uint32_t wakeup_on_mpv_render_update;
 extern uint32_t wakeup_on_mpv_events;
 
+
+extern CMediaProbe *MediaProbe;
 
 extern mpv_opengl_fbo fbo;
 extern mpv_render_param params[3];

@@ -98,6 +98,10 @@ namespace Windows {
 						}
 						if(topmenu[n] == "Playlist"){
 							item.state = MENU_STATE_PLAYLISTBROWSER;
+							if(MediaProbe == nullptr){
+								MediaProbe = new CMediaProbe(playlist);
+								MediaProbe->StartMediaProbeThread();
+							}
 							if(usbPlaylistMounter==nullptr){
 								bool mountUSB = false;
 								std::vector<Playlist::playlist_struct> thisplaylist = playlist->getPlaylist();
@@ -108,6 +112,7 @@ namespace Windows {
 								}
 								if(mountUSB)usbPlaylistMounter= new USBMounter(playlist);
 							}
+							
 						}
 						if(topmenu[n] == "MTP"){
 							item.state = MENU_STATE_MTPSERVER;

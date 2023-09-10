@@ -123,6 +123,26 @@ libMpv::libMpv(const std::string &configDir) {
 	}
 	
 	std::sort(decoderlist.begin(),decoderlist.end(),codecSort);
+	
+	//mpv_node node2;
+    mpv_get_property(handle, "demuxer-list", MPV_FORMAT_NODE, &node);
+    if (node.format == MPV_FORMAT_NODE_ARRAY) {
+        for (int i = 0; i < node.u.list->num; i++) {
+            if (node.u.list->values[i].format == MPV_FORMAT_NODE_MAP) {
+				decoderlist_struct decoderentry{};
+				for (int n = 0; n < node.u.list->values[i].u.list->num; n++) {
+					std::string key = node.u.list->values[i].u.list->keys[n];
+					printf("KEY: %s\r\n",key.c_str());
+					printf("DESC: %s\r\n",node.u.list->values[i].u.list->values[n].u.string);
+				}
+				decoderlist.push_back(decoderentry);
+				
+			}
+			
+		}
+		
+	}
+	
 	NXLOG::DEBUGLOG("MPV Init Completed\n");
 	
 }

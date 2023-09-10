@@ -551,7 +551,16 @@ namespace Popups{
                 item.popupstate = POPUP_STATE_NONE;
 				ImGui::CloseCurrentPopup();
             }
-			
+			/*
+			if (ImGui::Button("Test",button_size))
+				{
+					if(MediaProbe == nullptr){
+						MediaProbe = new CMediaProbe();
+					}
+					printf("Duration %ld\n",MediaProbe->ProbeFileDuration(filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path));
+					
+				}
+			*/
 		}
 		Popups::ExitPopup();
 	}

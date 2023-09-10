@@ -62,6 +62,7 @@ CNetworkShare *NewNetworkShare = nullptr;
 NXUPnP *nxupnp = nullptr;
 USBMounter *usbmounter = nullptr;
 Enigma2 *enigma2 = nullptr;
+CMediaProbe *MediaProbe = nullptr;
 
 USBMounter *usbPlaylistMounter = nullptr;
 
@@ -434,6 +435,10 @@ int main() {
 			httpdir = nullptr;
 		}
 		*/
+		if(MediaProbe != nullptr){
+			delete MediaProbe;
+			MediaProbe = nullptr;
+		}
 		if(enigma2 != nullptr){
 			delete enigma2;
 			enigma2 = nullptr;
