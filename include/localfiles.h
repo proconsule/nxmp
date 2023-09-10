@@ -27,6 +27,15 @@ namespace FS {
 		Directory = 2
 	};
 	
+	enum FILESORTORDER{
+		FS_NAME_ASCENDINGORDER = 0,
+		FS_NAME_DESCENDINGORDER,
+		FS_DATE_ASCENDINGORDER,
+		FS_DATE_DESCENDINGORDER,
+		FS_SIZE_ASCENDINGORDER,
+		FS_SIZE_DESCENDINGORDER,
+	};
+	
 	
 	struct FileEntry{
 		std::string name;
@@ -49,8 +58,18 @@ namespace FS {
 	std::vector<FileEntry> getDirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
 	std::string backPath(std::string path);
 	bool Sort(const FileEntry &entryA, const FileEntry &entryB);
-	bool SortAsc(const FileEntry &entryA, const FileEntry &entryB);
-	bool SortDesc(const FileEntry &entryA, const FileEntry &entryB);
+	//bool SortAsc(const FileEntry &entryA, const FileEntry &entryB);
+	//bool SortDesc(const FileEntry &entryA, const FileEntry &entryB);
+	
+	bool SortNameAsc(const FileEntry &entryA, const FileEntry &entryB);
+	bool SortNameDesc(const FileEntry &entryA, const FileEntry &entryB);
+	
+	bool SortDateAsc(const FileEntry &entryA, const FileEntry &entryB);
+	bool SortDateDesc(const FileEntry &entryA, const FileEntry &entryB);
+	
+	bool SortSizeAsc(const FileEntry &entryA, const FileEntry &entryB);
+	bool SortSizeDesc(const FileEntry &entryA, const FileEntry &entryB);
+	
 	std::string getFilefromPath(std::string path);
 }
 

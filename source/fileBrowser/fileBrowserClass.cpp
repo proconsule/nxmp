@@ -288,7 +288,7 @@
 		return "";
 	}
 	
-	void CFileBrowser::setSordOrder(int myorder){
+	void CFileBrowser::setSordOrder(FS::FILESORTORDER myorder){
 		sortOrder = myorder;
 		if(mylocal!= nullptr){
 			mylocal->sortOrder = sortOrder;

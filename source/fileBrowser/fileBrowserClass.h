@@ -11,14 +11,6 @@
 
 #include "utils.h"
 
-
-enum FILESORTORDER{
-	FSASCENDINGORDER = 0,
-	FSDESCENDINGORDER,
-	
-	
-};
-
 class CFileBrowser{
 public:
 	CFileBrowser(std::string _path,Playlist * _playlist,bool isUSB = false);
@@ -48,12 +40,12 @@ public:
 	void clearChecked();
 	bool *checked(int pos);
 	
-	void setSordOrder(int myorder);
+	void setSordOrder(FS::FILESORTORDER myorder);
 	
 	std::string getTitle(); 
 	std::string path;
 	
-	int sortOrder = FSASCENDINGORDER;
+	FS::FILESORTORDER sortOrder = FS::FS_NAME_ASCENDINGORDER;
 	bool currshowHidden = false;
 	
 	std::vector<usb_devices> getUsbDev();

@@ -106,11 +106,11 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 		
 	}
 	nfs_closedir(nfs, nfsdir);
-	if(sortOrder == 0){
-		std::sort(currentlist.begin(), currentlist.end(), FS::SortAsc);
+	if(sortOrder == FS::FS_NAME_ASCENDINGORDER){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortNameAsc);
 	}
-	if(sortOrder == 1){
-		std::sort(currentlist.begin(), currentlist.end(), FS::SortDesc);
+	if(sortOrder == FS::FS_NAME_DESCENDINGORDER){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortNameDesc);
 	}			
 	currentlist.erase(
 		std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {

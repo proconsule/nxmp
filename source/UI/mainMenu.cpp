@@ -98,6 +98,16 @@ namespace Windows {
 						}
 						if(topmenu[n] == "Playlist"){
 							item.state = MENU_STATE_PLAYLISTBROWSER;
+							if(usbPlaylistMounter==nullptr){
+								bool mountUSB = false;
+								std::vector<Playlist::playlist_struct> thisplaylist = playlist->getPlaylist();
+								for(int z=0;z<thisplaylist.size();z++){
+									if(Utility::startWith(thisplaylist[z].fulluri,"ums",false)){
+										mountUSB=true;
+									}
+								}
+								if(mountUSB)usbPlaylistMounter= new USBMounter(playlist);
+							}
 						}
 						if(topmenu[n] == "MTP"){
 							item.state = MENU_STATE_MTPSERVER;

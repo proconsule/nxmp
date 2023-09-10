@@ -28,6 +28,7 @@ namespace Windows {
 						if (ImGui::Selectable(itemid.c_str(), playlist->getCurrIdx() == n)){
 							item.laststate = item.state;
 							playlist->setPlaylistIdx(n);
+							
 							libmpv->loadFile(thislist[n].fulluri);
 							if(sqlitedb != nullptr){
 								libmpv->getFileInfo()->resume = sqlitedb->getResume(thislist[n].fulluri);

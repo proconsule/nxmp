@@ -63,6 +63,8 @@ NXUPnP *nxupnp = nullptr;
 USBMounter *usbmounter = nullptr;
 Enigma2 *enigma2 = nullptr;
 
+USBMounter *usbPlaylistMounter = nullptr;
+
 
 Themes *themes = nullptr;
 
@@ -443,6 +445,10 @@ int main() {
 		if(sqlitedb != nullptr){
 			delete sqlitedb;
 			sqlitedb = nullptr;
+		}
+		if(usbPlaylistMounter != nullptr){
+			delete usbPlaylistMounter;
+			usbPlaylistMounter=nullptr;
 		}
 	
 		ImGui_ImplOpenGL3_Shutdown();

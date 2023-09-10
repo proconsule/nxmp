@@ -55,7 +55,7 @@ namespace FS {
     return str;
 	}
 	
-	bool SortAsc(const FileEntry &entryA, const FileEntry &entryB){
+	bool SortNameAsc(const FileEntry &entryA, const FileEntry &entryB){
 		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
 			return true;
 		else if (!(entryA.type == FileEntryType::Directory) && (entryB.type == FileEntryType::Directory))
@@ -68,7 +68,7 @@ namespace FS {
 		
 		return false;
 	}
-	bool SortDesc(const FileEntry &entryA, const FileEntry &entryB){
+	bool SortNameDesc(const FileEntry &entryA, const FileEntry &entryB){
 		if ((entryA.type == FileEntryType::Directory) && !(entryB.type == FileEntryType::Directory))
 			return true;
 		else if (!(entryA.type == FileEntryType::Directory) && (entryB.type == FileEntryType::Directory))
