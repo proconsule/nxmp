@@ -4,8 +4,8 @@
 #include "localFs.h"
 #include "sambaDir.h"
 #include "sshDir.h"
-#include "ftpDir.h"
-#include "httpDir.h"
+#include "FTPDir.h"
+#include "HTTPDir.h"
 #include "nfsDir.h"
 #include "usbfs.h"
 
