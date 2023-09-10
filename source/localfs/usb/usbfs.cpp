@@ -90,7 +90,7 @@ int usbThread(void *arg) {
 			tmpdev.fstype = LIBUSBHSFS_FS_TYPE_STR(device->fs_type);
 			tmpdev.capacity = device->capacity;
 			mymounter->mounted_devs.push_back(tmpdev);
-            
+            mymounter->playlist->Invalidate();
         }
 	
     }

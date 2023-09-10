@@ -229,7 +229,7 @@ extern nfsDir *nfsdir;
 extern NXUPnP *nxupnp;
 //extern USBMounter *usbmounter;
 
-extern USBMounter *usbPlaylistMounter;
+extern USBMounter *MyUSBMount;
 
 extern Enigma2 *enigma2;
 

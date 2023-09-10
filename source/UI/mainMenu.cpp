@@ -65,8 +65,11 @@ namespace Windows {
 						}
 						if(topmenu[n] == "USB"){
 							usbInit();
+							if(MyUSBMount==nullptr){
+								MyUSBMount=new USBMounter(playlist);
+							}
 							item.state = MENU_STATE_USB_MOUNT;
-							filebrowser = new CFileBrowser("",playlist,true);
+							filebrowser = new CFileBrowser("",playlist,MyUSBMount);
 							
 						}
 						if(topmenu[n] == "Network"){
@@ -101,16 +104,6 @@ namespace Windows {
 							if(MediaProbe == nullptr){
 								MediaProbe = new CMediaProbe(playlist);
 								MediaProbe->StartMediaProbeThread();
-							}
-							if(usbPlaylistMounter==nullptr){
-								bool mountUSB = false;
-								std::vector<Playlist::playlist_struct> thisplaylist = playlist->getPlaylist();
-								for(int z=0;z<thisplaylist.size();z++){
-									if(Utility::startWith(thisplaylist[z].fulluri,"ums",false)){
-										mountUSB=true;
-									}
-								}
-								if(mountUSB)usbPlaylistMounter= new USBMounter(playlist);
 							}
 							
 						}

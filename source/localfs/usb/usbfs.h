@@ -40,8 +40,10 @@ public:
 	
 	int sortOrder=0;
 	
-private:
 	Playlist * playlist;
+	
+private:
+	
 	std::string basepath = "";
 	std::string currentpath = "";
 	std::vector<FS::FileEntry> currentlist;

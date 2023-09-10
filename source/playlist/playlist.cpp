@@ -13,6 +13,12 @@ Playlist::Playlist(){
 	
 }
 
+void Playlist::Invalidate(){
+	for(int i=0;i<currplaylist.size();i++){
+		currplaylist[i].is_valid = false;
+	}
+}
+
 std::vector<Playlist::playlist_struct> Playlist::getPlaylist(){
 	return currplaylist;
 }
@@ -80,6 +86,17 @@ void Playlist::moveForw(int eleidx){
 		playlistmove(currplaylist,eleidx,eleidx+1);
 	}
 }
+
+
+bool Playlist::HaveUSBEntrys(){
+	for(int i=0;i<currplaylist.size();i++){
+		if(Utility::startWith(currplaylist[i].fulluri,"ums",false)){
+			return true;
+		}
+	}
+}
+
+
 
 bool Playlist::isPresent(FS::FileEntry myfile,std::string fulluri){
 	for(int i=0;i<currplaylist.size();i++){

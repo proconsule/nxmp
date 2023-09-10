@@ -13,7 +13,9 @@ void ProbeThread(void*arg) {
 			
 			if(!ctx->playlist->currplaylist[i].is_valid){
 				AVFormatContext* pFormatCtx = avformat_alloc_context();
-				if(avformat_open_input(&pFormatCtx, ctx->playlist->currplaylist[i].fulluri.c_str(), NULL, NULL) != 0){
+				int rc = avformat_open_input(&pFormatCtx, ctx->playlist->currplaylist[i].fulluri.c_str(), NULL, NULL);
+				if(rc != 0){
+					printf("RC %d\r\n",rc);
 					ctx->playlist->currplaylist[i].is_valid = true;
 					continue;
 				}

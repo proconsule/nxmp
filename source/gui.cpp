@@ -320,10 +320,10 @@ namespace GUI {
 								localdir = nullptr;
 							}
 							*/
-							//if(usbmounter != nullptr && libmpv->Stopped() && !usbmounter->haveIteminPlaylist()){
-							//	delete usbmounter;
-							//	usbmounter = nullptr;
-							//}
+							if(MyUSBMount != nullptr && libmpv->Stopped() && !playlist->HaveUSBEntrys()){
+								delete MyUSBMount;
+								MyUSBMount = nullptr;
+							}
 							if(NewNetworkShare != nullptr){
 								delete NewNetworkShare;
 								NewNetworkShare = nullptr;

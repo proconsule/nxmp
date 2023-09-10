@@ -64,7 +64,7 @@ USBMounter *usbmounter = nullptr;
 Enigma2 *enigma2 = nullptr;
 CMediaProbe *MediaProbe = nullptr;
 
-USBMounter *usbPlaylistMounter = nullptr;
+USBMounter *MyUSBMount = nullptr;
 
 
 Themes *themes = nullptr;
@@ -451,9 +451,9 @@ int main() {
 			delete sqlitedb;
 			sqlitedb = nullptr;
 		}
-		if(usbPlaylistMounter != nullptr){
-			delete usbPlaylistMounter;
-			usbPlaylistMounter=nullptr;
+		if(MyUSBMount != nullptr){
+			delete MyUSBMount;
+			MyUSBMount=nullptr;
 		}
 	
 		ImGui_ImplOpenGL3_Shutdown();

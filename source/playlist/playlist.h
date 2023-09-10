@@ -28,6 +28,8 @@ public:
 	playlist_struct getPlaylistItem(int pos);
 	void setPlaylistIdx(int pos);
 	
+	void Invalidate();
+	
 	void RemoveElement(int pos);
 	void moveBack(int eleidx);
 	void moveForw(int eleidx);
@@ -36,6 +38,8 @@ public:
 	playlist_struct getPrev();
 	int getCurrIdx();
 	bool isPresent(FS::FileEntry myfile,std::string fulluri);
+	
+	bool HaveUSBEntrys();
 	
 	std::vector<playlist_struct> currplaylist;
 

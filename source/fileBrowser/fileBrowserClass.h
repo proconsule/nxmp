@@ -13,7 +13,7 @@
 
 class CFileBrowser{
 public:
-	CFileBrowser(std::string _path,Playlist * _playlist,bool isUSB = false);
+	CFileBrowser(std::string _path,Playlist * _playlist,USBMounter * _myusb = nullptr);
 	~CFileBrowser();
 	
 	localFs *mylocal= nullptr;

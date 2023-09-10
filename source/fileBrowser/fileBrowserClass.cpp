@@ -3,11 +3,11 @@
 	
 
 
-	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist,bool isUSB){
+	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist,USBMounter * _myusb){
 		
-		if(isUSB){
+		if(_myusb!= nullptr){
 			title = "USB Browser";
-			myusb = new USBMounter(_playlist);
+			myusb = _myusb;
 		}else{
 			path = _path;
 			if(Utility::startWith(path,"/",false)){
@@ -53,9 +53,7 @@
 		if(mynfs!= nullptr){
 			delete mynfs;
 		}
-		if(myusb!= nullptr){
-			delete myusb;
-		}
+		
 	}
 	
 	void CFileBrowser::DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions){
@@ -286,6 +284,9 @@
 		}
 		if(mynfs!= nullptr){
 			return thisurl.scheme + std::string("://") + thisurl.server;
+		}
+		if(myusb!= nullptr){
+			return "";
 		}
 		return "";
 	}
