@@ -11,11 +11,20 @@ void ProbeThread(void*arg) {
 		for(int i=0;i<ctx->playlist->currplaylist.size();i++){
 			
 			
+			
 			if(!ctx->playlist->currplaylist[i].is_valid){
+				
+				std::string mycheckfile = ctx->playlist->currplaylist[i].fulluri;
+				if(Utility::startWith(mycheckfile,"ums",false)){
+					mycheckfile = std::string("file:") + mycheckfile;
+				}
+				
 				AVFormatContext* pFormatCtx = avformat_alloc_context();
-				int rc = avformat_open_input(&pFormatCtx, ctx->playlist->currplaylist[i].fulluri.c_str(), NULL, NULL);
+				int rc = avformat_open_input(&pFormatCtx, mycheckfile.c_str(), NULL, NULL);
 				if(rc != 0){
-					printf("RC %d\r\n",rc);
+					char err[1024] = { 0 };
+					av_strerror(rc, err, 1024);
+					printf("RC %s\r\n",err);
 					ctx->playlist->currplaylist[i].is_valid = true;
 					continue;
 				}
@@ -29,12 +38,12 @@ void ProbeThread(void*arg) {
 				ctx->playlist->currplaylist[i].is_valid = true;
 				avformat_close_input(&pFormatCtx);
 				avformat_free_context(pFormatCtx);
-				
+				svcSleepThread(100'000'000);
 				
 			}
 			
 		}
-		usleep(1000000);
+		svcSleepThread(1'000'000'000);
 	}
 }
 
