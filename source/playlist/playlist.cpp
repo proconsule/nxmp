@@ -63,12 +63,14 @@ Playlist::playlist_struct Playlist::getPlaylistItem(int pos){
 
 void Playlist::RemoveElement(int pos){
 	currplaylist.erase(currplaylist.begin()+pos);
+	CalcPlaylist();
 }
 
 void Playlist::setPlaylistIdx(int pos){
 	if(pos >=0 && pos < currplaylist.size()){
 		currentidx = pos;
 	}
+	CalcPlaylist();
 }
 
 int Playlist::getCurrIdx(){
@@ -105,4 +107,15 @@ bool Playlist::isPresent(FS::FileEntry myfile,std::string fulluri){
 		}
 	}
 	return false;
+}
+
+void Playlist::CalcPlaylist(){
+	remtime = 0;
+	totaltime = 0;
+	for(int i=0;i<currplaylist.size();i++){
+		if(i>=currentidx){
+			remtime+=currplaylist[i].duration;
+		}
+		totaltime += currplaylist[i].duration;
+	}
 }

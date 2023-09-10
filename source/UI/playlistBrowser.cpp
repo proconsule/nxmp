@@ -53,7 +53,9 @@ namespace Windows {
 					
 					ImGui::EndTable();
 				}
-							
+				std::string playtime = Utility::formatTimeShort(playlist->remtime) + " / " + Utility::formatTimeShort(playlist->totaltime);
+				ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - ImGui::GetStyle().FramePadding.x - ImGui::CalcTextSize(playtime.c_str(), NULL, true).x);
+				ImGui::Text("%s",playtime.c_str());				
 				if(item.playlistUpdateHovered){
 					std::string itemid = "##" + std::to_string(item.playlistnewHoverIdx);
 					NXLOG::DEBUGLOG("Set hover id %d\n",item.playlistnewHoverIdx);

@@ -36,6 +36,7 @@ void ProbeThread(void*arg) {
 				int64_t duration = pFormatCtx->duration;
 				ctx->playlist->currplaylist[i].duration = pFormatCtx->duration/AV_TIME_BASE;
 				ctx->playlist->currplaylist[i].is_valid = true;
+				ctx->playlist->CalcPlaylist();
 				avformat_close_input(&pFormatCtx);
 				avformat_free_context(pFormatCtx);
 				svcSleepThread(100'000'000);
@@ -51,8 +52,6 @@ void ProbeThread(void*arg) {
 CMediaProbe::CMediaProbe(Playlist *_playlist){
 	
 	playlist = _playlist;
-	
-	
 	
 }
 

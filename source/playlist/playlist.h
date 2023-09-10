@@ -40,8 +40,12 @@ public:
 	bool isPresent(FS::FileEntry myfile,std::string fulluri);
 	
 	bool HaveUSBEntrys();
+	void CalcPlaylist();
 	
 	std::vector<playlist_struct> currplaylist;
+	
+	int remtime;
+	int totaltime;
 
 private:
 	
