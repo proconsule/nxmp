@@ -492,19 +492,21 @@ namespace Popups{
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}
-			if (off > 0.0f)
-				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-			if(filebrowser->sortOrder == FS::FS_DATE_ASCENDINGORDER){
-				if (ImGui::Button("Sort Descending (Date)",button_size))
-				{
-					filebrowser->setSordOrder(FS::FS_DATE_DESCENDINGORDER);
-					item.popupstate = POPUP_STATE_NONE;
-				}
-			}else{
-				if (ImGui::Button("Sort Ascending (Date)",button_size))
-				{
-					filebrowser->setSordOrder(FS::FS_DATE_ASCENDINGORDER);
-					item.popupstate = POPUP_STATE_NONE;
+			if(!filebrowser->timelessFS){
+				if (off > 0.0f)
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+				if(filebrowser->sortOrder == FS::FS_DATE_ASCENDINGORDER){
+					if (ImGui::Button("Sort Descending (Date)",button_size))
+					{
+						filebrowser->setSordOrder(FS::FS_DATE_DESCENDINGORDER);
+						item.popupstate = POPUP_STATE_NONE;
+					}
+				}else{
+					if (ImGui::Button("Sort Ascending (Date)",button_size))
+					{
+						filebrowser->setSordOrder(FS::FS_DATE_ASCENDINGORDER);
+						item.popupstate = POPUP_STATE_NONE;
+					}
 				}
 			}
 			if (off > 0.0f)

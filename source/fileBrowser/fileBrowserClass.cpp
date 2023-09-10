@@ -13,6 +13,7 @@
 			if(Utility::startWith(path,"/",false)){
 				mylocal = new localFs(path,_playlist);
 				title = "File Browser";
+				timelessFS = true;
 			}else if(Utility::startWith(path,"smb",false)){
 				mysamba = new sambaDir(path,_playlist);
 				title = "SMB Browser";
@@ -25,6 +26,7 @@
 			}else if(Utility::startWith(path,"http",false)){
 				myhttp = new HTTPDir(path);
 				title = "HTTP Browser";
+				timelessFS = true;
 			}else if(Utility::startWith(path,"nfs",false)){
 				title = "NFS Browser";
 				mynfs = new nfsDir(path,_playlist);

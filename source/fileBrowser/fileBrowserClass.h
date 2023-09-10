@@ -48,6 +48,7 @@ public:
 	FS::FILESORTORDER sortOrder = FS::FS_NAME_ASCENDINGORDER;
 	bool currshowHidden = false;
 	
+	bool timelessFS = false;
 	std::vector<usb_devices> getUsbDev();
 
 private:
