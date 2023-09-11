@@ -75,6 +75,7 @@ Config::Config(std::string inifile){
 	
 	nxmpconfig.emuoverrides = ini->GetBoolValue("Main", "emuoverrides",false);
 	nxmpconfig.loglevel = ini->GetLongValue("Main", "loglevel",0);
+	nxmpconfig.consolewindow = ini->GetBoolValue("Main", "consolewindow",false);
 	
 	const char* themenamepv;
 	themenamepv = ini->GetValue("Main", "theme");
@@ -466,6 +467,26 @@ int Config::getLogLevel(){
 	return nxmpconfig.loglevel;
 }
 
+bool Config::getConsoleWindow(){
+	return nxmpconfig.consolewindow;
+}
+
+std::vector<std::string> Config::getConfigExtensions(){
+	
+	const char* pv;
+	pv = ini->GetValue("Main", "enabled_extensions");
+	if(pv==nullptr){
+
+		return nxmpconfig.config_enabled_extensions;
+	}
+	
+	nxmpconfig.config_enabled_extensions = char_split(std::string(pv),',');
+	//return pv;
+	
+	return nxmpconfig.config_enabled_extensions;
+}
+
+
 
 void Config::setThemeName(std::string value){
 	nxmptmpconfig.themename = value;
@@ -603,6 +624,9 @@ void Config::saveSettings(){
 	
 	ini->Delete("Main", "loglevel");
 	ini->SetLongValue("Main", "loglevel", nxmpconfig.loglevel, NULL, false);
+	
+	ini->Delete("Main", "consolewindow");
+	ini->SetLongValue("Main", "consolewindow", nxmpconfig.consolewindow, NULL, false);
 	
 	
 	

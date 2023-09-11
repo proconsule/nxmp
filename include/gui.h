@@ -31,6 +31,7 @@
 #include "usbfs.h"
 
 
+
 #include "Enigma2.h"
 #include "mediaprobe.h"
 
@@ -259,6 +260,7 @@ extern Playlist *playlist;
 extern SysIcons nxmpicons;
 
 extern CStats *nxmpstats;
+
 
 extern int newResW;
 extern int newResH;

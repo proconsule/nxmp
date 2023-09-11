@@ -793,6 +793,7 @@ namespace GUI {
 		ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
+		
 			switch (item.state) {
 				case MENU_STATE_HOME:
 					Windows::MainMenuWindow(&item.focus, &item.first_item);
@@ -969,6 +970,10 @@ namespace GUI {
 					playerWindows::AudioSuperEqualizer(&item.rightmenu_focus,&item.rightmenu_first_item);
 					break;	
 					
+			}
+			
+			if(NXLOG::ConsoleWindow != nullptr){
+				NXLOG::ConsoleWindow->Draw();
 			}
 		
 	}

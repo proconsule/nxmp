@@ -41,7 +41,7 @@ TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/imgui libs/imgui/opengl3 libs/imgui/misc/freetype source source/updater source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 DATA		:=	data
-INCLUDES	:=	source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
+INCLUDES	:=	libs/imgui-console/include/imgui_console source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 ROMFS		:=	romfs
 
 GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'

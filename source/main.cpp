@@ -64,8 +64,8 @@ USBMounter *usbmounter = nullptr;
 Enigma2 *enigma2 = nullptr;
 CMediaProbe *MediaProbe = nullptr;
 
-USBMounter *MyUSBMount = nullptr;
 
+USBMounter *MyUSBMount = nullptr;
 
 Themes *themes = nullptr;
 
@@ -301,6 +301,19 @@ int main() {
 		const char* glsl_version = "#version 430 core";
 		
 		ImGui_ImplOpenGL3_Init(glsl_version);
+		
+		if(configini->getConsoleWindow()){
+			NXLOG::ConsoleWindow = new CConsoleWindow();
+		}
+		
+		
+		
+		
+		MediaProbe =  new CMediaProbe(playlist);
+		
+		std::vector<std::string> extensionlist = configini->getConfigExtensions();
+		
+		Utility::setMediaExtensions(extensionlist);
 		
 		//plInitialize(PlServiceType_System);
 		if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {

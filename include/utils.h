@@ -51,6 +51,8 @@ namespace Utility{
 		std::string lang3;
 	};
 	
+	extern std::vector<std::string> supportedExtensions;
+	
 	std::string formatTimeStamp(time_t timestamp);
 	std::string formatTimeShort(double seconds);
 	urlschema parseUrl(std::string url); 
@@ -64,6 +66,7 @@ namespace Utility{
 	bool startWith(const std::string &str, const std::string &value, bool sensitive);
 	
 	std::vector<std::string> getMediaExtensions();
+	void setMediaExtensions(std::vector<std::string> myext);
 	std::string humanSize(size_t bytes);
 	std::string str_tolower(std::string s);
 	std::vector<lang_code_struct> getLanguages();

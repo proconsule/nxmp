@@ -6,6 +6,8 @@
 
 namespace Utility{
 	
+	std::vector<std::string> supportedExtensions;
+	
 	std::string formatTimeStamp(time_t timestamp){
 		
 		struct tm* timeStruct = localtime((const time_t *)&timestamp);
@@ -175,8 +177,51 @@ namespace Utility{
 		return ret;
 	}
 	
+	void setMediaExtensions(std::vector<std::string> myext){
+		if(myext.size()==0){
+			supportedExtensions = {
+					".8svx",
+					".aac",
+					".ac3",
+					".aif",
+					".asf",
+					".avi",
+					".dv",
+					".flv",
+					".m2ts",
+					".m2v",
+					".m4a",
+					".mkv",
+					".mov",
+					".mp3",
+					".mp4",
+					".mpeg",
+					".mpg",
+					".mts",
+					".ogg",
+					".rmvb",
+					".swf",
+					".ts",
+					".vob",
+					".wav",
+					".wma",
+					".wmv",
+					".flac",
+					".m3u",
+					".m3u8",
+					".webm",
+					".jpg",
+					".gif",
+					".png"
+			};
+		}else{
+			supportedExtensions = myext;
+		}
+	}
+	
 	std::vector<std::string> getMediaExtensions() {
-    return {
+    /*
+	return {
             ".8svx",
             ".aac",
             ".ac3",
@@ -211,6 +256,8 @@ namespace Utility{
 			".gif",
 			".png"
     };
+	*/
+		return supportedExtensions;
 	}
 	
 	std::vector<lang_code_struct> getLanguages() {

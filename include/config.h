@@ -32,6 +32,8 @@ typedef struct{
 	std::string themename;
 	bool emuoverrides;
 	int loglevel;
+	bool consolewindow;
+	std::vector<std::string> config_enabled_extensions;
 }nxmpconfig_struct;
 
 
@@ -125,6 +127,10 @@ public:
 	
 	bool getEmuOverrides();
 	int getLogLevel();
+	
+	bool getConsoleWindow();
+	
+	std::vector<std::string> getConfigExtensions();
 	
 	
 private:

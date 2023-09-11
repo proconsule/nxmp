@@ -5,10 +5,12 @@
 #include <cstdio>
 #include <cstdarg>
 
+#include "consolewindow.h"
+
 namespace NXLOG{
 	
 	extern int loglevel;
-	
+	extern CConsoleWindow *ConsoleWindow;
 	
 	void INFOLOG(const char *fmt, ...);
 	void ERRORLOG(const char *fmt, ...);
