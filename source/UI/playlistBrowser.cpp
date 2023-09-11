@@ -47,14 +47,16 @@ namespace Windows {
 						ImGui::SameLine();
 						ImGui::Text("%d. %s",n+1,thislist[n].file.name.c_str());
 						ImGui::TableSetColumnIndex(1);
-						ImGui::Text("%s",thislist[n].is_valid ? Utility::formatTimeShort(thislist[n].duration).c_str(): "????");
+						std::string itemdurationstr = thislist[n].is_valid ? Utility::formatTimeShort(thislist[n].duration).c_str(): "????";
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() - ImGui::CalcTextSize(itemdurationstr.c_str()).x  - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x);
+						ImGui::Text("%s",itemdurationstr.c_str());
 						
 					}
 					
 					ImGui::EndTable();
 				}
 				std::string playtime = Utility::formatTimeShort(playlist->remtime) + " / " + Utility::formatTimeShort(playlist->totaltime);
-				ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - ImGui::GetStyle().FramePadding.x - ImGui::CalcTextSize(playtime.c_str(), NULL, true).x);
+				ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x -  ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x - ImGui::CalcTextSize(playtime.c_str(), NULL, true).x);
 				ImGui::Text("%s",playtime.c_str());				
 				if(item.playlistUpdateHovered){
 					std::string itemid = "##" + std::to_string(item.playlistnewHoverIdx);

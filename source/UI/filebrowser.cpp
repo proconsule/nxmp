@@ -102,7 +102,6 @@ namespace Windows {
 						}
 						ImGui::SameLine();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f);
-						//std::string itemid = "##" + std::to_string(n);
 						ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
 						
 						if(item.selectionstate != FILE_SELECTION_CHECKBOX){
@@ -114,6 +113,7 @@ namespace Windows {
 									item.laststate = item.state;
 									playlist->clearPlaylist();
 									filebrowser->clearChecked();
+									NXLOG::DEBUGLOG("OPEN FILE: %s\n",(filebrowser->getOpenUrlPart()+thislist[n].path).c_str());
 									libmpv->loadFile(filebrowser->getOpenUrlPart()+thislist[n].path);
 									if(configini->getDbActive(true)){
 										libmpv->getFileInfo()->resume = sqlitedb->getResume(filebrowser->getOpenUrlPart()+thislist[n].path);

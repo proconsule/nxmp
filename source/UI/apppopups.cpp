@@ -571,7 +571,17 @@ namespace Popups{
 		if (ImGui::BeginPopupModal("Playlist Menu Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
 			
-			ImVec2 button_size(ImGui::GetFontSize() * 10.0f, 0.0f);
+			ImVec2 button_size(400.0f, 0.0f);
+			
+			float alignment = 0.5f;
+			
+			float size = 400.0f + ImGui::GetStyle().FramePadding.x * 2.0f;
+			float avail = ImGui::GetContentRegionAvail().x;
+
+			float off = (avail - size) * alignment;
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
 			
 			if (ImGui::Button("Start Playlist",button_size))
 			{
@@ -586,6 +596,9 @@ namespace Popups{
 				}
                 
             }
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
 			if (ImGui::Button("Set as Startring element",button_size))
 			{
                 playlist->setPlaylistIdx(item.playlistitemHighlighted);
@@ -595,6 +608,9 @@ namespace Popups{
 			if(item.playlistitemHighlighted<= 0){
 				ImGui::BeginDisabled();
 			}
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
 			if (ImGui::Button("Move Up Element",button_size))
 			{
                 playlist->moveBack(item.playlistitemHighlighted);
@@ -608,6 +624,9 @@ namespace Popups{
 			if(item.playlistitemHighlighted >= playlist->getPlaylist().size()-1){
 				ImGui::BeginDisabled();
 			}
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
 			if (ImGui::Button("Move Down",button_size))
 			{
                 playlist->moveForw(item.playlistitemHighlighted);
@@ -617,7 +636,9 @@ namespace Popups{
 			if(item.playlistitemHighlighted >= playlist->getPlaylist().size()-1){
 				ImGui::EndDisabled();
 			}
-			
+
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			if (ImGui::Button("Remove Element",button_size))
 			{
                 playlist->RemoveElement(item.playlistitemHighlighted);
@@ -625,6 +646,22 @@ namespace Popups{
 				ImGui::CloseCurrentPopup();
             }
 			
+			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+			
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			if (ImGui::Button("Clear Playlist",button_size))
+			{
+                playlist->clearPlaylist();
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+            }
+			ImGui::PopStyleColor(3);
+			
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			if (ImGui::Button("Exit", button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;
