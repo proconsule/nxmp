@@ -18,7 +18,7 @@ void FTPDir::DirList(std::string path,const std::vector<std::string> &extensions
 	urlschema thisurl = Utility::parseUrl(url);
 	currentlist.clear();
 	//if(thisurl.port == "")thisurl.port = "21";
-	std::string ftphost = thisurl.server+std::string(":")+ (thisurl.port.empty() ? "22" : thisurl.port);
+	std::string ftphost = thisurl.server+std::string(":")+ (thisurl.port.empty() ? "21" : thisurl.port);
 	if (!FtpConnect(ftphost.c_str(), &ftp_con)) {
 		NXLOG::ERRORLOG("could not connect to ftp server\n");
 	}else{

@@ -110,15 +110,16 @@ namespace playerWindows{
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, green_hover);
 				
 				ImVec4 color = ImGui::GetStyleColorVec4(ImGuiCol_Text);
-				ImVec4 colorMark = color;
+				//ImVec4 colorMark = color;
 				color.w *= 1.0f;
 				
 				if(powerstashoverd){
 					ImGui::PushStyleColor(ImGuiCol_FrameBg, offgreen_hover);
+					ImGui::PushStyleColor(ImGuiCol_Button, green_hover);
 				}
 				ImGui::Toggle("Power Stats", &item.showstats);
 				if(powerstashoverd){
-					ImGui::PopStyleColor();
+					ImGui::PopStyleColor(2);
 				}
 				
 				if(ImGui::IsItemHovered()){
@@ -129,10 +130,12 @@ namespace playerWindows{
 				
 				if(decstashoverd){
 					ImGui::PushStyleColor(ImGuiCol_FrameBg, offgreen_hover);
+					ImGui::PushStyleColor(ImGuiCol_Button, green_hover);
+					 
 				}
 				ImGui::Toggle("Dec Stats", &item.showdecstats);
 				if(decstashoverd){
-					ImGui::PopStyleColor();
+					ImGui::PopStyleColor(2);
 				}
 				if(ImGui::IsItemHovered()){
 					decstashoverd = true;
@@ -149,8 +152,6 @@ namespace playerWindows{
 				
 				
 				if(item.showstats)item.showdecstats=false;
-				
-				
 				
 				//battery
 				

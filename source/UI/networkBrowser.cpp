@@ -28,25 +28,25 @@ namespace Windows {
 			ImGui::SameLine();
 			//ImGui::Combo("##protocombo", (int *)&NewNetworkShare->type, NewNetworkShare->protonames, 5);
 			static const char* item_current = NULL;
-			if (ImGui::BeginCombo("##protocombo", item_current, NULL)) // The second parameter is the label previewed before opening the combo.
+			if (ImGui::BeginCombo("##protocombo", item_current, 0)) // The second parameter is the label previewed before opening the combo.
 			{
 				for (int n = 0; n < IM_ARRAYSIZE(NewNetworkShare->protonames); n++)
 				{
 					bool is_selected = (item_current == NewNetworkShare->protonames[n]);
 					
-					if(NewNetworkShare->protonames[n] == "FTP"){
+					if(std::string(NewNetworkShare->protonames[n]) == "FTP"){
 						GUI::NXMPImage((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(30,30));
 					}
-					if(NewNetworkShare->protonames[n] == "HTTP"){
+					if(std::string(NewNetworkShare->protonames[n]) == "HTTP"){
 						GUI::NXMPImage((void*)(intptr_t)nxmpicons.HTTPTexture.id, ImVec2(30,30));
 					}
-					if(NewNetworkShare->protonames[n] == "SMB"){
+					if(std::string(NewNetworkShare->protonames[n]) == "SMB"){
 						GUI::NXMPImage((void*)(intptr_t)nxmpicons.NFSTexture.id, ImVec2(30,30));
 					}
-					if(NewNetworkShare->protonames[n] == "NFS"){
+					if(std::string(NewNetworkShare->protonames[n]) == "NFS"){
 						GUI::NXMPImage((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(30,30));
 					}
-					if(NewNetworkShare->protonames[n] == "SSH"){
+					if(std::string(NewNetworkShare->protonames[n]) == "SSH"){
 						GUI::NXMPImage((void*)(intptr_t)nxmpicons.SFTPTexture.id, ImVec2(30,30));
 					}
 					

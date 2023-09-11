@@ -306,11 +306,6 @@ int main() {
 			NXLOG::ConsoleWindow = new CConsoleWindow();
 		}
 		
-		
-		
-		
-		MediaProbe =  new CMediaProbe(playlist);
-		
 		std::vector<std::string> extensionlist = configini->getConfigExtensions();
 		
 		Utility::setMediaExtensions(extensionlist);
@@ -368,8 +363,6 @@ int main() {
 			themes->setDefault();
 			delete themes;
 		}
-
-
 
 		if (hosversionBefore(8, 0, 0)) {
 			if (R_SUCCEEDED(pcvInitialize())) {

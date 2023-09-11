@@ -626,7 +626,7 @@ void Config::saveSettings(){
 	ini->SetLongValue("Main", "loglevel", nxmpconfig.loglevel, NULL, false);
 	
 	ini->Delete("Main", "consolewindow");
-	ini->SetLongValue("Main", "consolewindow", nxmpconfig.consolewindow, NULL, false);
+	ini->SetBoolValue("Main", "consolewindow", nxmpconfig.consolewindow, NULL, false);
 	
 	
 	

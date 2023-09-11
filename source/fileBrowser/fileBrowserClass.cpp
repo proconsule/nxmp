@@ -345,4 +345,5 @@
 		if(myusb != nullptr){
 			return myusb->mounted_devs;
 		}
+		return std::vector<usb_devices>();
 	}

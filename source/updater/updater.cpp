@@ -13,14 +13,14 @@ void Updater::fetchReleases(){
 	
 	curlDownloader * curldownloader = new curlDownloader();
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
-	curldownloader->Download((char const *)"https://api.github.com/repos/proconsule/nxmp/releases",chunk);
-	NXLOG::DEBUGLOG(chunk->memory);
+	curldownloader->Download((char *)std::string("https://api.github.com/repos/proconsule/nxmp/releases").c_str(),chunk);
+	NXLOG::DEBUGLOG("%s",chunk->memory);
 	
 	
 	json_t *root;
     json_error_t error;
 	
-	root = json_loads(chunk->memory, 0, &error);
+	root = json_loads((const char *)chunk->memory, 0, &error);
 	free(chunk->memory);
 	free(chunk);
 	

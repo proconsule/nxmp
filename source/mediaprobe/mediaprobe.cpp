@@ -24,7 +24,7 @@ void ProbeThread(void*arg) {
 				if(rc != 0){
 					char err[1024] = { 0 };
 					av_strerror(rc, err, 1024);
-					printf("RC %s\r\n",err);
+					//printf("RC %s\r\n",err);
 					ctx->playlist->currplaylist[i].is_valid = true;
 					continue;
 				}
@@ -33,7 +33,6 @@ void ProbeThread(void*arg) {
 					continue;
 					
 				}
-				int64_t duration = pFormatCtx->duration;
 				ctx->playlist->currplaylist[i].duration = pFormatCtx->duration/AV_TIME_BASE;
 				ctx->playlist->currplaylist[i].is_valid = true;
 				ctx->playlist->CalcPlaylist();
@@ -71,25 +70,12 @@ bool CMediaProbe::needUpdate(){
 	
 }
 
-
-int64_t CMediaProbe::ProbeFileDuration(std::string _path){
-	
-}
-
-
 CMediaProbe::~CMediaProbe(){
 	
 	exitThread=true;
 	threadWaitForExit(&t0);
 	threadClose(&t0);
 }
-
-static int is_device(const AVClass *avclass)
-{
-    if (!avclass)
-        return 0;
-    return AV_IS_INPUT_DEVICE(avclass->category) || AV_IS_OUTPUT_DEVICE(avclass->category);
-}
-
+	
 
 

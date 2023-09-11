@@ -220,43 +220,7 @@ namespace Utility{
 	}
 	
 	std::vector<std::string> getMediaExtensions() {
-    /*
-	return {
-            ".8svx",
-            ".aac",
-            ".ac3",
-            ".aif",
-            ".asf",
-            ".avi",
-            ".dv",
-            ".flv",
-            ".m2ts",
-            ".m2v",
-            ".m4a",
-            ".mkv",
-            ".mov",
-            ".mp3",
-            ".mp4",
-            ".mpeg",
-            ".mpg",
-            ".mts",
-            ".ogg",
-            ".rmvb",
-            ".swf",
-            ".ts",
-            ".vob",
-            ".wav",
-            ".wma",
-            ".wmv",
-			".flac",
-            ".m3u",
-            ".m3u8",
-			".webm",
-			".jpg",
-			".gif",
-			".png"
-    };
-	*/
+   
 		return supportedExtensions;
 	}
 	

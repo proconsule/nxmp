@@ -20,11 +20,7 @@ public:
 		bool needUpdate();
 		void SetProbeList(std::vector<Playlist::playlist_struct> *_playlist);
 		
-		int64_t ProbeFileDuration(std::string _path);
-		
-		
 		Playlist *playlist;
-		
 		
 		bool exitThread = false;
 		void StartMediaProbeThread();

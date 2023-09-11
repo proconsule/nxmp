@@ -1189,7 +1189,7 @@ std::vector<FS::FileEntry> FtpDirList(const char *p, netbuf *nControl,const std:
             }
             FS::FileEntry tmpentry;
 			tmpentry.name=name;
-			tmpentry.path=path;
+			tmpentry.path=std::string(std::string(path)+std::string(name)).c_str();
 			tmpentry.type = fp.flagtrycwd == 1 ? FS::FileEntryType::Directory : FS::FileEntryType::File;
 			tmpentry.size = fp.size;
 			tmpentry.is_valid = 1;
@@ -1200,7 +1200,7 @@ std::vector<FS::FileEntry> FtpDirList(const char *p, netbuf *nControl,const std:
         }
     }
 	
-	std::sort(files.begin(), files.end(), FS::Sort);
+	std::sort(files.begin(), files.end(), FS::SortNameAsc);
 				
 	files.erase(
 		std::remove_if(files.begin(), files.end(), [extensions](const FS::FileEntry &file) {

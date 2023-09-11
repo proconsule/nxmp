@@ -89,4 +89,7 @@ networkSource CNetworkShare::GenConfigLine(){
 		tmpret.url = urlstring;
 		return tmpret;
 	}
+	
+	networkSource tmpret;
+	return tmpret;
 }

@@ -60,8 +60,8 @@ namespace Windows {
 				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
 			}
-			float total_w = ImGui::GetContentRegionAvail().x;
-			float total_h = ImGui::GetContentRegionAvail().y;
+			//float total_w = ImGui::GetContentRegionAvail().x;
+			//float total_h = ImGui::GetContentRegionAvail().y;
 			std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 			bool triggerselect = false;
 			
@@ -167,7 +167,7 @@ namespace Windows {
 						
 						if(thislist[n].is_valid){
 							std::string strdate = Utility::formatTimeStamp(thislist[n].modified);
-							ImVec2 textSize = ImGui::CalcTextSize(strdate.c_str());
+							//ImVec2 textSize = ImGui::CalcTextSize(strdate.c_str());
 							ImGui::TextColored(textcolor,"%s",strdate.c_str());
 						}
 						

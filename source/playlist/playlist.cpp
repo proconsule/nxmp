@@ -96,6 +96,7 @@ bool Playlist::HaveUSBEntrys(){
 			return true;
 		}
 	}
+	return false;
 }
 
 
