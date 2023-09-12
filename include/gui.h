@@ -55,6 +55,8 @@
 #include "themes.h"
 #include "logger.h"
 
+#include "vout.h"
+
 #define handheldWidth 1280
 #define handheldHeight 720
 #define dockedWidth 1920
@@ -282,6 +284,13 @@ extern CNetworkShare *NewNetworkShare;
 
 
 extern float currFontsize;
+
+//extern GLuint mpv_fbo;
+//extern GLuint mpv_fbotexture;
+//extern GLuint mpv_rbo;
+
+extern CVOUT *videoout;
+
 
 
 /* theme porp */

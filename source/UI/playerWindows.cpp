@@ -45,6 +45,7 @@ namespace playerWindows{
 	
 	static int supereqpresetsidx = 0;
 	
+	/*
 	
 	float playertextscrollpos = 0.0f;
 	int waitpos = 0;
@@ -53,10 +54,12 @@ namespace playerWindows{
 	bool playertextforwardscroll = true;
 	bool playertextlaststate = true;
 	
+	*/
+	
 	bool decstashoverd = false;
 	bool powerstashoverd = false;
 	
-	
+	CTextScroller * playerTextScroller;
 	
 	
 	void RightHomeWindow(bool *focus, bool *first_item){
@@ -871,6 +874,9 @@ namespace playerWindows{
 	
 	void playerControls(){
 		playerWindows::SetupPlayerControlsWindow();
+		if(playerTextScroller == nullptr){
+			playerTextScroller = new CTextScroller("##scrollerplayer");
+		}
 		static bool selected = -1;
 		if (ImGui::Begin("Player Controls", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			
@@ -957,13 +963,14 @@ namespace playerWindows{
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0*multiplyRes);
 			
 			if(libmpv->getFileInfo()->playbackInfo.title ==""){
-				PlayerScrollText(centerposition-120,40,"%s",FS::getFilefromPath(libmpv->getFileInfo()->path).c_str());
+				//PlayerScrollText(centerposition-120,40,"%s",FS::getFilefromPath(libmpv->getFileInfo()->path).c_str());
+				playerTextScroller->Draw(centerposition-120,40,"%s",FS::getFilefromPath(libmpv->getFileInfo()->path).c_str());
 			}else{
 				if(libmpv->getFileInfo()->playbackInfo.artist ==""){
-					PlayerScrollText(centerposition-120*multiplyRes,40*multiplyRes,"%s",libmpv->getFileInfo()->playbackInfo.title.c_str());
+					playerTextScroller->Draw(centerposition-120*multiplyRes,40*multiplyRes,"%s",libmpv->getFileInfo()->playbackInfo.title.c_str());
 				}else{
 					std::string titleandartist = libmpv->getFileInfo()->playbackInfo.title + std::string(" - ") + libmpv->getFileInfo()->playbackInfo.artist;
-					PlayerScrollText(centerposition-120*multiplyRes,40*multiplyRes,"%s",titleandartist.c_str());
+					playerTextScroller->Draw(centerposition-120*multiplyRes,40*multiplyRes,"%s",titleandartist.c_str());
 				}
 			}
 			ImGui::SetCursorPosX(20);
@@ -1052,7 +1059,7 @@ namespace playerWindows{
 	
 	void StatsWindow(){
 		playerWindows::SetupStatsWindow();
-		if (ImGui::Begin("Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+		if (ImGui::Begin("Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
@@ -1069,7 +1076,7 @@ namespace playerWindows{
 	
 	void DecodingStatsWindow(){
 		playerWindows::SetupStatsWindow();
-		if (ImGui::Begin("Decoding Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
+		if (ImGui::Begin("Decoding Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
@@ -1096,6 +1103,7 @@ namespace playerWindows{
 		playerWindows::ExitStatsWindow();
 	}
 	
+/*
 	void PlayerScrollText(float w,float h,const char* fmt, ...){
 		
 		ImGui::BeginChild("##scrolling", ImVec2(w, h), false);
@@ -1130,5 +1138,7 @@ namespace playerWindows{
 		ImGui::SetScrollX(playertextscrollpos);
 		ImGui::EndChild();
 	}
+*/
+
 
 }

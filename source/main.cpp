@@ -58,6 +58,12 @@ sshDir *sshdir = nullptr;
 sambaDir *sambadir = nullptr;
 nfsDir *nfsdir = nullptr;
 */
+
+GLuint mpv_fbo;
+GLuint mpv_fbotexture;
+GLuint mpv_rbo;
+
+
 CNetworkShare *NewNetworkShare = nullptr;
 NXUPnP *nxupnp = nullptr;
 USBMounter *usbmounter = nullptr;
@@ -113,6 +119,8 @@ float currFontsize = 20.0f;
 GLuint WIDTH = handheldWidth, HEIGHT = handheldWidth;
 
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
+
+CVOUT *videoout = nullptr;
 
 
 
@@ -381,6 +389,8 @@ int main() {
 		NXLOG::DEBUGLOG("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
 		SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
 
+		
+		
 
 		
 		GUI::initMpv();
@@ -388,8 +398,15 @@ int main() {
 		int w, h;
 		SDL_GetWindowSize(window, &w, &h);
 		
+		videoout = new CVOUT();
+		videoout->Create_Framebuffer(w,h);
+		
+		//create_framebuffer();
+		//rescale_framebuffer(w,h);
+
+		
 		fbo = {
-				.fbo = 0,
+				.fbo = (int)videoout->mpv_fbo,
 				.w = w,
 				.h = h,
 		};
@@ -416,6 +433,10 @@ int main() {
 		delete libmpv;
 		libmpv = nullptr;
 		NXLOG::DEBUGLOG("Ending MPV\n");
+		
+		if(videoout!= nullptr){
+			delete videoout;
+		}
 		
 		if(filebrowser != nullptr){
 			delete filebrowser;

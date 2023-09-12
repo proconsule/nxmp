@@ -24,11 +24,13 @@ namespace Windows {
 				if (ImGui::BeginTable("##tableplaylist", 3)){
 					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (1150.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
 					ImGui::TableSetupColumn("duration", ImGuiTableColumnFlags_WidthFixed, 130.0f*multiplyRes); // Default to 200.0f
+					ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
+						
 					for(unsigned int n=0;n<thislist.size();n++){
 						ImGui::TableNextRow();
 						ImGui::TableSetColumnIndex(0);
 						std::string itemid = "##" + std::to_string(n);
-						if (ImGui::Selectable(itemid.c_str(), playlist->getCurrIdx() == n)){
+						if (ImGui::Selectable(itemid.c_str(), playlist->getCurrIdx() == n,selectable_flags)){
 							
 							item.laststate = item.state;
 							playlist->setPlaylistIdx(n);

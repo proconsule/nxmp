@@ -3,6 +3,7 @@
 
 #include "imgui.h"
 #include "gui.h"
+#include "textscroller.h"
 
 extern int newResW;
 extern int newResH;
@@ -11,10 +12,16 @@ extern bool isHandheld;
 extern float initScale;
 extern int initSize;
 extern int batteryPorcent;
+
+extern CTextScroller * playerTextScroller;
+
+
 namespace playerWindows{
 	
+	/*
 	extern float playertextscrollpos;
 	extern bool playertextforwardscroll;
+	*/
 	
 	inline void SetupCacheWindow(void){
 		ImGui::SetNextWindowPos(ImVec2(10.0f*multiplyRes, 600.0f*multiplyRes), ImGuiCond_Once);
@@ -128,7 +135,7 @@ namespace playerWindows{
 	
 	void StatsWindow();
 	void DecodingStatsWindow();
-	void PlayerScrollText(float w,float h,const char* fmt, ...); 
+	//void PlayerScrollText(float w,float h,const char* fmt, ...); 
 }
 
 #endif

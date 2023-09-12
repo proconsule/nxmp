@@ -54,7 +54,7 @@ namespace Windows {
 	
 	void UniBrowserWindow(bool *focus, bool *first_item) {
 		 Windows::SetupWindow();
-		 if (ImGui::Begin(filebrowser->getTitle().c_str(), nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+		 if (ImGui::Begin(filebrowser->getTitle().c_str(), nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar )) {
             
 			if (ImGui::BeginMenuBar()) {
 				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
@@ -66,11 +66,11 @@ namespace Windows {
 			bool triggerselect = false;
 			
 			
-			if (ImGui::BeginTable("table1", 3)){
+			if (ImGui::BeginTable("table1", 3,ImGuiTableFlags_RowBg)){
+				ImGui::SetWindowFocus();
 				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (950.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
 				ImGui::TableSetupColumn("size", ImGuiTableColumnFlags_WidthFixed, 130.0f*multiplyRes); // Default to 200.0f
 				ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed,200.f*multiplyRes);       // Default to auto
-           
 				ImGuiListClipper clipper;
 				clipper.Begin(thislist.size());
 				while (clipper.Step())
@@ -206,7 +206,7 @@ namespace Windows {
         Windows::SetupWindow();
 		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		
-        if (ImGui::Begin("File Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+        if (ImGui::Begin("File Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar|ImGuiWindowFlags_NoNavFocus)) {
             if(item.popupstate == POPUP_STATE_NONE){
 				ImGui::SetNextWindowFocus();
 			}

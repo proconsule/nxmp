@@ -480,13 +480,13 @@ namespace Popups{
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
 			if(filebrowser->sortOrder == FS::FS_NAME_ASCENDINGORDER){
-				if (ImGui::Button("Sort Descending (Z-A)",button_size))
+				if (ImGui::Button("Sort Descending (Name)",button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_NAME_DESCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button("Sort Ascending (A-Z)",button_size))
+				if (ImGui::Button("Sort Ascending (Name)",button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_NAME_ASCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
@@ -541,6 +541,7 @@ namespace Popups{
 				if (ImGui::Button("Add File to Playlist",button_size))
 				{
 					playlist->appendFile(filebrowser->getCurrList()[item.fileHoveredidx],filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path);
+					item.popupstate = POPUP_STATE_NONE;
 				}
 			}
 			if (off > 0.0f)

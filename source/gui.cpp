@@ -213,15 +213,19 @@ namespace GUI {
 						if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
 							item.savestate = item.laststate;
 							item.state = item.laststate;	
+							videoout->SetFullScreen(false);
 						}else if(item.state != MENU_STATE_PLAYER && !libmpv->Stopped()){
 							std::cout << std::endl <<" State is?: " << item.state << std::endl;
 							//fix crash
 							if (item.state != item.savestate)
-							{item.state = MENU_STATE_FILEBROWSER;
-							filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
-							filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
-							item.first_item = true;}
-							
+							{
+								
+								item.state = MENU_STATE_FILEBROWSER;
+								filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
+								filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
+								item.first_item = true;
+							}
+							videoout->SetFullScreen(true);
 							item.state = MENU_STATE_PLAYER;
 							
 						}
@@ -310,6 +314,10 @@ namespace GUI {
 					}
 					if (button == SDL_KEY_Y && !item.masterlock){
 						if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER && item.popupstate == POPUP_STATE_NONE){
+							
+							if(item.selectionstate == FILE_SELECTION_CHECKBOX){
+								item.selectionstate =FILE_SELECTION_NONE;
+							}
 							if(filebrowser != nullptr){
 								delete filebrowser;
 								filebrowser = nullptr;
@@ -370,6 +378,10 @@ namespace GUI {
 										
 					}
 					if (button == SDL_KEY_B){
+						
+						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
+							item.selectionstate =FILE_SELECTION_NONE;
+						}
 						
 						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER|| item.state == MENU_STATE_USB_BROWSER){
 							if(item.popupstate != POPUP_STATE_NONE){
@@ -793,6 +805,7 @@ namespace GUI {
 		ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
+			videoout->Draw();
 		
 			switch (item.state) {
 				case MENU_STATE_HOME:
@@ -975,7 +988,7 @@ namespace GUI {
 			if(NXLOG::ConsoleWindow != nullptr){
 				NXLOG::ConsoleWindow->Draw();
 			}
-		
+			
 	}
 	
 	void HandleRender(){
@@ -1034,10 +1047,11 @@ namespace GUI {
 					currFontsize = 20.0f;
 					SDL_SetWindowSize(window, newResW, newResH);
 					fbo = {
-						.fbo = 0,
+						.fbo = videoout->mpv_fbo,
 						.w = newResW,
 						.h = newResH,
 					};
+					videoout->Resize(newResW,newResH);
 					reinit();
 				}
 			}
@@ -1051,10 +1065,11 @@ namespace GUI {
 					currFontsize = 30.0f;
 					SDL_SetWindowSize(window, newResW, newResH);
 					fbo = {
-						.fbo = 0,
+						.fbo = videoout->mpv_fbo,
 						.w = newResW,
 						.h = newResH,
 					};
+					videoout->Resize(newResW,newResH);
 					reinit();
 				}
 			}

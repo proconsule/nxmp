@@ -48,10 +48,13 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "image-display-duration", "inf");
 	mpv_set_option_string(handle, "hdr-compute-peak", "no");
 	
+	
 
 
 	if(configini->getHWDec(false)){
 		mpv_set_option_string(handle, "hwdec", "tx1-copy");
+		mpv_set_option_string(handle, "hwdec-codecs", "all");
+	
 	}
 
 	
@@ -765,7 +768,7 @@ bool libMpv::getLoop(){
 
 void libMpv::setAudioNormalize(bool val){
 	if(val){
-		std::string cmd = "no-osd af add @dynaudnorm:dynaudnorm=f=75:g=25:p=0.5";
+		std::string cmd = "no-osd af add @dynaudnorm:dynaudnorm=g=5:f=250:r=0.9:p=0.5";
 		mpv_command_string(handle, cmd.c_str());
 		audionorm = val;
 		
