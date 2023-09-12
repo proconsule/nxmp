@@ -48,7 +48,4 @@ void CTextScroller::Draw(float w,float h,const char* fmt, ...){
 	ImGui::SetScrollX(textscrollpos);
 	ImGui::EndChild();
 	
-	
-	
-	
 }

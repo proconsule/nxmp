@@ -71,7 +71,7 @@ void CVOUT::Draw(){
 	}
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	
-	if(ImGui::Begin("##videowindow",nullptr, ImGuiWindowFlags_NoFocusOnAppearing|ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoNavFocus)){
+	if(ImGui::Begin("##videowindow",nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoNavFocus)){
 				ImGui::Image((void*)(intptr_t)mpv_fbotexture, fullscreen?ImVec2(width,height):ImVec2(windowed_width,windowed_height),{0, 1}, {1, 0});
 	}
 	if(!fullscreen)ImGui::SetWindowFocus();

@@ -2,11 +2,15 @@
 #define NXMP_APPPOPUPS_H
 
 #include "imgui.h"
+#include "textscroller.h"
 
 extern int newResW;
 extern int newResH;
 extern float multiplyRes;
 extern bool isHandheld;
+
+extern CTextScroller * FilePopupTextScroller;
+
 
 namespace Popups {
     inline void SetupPopup(const char *id) {
@@ -31,7 +35,7 @@ namespace Popups {
 	void NetMenuPopup(void);
 	void FileContextPopup(void);
 	void PlaylistContextPopup(void);
-	void PopupScrollText(float w,float h,const char* fmt, ...);
+	//void PopupScrollText(float w,float h,const char* fmt, ...);
 	
 }
 

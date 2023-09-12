@@ -4,8 +4,11 @@
 #include "imgui_internal.h"
 #include "utils.h"
 
+
+CTextScroller * FilePopupTextScroller = nullptr;
+
 namespace Popups{
-	
+	/*
 	float pupuptextscrollpos = 0.0f;
 	int popuptextwaitpos = 0;
 	
@@ -47,7 +50,7 @@ namespace Popups{
 		ImGui::SetScrollX(pupuptextscrollpos);
 		ImGui::EndChild();
 	}
-	
+	*/
 	
 	void PlaylistStartPlaylist(void) {
 		Popups::SetupPopup("Playlist Start");
@@ -450,9 +453,11 @@ namespace Popups{
 	
 	void FileContextPopup(void) {
 		Popups::SetupPopup("File Context Menu Popup");
-
+		if(FilePopupTextScroller == nullptr){
+			FilePopupTextScroller = new CTextScroller("##filepopuptextscroll");
+		}
+		
 		if (ImGui::BeginPopupModal("File Context Menu Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			
 			
 			ImVec2 button_size(400.0f, 0.0f);
 			std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
@@ -462,9 +467,9 @@ namespace Popups{
 				for(int i=0;i<selectionlist.size();i++){
 					outstring = outstring + selectionlist[i].name + " ";
 				}
-				PopupScrollText(500.0f,30.0f,"%s",outstring.c_str());
+				FilePopupTextScroller->Draw(500.0f,30.0f,"%s",outstring.c_str());
 			}else{
-				PopupScrollText(500.0f,30.0f,"%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
+				FilePopupTextScroller->Draw(500.0f,30.0f,"%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
 				
 			
 			}
@@ -552,16 +557,7 @@ namespace Popups{
                 item.popupstate = POPUP_STATE_NONE;
 				ImGui::CloseCurrentPopup();
             }
-			/*
-			if (ImGui::Button("Test",button_size))
-				{
-					if(MediaProbe == nullptr){
-						MediaProbe = new CMediaProbe();
-					}
-					printf("Duration %ld\n",MediaProbe->ProbeFileDuration(filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path));
-					
-				}
-			*/
+			
 		}
 		Popups::ExitPopup();
 	}

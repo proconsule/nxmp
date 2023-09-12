@@ -3,11 +3,14 @@
 
 #include "imgui.h"
 #include "UIHelpers.h"
+#include "textscroller.h"
 
 extern int newResW;
 extern int newResH;
 extern float multiplyRes;
 extern bool isHandheld;
+
+extern CTextScroller * BrowserTextScroller;
 
 
 namespace Windows {

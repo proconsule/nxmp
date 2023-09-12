@@ -50,6 +50,7 @@ SDL_GLContext context;
 libMpv *libmpv = nullptr;
 
 CFileBrowser *filebrowser = nullptr;
+CTextScroller * BrowserTextScroller = nullptr;
 /*
 localFs *localdir = nullptr;
 FTPDir *ftpdir = nullptr;
