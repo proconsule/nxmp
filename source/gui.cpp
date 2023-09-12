@@ -275,6 +275,9 @@ namespace GUI {
 					if (button == SDL_KEY_X){
 						
 						if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_USB_BROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
+							if(FilePopupTextScroller == nullptr){
+								FilePopupTextScroller = new CTextScroller("##filepopuptextscroll");
+							}
 							FilePopupTextScroller->ResetPosition();
 							item.popupstate = POPUP_STATE_FILECONTEXTMENU;
 						}
