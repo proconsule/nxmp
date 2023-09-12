@@ -69,14 +69,20 @@ void CVOUT::Draw(){
 		ImGui::SetNextWindowSize(fullscreen?ImVec2(width,height): ImVec2(200.0f,200.0f/1.77),ImGuiCond_Always);
 		changevis = true;
 	}
+	
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.0));
 	
 	if(ImGui::Begin("##videowindow",nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoNavFocus)){
 				ImGui::Image((void*)(intptr_t)mpv_fbotexture, fullscreen?ImVec2(width,height):ImVec2(windowed_width,windowed_height),{0, 1}, {1, 0});
 	}
 	if(!fullscreen)ImGui::SetWindowFocus();
 	ImGui::End();
-	ImGui::PopStyleVar();
+	ImGui::PopStyleVar(3);
+	ImGui::PopStyleColor();
 
 	
 }
