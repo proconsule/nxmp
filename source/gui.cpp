@@ -848,7 +848,9 @@ namespace GUI {
 		ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
-			videoout->Draw();
+			if(item.state == MENU_STATE_PLAYER){
+				videoout->Draw();
+			}
 		
 			switch (item.state) {
 				case MENU_STATE_HOME:

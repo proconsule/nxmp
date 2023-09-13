@@ -1,7 +1,9 @@
 #ifndef NXMP_WINDOWS_H
 #define NXMP_WINDOWS_H
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "UIHelpers.h"
 #include "textscroller.h"
 

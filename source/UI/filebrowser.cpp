@@ -25,7 +25,22 @@ namespace Windows {
 			//float total_h = ImGui::GetContentRegionAvail().y;
 			std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 			bool triggerselect = false;
-			
+			if(!libmpv->Stopped()){
+				
+				ImVec2 image_pnew	= ImVec2((1280.0*multiplyRes-videoout->windowed_width*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x),(720.0*multiplyRes-videoout->windowed_height*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
+				ImVec2 image_p1 = ImVec2((1280.0*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x), (720.0*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
+		
+				image_pnew = image_pnew - ImVec2(10,10);
+				image_p1 = image_p1 - ImVec2(10,10);
+				
+				ImVec2 image_pnew_border = image_pnew - ImVec2(1,1);
+				ImVec2 image_p1_border = image_p1 + ImVec2(1,1);
+				
+				ImGui::GetForegroundDrawList()->AddRect(image_pnew_border, image_p1_border, ImGui::GetColorU32(ImVec4(1.0f,0.0f,0.0f,1.0f)), 0.0f);
+				ImGui::GetForegroundDrawList()->AddImage((void*)(intptr_t)videoout->mpv_fbotexture, image_pnew, image_p1, {0, 1}, {1, 0});
+				
+				//ImGui::Image((void*)(intptr_t)videoout->mpv_fbotexture, ImVec2(videoout->windowed_width,videoout->windowed_height),{0, 1}, {1, 0});
+			}
 			
 			if (ImGui::BeginTable("table1", 3,ImGuiTableFlags_RowBg)){
 				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (950.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
@@ -137,6 +152,7 @@ namespace Windows {
 				}
 				ImGui::EndTable();
 			}
+			
 			if (*first_item && thislist.size() >0) {
 				std::string itemid = "##" + std::to_string(0);
 				ImGui::SetFocusID(ImGui::GetID(itemid.c_str()), ImGui::GetCurrentWindow());
