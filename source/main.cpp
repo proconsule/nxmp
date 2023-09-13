@@ -121,6 +121,9 @@ GLuint WIDTH = handheldWidth, HEIGHT = handheldWidth;
 
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
 
+
+int64_t playercachesec =  0;
+int64_t playercachesize = 0;
 CVOUT *videoout = nullptr;
 
 
@@ -395,6 +398,7 @@ int main() {
 
 		
 		GUI::initMpv();
+		libmpv->setDemuxCache(configini->getDemuxCache(false));
 
 		int w, h;
 		SDL_GetWindowSize(window, &w, &h);

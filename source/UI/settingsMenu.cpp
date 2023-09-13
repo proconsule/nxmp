@@ -58,10 +58,6 @@ namespace Windows {
 					}
 					ImGui::Text("Misc (Need Restart))");
 					ImGui::Separator();
-					bool hwdecdefault = configini->getHWDec(true);
-					if(ImGui::Checkbox("HW Decoder", &hwdecdefault)){
-						configini->setHWDec(hwdecdefault);	
-					}
 					bool vsyncdefault = configini->getVSYNC(true);
 					if(ImGui::Checkbox("VSYNC", &vsyncdefault)){
 						configini->setVSYNC(vsyncdefault);	
@@ -71,6 +67,13 @@ namespace Windows {
 				}
 				if (ImGui::BeginTabItem("Player Settings"))
                 {
+					ImGui::Text("Decoder");
+					ImGui::Separator();
+					bool hwdecdefault = configini->getHWDec(true);
+					if(ImGui::Checkbox("HW Decoder", &hwdecdefault)){
+						configini->setHWDec(hwdecdefault);	
+					}
+					ImGui::Dummy(ImVec2(0.0f,30.0f));
 				ImGui::Text("Seek");
 				ImGui::Separator();
 				ImGui::Text("Short Seek Time");
@@ -104,6 +107,28 @@ namespace Windows {
 				ImGui::PopButtonRepeat();
 				ImGui::SameLine();
 				ImGui::Text("%d sec", configini->getLongSeek(true));
+				
+				ImGui::Dummy(ImVec2(0.0f,30.0f));
+				
+				ImGui::Text("Cache");
+				ImGui::Separator();
+				ImGui::SameLine(240,spacing);
+				ImGui::PushButtonRepeat(true);
+				if (ImGui::ArrowButton("##cacheleft", ImGuiDir_Left)) {
+					if(configini->getDemuxCache(true)-1 >0){
+						configini->setDemuxCache(configini->getDemuxCache(true)-1);
+					}
+				}
+				ImGui::SameLine(0.0f, spacing);
+				if (ImGui::ArrowButton("##cacheright", ImGuiDir_Right)) { 
+					configini->setDemuxCache(configini->getDemuxCache(true)+1);
+				}
+				ImGui::PopButtonRepeat();
+				ImGui::SameLine();
+				ImGui::Text("%d sec", configini->getDemuxCache(true));
+				
+				
+				
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
 				
 				ImGui::Text("Language");

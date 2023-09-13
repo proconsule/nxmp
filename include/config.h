@@ -28,6 +28,7 @@ typedef struct{
 	float subbordercolor[4];
 	int startresumeperc;
 	int stopresumeperc;
+	int demuxcachesec;
 	bool dbactive;
 	std::string themename;
 	bool emuoverrides;
@@ -48,6 +49,8 @@ public:
 	std::vector<networkSource> getNetworks();
 	std::string getEnigma();
 	std::string getStartPath();
+	
+	void ReadConfig();
 	
 	bool getshowHidden(bool tmpvalue);
 	void setshowHidden(bool val);
@@ -106,6 +109,9 @@ public:
 	int getDeinterlace(bool tmpvalue);
 	void setDeinterlace(int value);
 	
+	int getDemuxCache(bool tmpvalue);
+	void setDemuxCache(int mycachesec);
+	
 	bool getDbActive(bool tmpvalue);
 	void setDbActive(bool value);
 	
@@ -131,6 +137,8 @@ public:
 	bool getConsoleWindow();
 	
 	std::vector<std::string> getConfigExtensions();
+	
+	nxmpconfig_struct getConfig(bool tmpvalue);
 	
 	
 private:

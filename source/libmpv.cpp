@@ -48,6 +48,8 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "image-display-duration", "inf");
 	mpv_set_option_string(handle, "hdr-compute-peak", "no");
 	
+	mpv_set_option_string(handle, "demuxer-seekable-cache", "yes");
+	mpv_set_option_string(handle, "demuxer-readahead-secs", std::to_string(configini->getDemuxCache(false)).c_str());
 	
 
 
@@ -751,6 +753,11 @@ void libMpv::setAudioSuperEQ(float *eqval,bool osd){
 
 void libMpv::setDeinterlace(int value){
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(value).c_str());
+}
+
+
+void libMpv::setDemuxCache(int mycachesec){
+	mpv_set_option_string(handle, "demuxer-readahead-secs", std::to_string(mycachesec).c_str());
 }
 
 void libMpv::setLoop(bool val){

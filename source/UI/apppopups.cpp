@@ -106,6 +106,9 @@ namespace Popups{
 				item.state = MENU_STATE_HOME;
 				item.popupstate = POPUP_STATE_NONE;
 				configini->saveSettings();
+				configini->ReadConfig();
+				delete libmpv;
+				GUI::initMpv();
 					
 				}
 				ImGui::SameLine();

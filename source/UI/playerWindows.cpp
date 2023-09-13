@@ -1,8 +1,12 @@
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "imgui_internal.h"
 #include "gui.h"
 #include "playerwindows.h"
 #include "imgui.h"
 #include "utils.h"
-#include "imgui_internal.h"
+
+
 #include "SwitchSys.h"
 #include "imgui_toggle.h"
 #include "imgui_toggle_presets.h"
@@ -60,6 +64,49 @@ namespace playerWindows{
 	bool powerstashoverd = false;
 	
 	CTextScroller * playerTextScroller;
+	
+	
+	void PlayerProgressBar(float fraction1,float fraction2, const ImVec2& size_arg, const char* overlay)
+	{
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window->SkipItems)
+			return;
+
+		ImGuiContext& g = *GImGui;
+		const ImGuiStyle& style = g.Style;
+
+		ImVec2 pos = window->DC.CursorPos;
+		ImVec2 size = ImGui::CalcItemSize(size_arg, ImGui::CalcItemWidth(), g.FontSize + style.FramePadding.y * 2.0f);
+		ImRect bb(pos, pos + size);
+		ImGui::ItemSize(size, style.FramePadding.y);
+		if (!ImGui::ItemAdd(bb, 0))
+			return;
+
+		// Render
+		fraction1 = ImSaturate(fraction1);
+		//fraction2 = ImSaturate(fraction2);
+		
+		ImGui::RenderFrame(bb.Min, bb.Max, ImGui::GetColorU32(ImGuiCol_FrameBg), true, style.FrameRounding);
+		bb.Expand(ImVec2(-style.FrameBorderSize, -style.FrameBorderSize));
+		const ImVec2 fill1_br = ImVec2(ImLerp(bb.Min.x, bb.Max.x, fraction1), bb.Max.y);
+		const ImVec2 fill2_br = ImVec2(ImLerp(bb.Min.x, bb.Max.x, fraction2), bb.Max.y);
+		ImGui::RenderRectFilledRangeH(window->DrawList, bb, ImGui::GetColorU32(ImVec4(1.0,1.0,1.0,0.5)), 0.0f, fraction1, style.FrameRounding);
+		ImGui::RenderRectFilledRangeH(window->DrawList, bb, ImGui::GetColorU32(ImVec4(1.0,1.0,1.0,1.0)), 0.0f, fraction2, style.FrameRounding);
+
+
+
+		// Default displaying the fraction as percentage string, but user can override it
+		char overlay_buf[32];
+		if (!overlay)
+		{
+			ImFormatString(overlay_buf, IM_ARRAYSIZE(overlay_buf), "%.0f%%", fraction1 * 100 + 0.01f);
+			overlay = overlay_buf;
+		}
+
+		ImVec2 overlay_size = ImGui::CalcTextSize(overlay, NULL);
+		if (overlay_size.x > 0.0f)
+			ImGui::RenderTextClipped(ImVec2(ImClamp(fill1_br.x + style.ItemSpacing.x, bb.Min.x, bb.Max.x - overlay_size.x - style.ItemInnerSpacing.x), bb.Min.y), bb.Max, overlay, NULL, &overlay_size, ImVec2(0.0f, 0.5f), &bb);
+	}
 	
 	
 	void RightHomeWindow(bool *focus, bool *first_item){
@@ -852,7 +899,7 @@ namespace playerWindows{
 		if (ImGui::Begin("Caching", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			auto windowWidth = ImGui::GetWindowSize().x;
 			auto windowheight = ImGui::GetWindowSize().y;
-			ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Buffering Media...", NULL, true).x) * 0.5f);
+			ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Buffering Media - ", NULL, true).x) * 0.5f);
 			ImGui::SetCursorPosY((windowheight - 24) * 0.5f);
 			ImGui::Text("Buffering Media %c","|/-\\"[(int)(ImGui::GetTime() / 0.05f) & 3]);
 		}
@@ -882,10 +929,23 @@ namespace playerWindows{
 			
 			float centerposition = ImGui::GetWindowSize().x*0.5;
 			
+			/*
+			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.0));
+			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.0,1.0,0.0,0.5));
+			
+			ImGui::ProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPercCache(playercachesec), ImVec2(-1.0f, 10.0f*multiplyRes),"");
+			ImGui::PopStyleColor(2);
+			
+			ImGui::SameLine();
+			*/
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
-			ImGui::ProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPerc(), ImVec2(-1.0f, 10.0f*multiplyRes),"");
+			
+			//ImGui::ProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPerc(), ImVec2(-1.0f, 10.0f*multiplyRes),"");
+			PlayerProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPercCache(playercachesec),libmpv->getFileInfo()->playbackInfo.getplayPerc(), ImVec2(-1.0f, 10.0f*multiplyRes),"");
+			
+			
 			if (ImGui::IsItemClicked()){
 				ImGuiIO& io = ImGui::GetIO();
 				double barperc = io.MousePos.x*100/1270;

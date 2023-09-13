@@ -42,6 +42,9 @@ public:
 		double getplayPerc(){
 			return (double)position/(double)duration;
 		}
+		double getplayPercCache(int64_t cachesec){
+			return (double)(position+(double)cachesec)/(double)duration;
+		}
 		bool islive = false;
     };
 

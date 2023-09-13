@@ -116,6 +116,7 @@ public:
 	void setShader(std::string _filename);
 	void clearShader();
 
+	void setDemuxCache(int mycachesec);
 	
 	mpv_handle *getHandle();
 
@@ -138,6 +139,8 @@ private:
 	bool audionorm = false;
 	int volume = 100;
 	int tmpvolume = 100;
+	
+	int demuxcachesec = 20;
 	
 };
 

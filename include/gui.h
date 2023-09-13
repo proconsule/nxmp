@@ -291,6 +291,9 @@ extern float currFontsize;
 
 extern CVOUT *videoout;
 
+extern int64_t playercachesec;
+extern int64_t playercachesize;
+
 
 
 /* theme porp */

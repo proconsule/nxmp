@@ -570,6 +570,10 @@ namespace GUI {
 							
 							mpv_observe_property(libmpv->getHandle(), 0, "video-params", MPV_FORMAT_NODE);
 							mpv_observe_property(libmpv->getHandle(), 0, "audio-params", MPV_FORMAT_NODE);
+							mpv_observe_property(libmpv->getHandle(), 0, "paused-for-cache", MPV_FORMAT_FLAG);
+							mpv_observe_property(libmpv->getHandle(), 0, "demuxer-cache-duration", MPV_FORMAT_INT64);
+							mpv_observe_property(libmpv->getHandle(), 0, "demuxer-cache-state", MPV_FORMAT_INT64);
+	
 							item.playerstate = PLAYER_STATE_VIDEO;
 						}
 						
@@ -796,6 +800,41 @@ namespace GUI {
 							}
 						}
 						
+						if(std::string(prop->name) == "paused-for-cache") 
+						{
+							if(prop->format == MPV_FORMAT_FLAG)
+							{
+								bool playchache = *(bool *)prop->data;
+								if(playchache){
+									item.laststate = item.state;
+									item.state = MENU_STATE_PLAYERCACHING;
+								}else{
+									item.state = MENU_STATE_PLAYER;
+								}
+								
+								
+							}
+						}
+						
+						if(std::string(prop->name) == "demuxer-cache-duration") 
+						{
+							if(prop->format == MPV_FORMAT_INT64)
+							{
+								int64_t timepos = *(int64_t *)prop->data;
+								playercachesec = timepos;
+							}
+						}
+						
+						if(std::string(prop->name) == "demuxer-cache-state") 
+						{
+							if(prop->format == MPV_FORMAT_INT64)
+							{
+								int64_t timepos = *(int64_t *)prop->data;
+								playercachesize = timepos;
+							}
+						}
+						
+						
 					}
 					if(mp_event->event_id!=22){
 						//printf("event: %s %d\n", mpv_event_name(mp_event->event_id),mp_event->event_id);
@@ -819,17 +858,25 @@ namespace GUI {
 					}
 					break;
 				case MENU_STATE_FILEBROWSER:
-					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
-						Popups::FileContextPopup();
-					}
-					break;
+				case MENU_STATE_FTPBROWSER:
+				case MENU_STATE_HTTPBROWSER:
+				case MENU_STATE_SSHBROWSER:
+				case MENU_STATE_SAMBABROWSER:
+				case MENU_STATE_NFSBROWSER:
 				case MENU_STATE_USB_BROWSER:
 					Windows::UniBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
 						Popups::FileContextPopup();
 					}
 					break;
+				/*
+				case MENU_STATE_USB_BROWSER:
+					Windows::UniBrowserWindow(&item.focus, &item.first_item);
+					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
+						Popups::FileContextPopup();
+					}
+					break;
+				*/
 				case MENU_STATE_USB_MOUNT:
 					Windows::USBMountWindow(&item.focus, &item.first_item);
 					break;
@@ -842,6 +889,7 @@ namespace GUI {
 	            case MENU_STATE_ADDSHARE:
 					Windows::ShareAddWindow(&item.focus, &item.first_item);
 					break;
+				/*
 				case MENU_STATE_FTPBROWSER:
 					Windows::UniBrowserWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
@@ -872,6 +920,7 @@ namespace GUI {
 						Popups::FileContextPopup();
 					}
 					break;
+				*/
 				case MENU_STATE_UPNPBROWSER:
 					Windows::UPNPBrowserWindow(&item.focus, &item.first_item);
 					//if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
@@ -999,13 +1048,15 @@ namespace GUI {
 		ImGui::Render();
 		ImGuiIO &io = ImGui::GetIO();
 		
-		glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
+		
+		if(GUI::wakeup == 1){
+			mpv_render_context_render(libmpv->getContext(), params); 
+			glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
+			GUI::wakeup = 0;
+		}
 		glClearColor(0.00f, 0.00f, 0.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		//mpv_render_context_render(libmpv->getContext(), params); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
-         
-		mpv_render_context_render(libmpv->getContext(), params); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
-         
+		
 		 /*
 		SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
@@ -1032,12 +1083,11 @@ namespace GUI {
 			//	dochangethemefont = false;
 			//}
 			
-			nxmpstats->UpdateStats();
 			if(GUI::wakeup == 0){
 				nxmpstats->UpdateStats();
 				batteryPercent = nxmpstats->batpercentage;
 			}
-			GUI::wakeup = 0;
+			
 
     		//rewrite switch state
 			AppletOperationMode stus=appletGetOperationMode();
