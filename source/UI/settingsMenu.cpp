@@ -15,6 +15,8 @@ namespace Windows {
 	Updater *updater = nullptr;
 	Tex thempreview;
 	
+	int lastthemeprevidx = -1;
+	
     void SettingsMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		if (ImGui::Begin("Settings Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
@@ -386,21 +388,31 @@ namespace Windows {
 					}
 				}
 				
-				if(themeprevidx == 0){
-					ImGui::Text("Name: %s","Default");
-					ImGui::Text("Author: %s","proconsule/bodyXY");
-					Utility::TxtLoadFromFile("./romfs/preview.jpg",&thempreview.id,&thempreview.width,&thempreview.height);
+				if(lastthemeprevidx != themeprevidx){
+				
+					if(themeprevidx == 0){
+						Utility::TxtLoadFromFile("romfs:/preview.jpg",&thempreview.id,&thempreview.width,&thempreview.height);
+									
+					}else{
+						Utility::TxtLoadFromFile(themes->themeslist[themeprevidx-1].path+"preview.jpg",&thempreview.id,&thempreview.width,&thempreview.height);
 								
-				}else{
-					Utility::TxtLoadFromFile(themes->themeslist[themeprevidx-1].path+"preview.jpg",&thempreview.id,&thempreview.width,&thempreview.height);
-								
-					ImGui::Text("Name: %s",themes->themeslist[themeprevidx-1].name.c_str());
-					ImGui::Text("Author: %s",themes->themeslist[themeprevidx-1].author.c_str());
+					}
 					
 				}
 				
-				ImGui::Image((void*)(intptr_t)thempreview.id, ImVec2(thempreview.width/2,thempreview.height/2));
+				if(themeprevidx == 0){
+					ImGui::Text("Name: %s","Default");
+					ImGui::Text("Author: %s","proconsule/bodyXY");			
+				}else{
+					ImGui::Text("Name: %s",themes->themeslist[themeprevidx-1].name.c_str());
+					ImGui::Text("Author: %s",themes->themeslist[themeprevidx-1].author.c_str());
+						
+				}
 				
+				
+				
+				ImGui::Image((void*)(intptr_t)thempreview.id, ImVec2(thempreview.width/2,thempreview.height/2));
+				lastthemeprevidx = themeprevidx;
 					
 				ImGui::EndTabItem();
 			}

@@ -16,6 +16,7 @@ extern CTextScroller * BrowserTextScroller;
 namespace Windows {
 
 	extern int netwinselected;
+	extern int lastthemeprevidx;
 	
 	inline void SetupMainWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);

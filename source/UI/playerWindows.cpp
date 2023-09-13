@@ -89,10 +89,9 @@ namespace playerWindows{
 		ImGui::RenderFrame(bb.Min, bb.Max, ImGui::GetColorU32(ImGuiCol_FrameBg), true, style.FrameRounding);
 		bb.Expand(ImVec2(-style.FrameBorderSize, -style.FrameBorderSize));
 		const ImVec2 fill1_br = ImVec2(ImLerp(bb.Min.x, bb.Max.x, fraction1), bb.Max.y);
-		const ImVec2 fill2_br = ImVec2(ImLerp(bb.Min.x, bb.Max.x, fraction2), bb.Max.y);
 		ImGui::RenderRectFilledRangeH(window->DrawList, bb, ImGui::GetColorU32(ImVec4(1.0,1.0,1.0,0.5)), 0.0f, fraction1, style.FrameRounding);
 		ImGui::RenderRectFilledRangeH(window->DrawList, bb, ImGui::GetColorU32(ImVec4(1.0,1.0,1.0,1.0)), 0.0f, fraction2, style.FrameRounding);
-
+		
 
 
 		// Default displaying the fraction as percentage string, but user can override it
@@ -262,10 +261,9 @@ namespace playerWindows{
 					}
 					ImGui::SetCursorPosX(currstartpos);
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY()-50.0f);
-					ImGui::PushFont(fontSmall);
 					ImGui::Text("#%d %s",libmpv->getFileInfo()->videos[n].id,libmpv->getFileInfo()->videos[n].title.c_str());
 					ImGui::Text("%dx%d",libmpv->getFileInfo()->videos[n].width,libmpv->getFileInfo()->videos[n].height);
-					ImGui::PopFont();
+					
 				}
 			}
 			}
@@ -291,12 +289,10 @@ namespace playerWindows{
 					ImGui::SetCursorPosX(currstartpos);
 					ImGui::Text("#%d %s",libmpv->getFileInfo()->audios[n].id,libmpv->getFileInfo()->audios[n].title.c_str());
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY()-40.0f);
-					ImGui::PushFont(fontSmall);
 					ImGui::Text("%s",libmpv->getFileInfo()->audios[n].codec.c_str());
 					ImGui::SameLine();
 					ImGui::Text("%dch",libmpv->getFileInfo()->audios[n].channels);
 					ImGui::Text("%s",libmpv->getFileInfo()->audios[n].language.c_str());
-					ImGui::PopFont();
 				}
 				if (*first_item) {
 						std::string itemid = "##" + std::to_string(0);
@@ -327,11 +323,8 @@ namespace playerWindows{
 					ImGui::SetCursorPosX(currstartpos);
 					ImGui::Text("#%d %s",libmpv->getFileInfo()->subtitles[n].id,libmpv->getFileInfo()->subtitles[n].title.c_str());
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY()-20.0f);
-					ImGui::PushFont(fontSmall);
 					ImGui::Text("%s",libmpv->getFileInfo()->subtitles[n].language.c_str());
-					ImGui::PopFont();
-					
-					
+		
 				}
 				if (*first_item) {
 						std::string itemid = "##" + std::to_string(0);
@@ -362,9 +355,7 @@ namespace playerWindows{
 					}
 					ImGui::SameLine();
 					ImGui::SetCursorPosX(currstartpos);
-					ImGui::PushFont(fontSmall);
 					ImGui::Text("%s",libmpv->getFileInfo()->chapters[n].title.c_str());
-					ImGui::PopFont();
 					
 				}
 				if (*first_item) {
@@ -803,7 +794,6 @@ namespace playerWindows{
                 ImGui::PopID();
             }
 			ImGui::EndGroup();
-			ImGui::PushFont(fontSmall);
 			for (int y = 0; y < 6; y++){
 				ImGui::SetCursorPosX(sliderpos[y] + ((111.5f - ImGui::CalcTextSize(slider_hz[y], NULL, true).x))*0.5f);
 				ImGui::Text("%s",slider_hz[y]);
@@ -816,8 +806,7 @@ namespace playerWindows{
 				}
 				libmpv->setAudioEQ(slider_eq,false);
 			}
-			ImGui::PopFont();
-		
+
 		}
 		playerWindows::ExitWindow();
 	}
@@ -827,7 +816,7 @@ namespace playerWindows{
 		float sliderpos[18];
 		if (ImGui::Begin("Super Ex EQ", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			//const ImVec2 small_slider_size(18, (float)(int)((160.0f - (rows - 1) * spacing) / rows));
-			ImGui::PushFont(fontSmall);
+
 			ImGui::BeginGroup();
             for (int y = 0; y < 18; y++)
             {
@@ -889,7 +878,7 @@ namespace playerWindows{
 				}
 				ImGui::EndCombo();
 			}
-			ImGui::PopFont();
+
 		}
 		playerWindows::ExitWindow();
 	}
@@ -1018,7 +1007,6 @@ namespace playerWindows{
 			}
 			ImGui::SameLine();
 			
-			ImGui::PushFont(fontSmall);
 			ImGui::SetCursorPosX(20);
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0*multiplyRes);
 			
@@ -1039,7 +1027,6 @@ namespace playerWindows{
 			sprintf(timetext,"%s - %s",Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.position).c_str(),Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.duration).c_str());
 			ImGui::SetCursorPosX(20);
 			ImGui::Text("%s",timetext);
-			ImGui::PopFont();
 			GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,5.0f),true,batteryPercent,40*multiplyRes,20*multiplyRes,true);
 			
 			

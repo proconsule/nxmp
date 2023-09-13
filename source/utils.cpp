@@ -583,7 +583,7 @@ std::string KeyboardCall (std::string hint, std::string text){
 }
 
 
-void Utility::FontLoader(std::string fontpath,float fontSize,ImGuiIO &io,ImFont* fontSmallTmp){
+void Utility::FontLoader(std::string fontpath,float fontSize,ImGuiIO &io){
 	NXLOG::DEBUGLOG("Init Fonts\n");
       
 	unsigned char *pixels = nullptr;
@@ -606,7 +606,6 @@ void Utility::FontLoader(std::string fontpath,float fontSize,ImGuiIO &io,ImFont*
 	
 	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bpp);
-	//io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bpp);
 	
 	io.Fonts->Build();
 }

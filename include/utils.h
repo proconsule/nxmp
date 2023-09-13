@@ -82,7 +82,7 @@ namespace Utility{
 	std::string rtrim(const std::string &s);
 	std::string trim(const std::string &s);
 	std::string truncateLen(std::string path,int len);
-	void FontLoader(std::string fontpath,float fontSize,ImGuiIO &io,ImFont* fontSmallTmp);
+	void FontLoader(std::string fontpath,float fontSize,ImGuiIO &io);
 }
 
 #endif

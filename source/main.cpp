@@ -329,7 +329,7 @@ int main() {
 		}
 		
 		
-		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,io,fontSmall);
+		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,io);
 	
 		NXLOG::DEBUGLOG("Loading Textures\n");
 

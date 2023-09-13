@@ -53,9 +53,7 @@ namespace Windows {
 						ImGui::SetCursorPosX(currstartpos);
 						ImGui::Text("%s",enigma2->e2currbouqet[n].name.c_str());
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY()-40.0f);
-						ImGui::PushFont(fontSmall);
 						ImGui::Text("%s",enigma2->e2currbouqet[n].epg.title.c_str());
-						ImGui::PopFont();
 						float progressval = (float)(enigma2->e2currbouqet[n].epg.currTime-enigma2->e2currbouqet[n].epg.startTime)/(float)enigma2->e2currbouqet[n].epg.duration;
 						std::string progressid = std::string("progress") + itemid;
 						if(enigma2->e2currbouqet[n].epg.title == "")progressval=0.0f;

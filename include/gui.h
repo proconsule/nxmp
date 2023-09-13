@@ -276,8 +276,6 @@ extern std::string tempKbUrl;
 extern SDL_GLContext context;
 
 
-extern ImFont* fontSmall;
-
 extern shaderMania* shadermania;
 
 extern CNetworkShare *NewNetworkShare;

@@ -1164,7 +1164,7 @@ namespace GUI {
 		const char* glsl_version = "#version 430 core";
 		ImGui_ImplOpenGL3_Init(glsl_version);
 		
-		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,io,fontSmall);
+		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,io);
 		
 		
 	if(configini->getThemeName(false) != "Default"){
