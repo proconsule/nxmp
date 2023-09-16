@@ -1,6 +1,10 @@
 #ifndef NXMP_UPNP_H
 #define NXMP_UPNP_H
 
+
+
+
+
 #include <stdio.h>
 #include <cstring>
 #include <vector>
@@ -9,12 +13,15 @@
 #include <pthread.h>
 #include <unistd.h>
 
+
+
 #include "curldownloader.h"
 #include "localfiles.h"
 
 #include <sstream>
 #include <tinyxml2.h>
 
+#ifdef __SWITCH__
 #include <switch.h>
 
 
@@ -37,6 +44,7 @@ struct upnpres_struct{
 	int64_t size;
 	UPNPTYPE type;
 	Tex albumart;
+	int duration;
 	std::string albumarturi;
 };
 
@@ -93,4 +101,5 @@ private:
 	
 };
 
+#endif
 #endif

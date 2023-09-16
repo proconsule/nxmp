@@ -242,6 +242,17 @@ void CStats::UpdateStats(){
 				PowerConsumption
 			);
 			
+		time_t unixTime = time(NULL);
+        struct tm* timeStruct = localtime((const time_t *)&unixTime);//Gets UTC time. If you want local-time use localtime().
+
+        int hours = timeStruct->tm_hour;
+        int minutes = timeStruct->tm_min;
+        int seconds = timeStruct->tm_sec;
+        int day = timeStruct->tm_mday;
+        int month = timeStruct->tm_mon;
+        int year = timeStruct->tm_year +1900;
+        int wday = timeStruct->tm_wday;
+		sprintf(currentTime,"%02i:%02i", hours, minutes);
 }
 
 void BatteryChecker(void*arg) {

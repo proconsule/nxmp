@@ -1012,13 +1012,13 @@ namespace playerWindows{
 			
 			if(libmpv->getFileInfo()->playbackInfo.title ==""){
 				//PlayerScrollText(centerposition-120,40,"%s",FS::getFilefromPath(libmpv->getFileInfo()->path).c_str());
-				playerTextScroller->Draw(centerposition-120,40,"%s",FS::getFilefromPath(libmpv->getFileInfo()->path).c_str());
+				playerTextScroller->Draw("##scrollerplayer",centerposition-120,40,"%s",FS::getFilefromPath(libmpv->getFileInfo()->path).c_str());
 			}else{
 				if(libmpv->getFileInfo()->playbackInfo.artist ==""){
-					playerTextScroller->Draw(centerposition-120*multiplyRes,40*multiplyRes,"%s",libmpv->getFileInfo()->playbackInfo.title.c_str());
+					playerTextScroller->Draw("##scrollerplayer",centerposition-120*multiplyRes,40*multiplyRes,"%s",libmpv->getFileInfo()->playbackInfo.title.c_str());
 				}else{
 					std::string titleandartist = libmpv->getFileInfo()->playbackInfo.title + std::string(" - ") + libmpv->getFileInfo()->playbackInfo.artist;
-					playerTextScroller->Draw(centerposition-120*multiplyRes,40*multiplyRes,"%s",titleandartist.c_str());
+					playerTextScroller->Draw("##scrollerplayer",centerposition-120*multiplyRes,40*multiplyRes,"%s",titleandartist.c_str());
 				}
 			}
 			ImGui::SetCursorPosX(20);
@@ -1027,9 +1027,8 @@ namespace playerWindows{
 			sprintf(timetext,"%s - %s",Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.position).c_str(),Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.duration).c_str());
 			ImGui::SetCursorPosX(20);
 			ImGui::Text("%s",timetext);
+			GUI::cloktimeText(ImVec2((1180.0f*multiplyRes)-ImGui::CalcTextSize(nxmpstats->currentTime).x-(10.0*multiplyRes),5.0f),true,nxmpstats->currentTime);
 			GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,5.0f),true,batteryPercent,40*multiplyRes,20*multiplyRes,true);
-			
-			
 			
 		}
 		playerWindows::ExitControlsWindow();

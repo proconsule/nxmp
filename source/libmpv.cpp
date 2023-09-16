@@ -163,9 +163,13 @@ void libMpv::loadFile(std::string _path){
 		}
 		fileinfo = new fileInfo();
 	}
+	
+	
 	fileinfo->path = _path;
 	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
 	mpv_command_async(handle, 0, cmd);
+
+	
 	setLoop(false);
 	initSize = configini->getSubFontSize(false);
 	setSubFontSize(configini->getSubFontSize(false),false);
@@ -190,6 +194,9 @@ void libMpv::loadFileLive(std::string _path,std::string _changename){
 	fileinfo->path = _path;
 	fileinfo->playbackInfo.title = _changename;
 	fileinfo->playbackInfo.islive = true;
+	
+	
+	
 	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
 	mpv_command_async(handle, 0, cmd);
 	setLoop(false);

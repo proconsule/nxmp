@@ -5,7 +5,7 @@
 #include "utils.h"
 
 
-CTextScroller * FilePopupTextScroller = nullptr;
+
 
 namespace Popups{
 	/*
@@ -470,9 +470,9 @@ namespace Popups{
 				for(int i=0;i<selectionlist.size();i++){
 					outstring = outstring + selectionlist[i].name + " ";
 				}
-				FilePopupTextScroller->Draw(500.0f,30.0f,"%s",outstring.c_str());
+				FilePopupTextScroller->Draw("##filepopuptextscroll",500.0f,30.0f,"%s",outstring.c_str());
 			}else{
-				FilePopupTextScroller->Draw(500.0f,30.0f,"%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
+				FilePopupTextScroller->Draw("##filepopuptextscroll",500.0f,30.0f,"%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
 				
 			
 			}

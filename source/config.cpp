@@ -149,8 +149,8 @@ void Config::ReadConfig(){
 	}
 	
 	if(deintstring == "no")nxmpconfig.deint = 0;
-	if(deintstring == "yes")nxmpconfig.deint = 1;
-	if(deintstring == "auto")nxmpconfig.deint = 2;
+	if(deintstring == "shader")nxmpconfig.deint = 1;
+	if(deintstring == "ffmpeg")nxmpconfig.deint = 2;
 	
 	
 	const char* usedbpv;

@@ -2,10 +2,14 @@
 #define NXMP_VOUT_H
 
 #include <glad/glad.h>
+#include <string>
+#include <mpv/client.h>
+#include <mpv/render_gl.h>
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "logger.h"
 #include "imgui_impl_sdl.h"
+
 
 class CVOUT{
 public:
@@ -25,13 +29,17 @@ public:
 	
 	GLuint mpv_fbo;
 	GLuint mpv_fbotexture;
-	GLuint mpv_rbo;
+	//GLuint mpv_rbo;
+	
+	mpv_opengl_fbo fbo;
+	mpv_render_param params[3];
+	int __fbo_one = 1;
 	
 	float width=0.0f;
 	float height=0.0f;
 	
-	float windowed_width=200.0f;
-	float windowed_height=112.0f;
+	float windowed_width=350.0f;
+	float windowed_height=196.0f;
 	
 	
 	ImVec2 fullscreen_videopos = ImVec2(0,0);

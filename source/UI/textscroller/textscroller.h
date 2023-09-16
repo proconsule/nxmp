@@ -11,7 +11,9 @@ public:
 	CTextScroller(std::string _uniqueid);
 	~CTextScroller();
 	
-	void Draw(float w,float h,const char* fmt, ...);
+	void Draw(std::string myuniqueid,float w,float h,const char* fmt, ...);
+	void DrawColor(std::string myuniqueid,const ImVec4& col,float w,float h,const char* fmt, ...);
+	
 	void ResetPosition();
 	
 	std::string uniqueid;

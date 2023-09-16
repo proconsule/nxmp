@@ -209,6 +209,18 @@ typedef struct {
 	Tex VolumeIcon;
 	Tex LoopIcon;
 	Tex NoLoopIcon;
+	
+	Tex GUI_D_UP;
+	Tex GUI_D_DOWN;
+	Tex GUI_D_LEFT;
+	Tex GUI_D_RIGHT;
+	
+	Tex GUI_A_BUT;
+	Tex GUI_B_BUT;
+	Tex GUI_X_BUT;
+	Tex GUI_Y_BUT;
+	
+	
 		
 } SysIcons;
 
@@ -242,9 +254,9 @@ extern uint32_t wakeup_on_mpv_events;
 
 extern CMediaProbe *MediaProbe;
 
-extern mpv_opengl_fbo fbo;
-extern mpv_render_param params[3];
-extern int __fbo_one;
+//extern mpv_opengl_fbo fbo;
+//extern mpv_render_param params[3];
+//extern int __fbo_one;
 
 extern bool renderloopdone;
 

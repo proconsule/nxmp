@@ -203,6 +203,8 @@ public:
 	
 	uint64_t refreshrate = 1;
 	
+	char currentTime[32];
+	
 };
 
 

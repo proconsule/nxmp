@@ -75,7 +75,7 @@ CXXFLAGS	:= $(CFLAGS) -std=gnu++17 -fno-rtti -fexceptions -fpermissive -DIMGUI_I
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:=  `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lssh2 -lmpv -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lopenal -lnx -ljansson -lc -lz
+LIBS	:=  `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lssh2 -lmpv -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -ldvdnav -ldvdread -lnfs -lopenal -lnx -ljansson -lc -lz
 
 
 

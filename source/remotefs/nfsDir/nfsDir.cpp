@@ -99,9 +99,16 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 			break;
 		}
 		
+		
+		
 		tmpentry.name = nfsdirent->name;
 		tmpentry.path = _path + std::string("/") + std::string(nfsdirent->name);
 		tmpentry.size = nfsdirent->size;
+		tmpentry.is_valid = 1;
+		tmpentry.modified = nfsdirent->mtime.tv_sec;
+		tmpentry.accessed = nfsdirent->atime.tv_sec;
+		tmpentry.created = nfsdirent->ctime.tv_sec;
+		
 		currentlist.push_back(tmpentry);
 		
 	}
@@ -111,7 +118,19 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 	}
 	if(sortOrder == FS::FS_NAME_DESCENDINGORDER){
 		std::sort(currentlist.begin(), currentlist.end(), FS::SortNameDesc);
-	}			
+	}
+	if(sortOrder == FS::FS_DATE_ASCENDINGORDER){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortDateAsc);
+	}
+	if(sortOrder == FS::FS_DATE_DESCENDINGORDER){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortDateDesc);
+	}
+	if(sortOrder == FS::FS_SIZE_ASCENDINGORDER){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeAsc);
+	}
+	if(sortOrder == FS::FS_SIZE_DESCENDINGORDER){
+		std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeDesc);
+	}
 	currentlist.erase(
 		std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {
 			for (auto &ext : extensions) {

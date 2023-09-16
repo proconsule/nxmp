@@ -1052,7 +1052,7 @@ namespace GUI {
 		
 		
 		if(GUI::wakeup == 1){
-			mpv_render_context_render(libmpv->getContext(), params); 
+			mpv_render_context_render(libmpv->getContext(), videoout->params); 
 			glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
 			GUI::wakeup = 0;
 		}
@@ -1102,11 +1102,6 @@ namespace GUI {
 					multiplyRes = 1.0f;
 					currFontsize = 20.0f;
 					SDL_SetWindowSize(window, newResW, newResH);
-					fbo = {
-						.fbo = (int)videoout->mpv_fbo,
-						.w = newResW,
-						.h = newResH,
-					};
 					videoout->Resize(newResW,newResH);
 					reinit();
 				}
@@ -1120,11 +1115,6 @@ namespace GUI {
 					multiplyRes = 1.5f;
 					currFontsize = 30.0f;
 					SDL_SetWindowSize(window, newResW, newResH);
-					fbo = {
-						.fbo = (int)videoout->mpv_fbo,
-						.w = newResW,
-						.h = newResH,
-					};
 					videoout->Resize(newResW,newResH);
 					reinit();
 				}

@@ -17,6 +17,17 @@ namespace GUI {
 		ImGui::Image((void*)(intptr_t)user_texture_id, newsize);
 	}
 	
+	void cloktimeText(ImVec2 pos,bool absolute,std::string mytext){
+		ImVec2 canvas_p0 = ImGui::GetCursorScreenPos(); 
+		if(absolute){
+			canvas_p0 = pos;
+		}
+		
+		ImGui::GetForegroundDrawList()->AddText(canvas_p0, ImColor(255.0f,255.0f,255.0f,255.0f),mytext.c_str());
+		
+		
+	}
+	
 	void newbatteryIcon(ImVec2 pos,bool absolute,uint32_t batlevel, float w, float h,bool showperc){
 	
 		//ImVec2 iconsize = ImVec2(50.0f, 20.0f);

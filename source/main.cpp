@@ -39,6 +39,8 @@
 #include "stats.h"
 #include "logger.h"
 
+#include <switch.h>
+
 #define NDEBUG 1
 
 
@@ -51,18 +53,7 @@ libMpv *libmpv = nullptr;
 
 CFileBrowser *filebrowser = nullptr;
 CTextScroller * BrowserTextScroller = nullptr;
-/*
-localFs *localdir = nullptr;
-FTPDir *ftpdir = nullptr;
-HTTPDir *httpdir = nullptr;
-sshDir *sshdir = nullptr;
-sambaDir *sambadir = nullptr;
-nfsDir *nfsdir = nullptr;
-*/
-
-GLuint mpv_fbo;
-GLuint mpv_fbotexture;
-GLuint mpv_rbo;
+CTextScroller * FilePopupTextScroller = nullptr;
 
 
 CNetworkShare *NewNetworkShare = nullptr;
@@ -89,9 +80,7 @@ CStats *nxmpstats = nullptr;
 uint32_t wakeup_on_mpv_render_update;
 uint32_t wakeup_on_mpv_events;
 
-mpv_opengl_fbo fbo;
-mpv_render_param params[3];
-int __fbo_one = 1;
+
 bool renderloopdone = false;
 
 SysIcons nxmpicons;
@@ -156,6 +145,17 @@ void deinitTextures(){
 	glDeleteTextures(1, &nxmpicons.VolumeIcon.id);
 	glDeleteTextures(1, &nxmpicons.LoopIcon.id);
 	glDeleteTextures(1, &nxmpicons.NoLoopIcon.id);
+	glDeleteTextures(1, &nxmpicons.ShareAddTexture.id);
+	
+	glDeleteTextures(1, &nxmpicons.GUI_D_UP.id);
+	glDeleteTextures(1, &nxmpicons.GUI_D_DOWN.id);
+	glDeleteTextures(1, &nxmpicons.GUI_D_LEFT.id);
+	glDeleteTextures(1, &nxmpicons.GUI_D_RIGHT.id);
+	
+	glDeleteTextures(1, &nxmpicons.GUI_A_BUT.id);
+	glDeleteTextures(1, &nxmpicons.GUI_B_BUT.id);
+	glDeleteTextures(1, &nxmpicons.GUI_X_BUT.id);
+	glDeleteTextures(1, &nxmpicons.GUI_Y_BUT.id);
 	
 }
 
@@ -243,11 +243,131 @@ static bool init() {
     return success;
 }
 
+
+void DeallocateExtern(){
+	
+	
+	if(NewNetworkShare != nullptr){
+		delete NewNetworkShare;
+		NewNetworkShare=nullptr;
+	}
+	if(filebrowser == nullptr){
+		delete filebrowser;
+		filebrowser = nullptr;
+	}
+	if(FilePopupTextScroller == nullptr){
+		delete FilePopupTextScroller;
+		BrowserTextScroller = nullptr;
+	}
+	if(BrowserTextScroller == nullptr){
+		delete BrowserTextScroller;
+		BrowserTextScroller = nullptr;
+	}
+	
+	if(eqpreset != nullptr){
+		delete eqpreset;
+		eqpreset = nullptr;
+	}
+	
+	if(videoout!= nullptr){
+		delete videoout;
+		videoout = nullptr;
+	}
+	
+	if(usbmounter != nullptr){
+		delete usbmounter;
+		usbmounter = nullptr;
+	}
+	if(MediaProbe != nullptr){
+		delete MediaProbe;
+		MediaProbe = nullptr;
+	}
+	if(enigma2 != nullptr){
+		delete enigma2;
+		enigma2 = nullptr;
+	}
+	if(nxupnp != nullptr){
+		delete nxupnp;
+		nxupnp = nullptr;
+	}
+	if(sqlitedb != nullptr){
+		delete sqlitedb;
+		sqlitedb = nullptr;
+	}
+	if(MyUSBMount != nullptr){
+		delete MyUSBMount;
+		MyUSBMount=nullptr;
+	}
+	if(playlist != nullptr){
+		delete playlist;
+		playlist=nullptr;
+	}
+	if(themes != nullptr){
+		delete themes;
+		themes=nullptr;
+	}
+	if(shadermania != nullptr){
+		delete shadermania;
+		shadermania=nullptr;
+	}
+	
+	 
+	
+	
+	
+}
+
+const char *failtext =  "          ::::    :::       :::    :::         :::   :::       :::::::::\n" 
+"         :+:+:   :+:       :+:    :+:        :+:+: :+:+:      :+:    :+:\n" 
+"        :+:+:+  +:+        +:+  +:+        +:+ +:+:+ +:+     +:+    +:+\n"  
+"       +#+ +:+ +#+         +#++:+         +#+  +:+  +#+     +#++:++#+\n"    
+"      +#+  +#+#+#        +#+  +#+        +#+       +#+     +#+\n"          
+"     #+#   #+#+#       #+#    #+#       #+#       #+#     #+#\n"            
+"    ###    ####       ###    ###       ###       ###     ###\n";                  
+
+
+
 int main() {
 	
+	AppletType at = appletGetAppletType();
+    if (at != AppletType_Application && at != AppletType_SystemApplication) {
+		
+		
+		consoleInit(NULL);
+		
+		printf(failtext);
+		
+		printf("\x1b[19;20HCannot run in Applet mode!\n");
+		printf("\x1b[20;19HStart a Game Holding R Button\n");
+		printf("\x1b[21;27HPress + to exit\n");
+		
+		 padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+
+		PadState pad;
+		padInitializeDefault(&pad);
+	
+		while (appletMainLoop())
+		{
+			
+			padUpdate(&pad);
+			u64 kDown = padGetButtonsDown(&pad);
+
+			if (kDown & HidNpadButton_Plus) break;
+			
+			consoleUpdate(NULL);
+		}
+
+		consoleExit(NULL);
+		
+		return 0;
+	}
 	
 	appletLockExit();
-	socketInitializeDefault();
+	//socketInitializeDefault();
+	SocketInitConfig cfg = *(socketGetDefaultInitConfig());
+	cfg.bsd_service_type = BsdServiceType_System;
+	socketInitialize(&cfg);
+
 
 #ifdef NDEBUG
 	nxlinkStdio();
@@ -361,6 +481,16 @@ int main() {
 		Utility::TxtLoadFromFile("romfs:/player/loop.png",&nxmpicons.LoopIcon.id,&nxmpicons.LoopIcon.width,&nxmpicons.LoopIcon.height);
 		Utility::TxtLoadFromFile("romfs:/player/noloop.png",&nxmpicons.NoLoopIcon.id,&nxmpicons.NoLoopIcon.width,&nxmpicons.NoLoopIcon.height);
 		
+		Utility::TxtLoadFromFile("romfs:/gui/dpad-up.png",&nxmpicons.GUI_D_UP.id,&nxmpicons.GUI_D_UP.width,&nxmpicons.GUI_D_UP.height);
+		Utility::TxtLoadFromFile("romfs:/gui/dpad-down.png",&nxmpicons.GUI_D_DOWN.id,&nxmpicons.GUI_D_DOWN.width,&nxmpicons.GUI_D_DOWN.height);
+		Utility::TxtLoadFromFile("romfs:/gui/dpad-left.png",&nxmpicons.GUI_D_LEFT.id,&nxmpicons.GUI_D_LEFT.width,&nxmpicons.GUI_D_LEFT.height);
+		Utility::TxtLoadFromFile("romfs:/gui/dpad-right.png",&nxmpicons.GUI_D_RIGHT.id,&nxmpicons.GUI_D_RIGHT.width,&nxmpicons.GUI_D_RIGHT.height);
+		
+		Utility::TxtLoadFromFile("romfs:/gui/a-but.png",&nxmpicons.GUI_A_BUT.id,&nxmpicons.GUI_A_BUT.width,&nxmpicons.GUI_A_BUT.height);
+		Utility::TxtLoadFromFile("romfs:/gui/b-but.png",&nxmpicons.GUI_B_BUT.id,&nxmpicons.GUI_B_BUT.width,&nxmpicons.GUI_B_BUT.height);
+		Utility::TxtLoadFromFile("romfs:/gui/x-but.png",&nxmpicons.GUI_X_BUT.id,&nxmpicons.GUI_X_BUT.width,&nxmpicons.GUI_X_BUT.height);
+		Utility::TxtLoadFromFile("romfs:/gui/y-but.png",&nxmpicons.GUI_Y_BUT.id,&nxmpicons.GUI_Y_BUT.width,&nxmpicons.GUI_Y_BUT.height);
+		
 
 		if(configini->getThemeName(false) != "Default"){
 			Themes  *themes = new Themes();
@@ -406,25 +536,11 @@ int main() {
 		videoout = new CVOUT();
 		videoout->Create_Framebuffer(w,h);
 		
-		//create_framebuffer();
-		//rescale_framebuffer(w,h);
-
-		
-		fbo = {
-				.fbo = (int)videoout->mpv_fbo,
-				.w = w,
-				.h = h,
-		};
-		
-
-		params[0] = {MPV_RENDER_PARAM_OPENGL_FBO, &fbo};
-		params[1] = {MPV_RENDER_PARAM_FLIP_Y, &__fbo_one};
-		params[2] = {(mpv_render_param_type)0};
-			
 		
 		nxmpstats = new CStats();
 		nxmpstats->emuoverrides = emuoverrides;
 		nxmpstats->StartThreads();
+		
 		
 		GUI::RenderLoop();
 		NXLOG::DEBUGLOG("Ending Render Loop\n");
@@ -439,54 +555,8 @@ int main() {
 		libmpv = nullptr;
 		NXLOG::DEBUGLOG("Ending MPV\n");
 		
-		if(videoout!= nullptr){
-			delete videoout;
-		}
 		
-		if(filebrowser != nullptr){
-			delete filebrowser;
-			filebrowser = nullptr;
-		}
-		/*
-		if(localdir != nullptr){
-			delete localdir;
-			localdir = nullptr;
-		}
-		*/
-		if(usbmounter != nullptr){
-			delete usbmounter;
-			usbmounter = nullptr;
-		}
-		/*
-		if(ftpdir != nullptr){
-			delete ftpdir;
-			ftpdir = nullptr;
-		}
-		if(httpdir != nullptr){
-			delete httpdir;
-			httpdir = nullptr;
-		}
-		*/
-		if(MediaProbe != nullptr){
-			delete MediaProbe;
-			MediaProbe = nullptr;
-		}
-		if(enigma2 != nullptr){
-			delete enigma2;
-			enigma2 = nullptr;
-		}
-		if(nxupnp != nullptr){
-			delete nxupnp;
-			nxupnp = nullptr;
-		}
-		if(sqlitedb != nullptr){
-			delete sqlitedb;
-			sqlitedb = nullptr;
-		}
-		if(MyUSBMount != nullptr){
-			delete MyUSBMount;
-			MyUSBMount=nullptr;
-		}
+		
 	
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplSDL2_Shutdown();
@@ -498,6 +568,8 @@ int main() {
 	SDL_DestroyWindow(window);
 	window = NULL;
 	SDL_Quit();
+	
+	DeallocateExtern();
 	
 	if(nxmpstats != nullptr){
 		nxmpstats->CloseThreads();
@@ -513,13 +585,12 @@ int main() {
     } else {
 		clkrstExit();
     }
-	ncmExit();
-	//plExit();
-	//psmExit();
+
+	//ncmExit();
 	romfsExit();
     socketExit();
+	
 	appletUnlockExit();
-	nvExit();
 
     return 0;	
 }

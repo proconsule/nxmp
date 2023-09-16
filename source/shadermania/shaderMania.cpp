@@ -8,6 +8,10 @@ shaderMania::shaderMania(){
 	
 }
 
+shaderMania::~shaderMania(){
+	
+}
+
 
 std::vector<FS::FileEntry> shaderMania::getCurrList(){
 	return currentlist;

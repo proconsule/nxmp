@@ -11,11 +11,13 @@ CVOUT::~CVOUT(){
 	
 	glDeleteFramebuffers(1, &mpv_fbo);
 	glDeleteTextures(1, &mpv_fbotexture);
-	glDeleteRenderbuffers(1,&mpv_rbo);
+	//glDeleteRenderbuffers(1,&mpv_rbo);
 }
 
 void CVOUT::Create_Framebuffer(float w,float h)
 {
+	
+	
 	width = w;
 	height = h;
 	glGenFramebuffers(1, &mpv_fbo);
@@ -30,17 +32,31 @@ void CVOUT::Create_Framebuffer(float w,float h)
 	
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mpv_fbotexture, 0);
 
-	glGenRenderbuffers(1, &mpv_rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, mpv_rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mpv_rbo);
+	//glGenRenderbuffers(1, &mpv_rbo);
+	//glBindRenderbuffer(GL_RENDERBUFFER, mpv_rbo);
+	//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mpv_rbo);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		NXLOG::ERRORLOG("ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n");
+	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//	NXLOG::ERRORLOG("ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	//glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	
+	
+	fbo = {
+				.fbo = static_cast<int>(mpv_fbo),
+				.w = static_cast<int>(w),
+				.h = static_cast<int>(h),
+		};
+		
+
+	params[0] = {MPV_RENDER_PARAM_OPENGL_FBO, &fbo};
+	params[1] = {MPV_RENDER_PARAM_FLIP_Y, &__fbo_one};
+	params[2] = {(mpv_render_param_type)0};
+	
+	
 }
 
 void CVOUT::Rescale_Framebuffer(float _width, float _height)
@@ -51,9 +67,16 @@ void CVOUT::Rescale_Framebuffer(float _width, float _height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mpv_fbotexture, 0);
 
-	glBindRenderbuffer(GL_RENDERBUFFER, mpv_rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mpv_rbo);
+	//glBindRenderbuffer(GL_RENDERBUFFER, mpv_rbo);
+	//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height);
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mpv_rbo);
+
+	fbo = {
+				.fbo = static_cast<int>(mpv_fbo),
+				.w = static_cast<int>(_width),
+				.h = static_cast<int>(_height),
+		};
+		
 }
 
 

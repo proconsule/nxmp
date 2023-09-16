@@ -12,8 +12,12 @@ namespace Windows {
         Windows::SetupMainWindow();
 		std::vector<std::string> topmenu = configini->topmenu;
 		
-		GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,5.0f),true,batteryPercent,40,20,true);
-				
+		
+		
+		GUI::cloktimeText(ImVec2((1180.0f*multiplyRes)-ImGui::CalcTextSize(nxmpstats->currentTime).x-(10.0*multiplyRes),5.0f*multiplyRes),true,nxmpstats->currentTime);
+		GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,5.0f*multiplyRes),true,batteryPercent,40*multiplyRes,20*multiplyRes,true);
+		
+		
 		if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
 				static int selected = -1;					
 				for (unsigned int n = 0; n < topmenu.size(); n++){
