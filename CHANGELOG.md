@@ -6,7 +6,7 @@
 
 - ISO DVD VIDEO Support (both DVD and HD-DVD) (it will play the longest track as default)
 - GUI Updated (Now show file date on FS that support it)
-- Audren Audio Output (SDL still the default)
+- Audren Audio Output (SDL still the default if not changed in settings)
 - Media Probe (for Playlist duration parsing and in future for other cool things)
 - Mini Player (while browsing NXMP contents)
 - Battery % and Clock HH::MM on Menu
@@ -33,3 +33,8 @@
 
 - Tons of changes can lead to tons of bugs...
 - I know code is a mess but works (i am slowly trying to make it better)
+
+### Release Info
+
+- Since the ini parser changed is recommended to start with a fresh ini
+- The network share syntax changed see README
