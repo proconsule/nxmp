@@ -63,7 +63,7 @@ namespace playerWindows{
 	bool decstashoverd = false;
 	bool powerstashoverd = false;
 	
-	CTextScroller * playerTextScroller;
+	
 	
 	
 	void PlayerProgressBar(float fraction1,float fraction2, const ImVec2& size_arg, const char* overlay)
@@ -960,9 +960,9 @@ namespace playerWindows{
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition-90*multiplyRes);
 			if(libmpv->Paused()){
-				ImGui::Image((void*)(intptr_t)nxmpicons.PlayIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
+				ImGui::Image((void*)(intptr_t)imgloader->icons.PlayIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}else{
-				ImGui::Image((void*)(intptr_t)nxmpicons.PauseIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
+				ImGui::Image((void*)(intptr_t)imgloader->icons.PauseIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition+20*multiplyRes);
@@ -982,14 +982,14 @@ namespace playerWindows{
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetWindowSize().x-100.0f);
 			if(libmpv->getMute()){
-				ImGui::Image((void*)(intptr_t)nxmpicons.MuteIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
+				ImGui::Image((void*)(intptr_t)imgloader->icons.MuteIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}else{
-				ImGui::Image((void*)(intptr_t)nxmpicons.VolumeIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
+				ImGui::Image((void*)(intptr_t)imgloader->icons.VolumeIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}
 			
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition+20*multiplyRes);
-			ImGui::Image((void*)(intptr_t)nxmpicons.StopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
+			ImGui::Image((void*)(intptr_t)imgloader->icons.StopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			ImGui::SameLine();
 			
 			ImGui::SetCursorPosX(centerposition+(centerposition*0.5));
@@ -1001,9 +1001,9 @@ namespace playerWindows{
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(centerposition+(centerposition*0.5));
 			if(libmpv->getLoop()){
-				ImGui::Image((void*)(intptr_t)nxmpicons.LoopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
+				ImGui::Image((void*)(intptr_t)imgloader->icons.LoopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}else{
-				ImGui::Image((void*)(intptr_t)nxmpicons.NoLoopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
+				ImGui::Image((void*)(intptr_t)imgloader->icons.NoLoopIcon.id, ImVec2(60*multiplyRes,60*multiplyRes));
 			}
 			ImGui::SameLine();
 			
@@ -1092,7 +1092,7 @@ namespace playerWindows{
 			ImGui::PopStyleColor(2);
 			ImGui::PopStyleVar();
 			ImGui::SameLine();
-			ImGui::Image((void*)(intptr_t)nxmpicons.VolumeIcon.id, ImVec2(25,25));
+			ImGui::Image((void*)(intptr_t)imgloader->icons.VolumeIcon.id, ImVec2(25,25));
 			ImGuiContext& g = *GImGui;
 			if(item.VolumeHide +2 < g.Time){
 				item.showVolume = false;

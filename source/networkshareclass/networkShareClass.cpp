@@ -29,15 +29,15 @@ bool CNetworkShare::isValidShare(){
 }
 
 
-networkSource CNetworkShare::GenConfigLine(){
+oldnetworkSource CNetworkShare::GenConfigLine(){
 	if(type==0){
-		networkSource tmpret;
+		oldnetworkSource tmpret;
 		tmpret.name = name;
 		tmpret.url = httpstring;
 		return tmpret;
 	}
 	if(type==1){
-		networkSource tmpret;
+		oldnetworkSource tmpret;
 		std::string urlstring;
 		tmpret.name = name;
 		if(anon){
@@ -50,7 +50,7 @@ networkSource CNetworkShare::GenConfigLine(){
 		return tmpret;
 	}
 	if(type==2){
-		networkSource tmpret;
+		oldnetworkSource tmpret;
 		std::string urlstring;
 		tmpret.name = name;
 		if(anon){
@@ -64,7 +64,7 @@ networkSource CNetworkShare::GenConfigLine(){
 	}
 	
 	if(type==3){
-		networkSource tmpret;
+		oldnetworkSource tmpret;
 		std::string urlstring;
 		tmpret.name = name;
 		if(anon){
@@ -77,7 +77,7 @@ networkSource CNetworkShare::GenConfigLine(){
 		return tmpret;
 	}
 	if(type==4){
-		networkSource tmpret;
+		oldnetworkSource tmpret;
 		std::string urlstring;
 		tmpret.name = name;
 		if(anon){
@@ -90,6 +90,6 @@ networkSource CNetworkShare::GenConfigLine(){
 		return tmpret;
 	}
 	
-	networkSource tmpret;
+	oldnetworkSource tmpret;
 	return tmpret;
 }

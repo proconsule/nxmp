@@ -52,6 +52,7 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 
 					FS::FileEntry file;
 					file.name = ent->d_name;
+					file.dbread = -1;
 					file.path = FS::removeLastSlash(path) + "/" + file.name;
 					file.checked = playlist->isPresent(file,file.path);
 					
@@ -117,3 +118,13 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 
 	}
 	
+
+	void localFs::SetFileDbStatus(int idx,int dbstatus){
+		currentlist[idx].dbread = dbstatus;
+	}
+	
+	void localFs::ResetDbStatus(){
+		for(int i=0;i<currentlist.size();i++){
+			currentlist[i].dbread = -1;
+		}
+	}

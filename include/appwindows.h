@@ -13,7 +13,7 @@ extern float multiplyRes;
 extern bool isHandheld;
 
 extern CTextScroller * BrowserTextScroller;
-
+extern CTextScroller * playerTextScroller;
 
 namespace Windows {
 

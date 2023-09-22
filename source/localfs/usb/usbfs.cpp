@@ -251,3 +251,14 @@ bool USBMounter::haveIteminPlaylist(){
 	}
 	return false;
 }
+
+void USBMounter::SetFileDbStatus(int idx,int dbstatus){
+	currentlist[idx].dbread = dbstatus;
+}
+	
+void USBMounter::ResetDbStatus(){
+	for(int i=0;i<currentlist.size();i++)
+	{		
+		currentlist[i].dbread = -1;
+	}
+}

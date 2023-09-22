@@ -13,7 +13,6 @@ extern float initScale;
 extern int initSize;
 extern int batteryPorcent;
 
-extern CTextScroller * playerTextScroller;
 
 
 namespace playerWindows{

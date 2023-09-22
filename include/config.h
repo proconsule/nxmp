@@ -34,6 +34,7 @@ typedef struct{
 	bool emuoverrides;
 	int loglevel;
 	bool consolewindow;
+	int aout = 0;
 	std::vector<std::string> config_enabled_extensions;
 }nxmpconfig_struct;
 
@@ -131,10 +132,15 @@ public:
 	void addNetworkShare(networkSource netshare);
 	void RefreshNetworkShare(std::vector<networkSource> newnetsources);
 	
+	int getAout(bool tmpvalue);
+	void setAout(int value);
+	
+	
 	bool getEmuOverrides();
 	int getLogLevel();
 	
 	bool getConsoleWindow();
+	
 	
 	std::vector<std::string> getConfigExtensions();
 	
@@ -147,6 +153,7 @@ private:
 	nxmpconfig_struct nxmptmpconfig;
 	
 	std::string inifilePath;
+	
 };
 
 

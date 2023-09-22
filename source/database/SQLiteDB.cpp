@@ -5,16 +5,18 @@ SQLiteDB::SQLiteDB(std::string _filename){
 	dbfilename = _filename;
 	sqlite3_stmt *res;
 	bool haveversion = false;
-	int rc = sqlite3_open(":memory:",&db);
-	loadOrSaveDb(db,_filename.c_str(),0);
+	int rc = sqlite3_open_v2(_filename.c_str(),&db,SQLITE_OPEN_READWRITE,"HOS_VFS");
 	
 	if (rc != SQLITE_OK ) {
 		NXLOG::ERRORLOG("Error Opening DB\n");
 	}
 	char *err_msg = 0;
 	
-	sqlite3_extended_result_codes(db, 1);
 	
+	rc = sqlite3_exec(db, "PRAGMA journal_mode=DELETE;", 0, 0, 0);
+	if (rc != SQLITE_OK ) {
+		NXLOG::ERRORLOG("failed to set journal_mode\n");
+	}
 	
 	char sqlversion[] = "SELECT sqlite_version();";
 	rc = sqlite3_prepare_v2(db, sqlversion, -1, &res, NULL);
@@ -24,19 +26,26 @@ SQLiteDB::SQLiteDB(std::string _filename){
 	}
 	
 	sqlite3_finalize(res);
+	
 
 	char sql[] = "CREATE TABLE IF NOT EXISTS NXMP(major INTEGER, minor INTEGER, micro INTEGER);";
 	rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 	if (rc != SQLITE_OK ) {
-		
+		NXLOG::ERRORLOG("Error Creating Table NXMP\n");
 	}
+	
 	char sqlfileresume[] = "CREATE TABLE IF NOT EXISTS FILERESUME(Id INTEGER PRIMARY KEY AUTOINCREMENT , Path TEXT, Position INTEGER,Completed INTEGER default 0);";
 	rc = sqlite3_exec(db, sqlfileresume, 0, 0, &err_msg);
+	if (rc != SQLITE_OK ) {
+		NXLOG::ERRORLOG("Error Creating Table FILERESUME\n");
+	}
+	
 	
 	rc = sqlite3_prepare_v2(db, "SELECT * from NXMP", -1, &res, NULL);
 	if (rc != SQLITE_OK) {
 	
 	}
+	
 	rc = sqlite3_step(res);
 	
 	
@@ -47,6 +56,7 @@ SQLiteDB::SQLiteDB(std::string _filename){
 		NXLOG::DEBUGLOG("File DB Version %d.%d.%d\n", dbmajor,dbminor,dbmicro);
 		haveversion = true;
     }
+	
 	sqlite3_finalize(res);
 	
 	if(!haveversion){
@@ -65,6 +75,7 @@ SQLiteDB::SQLiteDB(std::string _filename){
 			dbmicro = VERSION_MICRO;
 		}
 	}
+	
 	if(haveversion){
 		
 		int checkmajor = VERSION_MAJOR-dbmajor;
@@ -81,11 +92,12 @@ SQLiteDB::SQLiteDB(std::string _filename){
 		
 	}
 	
-
+	this->UpdateDbStats();
+	
+	
 }
 
 SQLiteDB::~SQLiteDB(){
-	loadOrSaveDb(db,dbfilename.c_str(),1);
 	sqlite3_close(db);
 
 }
@@ -240,15 +252,17 @@ int SQLiteDB::getFileDbStatus(std::string path){
 	sprintf(sqlquery,"SELECT * from FILERESUME WHERE Path = \"%s\"",path.c_str());
 	int rc = sqlite3_prepare_v2(db, sqlquery, -1, &res, NULL);
 	rc = sqlite3_step(res);
+	int statusret = 0;
+	
 	if (rc == SQLITE_ROW) {
 		if(sqlite3_column_int(res, 3) == 1){
-			return 2;
+			statusret = 2;
 		}else{
-			return 1;
+			statusret =  1;
 		}
 	}
 	sqlite3_finalize(res);
-	return 0;
+	return statusret;
 	
 }
 
@@ -260,6 +274,31 @@ std::string SQLiteDB::getDbVersion(){
 	return outver;
 }
 
+void SQLiteDB::GetDbStats(int &recnum,int &reccomp){
+	recnum = recordCount;
+	reccomp = completedCount;
+}
+
+static int rowcount_callback(void *count, int argc, char **argv, char **azColName) {
+    int *c = (int *)count;
+    *c = atoi(argv[0]);
+    return 0;
+}
+
+void SQLiteDB::UpdateDbStats(){
+	NXLOG::DEBUGLOG("Updating Db Stats\n");
+	int rc = sqlite3_exec(db, "select count(*) from FILERESUME", rowcount_callback, &recordCount, NULL);
+    if (rc != SQLITE_OK) {
+		NXLOG::DEBUGLOG("ERROR ON COUNT RECORD\n");
+        recordCount = 0;
+    }
+	rc = sqlite3_exec(db, "select count(*) from FILERESUME WHERE Completed==1", rowcount_callback, &completedCount, NULL);
+    if (rc != SQLITE_OK) {
+		NXLOG::DEBUGLOG("ERROR ON COMPLETED RECORD\n");
+        completedCount = 0;
+    }
+}
+
 std::string SQLiteDB::getSQLiteVersion(){
 	return sqliteversion;
 }
@@ -267,53 +306,3 @@ std::string SQLiteDB::getSQLiteVersion(){
 bool SQLiteDB::getCorrupted(){
 	return dbcorrupted;
 }
-
-// code taken from https://stackoverflow.com/questions/1437327/saving-to-disk-an-in-memory-database
-
-int SQLiteDB::loadOrSaveDb(sqlite3 *pInMemory, const char *zFilename, int isSave) 
-{
-   int rc;                   /* Function return code */
-   sqlite3 *pFile;           /* Database connection opened on zFilename */
-   sqlite3_backup *pBackup;  /* Backup object used to copy data */
-   sqlite3 *pTo;             /* Database to copy to (pFile or pInMemory) */
-   sqlite3 *pFrom;           /* Database to copy from (pFile or pInMemory) */
-
-
-#ifdef __SWITCH__
-	rc = sqlite3_open_v2(zFilename,&pFile,SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,"unix-none");
-#endif
-#ifdef _WIN32
-	rc = sqlite3_open_v2(zFilename,&pFile,SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,"win32");
-#endif
-   if (rc == SQLITE_OK) 
-   {
-	   
-	  rc = sqlite3_exec(pFile, "PRAGMA journal_mode=MEMORY;", 0, 0, 0);
-	  if (rc != SQLITE_OK ) {
-		NXLOG::ERRORLOG("failed to set journal_mode\n");
-	  }
-	  rc = sqlite3_exec(pFile, "PRAGMA foreign_keys=ON;", 0, 0, 0);
-	  if (rc != SQLITE_OK ) {
-		NXLOG::ERRORLOG("failed to set journal_mode\n");
-	  }
-
-      pFrom = (isSave ? pInMemory : pFile);
-      pTo = (isSave ? pFile : pInMemory);
-
-      pBackup = sqlite3_backup_init(pTo, "main", pFrom, "main");
-      if (pBackup) {
-         int rcstep = sqlite3_backup_step(pBackup, -1);
-		 NXLOG::DEBUGLOG("RC STEP:%d\n",rcstep);
-         int rcfinish = sqlite3_backup_finish(pBackup);
-		 NXLOG::DEBUGLOG("RC FINISH:%d\n",rcfinish);
-      }
-      rc = sqlite3_errcode(pTo);
-	  NXLOG::DEBUGLOG("pTO Errocode %d\n",rc);
-   }else{
-		NXLOG::ERRORLOG("Error Opening File Database\n");
-   }
-
-   (void)sqlite3_close(pFile);
-   return rc;
-}
-

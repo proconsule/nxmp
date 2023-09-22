@@ -24,9 +24,11 @@ namespace Windows {
                 ImGui::SetNextWindowFocus();
                 *focus = true;
             }
-			
+			float total_w = ImGui::GetContentRegionAvail().x;
+			float total_h = ImGui::GetContentRegionAvail().y;
 			float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
-			
+			ImGui::BeginChild("##settingstablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
+				
 			if (ImGui::BeginTabBar("Settings Tab bar", 0))
             {
 				if (ImGui::BeginTabItem("Generals")) {
@@ -75,7 +77,46 @@ namespace Windows {
 					if(ImGui::Checkbox("HW Decoder", &hwdecdefault)){
 						configini->setHWDec(hwdecdefault);	
 					}
-					ImGui::Dummy(ImVec2(0.0f,30.0f));
+					
+					ImGui::Text("Demux Cache");
+					ImGui::Separator();
+					ImGui::Text("Demux Cache Sec");
+					ImGui::SameLine(240,spacing);
+					ImGui::PushButtonRepeat(true);
+					if (ImGui::ArrowButton("##demuxleft", ImGuiDir_Left)) {
+						if(configini->getShortSeek(true)-1 >0){
+							configini->setDemuxCache(configini->getDemuxCache(true)-1);
+						}
+					}
+					ImGui::SameLine(0.0f, spacing);
+					if (ImGui::ArrowButton("##demuxright", ImGuiDir_Right)) { 
+						configini->setDemuxCache(configini->getDemuxCache(true)+1);
+					}
+					ImGui::PopButtonRepeat();
+					ImGui::SameLine();
+					ImGui::Text("%d sec", configini->getDemuxCache(true));
+					
+					
+					
+					
+					ImGui::Text("Audio");
+					ImGui::Separator();
+					std::vector<std::string> aout_preview_value = {"SDL","Audren"};
+					//ImGui::BeginDisabled();
+					if (ImGui::BeginCombo("Audio Output", aout_preview_value[configini->getAout(true)].c_str(), 0))
+					{	
+						for (int n = 0; n < aout_preview_value.size(); n++)
+						{
+							const bool is_selected = (configini->getAout(true) == n);
+							if (ImGui::Selectable(aout_preview_value[n].c_str(), is_selected))
+								configini->setAout(n);
+
+							if (is_selected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+					//ImGui::EndDisabled();
 				ImGui::Text("Seek");
 				ImGui::Separator();
 				ImGui::Text("Short Seek Time");
@@ -283,8 +324,13 @@ namespace Windows {
 						ImGui::Text("SQLite Version: ");
 						ImGui::SameLine();
 						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f),sqlitedb->getSQLiteVersion().c_str());
-						
-						
+						int recnum = 0;
+						int reccom = 0;
+						if(sqlitedb!=nullptr)sqlitedb->GetDbStats(recnum,reccom);
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+30);
+						ImGui::Text("Resume point count: %d\n",recnum);
+						ImGui::Text("Completed view: %d\n",reccom);
+						ImGui::Separator();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+50);
 						ImGui::Text("Start saving resume info:");
 						//ImGui::SameLine(400,spacing);
@@ -446,12 +492,39 @@ namespace Windows {
 				
 				ImGui::EndTabItem();
 			}
+			if(item.popupstate == POPUP_STATE_NONE){
+					//ImGui::SetWindowFocus();
+				}
 			ImGui::EndTabBar();
 		}
+		ImGui::EndChild();
+		ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
+		GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
+		ImGui::SameLine();
+		GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
+		ImGui::SameLine();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Navigation");
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+		GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
+		ImGui::SameLine();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Select");
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+		GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
+		ImGui::SameLine();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("NXMP Home/Save");
+				
+				
+		ImGui::EndChild();
 			
-		ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2);
-		ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
-			
+		//ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2);
+		//ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
+		
+		/*
 		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
@@ -493,6 +566,7 @@ namespace Windows {
 				
 				item.state = MENU_STATE_HOME;
 			}
+		*/
 		}	
 		Windows::ExitWindow();
 	}

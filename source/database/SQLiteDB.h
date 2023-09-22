@@ -27,6 +27,8 @@ public:
 	std::string getSQLiteVersion();
 	bool getCorrupted();
 	bool dbwasUpdated();
+	void UpdateDbStats();
+	void GetDbStats(int &recnum,int &reccomp);
 	
 	int loadOrSaveDb(sqlite3 *pInMemory, const char *zFilename, int isSave);
 	
@@ -40,6 +42,10 @@ private:
 	int dbmicro;
 	std::string dbfilename;
 	std::string sqliteversion;
+	
+	int recordCount = 0;
+	int completedCount = 0;
+	
 	sqlite3 *db;
 };
 

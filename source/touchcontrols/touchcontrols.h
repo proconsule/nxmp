@@ -5,7 +5,6 @@
 #include "gui.h"
 #include <SDL.h>
 
-extern Config *configini;
 
 namespace TOUCHCONTROLS{
 	

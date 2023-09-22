@@ -116,6 +116,8 @@ public:
 	Thread t4;
 	Thread t7;
 	
+	Thread updatethread;
+	
 	
 	//NVDEC
 	uint32_t NVDEC_Hz = 0;

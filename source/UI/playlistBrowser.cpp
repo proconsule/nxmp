@@ -20,7 +20,8 @@ namespace Windows {
 			float total_h = ImGui::GetContentRegionAvail().y;
 			std::vector<Playlist::playlist_struct> thislist = playlist->getPlaylist();
 			if(thislist.size() >0){
-				
+				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
+			
 				if (ImGui::BeginTable("##tableplaylist", 3)){
 					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (1150.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
 					ImGui::TableSetupColumn("duration", ImGuiTableColumnFlags_WidthFixed, 130.0f*multiplyRes); // Default to 200.0f
@@ -56,6 +57,9 @@ namespace Windows {
 					}
 					
 					ImGui::EndTable();
+					if(item.popupstate == POPUP_STATE_NONE){
+						ImGui::SetWindowFocus();
+					}
 				}
 				std::string playtime = Utility::formatTimeShort(playlist->remtime) + " / " + Utility::formatTimeShort(playlist->totaltime);
 				ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x -  ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x - ImGui::CalcTextSize(playtime.c_str(), NULL, true).x);
@@ -67,13 +71,45 @@ namespace Windows {
 					ImGui::SetFocusID(ImGui::GetID((itemid.c_str())), ImGui::GetCurrentWindow());
 					item.playlistUpdateHovered = false;
 				}
+				ImGui::EndChild();
 				ImGuiContext& g = *GImGui;
 				ImGui::NavMoveRequestTryWrapping(g.CurrentWindow, ImGuiNavMoveFlags_LoopY);
 			}else{
+				ImGui::BeginChild("##tableemptycontainer",ImVec2(total_w,total_h-30*multiplyRes));
 				ImGui::SetCursorPosX((total_w - ImGui::CalcTextSize("Empty Playlist", NULL, true).x) * 0.5f);
 				ImGui::SetCursorPosY(total_h  * 0.5f);
 				ImGui::Text("Empty Playlist");
+				ImGui::EndChild();
 			}
+			
+			ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
+			ImGui::SameLine();
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
+			ImGui::SameLine();
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Navigation");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
+			ImGui::SameLine();
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Select/Play");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_X_BUT.id, ImVec2(30,30));
+			ImGui::SameLine();
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Context Menu");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
+			ImGui::SameLine();
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("NXMP Home");
+			
+			
+			ImGui::EndChild();
 			
 		}
 		Windows::ExitWindow();

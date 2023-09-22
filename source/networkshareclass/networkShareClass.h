@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "config.h"
+#include "iniparser.h"
 
 
 class CNetworkShare{
@@ -11,7 +11,7 @@ public:
 	CNetworkShare();
 	~CNetworkShare();
 	
-	networkSource GenConfigLine();
+	oldnetworkSource GenConfigLine();
 	
 	bool isValidShare();
 	

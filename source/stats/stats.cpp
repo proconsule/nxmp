@@ -84,7 +84,7 @@ void Misc(void*arg) {
 	//Service* psmService = 0;
 	//Result nvCheck = 1;
 	
-	ctx->clkrstCheck = clkrstInitialize();
+	//ctx->clkrstCheck = clkrstInitialize();
 	
 	
 	while (!ctx->threadexit) {
@@ -115,10 +115,10 @@ void Misc(void*arg) {
 		}
 		
 		// Interval
+		ctx->UpdateStats();
 		svcSleepThread(1'000'000'000);
 	}
 }
-
 
 
 void CStats::StartThreads() {
@@ -154,6 +154,8 @@ void CStats::StartThreads() {
 	threadCreate(&t7, BatteryChecker, this, NULL, 0x1000, 0x3B, -2);
 	
 	
+	
+	
 	threadStart(&t0);
 	threadStart(&t1);
 	threadStart(&t2);
@@ -161,6 +163,7 @@ void CStats::StartThreads() {
 	threadStart(&t4);
 	
 	threadStart(&t7);
+	
 	
 	
 }
@@ -173,6 +176,7 @@ void CStats::CloseThreads() {
 	
 	threadWaitForExit(&t4);
 	threadWaitForExit(&t7);
+	
 	
 	
 	threadClose(&t0);

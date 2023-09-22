@@ -41,6 +41,9 @@ public:
 	bool *checked(int pos);
 	
 	void setSordOrder(FS::FILESORTORDER myorder);
+	void SetFileDbStatus(int idx,int dbstatus);
+	void ResetDbStatus();
+	
 	
 	std::string getTitle(); 
 	std::string path;

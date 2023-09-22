@@ -46,9 +46,9 @@ namespace Windows {
 			}
 			ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
 			if (ImGui::BeginTable("table1", 3,ImGuiTableFlags_RowBg)){
-				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (950.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
+				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
 				ImGui::TableSetupColumn("size", ImGuiTableColumnFlags_WidthFixed, 130.0f*multiplyRes); // Default to 200.0f
-				ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed,200.f*multiplyRes);       // Default to auto
+				ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed,210.f*multiplyRes);       // Default to auto
 				ImGuiListClipper clipper;
 				clipper.Begin(thislist.size());
 				while (clipper.Step())
@@ -74,15 +74,15 @@ namespace Windows {
 						}
 						
 						if(thislist[n].type == FS::FileEntryType::Directory){
-							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FolderTexture.id, ImVec2(30,30));
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FolderTexture.id, ImVec2(30,30));
 						}else{
-							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FileTexture.id, ImVec2(30,30));
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FileTexture.id, ImVec2(30,30));
 						}
 						ImGui::SameLine();
 						//ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f);
 						ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
 						if(item.selectionstate != FILE_SELECTION_CHECKBOX){
-							if (ImGui::Selectable(itemid.c_str(), selected == n,selectable_flags,ImVec2(0,30.0f))){
+							if (ImGui::Selectable(itemid.c_str(), selected == n,selectable_flags,ImVec2(0,30.0f*multiplyRes))){
 									if(filebrowser->getCurrList()[n].type == FS::FileEntryType::Directory){
 									triggerselect = true;
 									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
@@ -108,34 +108,42 @@ namespace Windows {
 						if (ImGui::IsItemHovered()){
 							if(item.fileHoveredidx != n){
 								BrowserTextScroller->ResetPosition();
-								//playertextscrollpos=0.0f;
-								//waitpos = 0;
+								
 							}
 							item.fileHoveredidx = n;
 						}
 						ImVec4* colors = ImGui::GetStyle().Colors;
 						ImVec4 textcolor = colors[ImGuiCol_Text];
-						if(sqlitedb != nullptr){
-							int dbfilestatus = sqlitedb->getFileDbStatus(thislist[n].path);
+						if(sqlitedb != nullptr && thislist[n].dbread == -1){
+							int dbfilestatus = sqlitedb->getFileDbStatus(filebrowser->getOpenUrlPart()+thislist[n].path);
 							if(dbfilestatus == 2){
 								textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
-							}
-							if(dbfilestatus == 1){
+							} else if(dbfilestatus == 1){
 								textcolor = ImVec4(0.0f,1.0f,1.0f,1.0f);
 							}
-								
+							filebrowser->SetFileDbStatus(n,dbfilestatus);
+						}else if(sqlitedb != nullptr){
+							if(thislist[n].dbread == 2){
+								textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
+							} else if(thislist[n].dbread == 1){
+								textcolor = ImVec4(0.0f,1.0f,1.0f,1.0f);
+							}
 						}
 						ImGui::SameLine();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f);
-					
-					
+						
 						std::string bsid =std::string("##bs") + std::to_string(n);
-						//if(item.fileHoveredidx == n){
-							BrowserTextScroller->DrawColor(bsid.c_str(),textcolor,(950.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes,(30.0f-2 * ImGui::GetStyle().ItemSpacing.y)*multiplyRes,"%s",thislist[n].name.c_str());
-							//BrowserScrollText((950.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes,30.0f*multiplyRes,"%s",thislist[n].name.c_str());
-						//}else{
-						//	ImGui::TextColored(textcolor,"%s",thislist[n].name.c_str());
-						//}
+						if(item.fileHoveredidx == n){
+							ImGui::Dummy(ImVec2(-10.0,(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y)));
+							ImGui::SameLine();
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX()-10.0f);
+							BrowserTextScroller->DrawColor(bsid.c_str(),textcolor,(940.0f*multiplyRes -2* ImGui::GetStyle().ItemSpacing.x),(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y),thislist[n].name.c_str());	
+						}else{
+							ImGui::Dummy(ImVec2(-10.0,(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y)));
+							ImGui::SameLine();
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX()-10.0f);
+							ImGui::TextColored(textcolor,"%s",thislist[n].name.c_str());
+						}
 						ImGui::TableSetColumnIndex(1);
 						if(thislist[n].type == FS::FileEntryType::File){
 							ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
@@ -143,6 +151,8 @@ namespace Windows {
 							ImVec2 textSize = ImGui::CalcTextSize(strsize.c_str());
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() -textSize.x- ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x);
 							ImGui::TextColored(textcolor,"%s",strsize.c_str());
+						}else{
+							ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
 						}
 						
 						ImGui::TableSetColumnIndex(2);
@@ -162,40 +172,40 @@ namespace Windows {
 				}
 			}
 			ImGui::EndChild();
-			ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30*multiplyRes));
-			GUI::NXMPImage((void*)(intptr_t)nxmpicons.GUI_D_UP.id, ImVec2(30,30));
+			ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
 			ImGui::SameLine();
-			GUI::NXMPImage((void*)(intptr_t)nxmpicons.GUI_D_DOWN.id, ImVec2(30,30));
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Navigation");
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)nxmpicons.GUI_D_LEFT.id, ImVec2(30,30));
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_LEFT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("CheckBox");
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)nxmpicons.GUI_A_BUT.id, ImVec2(30,30));
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Select/Play");
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)nxmpicons.GUI_B_BUT.id, ImVec2(30,30));
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_B_BUT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Back");
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)nxmpicons.GUI_X_BUT.id, ImVec2(30,30));
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_X_BUT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Context Menu");
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)nxmpicons.GUI_Y_BUT.id, ImVec2(30,30));
+			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("NXMP Home");
@@ -255,7 +265,7 @@ namespace Windows {
 						ImGui::SameLine();
 						float currstartYpos = ImGui::GetCursorPosY();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f);
-						ImGui::Image((void*)(intptr_t)nxmpicons.UsbTexture.id, ImVec2(40,40));
+						ImGui::Image((void*)(intptr_t)imgloader->icons.UsbTexture.id, ImVec2(40,40));
 						ImGui::SameLine();
 						ImGui::SetCursorPosY(currstartYpos);
 						float currstartXpos = ImGui::GetCursorPosX();

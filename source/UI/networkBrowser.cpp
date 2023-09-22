@@ -14,10 +14,7 @@ namespace Windows {
 		Windows::SetupWindow();
 		if (ImGui::Begin("Add Share", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
            
-            if(item.popupstate == POPUP_STATE_NONE){
-				//ImGui::SetNextWindowFocus();
-			}
-           
+		   
 			if (ImGui::BeginMenuBar()) {
 				ImGui::Text("Add Share Menu");
 				ImGui::EndMenuBar();
@@ -34,19 +31,19 @@ namespace Windows {
 					bool is_selected = (item_current == NewNetworkShare->protonames[n]);
 					
 					if(std::string(NewNetworkShare->protonames[n]) == "FTP"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(30,30));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FTPTexture.id, ImVec2(30,30));
 					}
 					if(std::string(NewNetworkShare->protonames[n]) == "HTTP"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.HTTPTexture.id, ImVec2(30,30));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.HTTPTexture.id, ImVec2(30,30));
 					}
 					if(std::string(NewNetworkShare->protonames[n]) == "SMB"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.NFSTexture.id, ImVec2(30,30));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NFSTexture.id, ImVec2(30,30));
 					}
 					if(std::string(NewNetworkShare->protonames[n]) == "NFS"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(30,30));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FTPTexture.id, ImVec2(30,30));
 					}
 					if(std::string(NewNetworkShare->protonames[n]) == "SSH"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.SFTPTexture.id, ImVec2(30,30));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SFTPTexture.id, ImVec2(30,30));
 					}
 					
 					ImGui::SameLine();
@@ -106,8 +103,8 @@ namespace Windows {
 		}
 		
 		if (ImGui::Button("Save")){
-			item.state = MENU_STATE_NETWORKBROWSER;
 			configini->addNetworkShare(NewNetworkShare->GenConfigLine());
+			item.state = MENU_STATE_NETWORKBROWSER;
 		}
 		if(!NewNetworkShare->isValidShare()){
 			 ImGui::EndDisabled();
@@ -127,17 +124,22 @@ namespace Windows {
 	
     void NetworkWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
-		std::vector<std::string> topmenu = {"Local Files","Network","Enigma2"};
 		
         if (ImGui::Begin("Network Source Selection", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
            
-            if(item.popupstate == POPUP_STATE_NONE){
-				ImGui::SetNextWindowFocus();
-			}
-           
+			GUI::cloktimeText(ImVec2((1180.0f*multiplyRes)-ImGui::CalcTextSize(nxmpstats->currentTime).x-(10.0*multiplyRes),2.0f*multiplyRes),true,nxmpstats->currentTime);
+			GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,2.0f*multiplyRes),true,batteryPercent,40,20,true);
+			
+			float total_w = ImGui::GetContentRegionAvail().x;
+			float total_h = ImGui::GetContentRegionAvail().y;
+			
 			if(item.networkselect){
-				if (ImGui::BeginListBox("Network Source Menu",ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes))){
-					GUI::NXMPImage((void*)(intptr_t)nxmpicons.ShareAddTexture.id, ImVec2(50,50));
+				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
+				if (ImGui::BeginTable("Network Source Menu",1)){
+					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (1280.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0);
+					GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ShareAddTexture.id, ImVec2(50,50));
 					ImGui::SameLine();
 					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});
 					static int selected = -1;
@@ -150,27 +152,28 @@ namespace Windows {
 					}
 					
 					for(unsigned int n=0;n<item.networksources.size();n++){
-						
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
 						urlschema thisurl = Utility::parseUrl(item.networksources[n].url);
 						if(thisurl.scheme == "ftp"){
-							GUI::NXMPImage((void*)(intptr_t)nxmpicons.FTPTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "http"){
-							GUI::NXMPImage((void*)(intptr_t)nxmpicons.HTTPTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.HTTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "sftp"){
-							GUI::NXMPImage((void*)(intptr_t)nxmpicons.SFTPTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SFTPTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "smb"){
-							GUI::NXMPImage((void*)(intptr_t)nxmpicons.SMBTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SMBTexture.id, ImVec2(50,50));
 						}
 						if(thisurl.scheme == "nfs"){
-							GUI::NXMPImage((void*)(intptr_t)nxmpicons.NFSTexture.id, ImVec2(50,50));
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NFSTexture.id, ImVec2(50,50));
 						}
 						ImGui::SameLine();
 						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50*multiplyRes - ImGui::GetFont()->FontSize) / 2});
 						
-						if (ImGui::Selectable(item.networksources[n].name.c_str(), selected == n+1)){
+						if (ImGui::Selectable(std::string(item.networksources[n].name + " @ " +thisurl.server).c_str(), selected == n+1)){
 							item.first_item = true;		
 							item.networkselect = false;
 							
@@ -215,8 +218,32 @@ namespace Windows {
                         ImGui::SetFocusID(ImGui::GetID((item.networksources[0].name.c_str())), ImGui::GetCurrentWindow());
                         *first_item = false;
                     }
+					ImGui::EndTable();
+					ImGui::SetWindowFocus();
 				}
-				ImGui::EndListBox();
+				ImGui::EndChild();
+				ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
+				ImGui::SameLine();
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
+				ImGui::SameLine();
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text("Navigation");
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
+				ImGui::SameLine();
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text("Select");
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
+				ImGui::SameLine();
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text("NXMP Home");
+				
+				
+				ImGui::EndChild();
 			}
 		}
 		Windows::ExitWindow();

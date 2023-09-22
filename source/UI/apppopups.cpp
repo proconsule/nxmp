@@ -114,7 +114,7 @@ namespace Popups{
 				ImGui::SameLine();
 				if (ImGui::Button("No", button_size))
 				{
-                    
+                    configini->ReadConfig();
 					item.state = MENU_STATE_HOME;
 					item.popupstate = POPUP_STATE_NONE;
 					ImGui::CloseCurrentPopup();
@@ -399,8 +399,8 @@ namespace Popups{
 			if (ImGui::Button("Move Up", button_size))
             {
 					
-					networkSource v1 = item.networksources[Windows::netwinselected];
-					networkSource v2 = item.networksources[Windows::netwinselected-1];
+					oldnetworkSource v1 = item.networksources[Windows::netwinselected];
+					oldnetworkSource v2 = item.networksources[Windows::netwinselected-1];
 					
 					item.networksources[Windows::netwinselected]  = v2;
 					item.networksources[Windows::netwinselected-1]  = v1;
@@ -418,8 +418,8 @@ namespace Popups{
 			}
 			if (ImGui::Button("Move Down", button_size))
             {
-					networkSource v1 = item.networksources[Windows::netwinselected];
-					networkSource v2 = item.networksources[Windows::netwinselected+1];
+					oldnetworkSource v1 = item.networksources[Windows::netwinselected];
+					oldnetworkSource v2 = item.networksources[Windows::netwinselected+1];
 					
 					item.networksources[Windows::netwinselected]  = v2;
 					item.networksources[Windows::netwinselected+1]  = v1;

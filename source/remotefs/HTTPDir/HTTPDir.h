@@ -37,6 +37,9 @@ public:
 	
 	int sortOrder=0;
 	
+	void SetFileDbStatus(int idx,int dbstatus);
+	void ResetDbStatus();
+	
 	
 private:
 	std::vector<FS::FileEntry> currentlist;

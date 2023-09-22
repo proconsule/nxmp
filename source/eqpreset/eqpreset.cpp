@@ -24,7 +24,7 @@ EQPreset::EQPreset(std::string _filename){
 		for(int y=0;y<18;y++){
 			char tmpkey[12];
 			sprintf(tmpkey,"f%d",y);
-			std::string tmpf = ini->GetValue(it->pItem,tmpkey);
+			std::string tmpf = ini->GetValue(it->pItem,tmpkey,"1.0");
 			tmp_preset.eqvals[y] = std::stof(tmpf);
 			
 		}

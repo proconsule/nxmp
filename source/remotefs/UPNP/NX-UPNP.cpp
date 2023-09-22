@@ -191,9 +191,7 @@ void Device::browseOID(){
 		tmpentry.name = itemele->GetText();
 		XMLElement * itemres = itemnode->FirstChildElement("res");
 		tmpentry.uri = itemres->GetText();
-#ifdef __SWITCH__
 		tmpentry.size = atoi(itemres->Attribute("size"));
-#endif
 
 		
 		
@@ -437,7 +435,7 @@ char ipv4address[INET_ADDRSTRLEN];
 
 
 	
-	nifmInitialize(NifmServiceType_User);
+	nifmInitialize(NifmServiceType_System);
 	uint32_t currentIp;
 	nifmGetCurrentIpAddress(&currentIp);
 	inet_ntop(AF_INET, &currentIp, ipv4address, INET_ADDRSTRLEN);

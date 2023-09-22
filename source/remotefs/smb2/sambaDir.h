@@ -13,6 +13,8 @@
 #include "localfiles.h"
 #include "playlist.h"
 
+#define SMB_MAX_PATH_LENGTH 1024
+
 class sambaDir{
 public:
 	sambaDir(std::string _url,Playlist * _playlist);
@@ -30,6 +32,9 @@ public:
 	void clearChecked();
 	
 	int sortOrder=0;
+	
+	void SetFileDbStatus(int idx,int dbstatus);
+	void ResetDbStatus();
 	
 private:
 	std::vector<FS::FileEntry> currentlist;

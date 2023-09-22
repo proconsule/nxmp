@@ -46,6 +46,7 @@ namespace FS {
 		time_t modified;
 		time_t accessed;
 		time_t created;
+		int dbread = -1;
 		bool checked = false;
 	};
 	

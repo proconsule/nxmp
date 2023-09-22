@@ -11,6 +11,8 @@ CVOUT::~CVOUT(){
 	
 	glDeleteFramebuffers(1, &mpv_fbo);
 	glDeleteTextures(1, &mpv_fbotexture);
+	mpv_fbo = 0;
+	mpv_fbotexture = 0;
 	//glDeleteRenderbuffers(1,&mpv_rbo);
 }
 
@@ -40,8 +42,8 @@ void CVOUT::Create_Framebuffer(float w,float h)
 	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	//	NXLOG::ERRORLOG("ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n");
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
 	//glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	
 	
@@ -87,11 +89,9 @@ void CVOUT::Resize(float w,float h){
 }
 
 void CVOUT::Draw(){
-	if(changevis){
-		ImGui::SetNextWindowPos(fullscreen?fullscreen_videopos:windowed_videopos, ImGuiCond_Always);
-		ImGui::SetNextWindowSize(fullscreen?ImVec2(width,height): ImVec2(200.0f,200.0f/1.77),ImGuiCond_Always);
-		changevis = true;
-	}
+	
+	ImGui::SetNextWindowPos(fullscreen_videopos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(width,height),ImGuiCond_Always);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
@@ -102,7 +102,6 @@ void CVOUT::Draw(){
 	if(ImGui::Begin("##videowindow",nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoNavFocus)){
 				ImGui::Image((void*)(intptr_t)mpv_fbotexture, fullscreen?ImVec2(width,height):ImVec2(windowed_width,windowed_height),{0, 1}, {1, 0});
 	}
-	if(!fullscreen)ImGui::SetWindowFocus();
 	ImGui::End();
 	ImGui::PopStyleVar(3);
 	ImGui::PopStyleColor();
@@ -114,11 +113,11 @@ void CVOUT::SetFullScreen(bool _fullscreen){
 	return;
 	if(_fullscreen){
 		changevis=true;
-		//Rescale_Framebuffer(width,height);
+		Rescale_Framebuffer(width,height);
 		
 	}else{
 		changevis=true;
-		//Rescale_Framebuffer(windowed_width,windowed_height);
+		Rescale_Framebuffer(windowed_width,windowed_height);
 		
 	}
 	fullscreen = _fullscreen;

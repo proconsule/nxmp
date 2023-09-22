@@ -20,15 +20,26 @@ startpath=/switch/nxmp
 [Enigma2]
 ```
 
-Network have syntax (you can add as many source as you like)
+Network have syntax (you can add as many source as you like) up to version 0.7.0
 
 ```
-[Network]
+Network]
 source=TESTFtp|ftp://user:pass@192.168.1.10:21/path/
 source=TestHTTP|http://192.168.1.10/path/
 source=TestSFTp|sftp://192.168.1.10/path/ (without path it default to home)
 source=TestSamba|smb://user:pass@192.168.1.10/share/ (share is a share name not a path)
 source=TestNFS|nfs://192.168.1.10/export/
+```
+
+Network have syntax (you can add as many source as you like) from version 0.8.0
+
+```
+[Network]
+TESTFtp = ftp://user:pass@192.168.1.10:21/path/
+TestHTTP = http://192.168.1.10/path/
+TestSFTp = sftp://user:pass@192.168.1.10/path/ (without path it default to home)
+TestSamba = smb://user:pass@192.168.1.10/share/ (share is a share name not a path)
+TestNFS = nfs://192.168.1.10/export/
 ```
 
 Enigma2 have syntax
@@ -75,6 +86,7 @@ Thanks to
 - Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv and Overclock part)
 - DarkMatterCore for libusbhsfs https://github.com/DarkMatterCore/libusbhsfs (this gives NXMP USB support)
 - Averne for HW Decoding on Tegra X1 https://github.com/averne/FFmpeg and for all the hints and help (thanks a lot!)
+- xfangfang for https://github.com/xfangfang/wiliwili (for Audren audio mpv patch)
 - Chocola @ GBATemp forum for usage guide and beta testing
 - sashka69 @ GBATemp forum for beta testing
 - bodyXY @ GBATemp forum for banner and icons

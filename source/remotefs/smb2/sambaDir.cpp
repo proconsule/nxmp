@@ -1,5 +1,23 @@
 #include "sambaDir.h"
 
+#define MAX_URL_SIZE 1024
+
+#define discard_const(ptr) ((void *)((intptr_t)(ptr)))
+
+struct smb2_urlext {
+        const char *domain;
+        const char *user;
+		const char *pass;
+        const char *server;
+        const char *share;
+        const char *path;
+		const char *args;
+};
+
+struct smb2_urlext *smb2_parse_urlext(const char *url);
+void smb2_destroy_url(struct smb2_urlext *url);
+
+
 sambaDir::sambaDir(std::string _url,Playlist * _playlist){
 	url = _url;	
 	urlschema thisurl = Utility::parseUrl(url);
@@ -52,19 +70,21 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 	}
 	
 	
-	struct smb2_url *myurl = smb2_parse_url(smb2, url.c_str());
+	struct smb2_urlext *myurl = smb2_parse_urlext(url.c_str());
 	
 	NXLOG::DEBUGLOG("user: %s\n",myurl->user);
+	NXLOG::DEBUGLOG("pass: %s\n",myurl->pass);
 	fflush(stdout);
-	char const *search = ":";
-	char * token = strtok((char *)myurl->user, search);
-	smb2_set_user(smb2,thisurl.user.c_str()); 
-	token = strtok(NULL, search);
-	smb2_set_password(smb2,thisurl.pass.c_str()); 
+	//char const *search = ":";
+	//char * token = strtok((char *)myurl->user, search);
+	smb2_set_user(smb2,myurl->user); 
+	//token = strtok(NULL, search);
+	smb2_set_password(smb2,myurl->pass); 
 	
 	smb2_set_security_mode(smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
 	
-	NXLOG::DEBUGLOG("SMBURL: %s %s\n",share.c_str(),path.c_str());
+	NXLOG::DEBUGLOG("SMBURL: %s %s %s\n",myurl->share,myurl->path,path.c_str());
+	
 	
 	if (smb2_connect_share(smb2, myurl->server, myurl->share, NULL) < 0) {
 		NXLOG::ERRORLOG("smb2_connect_share failed. %s\n", smb2_get_error(smb2));
@@ -123,6 +143,7 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 				
 				tmpentry.size = ent->st.smb2_size;
 				tmpentry.is_valid = 1;
+				tmpentry.dbread = -1;
 				tmpentry.modified = (time_t)ent->st.smb2_mtime;
 				tmpentry.accessed = (time_t)ent->st.smb2_atime;
 				tmpentry.created = (time_t)ent->st.smb2_ctime;
@@ -207,3 +228,109 @@ void sambaDir::backDir(){
 	currentpath = FS::removeLastSlash(currentpath);
 	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
 }
+
+struct smb2_urlext *smb2_parse_urlext(const char *url)
+{
+        struct smb2_urlext *u;
+        char *ptr, *tmp, str[MAX_URL_SIZE];
+        char *args;
+
+        if (strncmp(url, "smb://", 6)) {
+                return NULL;
+        }
+        if (strlen(url + 6) >= MAX_URL_SIZE) {
+                return NULL;
+        }
+        strncpy(str, url + 6, MAX_URL_SIZE);
+		
+		
+        
+        u = (smb2_urlext *)calloc(1, sizeof(struct smb2_urlext));
+        if (u == NULL) {
+                return NULL;
+        }
+
+        ptr = str;
+		
+		args = strchr(str, '?');
+		if(args!= NULL){
+			*(args++) = '\0';
+			u->args = strdup(args);
+		}
+
+        char *shared_folder = strchr(ptr, '/');
+        if (!shared_folder) {
+                return NULL;
+        }
+        int len_shared_folder = strlen(shared_folder);
+
+        /* domain */
+        if ((tmp = strchr(ptr, ';')) != NULL && strlen(tmp) > len_shared_folder) {
+                *(tmp++) = '\0';
+                u->domain = strdup(ptr);
+                ptr = tmp;
+        }
+        /* user */
+        if ((tmp = strchr(ptr, ':')) != NULL && strlen(tmp) > len_shared_folder) {
+                *(tmp++) = '\0';
+                u->user = strdup(ptr);
+                ptr = tmp;
+        }
+		/* pass */
+		if ((tmp = strchr(ptr, '@')) != NULL && strlen(tmp) > len_shared_folder) {
+                *(tmp++) = '\0';
+                if(u->user == NULL){
+					u->user = strdup(ptr);
+				}else{
+					u->pass = strdup(ptr);
+				}
+                ptr = tmp;
+        }
+        /* server */
+        if ((tmp = strchr(ptr, '/')) != NULL) {
+                *(tmp++) = '\0';
+                u->server = strdup(ptr);
+                ptr = tmp;
+        }
+
+        /* Do we just have a share or do we have both a share and an object */
+        tmp = strchr(ptr, '/');
+        
+        /* We only have a share */
+        if (tmp == NULL) {
+                u->share = strdup(ptr);
+                return u;
+        }
+
+        /* we have both share and object path */
+        *(tmp++) = '\0';
+        u->share = strdup(ptr);
+        u->path = strdup(tmp);
+
+        return u;
+}
+
+void smb2_destroy_url(struct smb2_urlext *url)
+{
+        if (url == NULL) {
+                return;
+        }
+        free(discard_const(url->domain));
+        free(discard_const(url->user));
+		free(discard_const(url->pass));
+        free(discard_const(url->server));
+        free(discard_const(url->share));
+        free(discard_const(url->path));
+		free(discard_const(url->args));
+        free(url);
+}
+
+void sambaDir::SetFileDbStatus(int idx,int dbstatus){
+		currentlist[idx].dbread = dbstatus;
+	}
+	
+	void sambaDir::ResetDbStatus(){
+		for(int i=0;i<currentlist.size();i++){
+			currentlist[i].dbread = -1;
+		}
+	}

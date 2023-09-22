@@ -124,6 +124,7 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 			}
 			
 			tmpentry.name = mem;
+			tmpentry.dbread = -1;
 			tmpentry.path = path + std::string("/") + std::string(mem);
 			if(!showHidden){
 				if (mem[0] == '.') {
@@ -224,4 +225,14 @@ void sshDir::backDir(){
 	if(currentpath == basepath)return;
 	currentpath = FS::removeLastSlash(currentpath);
 	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
+}
+
+void sshDir::SetFileDbStatus(int idx,int dbstatus){
+		currentlist[idx].dbread = dbstatus;
+	}
+	
+void sshDir::ResetDbStatus(){
+	for(int i=0;i<currentlist.size();i++){
+		currentlist[i].dbread = -1;
+	}
 }

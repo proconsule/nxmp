@@ -49,6 +49,7 @@ public:
 	void setCurrBouquet(EnigmaServices _bouquet);
 	
 	bool getServices();
+	std::string getUrl();
 	
 	vector<ChannelStruct> e2currbouqet;
 	vector<EnigmaServices> e2services;

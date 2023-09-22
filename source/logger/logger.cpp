@@ -5,7 +5,7 @@
 namespace NXLOG{
 		
 	int loglevel = 0;
-	CConsoleWindow *ConsoleWindow = nullptr;
+	
 	
 	
 	std::string stringFmt(const char *fmt, ...) {
@@ -38,10 +38,9 @@ namespace NXLOG{
 			vprintf( fmt, arglist );
 			std::vsnprintf(outbuff, sizeof outbuff, fmt, arglist);
 			va_end( arglist );
+			fflush(stdout);
 			
 			if(ConsoleWindow != nullptr){
-				
-				
 				ConsoleWindow->AddText(outbuff);
 			}
 		}
@@ -59,10 +58,9 @@ namespace NXLOG{
 			vprintf( fmt, arglist );
 			std::vsnprintf(outbuff, sizeof outbuff, fmt, arglist);
 			va_end( arglist );
+			fflush(stdout);
 			
 			if(ConsoleWindow != nullptr){
-				
-				
 				ConsoleWindow->AddText(outbuff);
 			}
 		}
@@ -77,6 +75,7 @@ namespace NXLOG{
 			vprintf( fmt, arglist );
 			std::vsnprintf(outbuff, sizeof outbuff, fmt, arglist);
 			va_end( arglist );
+			fflush(stdout);
 			
 			if(ConsoleWindow != nullptr){
 				

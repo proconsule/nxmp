@@ -22,6 +22,7 @@ public:
 	float textscrollpos = 0.0f;
 	int waitpos = 0;
 	
+	float scroll_max_x;
 	
 	bool textforwardscroll = true;
 	bool textlaststate = true;

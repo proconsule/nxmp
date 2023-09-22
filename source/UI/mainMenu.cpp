@@ -8,9 +8,13 @@
 #include "curldownloader.h"
 
 namespace Windows {
+	
+	static std::vector<std::string> topmenu {"Local Files","USB","Stream Url","Network","UPNP","Enigma2","Playlist","Settings","Info","Exit"};
+	
+	
     void MainMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupMainWindow();
-		std::vector<std::string> topmenu = configini->topmenu;
+		//std::vector<std::string> topmenu = configini->topmenu;
 		
 		
 		
@@ -23,37 +27,37 @@ namespace Windows {
 				for (unsigned int n = 0; n < topmenu.size(); n++){
 					std::string itemid = "##" + std::to_string(n);
 					if(topmenu[n] == "Local Files"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.SdCardTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SdCardTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "USB"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.UsbTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.UsbTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Network"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NetworkTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "UPNP"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.UPNPTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.UPNPTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Enigma2"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.Enigma2Texture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.Enigma2Texture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Playlist"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.PlaylistTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.PlaylistTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Stream Url"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.NetworkTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NetworkTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "MTP"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.PlaylistTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.PlaylistTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Info"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.InfoTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.InfoTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Settings"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.SettingsTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SettingsTexture.id, ImVec2(50,50));
 					}
 					else if(topmenu[n] == "Exit"){
-						GUI::NXMPImage((void*)(intptr_t)nxmpicons.ExitTexture.id, ImVec2(50,50));
+						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ExitTexture.id, ImVec2(50,50));
 					}
 							
 							
@@ -99,8 +103,9 @@ namespace Windows {
 							}
 						}
 						if(topmenu[n] == "Settings"){
-							configini->setLongSeek(configini->getLongSeek(false));
-							configini->setShortSeek(configini->getShortSeek(false));
+							//configini->setLongSeek(configini->getLongSeek(false));
+							//configini->setShortSeek(configini->getShortSeek(false));
+							if(sqlitedb != nullptr)sqlitedb->UpdateDbStats();
 							item.state = MENU_STATE_SETTINGS;
 						}
 						if(topmenu[n] == "Playlist"){

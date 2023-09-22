@@ -319,6 +319,7 @@ namespace GUI {
 					if (button == SDL_KEY_Y && !item.masterlock){
 						if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER && item.popupstate == POPUP_STATE_NONE){
 							
+							
 							if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 								item.selectionstate =FILE_SELECTION_NONE;
 							}
@@ -326,12 +327,7 @@ namespace GUI {
 								delete filebrowser;
 								filebrowser = nullptr;
 							}
-							/*
-							if(localdir != nullptr){
-								delete localdir;
-								localdir = nullptr;
-							}
-							*/
+							
 							if(MyUSBMount != nullptr && libmpv->Stopped() && !playlist->HaveUSBEntrys()){
 								delete MyUSBMount;
 								MyUSBMount = nullptr;
@@ -340,24 +336,7 @@ namespace GUI {
 								delete NewNetworkShare;
 								NewNetworkShare = nullptr;
 							}
-							/*
-							if(ftpdir != nullptr){
-								delete ftpdir;
-								ftpdir = nullptr;
-							}
-							if(httpdir != nullptr){
-								delete httpdir;
-								httpdir = nullptr;
-							}
-							if(sshdir != nullptr){
-								delete sshdir;
-								sshdir = nullptr;
-							}
-							if(sambadir != nullptr){
-								delete sambadir;
-								sambadir = nullptr;
-							}
-							*/
+							
 							if(nxupnp != nullptr){
 								delete nxupnp;
 								nxupnp = nullptr;
@@ -373,10 +352,15 @@ namespace GUI {
 							}
 							item.networkselect = true;
 							item.first_item = true;
-							item.state = MENU_STATE_HOME;
-							//if(usbmounter != nullptr && usbmounter->haveIteminPlaylist()){
-							//	usbmounter->setBasePath("");
-							//}
+							if(item.state == MENU_STATE_SETTINGS){
+								if(configini->Modified()){
+									item.popupstate = POPUP_STATE_SAVE_SETTINGS;
+								}else{
+									item.state = MENU_STATE_HOME;
+								}
+							}else{
+								item.state = MENU_STATE_HOME;
+							}
 							
 						}
 										
@@ -402,38 +386,7 @@ namespace GUI {
 							item.first_item = true;
 							enigma2->backToTop();
 						}
-						/*
-						if(item.state == MENU_STATE_FTPBROWSER){
-							item.first_item = true;
-							filebrowser->backDir();
-							filebrowser->DirList(filebrowser->getCurrentPath(),false,Utility::getMediaExtensions());
-						}
 						
-						if(item.state == MENU_STATE_HTTPBROWSER){
-							item.first_item = true;
-							filebrowser->backDir();
-							filebrowser->DirList(filebrowser->getCurrentPath(),false,Utility::getMediaExtensions());
-							
-						}
-						if(item.state == MENU_STATE_SSHBROWSER){
-							item.first_item = true;
-							filebrowser->backDir();
-							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
-							
-						}
-						if(item.state == MENU_STATE_SAMBABROWSER){
-							item.first_item = true;
-							filebrowser->backDir();
-							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
-							
-						}
-						if(item.state == MENU_STATE_NFSBROWSER){
-							item.first_item = true;
-							filebrowser->backDir();
-							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
-							
-						}
-						*/
 						if(item.state == MENU_STATE_UPNPBROWSER){
 							item.first_item = true;
 							if(nxupnp->getSelDevice()>-1){
@@ -442,32 +395,12 @@ namespace GUI {
 								nxupnp->getDevice(nxupnp->getSelDevice())->browseOID();
 							}
 						}
-						/*
-						if(item.state == MENU_STATE_USB_BROWSER){	
-							item.first_item = true;
-							filebrowser->backDir();
-							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
-								
-						}
-						*/
-						if(item.state == MENU_STATE_USB_MOUNT){
-/*							
-							if(usbmounter->getBasePath() != ""){
-								item.first_item = true;
-								usbmounter->backDir();
-								usbmounter->DirList(usbmounter->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 						
-							}
-							*/		
-						}
-						/*
-						if(item.state == MENU_STATE_FILEBROWSER){
-							item.first_item = true;
-							filebrowser->backDir();
-							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+						if(item.state == MENU_STATE_USB_MOUNT){
+						
 							
 						}
-						*/
+						
 						
 						if(item.state == MENU_STATE_PLAYER || item.state == MENU_STATE_PLAYERCACHING){
 							if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
@@ -596,21 +529,26 @@ namespace GUI {
 						
 					}
 					if (mp_event->event_id == MPV_EVENT_END_FILE) {
+						mpv_render_context_render(libmpv->getContext(), videoout->params); 
+			
 						appletSetMediaPlaybackState(false);
 						struct mpv_event_end_file *eof = (struct mpv_event_end_file *)mp_event->data;
 						libmpv->setLoop(false);
 						if(item.playerstate == PLAYER_STATE_VIDEO  && libmpv->getFileInfo()->playbackInfo.islive == false && sqlitedb != nullptr){
 							if(libmpv->getFileInfoPerc() >= configini->getResumeStartPerc(false) && 100-libmpv->getFileInfoPerc() >= configini->getResumeStopPerc(false)){
 								sqlitedb->writeResume(libmpv->getFileInfo()->path,libmpv->getFileInfo()->playbackInfo.position);
+								if(filebrowser!=nullptr)filebrowser->ResetDbStatus();
 							}else{
 								if(eof->reason != MPV_END_FILE_REASON_EOF){
 									if(100-libmpv->getFileInfoPerc() < configini->getResumeStopPerc(false))
 									sqlitedb->markCompleted(libmpv->getFileInfo()->path);
+									if(filebrowser!=nullptr)filebrowser->ResetDbStatus();
 								}
 							}
 							
 							if(eof->reason == MPV_END_FILE_REASON_EOF){
 								sqlitedb->markCompleted(libmpv->getFileInfo()->path);
+								if(filebrowser!=nullptr)filebrowser->ResetDbStatus();
 							}
 							
 						}
@@ -805,13 +743,14 @@ namespace GUI {
 							if(prop->format == MPV_FORMAT_FLAG)
 							{
 								bool playchache = *(bool *)prop->data;
+								/*
 								if(playchache){
 									item.laststate = item.state;
 									item.state = MENU_STATE_PLAYERCACHING;
 								}else{
 									item.state = MENU_STATE_PLAYER;
 								}
-								
+								*/
 								
 							}
 						}
@@ -871,14 +810,7 @@ namespace GUI {
 						Popups::FileContextPopup();
 					}
 					break;
-				/*
-				case MENU_STATE_USB_BROWSER:
-					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
-						Popups::FileContextPopup();
-					}
-					break;
-				*/
+				
 				case MENU_STATE_USB_MOUNT:
 					Windows::USBMountWindow(&item.focus, &item.first_item);
 					break;
@@ -891,38 +823,7 @@ namespace GUI {
 	            case MENU_STATE_ADDSHARE:
 					Windows::ShareAddWindow(&item.focus, &item.first_item);
 					break;
-				/*
-				case MENU_STATE_FTPBROWSER:
-					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
-						Popups::PlaylistStartPlaylist();
-					}
-					break;
-				case MENU_STATE_HTTPBROWSER:
-					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
-						Popups::FileContextPopup();
-					}
-					break;
-				case MENU_STATE_SSHBROWSER:
-					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
-						Popups::FileContextPopup();
-					}
-					break;
-				case MENU_STATE_SAMBABROWSER:
-					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
-						Popups::FileContextPopup();
-					}
-					break;
-				case MENU_STATE_NFSBROWSER:
-					Windows::UniBrowserWindow(&item.focus, &item.first_item);
-					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
-						Popups::FileContextPopup();
-					}
-					break;
-				*/
+				
 				case MENU_STATE_UPNPBROWSER:
 					Windows::UPNPBrowserWindow(&item.focus, &item.first_item);
 					//if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
@@ -1040,8 +941,8 @@ namespace GUI {
 					
 			}
 			
-			if(NXLOG::ConsoleWindow != nullptr){
-				NXLOG::ConsoleWindow->Draw();
+			if(ConsoleWindow != nullptr){
+				ConsoleWindow->Draw();
 			}
 			
 	}
@@ -1086,7 +987,6 @@ namespace GUI {
 			//}
 			
 			if(GUI::wakeup == 0){
-				nxmpstats->UpdateStats();
 				batteryPercent = nxmpstats->batpercentage;
 			}
 			
@@ -1126,12 +1026,19 @@ namespace GUI {
 	}
     void reinit()
 	{
-	ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
+		
+		if(imgloader != nullptr){
+			delete imgloader;
+		}
+		
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplSDL2_Shutdown();
+		ImGui::DestroyContext();
 
 
-	IMGUI_CHECKVERSION();
+		imgloader = new CImgLoader("romfs:");
+
+		IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
         (void) io;

@@ -14,12 +14,16 @@
 #include "apppopups.h"
 #include "playerwindows.h"
 #include "libmpv.h"
-#include "config.h"
+
+//#include "config.h"
+#include "iniparser.h"
+#include "imgloader.h"
+
 #include "playlist.h"
 #include "remotefs.h"
 #include "networkShareClass.h"
 #include "localfiles.h"
-#include "SimpleIni.h"
+//#include "SimpleIni.h"
 #include "eqpreset.h"
 #include "SQLiteDB.h"
 #include "remotefs.h"
@@ -149,7 +153,7 @@ typedef struct {
 	//std::string usbbasepath = "";
 	std::vector<FS::FileEntry> usbfileentries;
 	
-	std::vector<networkSource> networksources;
+	std::vector<oldnetworkSource> networksources;
 	
 	float rightmenu_startpos = 1280.0;
 	
@@ -262,7 +266,10 @@ extern bool renderloopdone;
 
 extern std::string nxmpTitle;
 
-extern Config *configini;
+//extern Config *configini;
+extern CIniParser *configini;
+extern CImgLoader *imgloader;
+
 extern EQPreset *eqpreset;
 extern SQLiteDB *sqlitedb;
 extern CMTP *mtp;
@@ -271,7 +278,7 @@ extern bool dbUpdated;
 
 extern Playlist *playlist;
 
-extern SysIcons nxmpicons;
+//extern SysIcons nxmpicons;
 
 extern CStats *nxmpstats;
 
@@ -311,14 +318,6 @@ extern bool dochangethemefont;
 extern std::string themefontpath;
 extern float themefontsize;
 extern float themefontsmall;
-
-
-
-#ifdef _WIN32
-extern bool isMouseSelection;
-extern int startMousex;
-extern int startMousey;
-#endif
 
 /*
 extern float swipex;

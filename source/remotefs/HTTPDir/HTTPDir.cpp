@@ -81,6 +81,7 @@ void HTTPDir::DirList(std::string path,const std::vector<std::string> &extension
 			tmpentry.type = FS::FileEntryType::File;
 		}
 		tmpentry.size = 0;
+		tmpentry.dbread = -1;
 		currentlist.push_back(tmpentry);
 		s = sm.suffix();
 	}
@@ -134,3 +135,13 @@ void HTTPDir::backDir(){
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
 	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/")+1);
 }
+
+void HTTPDir::SetFileDbStatus(int idx,int dbstatus){
+		currentlist[idx].dbread = dbstatus;
+	}
+	
+	void HTTPDir::ResetDbStatus(){
+		for(int i=0;i<currentlist.size();i++){
+			currentlist[i].dbread = -1;
+		}
+	}

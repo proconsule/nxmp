@@ -182,3 +182,7 @@ void Enigma2::backToTop(){
 Enigma2::Enigma2(std::string _url){
 	enigmaurl = _url;
 }
+
+std::string Enigma2::getUrl(){
+	return enigmaurl;
+}

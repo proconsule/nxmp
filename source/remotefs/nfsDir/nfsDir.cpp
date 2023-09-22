@@ -105,6 +105,7 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 		tmpentry.path = _path + std::string("/") + std::string(nfsdirent->name);
 		tmpentry.size = nfsdirent->size;
 		tmpentry.is_valid = 1;
+		tmpentry.dbread = -1;
 		tmpentry.modified = nfsdirent->mtime.tv_sec;
 		tmpentry.accessed = nfsdirent->atime.tv_sec;
 		tmpentry.created = nfsdirent->ctime.tv_sec;
@@ -186,3 +187,13 @@ void nfsDir::backDir(){
 	currentpath = FS::removeLastSlash(currentpath);
 	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
 }
+
+void nfsDir::SetFileDbStatus(int idx,int dbstatus){
+		currentlist[idx].dbread = dbstatus;
+	}
+	
+	void nfsDir::ResetDbStatus(){
+		for(int i=0;i<currentlist.size();i++){
+			currentlist[i].dbread = -1;
+		}
+	}

@@ -7,10 +7,12 @@
 
 #include "consolewindow.h"
 
+extern CConsoleWindow *ConsoleWindow;
+
 namespace NXLOG{
 	
 	extern int loglevel;
-	extern CConsoleWindow *ConsoleWindow;
+	
 	
 	void INFOLOG(const char *fmt, ...);
 	void ERRORLOG(const char *fmt, ...);

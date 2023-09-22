@@ -10,25 +10,26 @@
 			myusb = _myusb;
 		}else{
 			path = _path;
+			urlschema thisurl = Utility::parseUrl(_path); 
 			if(Utility::startWith(path,"/",false)){
 				mylocal = new localFs(path,_playlist);
 				title = "File Browser";
 				timelessFS = true;
 			}else if(Utility::startWith(path,"smb",false)){
 				mysamba = new sambaDir(path,_playlist);
-				title = "SMB Browser";
+				title = "SMB Browser " + thisurl.server;
 			}else if(Utility::startWith(path,"sftp",false)){
 				myssh = new sshDir(path,_playlist);
-				title = "SFTP Browser";
+				title = "SFTP Browser " + thisurl.server;;
 			}else if(Utility::startWith(path,"ftp",false)){
 				myftp = new FTPDir(path,_playlist);
-				title = "FTP Browser";
+				title = "FTP Browser " + thisurl.server;;
 			}else if(Utility::startWith(path,"http",false)){
 				myhttp = new HTTPDir(path);
-				title = "HTTP Browser";
+				title = "HTTP Browser " + thisurl.server;;
 				timelessFS = true;
 			}else if(Utility::startWith(path,"nfs",false)){
-				title = "NFS Browser";
+				title = "NFS Browser " + thisurl.server;;
 				mynfs = new nfsDir(path,_playlist);
 			}
 		}
@@ -332,6 +333,55 @@
 		
 		return retvector;
 		
+	}
+	
+	void CFileBrowser::ResetDbStatus(){
+		if(mylocal!= nullptr){
+			mylocal->ResetDbStatus();
+		}
+		if(mysamba!= nullptr){
+			mysamba->ResetDbStatus();
+		}
+		if(myssh!= nullptr){
+			myssh->ResetDbStatus();
+		}
+		if(myftp!= nullptr){
+			myftp->ResetDbStatus();
+		}
+		if(myhttp!= nullptr){
+			myhttp->ResetDbStatus();
+		}
+		if(mynfs!= nullptr){
+			mynfs->ResetDbStatus();
+		}
+		if(myusb!= nullptr){
+			myusb->ResetDbStatus();
+		}
+		
+	}
+	
+	void CFileBrowser::SetFileDbStatus(int idx,int dbstatus){
+		if(mylocal!= nullptr){
+			mylocal->SetFileDbStatus(idx,dbstatus);
+		}
+		if(mysamba!= nullptr){
+			mysamba->SetFileDbStatus(idx,dbstatus);
+		}
+		if(myssh!= nullptr){
+			myssh->SetFileDbStatus(idx,dbstatus);
+		}
+		if(myftp!= nullptr){
+			myftp->SetFileDbStatus(idx,dbstatus);
+		}
+		if(myhttp!= nullptr){
+			myhttp->SetFileDbStatus(idx,dbstatus);
+		}
+		if(mynfs!= nullptr){
+			mynfs->SetFileDbStatus(idx,dbstatus);
+		}
+		if(myusb!= nullptr){
+			myusb->SetFileDbStatus(idx,dbstatus);
+		}
 	}
 	
 	

@@ -38,6 +38,9 @@ public:
 	
 	bool haveIteminPlaylist();
 	
+	void SetFileDbStatus(int idx,int dbstatus);
+	void ResetDbStatus();
+	
 	int sortOrder=0;
 	
 	Playlist * playlist;

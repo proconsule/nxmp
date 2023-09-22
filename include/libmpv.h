@@ -6,7 +6,8 @@
 #include <mpv/render_gl.h>
 
 #include "fileInfo.h"
-#include "config.h"
+//#include "config.h"
+#include "iniparser.h"
 #include "logger.h"
 
 
@@ -16,7 +17,7 @@ struct decoderlist_struct{
 	std::string codecdesc;
 };
 
-extern Config *configini;
+extern CIniParser *configini;
 extern bool clockoc;
 extern float initScale;
 extern int initSize;

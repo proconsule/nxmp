@@ -42,7 +42,7 @@ libMpv::libMpv(const std::string &configDir) {
 	
 	
 	//mpv_set_option_string(handle, "interpolation", "no");
-	mpv_set_option_string(handle, "scale", "bilinear");
+	mpv_set_option_string(handle, "scale", "linear");
 
 	
 	mpv_set_option_string(handle, "image-display-duration", "inf");
@@ -52,11 +52,17 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "demuxer-readahead-secs", std::to_string(configini->getDemuxCache(false)).c_str());
 	
 
-
 	if(configini->getHWDec(false)){
 		mpv_set_option_string(handle, "hwdec", "tx1-copy");
 		mpv_set_option_string(handle, "hwdec-codecs", "all");
 	
+	}
+	
+	if(configini->getAout(false) == 0){
+		mpv_set_option_string(handle, "aout", "sdl");
+	
+	}else if(configini->getAout(false) == 1){
+		mpv_set_option_string(handle, "aout", "hos");
 	}
 
 	
@@ -129,7 +135,7 @@ libMpv::libMpv(const std::string &configDir) {
 	
 	std::sort(decoderlist.begin(),decoderlist.end(),codecSort);
 	
-	//mpv_node node2;
+	/*
     mpv_get_property(handle, "demuxer-list", MPV_FORMAT_NODE, &node);
     if (node.format == MPV_FORMAT_NODE_ARRAY) {
         for (int i = 0; i < node.u.list->num; i++) {
@@ -147,7 +153,7 @@ libMpv::libMpv(const std::string &configDir) {
 		}
 		
 	}
-	
+	*/
 	NXLOG::DEBUGLOG("MPV Init Completed\n");
 	
 }

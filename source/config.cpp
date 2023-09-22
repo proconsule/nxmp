@@ -16,6 +16,9 @@ std::vector<std::string> char_split (const std::string &s, char delim) {
     return result;
 }
 
+
+
+
 void Config::ReadConfig(){
 	
 	if(ini != nullptr){
@@ -32,52 +35,44 @@ void Config::ReadConfig(){
 	
 
 	
-	nxmpconfig.showhidden = ini->GetBoolValue("Main", "showhidden");
+	nxmpconfig.showhidden = ini->GetBoolValue("Main", "showhidden",false);
 	
-	nxmpconfig.touchenable = ini->GetBoolValue("Main", "touchenable");
+	nxmpconfig.touchenable = ini->GetBoolValue("Main", "touchenable",false);
 	
-	nxmpconfig.playeswipeseek = ini->GetLongValue("Main", "playeswipeseek");
-	
-	
-	nxmpconfig.longseek = ini->GetLongValue("Main", "longseek");
-	nxmpconfig.shortseek = ini->GetLongValue("Main", "shortseek");
-	if(nxmpconfig.longseek == 0)nxmpconfig.longseek = 60;
-	if(nxmpconfig.shortseek == 0)nxmpconfig.shortseek = 10;
+	nxmpconfig.playeswipeseek = ini->GetLongValue("Main", "playeswipeseek",false);
 	
 	
-	nxmpconfig.usealang = ini->GetBoolValue("Main", "usealang");
+	nxmpconfig.longseek = ini->GetLongValue("Main", "longseek",60);
+	nxmpconfig.shortseek = ini->GetLongValue("Main", "shortseek",10);
+	//if(nxmpconfig.longseek == 0)nxmpconfig.longseek = 60;
+	//if(nxmpconfig.shortseek == 0)nxmpconfig.shortseek = 10;
+	
+	
+	nxmpconfig.usealang = ini->GetBoolValue("Main", "usealang",false);
 	const char* alangpv;
-	alangpv = ini->GetValue("Main", "alang");
-	std::string alangstring = "eng";
-	if(alangpv!= nullptr){
-		alangstring = alangpv;
-	}
-	if(alangstring == ""){
-		alangstring = "eng";
-	}
+	alangpv = ini->GetValue("Main", "alang","eng");
+	std::string alangstring = alangpv;
+	
 	
 	nxmpconfig.alang = Utility::getLanguagesIdx(alangstring);
 	
 	//Slang
-	nxmpconfig.useslang = ini->GetBoolValue("Main", "useslang");
+	nxmpconfig.useslang = ini->GetBoolValue("Main", "useslang",false);
 	
 	const char* slangpv;
-	slangpv = ini->GetValue("Main", "slang");
-	std::string slangstring = "eng";
-	if(slangpv!= nullptr){
-		slangstring = slangpv;
-	}
-	if(slangstring == ""){
-		slangstring = "eng";
-	}
+	slangpv = ini->GetValue("Main", "slang","eng");
+	std::string slangstring = slangpv;
 	
 	nxmpconfig.slang = Utility::getLanguagesIdx(slangstring);
 	//endSlang
 	
-	nxmpconfig.useoc = ini->GetBoolValue("Main", "useoc");
+	nxmpconfig.useoc = ini->GetBoolValue("Main", "useoc",false);
 	
 	nxmpconfig.hwdec = ini->GetBoolValue("Main", "hwdec",true);
 	nxmpconfig.vsync = ini->GetBoolValue("Main", "vsync",false);
+	
+	nxmpconfig.aout = ini->GetLongValue("Main", "aout",0);
+	
 	
 	nxmpconfig.demuxcachesec = ini->GetLongValue("Main", "demuxcachesec",20);
 	
@@ -88,12 +83,8 @@ void Config::ReadConfig(){
 	nxmpconfig.consolewindow = ini->GetBoolValue("Main", "consolewindow",false);
 	
 	const char* themenamepv;
-	themenamepv = ini->GetValue("Main", "theme");
-	std::string themenamestring = "Default";
-	if(themenamepv!= nullptr){
-		themenamestring = themenamepv;
-	}
-	nxmpconfig.themename = themenamestring;
+	themenamepv = ini->GetValue("Main", "theme","Default");
+	nxmpconfig.themename = themenamepv;
 	
 	nxmpconfig.subfontsize = ini->GetLongValue("Main", "subfontsize");
 	if(nxmpconfig.subfontsize == 0)nxmpconfig.subfontsize = 55;
@@ -103,15 +94,10 @@ void Config::ReadConfig(){
 	if(nxmpconfig.subfontscale == 0)nxmpconfig.subfontscale = 1.0f;
 	//subscale
 
-	std::string fontcolorstring = "#FFFFFF";
 	const char* fontcolorpv;
-	fontcolorpv = ini->GetValue("Main", "subfontcolor");
-	if(fontcolorpv!= nullptr){
-		fontcolorstring = fontcolorpv;
-	}
-	if(fontcolorstring == ""){
-		fontcolorstring = "#FFFFFF";
-	}
+	fontcolorpv = ini->GetValue("Main", "subfontcolor","#FFFFFF");
+	std::string fontcolorstring = fontcolorpv;
+	
 	int tmpcolors[3];
 	sscanf(fontcolorstring.c_str(),"#%02X%02X%02X",&tmpcolors[0],&tmpcolors[1],&tmpcolors[2]);
 	nxmpconfig.subfontcolor[0] = (float)tmpcolors[0]/255.0f;
@@ -121,15 +107,11 @@ void Config::ReadConfig(){
 
 	//bordercolor
 	
-	std::string fontcolorstring2 = "#000000";
 	const char* fontcolorpv2;
-	fontcolorpv2 = ini->GetValue("Main", "subbordercolor");
-	if(fontcolorpv2!= nullptr){
-		fontcolorstring2 = fontcolorpv2;
-	}
-	if(fontcolorstring2 == ""){
-		fontcolorstring2 = "#000000";
-	}
+	fontcolorpv2 = ini->GetValue("Main", "subbordercolor","#000000");
+	std::string fontcolorstring2 = fontcolorpv2;
+	
+	
 	int tmpcolors2[3];
 	sscanf(fontcolorstring2.c_str(),"#%02X%02X%02X",&tmpcolors2[0],&tmpcolors2[1],&tmpcolors2[2]);
 	nxmpconfig.subbordercolor[0] = (float)tmpcolors2[0]/255.0f;
@@ -139,24 +121,19 @@ void Config::ReadConfig(){
 	//endbordercolor
 	
 	const char* deintpv;
-	deintpv = ini->GetValue("Main", "deinterlace");
-	std::string deintstring;
-	if(deintpv!= nullptr){
-		deintstring = deintpv;
-	}
-	if(deintstring == ""){
-		deintstring = "no";
-	}
+	deintpv = ini->GetValue("Main", "deinterlace","no");
+	std::string deintstring = deintpv;
+	
 	
 	if(deintstring == "no")nxmpconfig.deint = 0;
-	if(deintstring == "shader")nxmpconfig.deint = 1;
-	if(deintstring == "ffmpeg")nxmpconfig.deint = 2;
+	if(deintstring == "yes")nxmpconfig.deint = 1;
+	if(deintstring == "auto")nxmpconfig.deint = 2;
 	
 	
 	const char* usedbpv;
-	usedbpv = ini->GetValue("Main", "usedb");
+	usedbpv = ini->GetValue("Main", "usedb","no");
 	nxmpconfig.dbactive = false;
-	if(usedbpv!= nullptr){
+	if(usedbpv!= NULL){
 		std::string usebdstring = usedbpv;
 		if(usebdstring == "yes")nxmpconfig.dbactive=true;
 	}
@@ -322,12 +299,12 @@ Config::Config(std::string inifile){
 	nxmptmpconfig = nxmpconfig;
 	
 	*/
-	CSimpleIniA::TNamesDepend values;
+	//CSimpleIniA::TNamesDepend values;
 	
 	topmenu.push_back("Local Files");
 	topmenu.push_back("USB");
 	topmenu.push_back("Stream Url");
-	ini->GetAllValues("Network", "source", values);
+	//ini->GetAllValues("Network", "source", values);
 	topmenu.push_back("Network");
 	topmenu.push_back("UPNP");
 	if(getEnigma() != ""){
@@ -361,20 +338,13 @@ std::vector<networkSource> Config::getNetworks(){
 
 std::string Config::getStartPath(){
 	const char* pv;
-	pv = ini->GetValue("Main", "startpath");
-	if(pv==nullptr){
-
-		return "/switch/nxmp";
-	}
+	pv = ini->GetValue("Main", "startpath","/switch/nxmp");
 	return pv;
 }
 
 std::string Config::getEnigma(){
 	const char* pv;
-	pv = ini->GetValue("Enigma2", "e2address");
-	if(pv==nullptr){
-		return "";
-	}
+	pv = ini->GetValue("Enigma2", "e2address","");
 	return pv;
 	
 }
@@ -643,6 +613,17 @@ nxmpconfig_struct Config::getConfig(bool tmpvalue){
 	return nxmpconfig;
 }
 
+int Config::getAout(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.aout;
+	}
+	return nxmpconfig.aout;
+}
+
+void Config::setAout(int value){
+	nxmptmpconfig.aout = value;
+}
+
 bool Config::getEmuOverrides(){
 	return nxmpconfig.emuoverrides;
 }
@@ -658,14 +639,8 @@ bool Config::getConsoleWindow(){
 std::vector<std::string> Config::getConfigExtensions(){
 	
 	const char* pv;
-	pv = ini->GetValue("Main", "enabled_extensions");
-	if(pv==nullptr){
-
-		return nxmpconfig.config_enabled_extensions;
-	}
-	
+	pv = ini->GetValue("Main", "enabled_extensions",".8svx,.aac,.ac3,.aif,.asf,.avi,.dv,.flv,.m2ts,.m2v,.m4a,.mkv,.mov,.mp3,.mp4,.mpeg,.mpg,.mts,.ogg,.rmvb,.swf,.ts,.vob,.wav,.wma,.wmv,.flac,.m3u,.m3u8,.webm,.jpg,.gif,.png,.iso");
 	nxmpconfig.config_enabled_extensions = char_split(std::string(pv),',');
-	//return pv;
 	
 	return nxmpconfig.config_enabled_extensions;
 }
@@ -771,6 +746,9 @@ void Config::saveSettings(){
 	
 	ini->Delete("Main", "vsync");
 	ini->SetBoolValue("Main", "vsync", nxmpconfig.vsync, NULL, false);
+	
+	ini->Delete("Main", "aout");
+	ini->SetLongValue("Main", "aout", nxmpconfig.aout, NULL, false);
 
 	ini->Delete("Main", "subfontsize");
 	ini->SetLongValue("Main", "subfontsize", nxmpconfig.subfontsize, NULL, false);

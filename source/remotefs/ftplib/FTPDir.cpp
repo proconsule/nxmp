@@ -72,3 +72,13 @@ void FTPDir::backDir(){
 	currpath = FS::removeLastSlash(currpath);
 	currpath = currpath.substr(0, currpath.find_last_of("/"));
 }
+
+void FTPDir::SetFileDbStatus(int idx,int dbstatus){
+		currentlist[idx].dbread = dbstatus;
+	}
+	
+void FTPDir::ResetDbStatus(){
+	for(int i=0;i<currentlist.size();i++){
+		currentlist[i].dbread = -1;
+	}
+}
