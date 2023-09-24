@@ -480,6 +480,7 @@ namespace GUI {
 					if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
 						libmpv->getfileInfo();
 						item.state = MENU_STATE_PLAYER;
+						printf("LOADED\n");
 						if(libmpv->getFileInfo()->videos.size() == 0 || (libmpv->getFileInfo()->videos.size() == 1 && libmpv->getFileInfo()->videos[0].albumart) ){
 							item.playerstate = PLAYER_STATE_AUDIO;
 							mpv_observe_property(libmpv->getHandle(), 0, "playback-time", MPV_FORMAT_DOUBLE);
@@ -511,12 +512,11 @@ namespace GUI {
 						}
 						
 						
-							
-						nxmpstats->decodingstats.videodecstats.codec = libmpv->getVideoCodec();
-						
+						if(libmpv->getFileInfo()->videos.size() > 0){
+							nxmpstats->decodingstats.videodecstats.codec = libmpv->getVideoCodec();
+						}
 						if(libmpv->getFileInfo()->audios.size() > 0){
-							nxmpstats->decodingstats.audiodecstats.codec = libmpv->getAudioCodec();
-							
+							nxmpstats->decodingstats.audiodecstats.codec = libmpv->getAudioCodec();	
 						}
 						
 					}
@@ -955,6 +955,7 @@ namespace GUI {
 		if(GUI::wakeup == 1){
 			mpv_render_context_render(libmpv->getContext(), videoout->params); 
 			glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
+			mpv_render_context_report_swap(libmpv->getContext());
 			GUI::wakeup = 0;
 		}
 		glClearColor(0.00f, 0.00f, 0.00f, 1.00f);

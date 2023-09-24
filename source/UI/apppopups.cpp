@@ -551,6 +551,7 @@ namespace Popups{
 					playlist->appendFile(filebrowser->getCurrList()[item.fileHoveredidx],filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path);
 					item.popupstate = POPUP_STATE_NONE;
 				}
+				
 			}
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
@@ -599,7 +600,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button("Set as Startring element",button_size))
+			if (ImGui::Button("Set as Starting element",button_size))
 			{
                 playlist->setPlaylistIdx(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;

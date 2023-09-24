@@ -48,7 +48,7 @@ GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'
 
 VERSION_MAJOR := 0
 VERSION_MINOR := 8
-VERSION_MICRO := 0
+VERSION_MICRO := 1
 
 APP_TITLE     := NXMP
 APP_AUTHOR    := proconsule and darkxex

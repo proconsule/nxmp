@@ -46,7 +46,7 @@
 
 #define NDEBUG 1
 
-//#define APPLETMODEENA 1
+#define APPLETMODEENA 1
 
 
 /*	Exit from HB Menu instead fo returning  
@@ -498,7 +498,7 @@ int main() {
 
 		
 		GUI::initMpv();
-		libmpv->setDemuxCache(configini->getDemuxCache(false));
+		//libmpv->setDemuxCache(configini->getDemuxCache(false));
 
 		int w, h;
 		SDL_GetWindowSize(window, &w, &h);

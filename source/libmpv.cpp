@@ -48,8 +48,8 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "image-display-duration", "inf");
 	mpv_set_option_string(handle, "hdr-compute-peak", "no");
 	
-	mpv_set_option_string(handle, "demuxer-seekable-cache", "yes");
-	mpv_set_option_string(handle, "demuxer-readahead-secs", std::to_string(configini->getDemuxCache(false)).c_str());
+	//mpv_set_option_string(handle, "demuxer-seekable-cache", "yes");
+	//mpv_set_option_string(handle, "demuxer-readahead-secs", std::to_string(configini->getDemuxCache(false)).c_str());
 	
 
 	if(configini->getHWDec(false)){
@@ -59,10 +59,10 @@ libMpv::libMpv(const std::string &configDir) {
 	}
 	
 	if(configini->getAout(false) == 0){
-		mpv_set_option_string(handle, "aout", "sdl");
+		mpv_set_option_string(handle, "ao", "sdl");
 	
 	}else if(configini->getAout(false) == 1){
-		mpv_set_option_string(handle, "aout", "hos");
+		mpv_set_option_string(handle, "ao", "hos");
 	}
 
 	
@@ -817,25 +817,27 @@ void libMpv::clearShader(){
 }
 
 void libMpv::resetFileInfo(){
-	fileinfo->title = "Unknown";
-    fileinfo->path = "";
-    fileinfo->duration = 0;
-	fileinfo->resume = 0;
-    fileinfo->bit_rate = 0;
-    fileinfo->videos.clear();
-    fileinfo->audios.clear();
-    fileinfo->subtitles.clear();
-	
-	fileinfo->chapters.clear();
-	
-	fileinfo->playbackInfo.vid_id = -1;
-    fileinfo->playbackInfo.aud_id = -1;
-    fileinfo->playbackInfo.sub_id = -1;
-    fileinfo->playbackInfo.position = 0;
-	fileinfo->playbackInfo.duration = 0;
-	fileinfo->playbackInfo.title = "";
-	fileinfo->playbackInfo.artist = "";
-	fileinfo->playbackInfo.islive = false;
+	if(fileinfo!= NULL){
+		fileinfo->title = "Unknown";
+		fileinfo->path = "";
+		fileinfo->duration = 0;
+		fileinfo->resume = 0;
+		fileinfo->bit_rate = 0;
+		fileinfo->videos.clear();
+		fileinfo->audios.clear();
+		fileinfo->subtitles.clear();
+		
+		fileinfo->chapters.clear();
+		
+		fileinfo->playbackInfo.vid_id = -1;
+		fileinfo->playbackInfo.aud_id = -1;
+		fileinfo->playbackInfo.sub_id = -1;
+		fileinfo->playbackInfo.position = 0;
+		fileinfo->playbackInfo.duration = 0;
+		fileinfo->playbackInfo.title = "";
+		fileinfo->playbackInfo.artist = "";
+		fileinfo->playbackInfo.islive = false;
+	}
 }
 
 

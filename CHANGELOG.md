@@ -1,6 +1,14 @@
 # NXMP Changelog
 
-## [Unreleased 0.8.0]
+## [0.8.1]
+
+### Fixed
+
+- Audio File playback crash fixed
+- Fixed a typo error in popups
+
+
+## [0.8.0]
 
 ### Added
 
