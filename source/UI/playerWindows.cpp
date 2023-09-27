@@ -1022,7 +1022,7 @@ namespace playerWindows{
 				}
 			}
 			ImGui::SetCursorPosX(20);
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY()-40.0f*multiplyRes);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()-30.0f*multiplyRes);
 			char timetext[64];
 			sprintf(timetext,"%s - %s",Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.position).c_str(),Utility::formatTimeShort(libmpv->getFileInfo()->playbackInfo.duration).c_str());
 			ImGui::SetCursorPosX(20);

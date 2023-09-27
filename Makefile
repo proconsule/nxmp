@@ -39,16 +39,16 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source/iniparser source/imgloader source/networkshareclass source/UI/textscroller source/vout source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/imgui libs/imgui/opengl3 libs/imgui/misc/freetype source source/updater source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
+SOURCES		:=	source/backends source/backends/glfw3-opengl3 source/iniparser source/imgloader source/networkshareclass source/UI/textscroller source/vout source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/imgui-1.89.9 libs/imgui-1.89.9/misc/freetype source source/updater source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 DATA		:=	data
-INCLUDES	:=	source/iniparser source/imgloader source/networkshareclass source/UI/textscroller source/vout source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/simpleini libs/imgui libs/imgui/opengl3 include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
+INCLUDES	:=	source/backends source/backends/glfw3-opengl3 source/iniparser source/imgloader source/networkshareclass source/UI/textscroller source/vout source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/simpleini libs/imgui-1.89.9 include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/themes
 ROMFS		:=	romfs
 
 GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'
 
 VERSION_MAJOR := 0
 VERSION_MINOR := 8
-VERSION_MICRO := 1
+VERSION_MICRO := 2
 
 APP_TITLE     := NXMP
 APP_AUTHOR    := proconsule and darkxex
@@ -69,13 +69,13 @@ CFLAGS	+=	$(INCLUDE) -D__SWITCH__ $(BUILD_TYPE)
 
 CFLAGS  +=      -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) 
 
-CXXFLAGS	:= $(CFLAGS) -std=gnu++17 -fno-rtti -fexceptions -fpermissive -DIMGUI_IMPL_OPENGL_LOADER_GLAD \
+CXXFLAGS	:= $(CFLAGS) -std=gnu++17 -fno-rtti -fexceptions -fpermissive -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM \
 		  -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:=  `curl-config --libs` `sdl2-config --libs` `freetype-config --libs` -lssh2 -lmpv -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lnx -ljansson -lc -lz
+LIBS	:=  `curl-config --libs` `freetype-config --libs` -lssh2 -lmpv `sdl2-config --libs` -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lglfw3 -lnx -ljansson -lc -lz
 
 
 

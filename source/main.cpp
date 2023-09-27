@@ -4,10 +4,10 @@
 #include <ctype.h>
 #include <utility>
 
-#include <SDL.h>
+
 #include <glad/glad.h>
 
-
+#include "nxmp-gfx.h"
 #include "iniparser.h"
 #include "imgloader.h"
 #include "config.h"
@@ -27,8 +27,7 @@
 
 
 #include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
+
 #include "SimpleIni.h"
 #include "SQLiteDB.h"
 #include "eqpreset.h"
@@ -57,10 +56,6 @@
 extern u32 __nx_applet_exit_mode;
 
 static bool init();
-
-/* Contexts */
-SDL_Window *window;
-SDL_GLContext context;
 
 /* Classes */
 
@@ -138,92 +133,7 @@ int64_t playercachesize = 0;
 
 
 
-static bool init() {
-	//get if console is docked
-	printf("Started recording\n");
-	fflush(stdout);
-	appletInitializeGamePlayRecording();
-    appletSetWirelessPriorityMode(AppletWirelessPriorityMode_OptimizedForWlan);
-	
-	extern u32 __nx_applet_type;
-    auto saved_applet_type = std::exchange(__nx_applet_type, AppletType_SystemApplet );
 
-    nvInitialize();
-    __nx_applet_type = saved_applet_type;
-	
-	printf("Applet type\n");
-	fflush(stdout);
-	
-	
-	AppletOperationMode stus=appletGetOperationMode();
-	if (stus == AppletOperationMode_Handheld) {
-		NXLOG::DEBUGLOG("Handheld Mode\n");
-		isHandheld=true;
-		newResW = handheldWidth;
-		newResH = handheldHeight;
-		multiplyRes = 1.0f;
-		currFontsize = 20.0f;
-	}
-	if (stus == AppletOperationMode_Console) {
-		NXLOG::DEBUGLOG("Docked Mode\n");
-		isHandheld=false;
-		newResW = dockedWidth;
-		newResH = dockedHeight;
-		multiplyRes = 1.5f;
-		currFontsize = 30.0f;
-	}
-	
-	bool success = true;
-	NXLOG::DEBUGLOG("INIT SDL");
-    SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "no");
-    if( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0 ){
-        NXLOG::ERRORLOG("%s: SDL could not initialize! SDL Error: %s", __func__, SDL_GetError());
-        success =  false;
-    }
-    else {
-		
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-		
-		
-	
-
-		WIDTH = newResW; HEIGHT = newResH;
-        window = SDL_CreateWindow(
-                "[glad] GL with SDL",
-                SDL_WINDOWPOS_CENTERED,
-                SDL_WINDOWPOS_CENTERED,
-                WIDTH, HEIGHT,
-                SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
-        );
-        if( window == NULL ){
-            NXLOG::ERRORLOG("%s: Window could not be created! SDL Error: %s", __func__, SDL_GetError());
-            success =  false;
-        }
-        else {
-            context = SDL_GL_CreateContext(window);
-			
-            if( context == NULL )
-            {
-                NXLOG::ERRORLOG( "%s: OpenGL context could not be created! SDL Error: %s", __func__, SDL_GetError());
-                success =  false;
-            }
-            else {
-                gladLoadGL();
-            }
-			if(configini->getVSYNC(false)){
-				SDL_GL_SetSwapInterval(1);
-			}else{
-				SDL_GL_SetSwapInterval(0);
-			}
-        }
-    }
-    return success;
-}
 
 
 void DeallocateExtern(){
@@ -416,47 +326,56 @@ int main() {
 		return ret;
 	}
 	
-	NXLOG::DEBUGLOG("Init GUI\n");
-	if ( init() ) {
-		
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO &io = ImGui::GetIO();
-        (void) io;
-		io.ConfigFlags |= ImGuiConfigFlags_IsTouchScreen;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-		
-		if(!configini->getTouchEnable(false)){
-			io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
-		}
-		
-		  
-		io.IniFilename = nullptr;
-		io.MouseDrawCursor = false;
-        
-        ImGui::StyleColorsDark();
-		
-		NXLOG::DEBUGLOG("Init IMGUI SDL BACKEND\n");
-		ImGui_ImplSDL2_InitForOpenGL(window, context);
-        NXLOG::DEBUGLOG("Init IMGUI OPENGL BACKEND\n");
-		const char* glsl_version = "#version 430 core";
-		
-		ImGui_ImplOpenGL3_Init(glsl_version);
-		
-		if(configini->getConsoleWindow()){
-			ConsoleWindow = new CConsoleWindow();
-		}
-		
-		std::vector<std::string> extensionlist = configini->getConfigExtensions();
-		
-		Utility::setMediaExtensions(extensionlist);
-		
-		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,io);
 	
-		NXLOG::DEBUGLOG("Loading Textures\n");
+	appletInitializeGamePlayRecording();
+    appletSetWirelessPriorityMode(AppletWirelessPriorityMode_OptimizedForWlan);
+	
+	extern u32 __nx_applet_type;
+    auto saved_applet_type = std::exchange(__nx_applet_type, AppletType_SystemApplet );
+
+    nvInitialize();
+    __nx_applet_type = saved_applet_type;
+	
+	printf("Applet type\n");
+	fflush(stdout);
+	
+	
+	AppletOperationMode stus=appletGetOperationMode();
+	if (stus == AppletOperationMode_Handheld) {
+		NXLOG::DEBUGLOG("Handheld Mode\n");
+		isHandheld=true;
+		newResW = handheldWidth;
+		newResH = handheldHeight;
+		multiplyRes = 1.0f;
+		currFontsize = 20.0f;
+	}
+	if (stus == AppletOperationMode_Console) {
+		NXLOG::DEBUGLOG("Docked Mode\n");
+		isHandheld=false;
+		newResW = dockedWidth;
+		newResH = dockedHeight;
+		multiplyRes = 1.5f;
+		currFontsize = 30.0f;
+	}
+	
+	
+	nxmpgfx::Init(!isHandheld,configini->getVSYNC(false));
+
+
+
+	if(configini->getConsoleWindow()){
+		ConsoleWindow = new CConsoleWindow();
+	}
 		
-		imgloader = new CImgLoader("romfs:");
+	std::vector<std::string> extensionlist = configini->getConfigExtensions();
+		
+	Utility::setMediaExtensions(extensionlist);
+		
+	Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,ImGui::GetIO());
+	
+	NXLOG::DEBUGLOG("Loading Textures\n");
+		
+	imgloader = new CImgLoader("romfs:");
 		
 		
 
@@ -476,73 +395,65 @@ int main() {
 		}
 		*/
 		
-		if (hosversionBefore(8, 0, 0)) {
-			if (R_SUCCEEDED(pcvInitialize())) {
-				SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
-				SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
-				SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
-			}
-		} else {
-			if (R_SUCCEEDED(clkrstInitialize())) {
-				SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
-				SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
-				SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
-			}
+	if (hosversionBefore(8, 0, 0)) {
+		if (R_SUCCEEDED(pcvInitialize())) {
+			SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
+			SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
+			SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
 		}
+	} else {
+		if (R_SUCCEEDED(clkrstInitialize())) {
+			SwitchSys::stock_cpu_clock = SwitchSys::getClock(SwitchSys::Module::Cpu);
+			SwitchSys::stock_gpu_clock = SwitchSys::getClock(SwitchSys::Module::Gpu);
+			SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
+		}
+	}
 
-		NXLOG::DEBUGLOG("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
-		SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
+	NXLOG::DEBUGLOG("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
+	SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
 
 		
 		
 
 		
-		GUI::initMpv();
+	GUI::initMpv();
 		//libmpv->setDemuxCache(configini->getDemuxCache(false));
 
-		int w, h;
-		SDL_GetWindowSize(window, &w, &h);
-		
-		videoout = new CVOUT();
-		videoout->Create_Framebuffer(w,h);
-		
-		if(nxmpstats == nullptr){
-			nxmpstats = new CStats();
-			nxmpstats->emuoverrides = emuoverrides;
-			nxmpstats->StartThreads();
-		}
-		
-		GUI::RenderLoop();
-		NXLOG::DEBUGLOG("Ending Render Loop\n");
-
-
-		SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
-
-
-		if(videoout!= nullptr){
-			delete videoout;
-			videoout = nullptr;
-		}
-		delete libmpv;
-		libmpv = nullptr;
-		NXLOG::DEBUGLOG("Ending MPV\n");
-		
-		DeallocateExtern();	
-		if(imgloader != nullptr){
-			delete imgloader;
-			imgloader = nullptr;
-		}
 	
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplSDL2_Shutdown();
-		ImGui::DestroyContext();
-		SDL_GL_DeleteContext(context);
 		
+	videoout = new CVOUT();
+	videoout->Create_Framebuffer(nxmpgfx::WIDTH,nxmpgfx::HEIGHT);
 		
+	if(nxmpstats == nullptr){
+		nxmpstats = new CStats();
+		nxmpstats->emuoverrides = emuoverrides;
+		nxmpstats->StartThreads();
 	}
-	SDL_DestroyWindow(window);
-	window = NULL;
-	SDL_Quit();
+		
+	GUI::RenderLoop();
+	NXLOG::DEBUGLOG("Ending Render Loop\n");
+
+	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
+
+	if(videoout!= nullptr){
+		delete videoout;
+		videoout = nullptr;
+	}
+	delete libmpv;
+	libmpv = nullptr;
+	NXLOG::DEBUGLOG("Ending MPV\n");
+		
+	DeallocateExtern();	
+	if(imgloader != nullptr){
+		delete imgloader;
+		imgloader = nullptr;
+	}
+	
+	nxmpgfx::Destroy();
+	nxmpgfx::Quit();
+	
+	//window = NULL;
+	
 	
 	
 	

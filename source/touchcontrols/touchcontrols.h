@@ -3,15 +3,15 @@
 
 #include "config.h"
 #include "gui.h"
-#include <SDL.h>
+//#include <SDL.h>
 
 
 namespace TOUCHCONTROLS{
-	
+	/*
 	void fingerDown(SDL_Event *sdlevent);
 	void fingerMotion(SDL_Event *sdlevent);
 	void fingerUp(SDL_Event *sdlevent);
-	
+	*/
 }
 
 

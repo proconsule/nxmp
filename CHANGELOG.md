@@ -1,5 +1,16 @@
 # NXMP Changelog
 
+## [0.8.2]
+### Changes
+
+- Update ImGui to last release
+- Moved from SDL to GLFW for window context
+
+### Fixed
+
+- SubFont Color fix
+
+
 ## [0.8.1]
 
 ### Fixed

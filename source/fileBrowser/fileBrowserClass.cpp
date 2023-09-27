@@ -63,7 +63,8 @@
 			mylocal->DirList(path,showHidden,extensions);
 		}
 		if(mysamba!= nullptr){
-			mysamba->DirList(path,showHidden,extensions);
+			connected = mysamba->DirList(path,showHidden,extensions);
+			errormsg = mysamba->errormsg;
 		}
 		if(myssh!= nullptr){
 			myssh->DirList(path,showHidden,extensions);

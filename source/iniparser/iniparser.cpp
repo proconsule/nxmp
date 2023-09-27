@@ -532,6 +532,28 @@ void CIniParser::ReadConfig(){
 		if(inidata["Main"].has("subfontscale")){
 			nxmpconfig.subfontscale = string_to_int(inidata.get("Main").get("subfontscale"));
 		}
+		if(inidata["Main"].has("subfontcolor")){
+			std::string fontcolorstr = inidata.get("Main").get("subfontcolor");
+			int tmpcolors[3];
+			sscanf(fontcolorstr.c_str(),"#%02X%02X%02X",&tmpcolors[0],&tmpcolors[1],&tmpcolors[2]);
+			nxmpconfig.subfontcolor[0] = (float)tmpcolors[0]/255.0f;
+			nxmpconfig.subfontcolor[1] = (float)tmpcolors[1]/255.0f;
+			nxmpconfig.subfontcolor[2] = (float)tmpcolors[2]/255.0f;
+			nxmpconfig.subfontcolor[3] = 1.0f;
+		
+		}
+		if(inidata["Main"].has("subbordercolor")){
+			std::string fontcolorstr = inidata.get("Main").get("subbordercolor");
+			int tmpcolors[3];
+			sscanf(fontcolorstr.c_str(),"#%02X%02X%02X",&tmpcolors[0],&tmpcolors[1],&tmpcolors[2]);
+			nxmpconfig.subbordercolor[0] = (float)tmpcolors[0]/255.0f;
+			nxmpconfig.subbordercolor[1] = (float)tmpcolors[1]/255.0f;
+			nxmpconfig.subbordercolor[2] = (float)tmpcolors[2]/255.0f;
+			nxmpconfig.subbordercolor[3] = 1.0f;
+		
+		}
+		
+		
 		if(inidata["Main"].has("startresumeperc")){
 			nxmpconfig.startresumeperc = string_to_int(inidata.get("Main").get("startresumeperc"));
 		}
@@ -562,7 +584,9 @@ void CIniParser::ReadConfig(){
 			nxmpconfig.e2addr = inidata.get("Enigma2").get("e2address");
 		}
 		
+	
 	}
+	
 	
 	nxmptmpconfig = nxmpconfig;
 	isModified = false;
@@ -594,6 +618,8 @@ void CIniParser::saveSettings(){
 		{"slang",Utility::getLanguages()[nxmpconfig.slang].lang3},
 		{"subfontsize", int_to_string(nxmpconfig.subfontsize)},
 		{"subfontscale", float_to_string(nxmpconfig.subfontscale)},
+		{"subfontcolor", getSubFontColorHex(true)},
+		{"subbordercolor", getSubBorderColorHex(true)},
 		{"playeswipeseek", bool_to_string(nxmpconfig.playeswipeseek)},
 		{"startresumeperc", int_to_string(nxmpconfig.startresumeperc)},
 		{"stopresumeperc", int_to_string(nxmpconfig.stopresumeperc)},

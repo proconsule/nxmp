@@ -40,14 +40,14 @@ sambaDir::sambaDir(std::string _url,Playlist * _playlist){
 }
 
 
-void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions){
+bool sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions){
 	
 	struct smb2_context *smb2;
 	struct smb2dir *dir;
 	struct smb2dirent *ent;
 
 	urlschema thisurl = Utility::parseUrl(url);
-	if(thisurl.user.empty())thisurl.user = "Guest";
+	
 	currentlist.clear();
 	
 	
@@ -65,7 +65,8 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 	smb2 = smb2_init_context();
 	if (smb2 == NULL) {
 		NXLOG::ERRORLOG("SMB2 Failed to init context\n");
-		return;
+		errormsg = "SMB2 Failed to init context";
+		return false;
 	
 	}
 	
@@ -77,10 +78,17 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 	fflush(stdout);
 	//char const *search = ":";
 	//char * token = strtok((char *)myurl->user, search);
-	smb2_set_user(smb2,myurl->user); 
+	if(myurl->user != NULL){
+		smb2_set_user(smb2,myurl->user); 
+	}else{
+		NXLOG::DEBUGLOG("Setting SMB Proto Version 302\n");
+		smb2_set_user(smb2,"Guest"); 
+		smb2_set_version(smb2, SMB2_VERSION_0210);
+	}
 	//token = strtok(NULL, search);
-	smb2_set_password(smb2,myurl->pass); 
-	
+	if(myurl->pass != NULL){
+		smb2_set_password(smb2,myurl->pass); 
+	}
 	smb2_set_security_mode(smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
 	
 	NXLOG::DEBUGLOG("SMBURL: %s %s %s\n",myurl->share,myurl->path,path.c_str());
@@ -88,14 +96,16 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 	
 	if (smb2_connect_share(smb2, myurl->server, myurl->share, NULL) < 0) {
 		NXLOG::ERRORLOG("smb2_connect_share failed. %s\n", smb2_get_error(smb2));
-		return;
+		errormsg = std::string("smb2_connect_share failed. ") + std::string(smb2_get_error(smb2));
+		return false;
 	}
 	NXLOG::DEBUGLOG("SMB2: Share Connected\n");
 	fflush(stdout);
 	dir = smb2_opendir(smb2, path.c_str());
 	if (dir == NULL) {
 		NXLOG::ERRORLOG("smb2_opendir failed. %s\n", smb2_get_error(smb2));
-		return;
+		errormsg = std::string("smb2_opendir failed. ") + std::string(smb2_get_error(smb2));
+		return false;
 	}
 	
 	while ((ent = smb2_readdir(smb2, dir))) {
@@ -187,7 +197,9 @@ void sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
     smb2_closedir(smb2, dir);
     smb2_disconnect_share(smb2);
     smb2_destroy_context(smb2);
-
+	
+	errormsg = "";
+	return true;
 }
 
 

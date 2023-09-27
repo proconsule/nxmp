@@ -4,12 +4,19 @@
 #include "libmpv.h"
 #include "utils.h"
 #include "SwitchSys.h"
+#include "GLFW/glfw3.h"
 
 
 bool codecSort(const decoderlist_struct &a, const decoderlist_struct &b) {
 
 		return Utility::str_tolower(a.codecname) < Utility::str_tolower(b.codecname);
 }
+
+
+static void *get_proc_address_mpv(void *fn_ctx, const char *name) {
+		glfwGetCurrentContext();
+		return reinterpret_cast<void *>(glfwGetProcAddress(name));
+	}
 
 libMpv::libMpv(const std::string &configDir) {
 
@@ -23,8 +30,13 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "config", "yes");
 	mpv_set_option_string(handle, "config-dir", configDir.c_str());
 	mpv_set_option_string(handle, "terminal", "yes");
+	if(NXLOG::loglevel == 0){
+		mpv_set_option_string(handle, "msg-level", "all=no");
+	}else{
+		mpv_set_option_string(handle, "msg-level", "all=v");
+	}
 	mpv_set_option_string(handle, "msg-level", "all=v");
-	mpv_set_option_string(handle, "vd-lavc-threads", "3");
+	mpv_set_option_string(handle, "vd-lavc-threads", "4");
 	//mpv_set_option_string(handle, "vd-lavc-skiploopfilter", "all");
 	mpv_set_option_string(handle, "audio-channels", "stereo");
 	mpv_set_option_string(handle, "video-timing-offset", "0");
@@ -39,17 +51,17 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "sub-shadow-offset", "1");
 	mpv_set_option_string(handle, "sub-shadow-color", "0.0/0.0/0.0/0.25");
 	
+	mpv_set_option_string(handle, "reset-on-next-file", "pause");
 	
-	
-	//mpv_set_option_string(handle, "interpolation", "no");
+	mpv_set_option_string(handle, "interpolation", "no");
 	mpv_set_option_string(handle, "scale", "linear");
 
 	
 	mpv_set_option_string(handle, "image-display-duration", "inf");
 	mpv_set_option_string(handle, "hdr-compute-peak", "no");
 	
-	//mpv_set_option_string(handle, "demuxer-seekable-cache", "yes");
-	//mpv_set_option_string(handle, "demuxer-readahead-secs", std::to_string(configini->getDemuxCache(false)).c_str());
+	mpv_set_option_string(handle, "demuxer-seekable-cache", "yes");
+	mpv_set_option_string(handle, "demuxer-readahead-secs", std::to_string(configini->getDemuxCache(false)).c_str());
 	
 
 	if(configini->getHWDec(false)){
@@ -88,13 +100,15 @@ libMpv::libMpv(const std::string &configDir) {
     }
 	
 	NXLOG::DEBUGLOG("MPV Init Renderer\n");
-	
-	
-
+	 
+	 
 	
 	mpv_opengl_init_params mpv_gl_init_params = {
-	.get_proc_address = [] (void *, const char *name) -> void * { return SDL_GL_GetProcAddress(name); },
+	.get_proc_address = get_proc_address_mpv,
 	};
+	
+	
+	
 	mpv_render_param params[]{
 		{MPV_RENDER_PARAM_API_TYPE, (void *) MPV_RENDER_API_TYPE_OPENGL},
 		{MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &mpv_gl_init_params},

@@ -23,9 +23,15 @@ namespace Windows {
 		
 		
 		if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
+			if (ImGui::BeginTable("##table1", 2)){
+				ImGui::TableSetupColumn("icon", ImGuiTableColumnFlags_WidthFixed, ((80.0f+ImGui::GetStyle().FramePadding.x) *multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
+				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthStretch); // Default to 200.0f
+				
 				static int selected = -1;					
 				for (unsigned int n = 0; n < topmenu.size(); n++){
+					ImGui::TableNextRow();
 					std::string itemid = "##" + std::to_string(n);
+					ImGui::TableSetColumnIndex(0);
 					if(topmenu[n] == "Local Files"){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SdCardTexture.id, ImVec2(50,50));
 					}
@@ -60,10 +66,11 @@ namespace Windows {
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ExitTexture.id, ImVec2(50,50));
 					}
 							
-							
-					ImGui::SameLine();
+															
+					ImGui::TableSetColumnIndex(1);
+					
 					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
-								
+									
 					if (ImGui::Selectable(itemid.c_str(), selected == n)){
 						if(topmenu[n] == "Local Files"){
 							item.state = MENU_STATE_FILEBROWSER;
@@ -166,6 +173,8 @@ namespace Windows {
 
 					}
 					ImGui::SameLine();
+					//ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
+					
 					ImGui::Text("%s",topmenu[n].c_str());
 					
 					
@@ -180,7 +189,8 @@ namespace Windows {
 					g.NavDisableMouseHover = true;
 					*first_item = false;
 				}
-				
+				ImGui::EndTable();
+			}	
 		}
 		
 		Windows::ExitMainWindow();

@@ -25,8 +25,8 @@ typedef struct{
 	int subfontsize = 55;
 	float subfontscale = 1.0f;
 	int deint = 0;
-	float subfontcolor[4];
-	float subbordercolor[4];
+	float subfontcolor[4] = {1.0f,1.0f,1.0f,1.0f};
+	float subbordercolor[4] = {0.0f,0.0f,0.0f,0.0f};
 	int startresumeperc = 5;
 	int stopresumeperc = 5;
 	int demuxcachesec = 20;

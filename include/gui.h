@@ -3,13 +3,12 @@
 
 #include <vector>
 #include <string>
-#include <SDL.h>
 
 
 #include <switch.h>
 
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
 #include "appwindows.h"
 #include "apppopups.h"
 #include "playerwindows.h"
@@ -51,8 +50,8 @@
 
 #include "NX-UPNP.h"
 
-
-#include "imgui_impl_sdl.h"
+#include "nxmp-gfx.h"
+//#include "imgui_impl_sdl2.h"
 
 #include "touchcontrols.h"
 #include "shaderMania.h"
@@ -61,10 +60,7 @@
 
 #include "vout.h"
 
-#define handheldWidth 1280
-#define handheldHeight 720
-#define dockedWidth 1920
-#define dockedHeight 1080
+
 
 enum MENU_STATES {
 	MENU_STATE_HOME,
@@ -230,7 +226,7 @@ typedef struct {
 
 
 
-extern SDL_Window *window;
+//extern SDL_Window *window;
 extern MenuItem item;
 
 extern libMpv *libmpv;
@@ -292,7 +288,7 @@ extern float initScale;
 extern bool isHandheld;
 extern bool clockoc;
 extern std::string tempKbUrl;
-extern SDL_GLContext context;
+//extern SDL_GLContext context;
 
 
 extern shaderMania* shadermania;

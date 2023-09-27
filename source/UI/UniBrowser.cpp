@@ -44,131 +44,149 @@ namespace Windows {
 				
 				//ImGui::Image((void*)(intptr_t)videoout->mpv_fbotexture, ImVec2(videoout->windowed_width,videoout->windowed_height),{0, 1}, {1, 0});
 			}
+			
+			
+			
 			ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
-			if (ImGui::BeginTable("table1", 3,ImGuiTableFlags_RowBg)){
-				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
-				ImGui::TableSetupColumn("size", ImGuiTableColumnFlags_WidthFixed, 130.0f*multiplyRes); // Default to 200.0f
-				ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed,210.f*multiplyRes);       // Default to auto
-				ImGuiListClipper clipper;
-				clipper.Begin(thislist.size());
-				while (clipper.Step())
-				{
-					for (unsigned int n = clipper.DisplayStart; n < clipper.DisplayEnd; n++){
-						static int selected = -1;
-						
-						ImGui::TableNextRow();
-						ImGui::TableSetColumnIndex(0);
-						std::string itemid = "##" + std::to_string(n);
-						
-						ImGui::Dummy(ImVec2(0,ImGui::CalcTextSize("A").y + ImGui::GetStyle().FramePadding.y * 2));
-						ImGui::SameLine();
-						
-						if(item.selectionstate == FILE_SELECTION_CHECKBOX){
-							if(thislist[n].type != FS::FileEntryType::Directory){
-								if(ImGui::Checkbox(itemid.c_str(), filebrowser->checked(n))){
-									
+			if(!filebrowser->connected){
+				ImGui::SetCursorPosX( (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Error Connecting").x) / 2.f);
+				ImGui::TextColored(ImVec4(1.0f,0.0f,0.0f,1.0f),"Error Connecting");
+				
+				ImGui::SetCursorPosX( (ImGui::GetWindowWidth() - ImGui::CalcTextSize(filebrowser->errormsg.c_str()).x) / 2.f);
+				ImGui::SetCursorPosY( (ImGui::GetWindowHeight() - ImGui::CalcTextSize(filebrowser->errormsg.c_str()).y) / 2.f);
+				ImGui::Text("%s",filebrowser->errormsg.c_str());
+			}else{
+				if (ImGui::BeginTable("table1", 3,ImGuiTableFlags_RowBg)){
+					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
+					ImGui::TableSetupColumn("size", ImGuiTableColumnFlags_WidthFixed, 130.0f*multiplyRes); // Default to 200.0f
+					ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed,210.f*multiplyRes);       // Default to auto
+					ImGui::TableSetupScrollFreeze(0, 1);
+					ImGui::TableHeadersRow();
+					ImGuiListClipper clipper;
+					clipper.Begin(thislist.size());
+					while (clipper.Step())
+					{
+						for (unsigned int n = clipper.DisplayStart; n < clipper.DisplayEnd; n++){
+							static int selected = -1;
+							
+							ImGui::TableNextRow();
+							ImGui::TableSetColumnIndex(0);
+							std::string itemid = "##" + std::to_string(n);
+							
+							ImGui::Dummy(ImVec2(0,30 + ImGui::GetStyle().FramePadding.y * 2));
+							ImGui::SameLine();
+							
+							if(item.selectionstate == FILE_SELECTION_CHECKBOX){
+								if(thislist[n].type != FS::FileEntryType::Directory){
+									if(ImGui::Checkbox(itemid.c_str(), filebrowser->checked(n))){
+										
+									}
+									ImGui::SameLine();
 								}
-								ImGui::SameLine();
+								
 							}
 							
-						}
-						
-						if(thislist[n].type == FS::FileEntryType::Directory){
-							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FolderTexture.id, ImVec2(30,30));
-						}else{
-							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FileTexture.id, ImVec2(30,30));
-						}
-						ImGui::SameLine();
-						//ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f);
-						ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
-						if(item.selectionstate != FILE_SELECTION_CHECKBOX){
-							if (ImGui::Selectable(itemid.c_str(), selected == n,selectable_flags,ImVec2(0,30.0f*multiplyRes))){
-									if(filebrowser->getCurrList()[n].type == FS::FileEntryType::Directory){
-									triggerselect = true;
-									filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
-								} else{
-									item.laststate = item.state;
-									playlist->clearPlaylist();
-									filebrowser->clearChecked();
-									NXLOG::DEBUGLOG("OPEN FILE: %s\n",(filebrowser->getOpenUrlPart()+thislist[n].path).c_str());
-									libmpv->loadFile(filebrowser->getOpenUrlPart()+thislist[n].path);
-									if(configini->getDbActive(true)){
-										libmpv->getFileInfo()->resume = sqlitedb->getResume(filebrowser->getOpenUrlPart()+thislist[n].path);
-										if(libmpv->getFileInfo()->resume>0){
-											item.popupstate = POPUP_STATE_RESUME;
+							if(thislist[n].type == FS::FileEntryType::Directory){
+								GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FolderTexture.id, ImVec2(30,30));
+							}else{
+								GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FileTexture.id, ImVec2(30,30));
+							}
+							
+							
+							ImGui::SameLine();
+							ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
+							if(item.selectionstate != FILE_SELECTION_CHECKBOX){
+								if (ImGui::Selectable(itemid.c_str(), selected == n,selectable_flags,ImVec2(0,30.0f*multiplyRes))){
+										if(filebrowser->getCurrList()[n].type == FS::FileEntryType::Directory){
+										triggerselect = true;
+										filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
+									} else{
+										item.laststate = item.state;
+										playlist->clearPlaylist();
+										filebrowser->clearChecked();
+										NXLOG::DEBUGLOG("OPEN FILE: %s\n",(filebrowser->getOpenUrlPart()+thislist[n].path).c_str());
+										libmpv->loadFile(filebrowser->getOpenUrlPart()+thislist[n].path);
+										if(configini->getDbActive(true)){
+											libmpv->getFileInfo()->resume = sqlitedb->getResume(filebrowser->getOpenUrlPart()+thislist[n].path);
+											if(libmpv->getFileInfo()->resume>0){
+												item.popupstate = POPUP_STATE_RESUME;
+											}
 										}
 									}
 								}
+							}else{
+								ImGui::Dummy(ImVec2(0,ImGui::CalcTextSize("A").y + ImGui::GetStyle().FramePadding.y * 2));
+								ImGui::SameLine();
+							
 							}
-						}else{
-							ImGui::Dummy(ImVec2(0,ImGui::CalcTextSize("A").y + ImGui::GetStyle().FramePadding.y * 2));
+							if (ImGui::IsItemHovered()){
+								if(item.fileHoveredidx != n){
+									BrowserTextScroller->ResetPosition();
+									
+								}
+								item.fileHoveredidx = n;
+							}
+							ImVec4* colors = ImGui::GetStyle().Colors;
+							ImVec4 textcolor = colors[ImGuiCol_Text];
+							if(sqlitedb != nullptr && thislist[n].dbread == -1){
+								int dbfilestatus = sqlitedb->getFileDbStatus(filebrowser->getOpenUrlPart()+thislist[n].path);
+								if(dbfilestatus == 2){
+									textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
+								} else if(dbfilestatus == 1){
+									textcolor = ImVec4(0.0f,1.0f,1.0f,1.0f);
+								}
+								filebrowser->SetFileDbStatus(n,dbfilestatus);
+							}else if(sqlitedb != nullptr){
+								if(thislist[n].dbread == 2){
+									textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
+								} else if(thislist[n].dbread == 1){
+									textcolor = ImVec4(0.0f,1.0f,1.0f,1.0f);
+								}
+							}
 							ImGui::SameLine();
-						
-						}
-						if (ImGui::IsItemHovered()){
-							if(item.fileHoveredidx != n){
-								BrowserTextScroller->ResetPosition();
+							//ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f);
+							
+							std::string bsid =std::string("##bs") + std::to_string(n);
+							if(item.fileHoveredidx == n){
+								ImGui::Dummy(ImVec2(-10.0,(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y)));
+								ImGui::SameLine();
+								ImGui::SetCursorPosX(ImGui::GetCursorPosX()-10.0f);
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
+								BrowserTextScroller->DrawColor(bsid.c_str(),textcolor,(940.0f*multiplyRes -2* ImGui::GetStyle().ItemSpacing.x),(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y),thislist[n].name.c_str());	
+							}else{
+								ImGui::Dummy(ImVec2(-10.0,(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y)));
 								
+								ImGui::SameLine();
+								ImGui::SetCursorPosX(ImGui::GetCursorPosX()-10.0f);
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY()+5.0f);
+								ImGui::TextColored(textcolor,"%s",thislist[n].name.c_str());
 							}
-							item.fileHoveredidx = n;
-						}
-						ImVec4* colors = ImGui::GetStyle().Colors;
-						ImVec4 textcolor = colors[ImGuiCol_Text];
-						if(sqlitedb != nullptr && thislist[n].dbread == -1){
-							int dbfilestatus = sqlitedb->getFileDbStatus(filebrowser->getOpenUrlPart()+thislist[n].path);
-							if(dbfilestatus == 2){
-								textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
-							} else if(dbfilestatus == 1){
-								textcolor = ImVec4(0.0f,1.0f,1.0f,1.0f);
+							ImGui::TableSetColumnIndex(1);
+							if(thislist[n].type == FS::FileEntryType::File){
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
+								std::string strsize = Utility::humanSize(thislist[n].size);
+								ImVec2 textSize = ImGui::CalcTextSize(strsize.c_str());
+								ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() -textSize.x- ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x);
+								ImGui::TextColored(textcolor,"%s",strsize.c_str());
+							}else{
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
 							}
-							filebrowser->SetFileDbStatus(n,dbfilestatus);
-						}else if(sqlitedb != nullptr){
-							if(thislist[n].dbread == 2){
-								textcolor = ImVec4(0.0f,1.0f,0.0f,1.0f);
-							} else if(thislist[n].dbread == 1){
-								textcolor = ImVec4(0.0f,1.0f,1.0f,1.0f);
+							
+							ImGui::TableSetColumnIndex(2);
+							//ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
+							
+							if(thislist[n].is_valid){
+								std::string strdate = Utility::formatTimeStamp(thislist[n].modified);
+								//ImVec2 textSize = ImGui::CalcTextSize(strdate.c_str());
+								ImGui::TextColored(textcolor,"%s",strdate.c_str());
 							}
+							
 						}
-						ImGui::SameLine();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f);
-						
-						std::string bsid =std::string("##bs") + std::to_string(n);
-						if(item.fileHoveredidx == n){
-							ImGui::Dummy(ImVec2(-10.0,(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y)));
-							ImGui::SameLine();
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX()-10.0f);
-							BrowserTextScroller->DrawColor(bsid.c_str(),textcolor,(940.0f*multiplyRes -2* ImGui::GetStyle().ItemSpacing.x),(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y),thislist[n].name.c_str());	
-						}else{
-							ImGui::Dummy(ImVec2(-10.0,(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y)));
-							ImGui::SameLine();
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX()-10.0f);
-							ImGui::TextColored(textcolor,"%s",thislist[n].name.c_str());
-						}
-						ImGui::TableSetColumnIndex(1);
-						if(thislist[n].type == FS::FileEntryType::File){
-							ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
-							std::string strsize = Utility::humanSize(thislist[n].size);
-							ImVec2 textSize = ImGui::CalcTextSize(strsize.c_str());
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() -textSize.x- ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.x);
-							ImGui::TextColored(textcolor,"%s",strsize.c_str());
-						}else{
-							ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
-						}
-						
-						ImGui::TableSetColumnIndex(2);
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
-						
-						if(thislist[n].is_valid){
-							std::string strdate = Utility::formatTimeStamp(thislist[n].modified);
-							//ImVec2 textSize = ImGui::CalcTextSize(strdate.c_str());
-							ImGui::TextColored(textcolor,"%s",strdate.c_str());
-						}
-						
 					}
-				}
-				ImGui::EndTable();
-				if(item.popupstate == POPUP_STATE_NONE){
-					ImGui::SetWindowFocus();
+					ImGui::EndTable();
+					if(item.popupstate == POPUP_STATE_NONE){
+						ImGui::SetWindowFocus();
+					}
 				}
 			}
 			ImGui::EndChild();

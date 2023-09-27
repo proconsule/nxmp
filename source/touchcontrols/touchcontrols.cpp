@@ -6,7 +6,7 @@ float swipey = 0.0;
 int fingersum = 0; 
 
 namespace TOUCHCONTROLS{
-	
+	/*
 	void fingerDown(SDL_Event *sdlevent){
 		swipex = 0.0;
 		swipey = 0.0;
@@ -98,7 +98,7 @@ namespace TOUCHCONTROLS{
 		fingersum = 0;
 		
 	}
-	
+	*/
 }
 
 

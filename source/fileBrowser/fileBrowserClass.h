@@ -52,6 +52,8 @@ public:
 	bool currshowHidden = false;
 	
 	bool timelessFS = false;
+	bool connected = true;
+	std::string errormsg = "";
 	std::vector<usb_devices> getUsbDev();
 
 private:
