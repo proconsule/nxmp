@@ -6,6 +6,7 @@
 #include "localfiles.h"
 #include "Enigma2.h"
 
+#include "nxmp-i18n.h"
 
 namespace Windows {
 	
@@ -56,12 +57,20 @@ namespace Windows {
 				ImGui::SetCursorPosY( (ImGui::GetWindowHeight() - ImGui::CalcTextSize(filebrowser->errormsg.c_str()).y) / 2.f);
 				ImGui::Text("%s",filebrowser->errormsg.c_str());
 			}else{
-				if (ImGui::BeginTable("table1", 3,ImGuiTableFlags_RowBg)){
-					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
-					ImGui::TableSetupColumn("size", ImGuiTableColumnFlags_WidthFixed, 130.0f*multiplyRes); // Default to 200.0f
-					ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed,210.f*multiplyRes);       // Default to auto
+				if (ImGui::BeginTable("table1", 3,ImGuiTableFlags_RowBg|ImGuiTableFlags_ScrollY)){
+					ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
+					ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 125.0f*multiplyRes); // Default to 200.0f
+					ImGui::TableSetupColumn("Date", ImGuiTableColumnFlags_WidthFixed,215.f*multiplyRes);       // Default to auto
 					ImGui::TableSetupScrollFreeze(0, 1);
-					ImGui::TableHeadersRow();
+					//ImGui::TableHeadersRow();
+					ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+					ImGui::TableSetColumnIndex(0);
+					ImGui::Text(Common_STR[NXCOMMON_NAME]);
+					ImGui::TableSetColumnIndex(1);
+					ImGui::Text(Common_STR[NXCOMMON_SIZE]);
+					ImGui::TableSetColumnIndex(2);
+					ImGui::Text(Common_STR[NXCOMMON_DATE]);
+					
 					ImGuiListClipper clipper;
 					clipper.Begin(thislist.size());
 					while (clipper.Step())
@@ -183,10 +192,11 @@ namespace Windows {
 							
 						}
 					}
-					ImGui::EndTable();
 					if(item.popupstate == POPUP_STATE_NONE){
 						ImGui::SetWindowFocus();
 					}
+					ImGui::EndTable();
+					
 				}
 			}
 			ImGui::EndChild();
@@ -196,7 +206,7 @@ namespace Windows {
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Navigation");
+			ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_LEFT.id, ImVec2(30,30));
@@ -208,25 +218,25 @@ namespace Windows {
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Select/Play");
+			ImGui::Text(Common_STR[NXCOMMON_SELECTPLAY]);
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_B_BUT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Back");
+			ImGui::Text(Common_STR[NXCOMMON_BACK]);
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_X_BUT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Context Menu");
+			ImGui::Text(Common_STR[NXCOMMON_CONTEXTMENU]);
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
-			ImGui::Text("NXMP Home");
+			ImGui::Text(Common_STR[NXCOMMON_HOME]);
 			
 			
 			ImGui::EndChild();

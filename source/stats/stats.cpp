@@ -43,6 +43,17 @@ CStats::~CStats(){
 	nvExit();
 }
 
+void CStats::CalcDelay(){
+	auto myeventdelay = std::chrono::duration_cast<std::chrono::microseconds>(eventtime - starttime);
+	auto mylayerdelay = std::chrono::duration_cast<std::chrono::microseconds>(layertime - eventtime);
+	auto myrenderdelay = std::chrono::duration_cast<std::chrono::microseconds>(rendertime - layertime);
+
+	event_time_delay = myeventdelay.count();
+	layer_time_delay = mylayerdelay.count();
+	render_time_delay = myrenderdelay.count();
+}
+
+
 void CheckCore0(void *arg) {
 	CStats * ctx = (CStats *)arg;
 	while (!ctx->threadexit) {
@@ -257,6 +268,9 @@ void CStats::UpdateStats(){
         int year = timeStruct->tm_year +1900;
         int wday = timeStruct->tm_wday;
 		sprintf(currentTime,"%02i:%02i", hours, minutes);
+		
+		sprintf(loopstat_c,"Event time: %.3f Layer time: %.3f Render Time: %.3f",event_time_delay/1000.0,layer_time_delay/1000.0,render_time_delay/1000.0);
+		
 }
 
 void BatteryChecker(void*arg) {

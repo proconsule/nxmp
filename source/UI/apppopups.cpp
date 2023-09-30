@@ -4,7 +4,7 @@
 #include "imgui_internal.h"
 #include "utils.h"
 
-
+#include "nxmp-i18n.h"
 
 
 namespace Popups{
@@ -94,14 +94,14 @@ namespace Popups{
 	}
 	
 	void SaveSettingsPopup(void) {
-		Popups::SetupPopup("Save Settings");
+		Popups::SetupPopup(Popup_STR[NXPOPUP_SAVESETTINGS]);
 
-		if (ImGui::BeginPopupModal("Save Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_SAVESETTINGS], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
-			ImGui::Text("Save Settings?");
+			ImGui::Text("%s?",Popup_STR[NXPOPUP_SAVESETTINGS]);
                
 			ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
-            if (ImGui::Button("Yes", button_size))
+            if (ImGui::Button(Common_STR[NXCOMMON_YES], button_size))
             {
 				item.state = MENU_STATE_HOME;
 				item.popupstate = POPUP_STATE_NONE;
@@ -112,7 +112,7 @@ namespace Popups{
 					
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("No", button_size))
+				if (ImGui::Button(Common_STR[NXCOMMON_NO], button_size))
 				{
                     configini->ReadConfig();
 					item.state = MENU_STATE_HOME;
@@ -125,16 +125,16 @@ namespace Popups{
 	}
 	
 	void ResumePopup(void) {
-		Popups::SetupPopup("Resume Play");
+		Popups::SetupPopup(Popup_STR[NXPOPUP_RESUMEPLAY]);
 
-		if (ImGui::BeginPopupModal("Resume Play", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_RESUMEPLAY], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
-			ImGui::Text("Resume Playback?");
+			ImGui::Text("%s?",Popup_STR[NXPOPUP_RESUMEPLAY]);
 			
-			ImGui::Text("Resume Playback @ %s",Utility::formatTimeShort(libmpv->getFileInfo()->resume).c_str());
+			ImGui::Text("%s @ %s",Popup_STR[NXPOPUP_RESUMEPLAY],Utility::formatTimeShort(libmpv->getFileInfo()->resume).c_str());
                
 			ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
-            if (ImGui::Button("Yes", button_size))
+            if (ImGui::Button(Common_STR[NXCOMMON_YES], button_size))
             {
 				libmpv->seek(libmpv->getFileInfo()->resume,false);
 				item.popupstate = POPUP_STATE_NONE;
@@ -142,7 +142,7 @@ namespace Popups{
 					
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("No", button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_NO], button_size))
 			{
                     
 				
@@ -369,15 +369,15 @@ namespace Popups{
 	//bordercolorend
 
 	void DBUpdatedPopup(void) {
-		Popups::SetupPopup("Database Updated");
-		if (ImGui::BeginPopupModal("Database Updated", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			ImGui::Text("Database was Updated");
-			ImGui::Text("DB Version: %s",sqlitedb->getDbVersion().c_str());
+		Popups::SetupPopup(Popup_STR[NXPOPUP_DBUPDATED]);
+		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_DBUPDATED], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::Text(Popup_STR[NXPOPUP_DBWASUPDATED]);
+			ImGui::Text("%s %s",SettingsMenu_STR[NXSET_DATABASEVERSION],sqlitedb->getDbVersion().c_str());
 			
-			if(ImGui::Button("OK",ImVec2(ImGui::GetContentRegionAvail().x,0.0f))){
+			if(ImGui::Button(Common_STR[NXCOMMON_OK],ImVec2(ImGui::GetContentRegionAvail().x,0.0f))){
 				item.popupstate = POPUP_STATE_NONE;
 			}
-			ImGui::SetFocusID(ImGui::GetID("OK"), ImGui::GetCurrentWindow()); 
+			ImGui::SetFocusID(ImGui::GetID(Common_STR[NXCOMMON_OK]), ImGui::GetCurrentWindow()); 
 			ImGuiContext& g = *ImGui::GetCurrentContext();
 			g.NavDisableHighlight = false;
 			
@@ -386,9 +386,9 @@ namespace Popups{
 	}
 	
 	void NetMenuPopup(void) {
-		Popups::SetupPopup("Network Menu Popup");
+		Popups::SetupPopup(Popup_STR[NXPOPUP_NETWORKPOPUP]);
 
-		if (ImGui::BeginPopupModal("Network Menu Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_NETWORKPOPUP], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
 			ImGui::Text("%s",item.networksources[Windows::netwinselected].name.c_str());
 			
@@ -396,7 +396,7 @@ namespace Popups{
 			if(Windows::netwinselected == 0){
 				ImGui::BeginDisabled();
 			}
-			if (ImGui::Button("Move Up", button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_MOVEUP], button_size))
             {
 					
 					oldnetworkSource v1 = item.networksources[Windows::netwinselected];
@@ -416,7 +416,7 @@ namespace Popups{
 			if(Windows::netwinselected == item.networksources.size()-1){
 				ImGui::BeginDisabled();
 			}
-			if (ImGui::Button("Move Down", button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_MOVEDOWN], button_size))
             {
 					oldnetworkSource v1 = item.networksources[Windows::netwinselected];
 					oldnetworkSource v2 = item.networksources[Windows::netwinselected+1];
@@ -433,7 +433,7 @@ namespace Popups{
 			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
-			if (ImGui::Button("Delete", button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_DELETE], button_size))
             {	
 				item.networksources.erase(item.networksources.begin() + Windows::netwinselected);
 				item.popupstate = POPUP_STATE_NONE;
@@ -443,7 +443,7 @@ namespace Popups{
 			
 			
 			
-			if (ImGui::Button("Exit", button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_EXIT], button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;
 				ImGui::CloseCurrentPopup();
@@ -455,12 +455,12 @@ namespace Popups{
 	
 	
 	void FileContextPopup(void) {
-		Popups::SetupPopup("File Context Menu Popup");
+		Popups::SetupPopup(Popup_STR[NXPOPUP_FILEMENU]);
 		if(FilePopupTextScroller == nullptr){
 			FilePopupTextScroller = new CTextScroller("##filepopuptextscroll");
 		}
 		
-		if (ImGui::BeginPopupModal("File Context Menu Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_FILEMENU], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
 			ImVec2 button_size(400.0f, 0.0f);
 			std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
@@ -488,13 +488,13 @@ namespace Popups{
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
 			if(filebrowser->sortOrder == FS::FS_NAME_ASCENDINGORDER){
-				if (ImGui::Button("Sort Descending (Name)",button_size))
+				if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_NAME],button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_NAME_DESCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button("Sort Ascending (Name)",button_size))
+				if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_NAME],button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_NAME_ASCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
@@ -504,13 +504,13 @@ namespace Popups{
 				if (off > 0.0f)
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 				if(filebrowser->sortOrder == FS::FS_DATE_ASCENDINGORDER){
-					if (ImGui::Button("Sort Descending (Date)",button_size))
+					if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_DATE],button_size))
 					{
 						filebrowser->setSordOrder(FS::FS_DATE_DESCENDINGORDER);
 						item.popupstate = POPUP_STATE_NONE;
 					}
 				}else{
-					if (ImGui::Button("Sort Ascending (Date)",button_size))
+					if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_DATE],button_size))
 					{
 						filebrowser->setSordOrder(FS::FS_DATE_ASCENDINGORDER);
 						item.popupstate = POPUP_STATE_NONE;
@@ -520,13 +520,13 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			if(filebrowser->sortOrder == FS::FS_SIZE_ASCENDINGORDER){
-				if (ImGui::Button("Sort Descending (Size)",button_size))
+				if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_SIZE],button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_SIZE_DESCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button("Sort Ascending (Size)",button_size))
+				if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_SIZE],button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_SIZE_ASCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
@@ -537,7 +537,7 @@ namespace Popups{
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
 			if(selectionlist.size()!=0){
-				if (ImGui::Button("Add Checked to Playlist",button_size))
+				if (ImGui::Button(Popup_STR[NXPOPUP_ADDSELEPLAYLIST],button_size))
 				{
 					
 					for(int i=0;i<selectionlist.size();i++){
@@ -546,7 +546,7 @@ namespace Popups{
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button("Add File to Playlist",button_size))
+				if (ImGui::Button(Popup_STR[NXPOPUP_ADDFILEPLAYLIST],button_size))
 				{
 					playlist->appendFile(filebrowser->getCurrList()[item.fileHoveredidx],filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path);
 					item.popupstate = POPUP_STATE_NONE;
@@ -556,7 +556,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button("Exit", button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_EXIT], button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;
 				ImGui::CloseCurrentPopup();
@@ -600,7 +600,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button("Set as Starting element",button_size))
+			if (ImGui::Button(Popup_STR[NXPOPUP_SETASSTARTING],button_size))
 			{
                 playlist->setPlaylistIdx(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;
@@ -612,7 +612,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button("Move Up Element",button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_MOVEUP],button_size))
 			{
                 playlist->moveBack(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;
@@ -628,7 +628,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button("Move Down",button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_MOVEDOWN],button_size))
 			{
                 playlist->moveForw(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;
@@ -640,7 +640,7 @@ namespace Popups{
 
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-			if (ImGui::Button("Remove Element",button_size))
+			if (ImGui::Button(Popup_STR[NXPOPUP_REMOVEELEMENT],button_size))
 			{
                 playlist->RemoveElement(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;
@@ -653,7 +653,7 @@ namespace Popups{
 			
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-			if (ImGui::Button("Clear Playlist",button_size))
+			if (ImGui::Button(Popup_STR[NXPOPUP_CLEARPLAYLIST],button_size))
 			{
                 playlist->clearPlaylist();
 				item.popupstate = POPUP_STATE_NONE;
@@ -663,7 +663,7 @@ namespace Popups{
 			
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-			if (ImGui::Button("Exit", button_size))
+			if (ImGui::Button(Common_STR[NXCOMMON_EXIT], button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;
 				ImGui::CloseCurrentPopup();

@@ -315,6 +315,8 @@ extern std::string themefontpath;
 extern float themefontsize;
 extern float themefontsmall;
 
+
+
 /*
 extern float swipex;
 extern float swipey;

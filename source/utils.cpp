@@ -603,7 +603,18 @@ void Utility::FontLoader(std::string fontpath,float fontSize,ImGuiIO &io){
 	
 	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesCyrillic());
 	font_cfg.MergeMode = true;
-	io.Fonts->AddFontFromFileTTF("romfs:/NotoSansCJKjp-Medium.otf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
+	//io.Fonts->AddFontFromFileTTF("romfs:/Source Han Sans CN Light.otf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
+	//io.Fonts->AddFontFromFileTTF("romfs:/Source Han Sans CN Light.otf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesChineseFull());
+	
+	static ImFontGlyphRangesBuilder range;
+	range.Clear();
+	static ImVector<ImWchar> gr;
+	gr.clear();
+	range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
+	range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+	range.BuildRanges(&gr);
+	io.Fonts->AddFontFromFileTTF("romfs:/Source Han Sans CN Light.otf", fontSize, &font_cfg, gr.Data);
+	
 	
 	
 	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;

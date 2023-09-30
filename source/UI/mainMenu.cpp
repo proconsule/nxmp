@@ -7,9 +7,12 @@
 #include "Enigma2.h"
 #include "curldownloader.h"
 
+#include "nxmp-i18n.h"
+
 namespace Windows {
 	
-	static std::vector<std::string> topmenu {"Local Files","USB","Stream Url","Network","UPNP","Enigma2","Playlist","Settings","Info","Exit"};
+	//static std::vector<std::string> topmenu {"Local Files","USB","Stream Url","Network","UPNP","Enigma2","Playlist","Settings","Info","Exit"};
+	//static std::vector<NX_MAINMENU_STR> topmenu {"Local Files","USB","Stream Url","Network","UPNP","Enigma2","Playlist","Settings","Info","Exit"};
 	
 	
     void MainMenuWindow(bool *focus, bool *first_item) {
@@ -28,41 +31,38 @@ namespace Windows {
 				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthStretch); // Default to 200.0f
 				
 				static int selected = -1;					
-				for (unsigned int n = 0; n < topmenu.size(); n++){
+				for (unsigned int n = 0; n < NX_MAINMENU_STR_NR_ITEMS; n++){
 					ImGui::TableNextRow();
 					std::string itemid = "##" + std::to_string(n);
 					ImGui::TableSetColumnIndex(0);
-					if(topmenu[n] == "Local Files"){
+					if(n == MM_LOCALFILES){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SdCardTexture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "USB"){
+					else if(n == MM_USB){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.UsbTexture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "Network"){
+					else if(n == MM_NETWORK){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NetworkTexture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "UPNP"){
+					else if(n == MM_UPNP){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.UPNPTexture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "Enigma2"){
+					else if(n == MM_ENIGMA){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.Enigma2Texture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "Playlist"){
+					else if(n == MM_PLAYLIST){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.PlaylistTexture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "Stream Url"){
+					else if(n == MM_STREAM){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NetworkTexture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "MTP"){
-						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.PlaylistTexture.id, ImVec2(50,50));
-					}
-					else if(topmenu[n] == "Info"){
+					else if(n == MM_INFO){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.InfoTexture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "Settings"){
+					else if(n == MM_SETTINGS){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SettingsTexture.id, ImVec2(50,50));
 					}
-					else if(topmenu[n] == "Exit"){
+					else if(n == MM_EXIT){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ExitTexture.id, ImVec2(50,50));
 					}
 							
@@ -72,13 +72,13 @@ namespace Windows {
 					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
 									
 					if (ImGui::Selectable(itemid.c_str(), selected == n)){
-						if(topmenu[n] == "Local Files"){
+						if(n == MM_LOCALFILES){
 							item.state = MENU_STATE_FILEBROWSER;
 							filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
 							filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 							item.first_item = true;
 						}
-						if(topmenu[n] == "USB"){
+						if(n == MM_USB){
 							usbInit();
 							if(MyUSBMount==nullptr){
 								MyUSBMount=new USBMounter(playlist);
@@ -87,19 +87,19 @@ namespace Windows {
 							filebrowser = new CFileBrowser("",playlist,MyUSBMount);
 							
 						}
-						if(topmenu[n] == "Network"){
+						if(n == MM_NETWORK){
 							item.networksources.clear();
 							item.networksources = configini->getNetworks();
 							item.state = MENU_STATE_NETWORKBROWSER;
 							item.first_item = true;								
 						}
-						if(topmenu[n] == "UPNP"){
+						if(n == MM_UPNP){
 							nxupnp = new NXUPnP();
 							nxupnp->Discovery();
 							item.state = MENU_STATE_UPNPBROWSER;
 							item.first_item = true;
 						}
-						if(topmenu[n] == "Enigma2"){
+						if(n == MM_ENIGMA){
 							enigma2 = new Enigma2(configini->getEnigma());
 							item.first_item = true;
 							if(configini->getEnigma() == ""){
@@ -109,13 +109,13 @@ namespace Windows {
 								item.state = MENU_STATE_ENIGMABROWSER;
 							}
 						}
-						if(topmenu[n] == "Settings"){
+						if(n == MM_SETTINGS){
 							//configini->setLongSeek(configini->getLongSeek(false));
 							//configini->setShortSeek(configini->getShortSeek(false));
 							if(sqlitedb != nullptr)sqlitedb->UpdateDbStats();
 							item.state = MENU_STATE_SETTINGS;
 						}
-						if(topmenu[n] == "Playlist"){
+						if(n == MM_PLAYLIST){
 							item.state = MENU_STATE_PLAYLISTBROWSER;
 							if(MediaProbe == nullptr){
 								MediaProbe = new CMediaProbe(playlist);
@@ -123,19 +123,14 @@ namespace Windows {
 							}
 							
 						}
-						if(topmenu[n] == "MTP"){
-							item.state = MENU_STATE_MTPSERVER;
-							mtp = new CMTP();
-							mtp->StartServer();
-						}
-						if(topmenu[n] == "Info"){
+						if(n == MM_INFO){
 							item.state = MENU_STATE_INFO;
 						}
-						if(topmenu[n] == "Exit"){
+						if(n == MM_EXIT){
 							renderloopdone = true;
 						}
-						if(topmenu[n] == "Stream Url"){
-					//i need move this, work in progress.
+						if(n == MM_STREAM){
+						//i need move this, work in progress.
 					    
 						std::string namefile = "Streaming from Url...";
 						std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", tempKbUrl);
@@ -175,7 +170,7 @@ namespace Windows {
 					ImGui::SameLine();
 					//ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
 					
-					ImGui::Text("%s",topmenu[n].c_str());
+					ImGui::Text("%s",MainMenu_STR[n]);
 					
 					
 					

@@ -27,7 +27,7 @@ nfsDir::nfsDir(std::string _url,Playlist * _playlist){
 	
 }
 
-void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::string> &extensions){
+bool nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::string> &extensions){
 	struct nfs_context *nfs = NULL;
 	struct client client;
 	struct nfs_url *_url = NULL;
@@ -42,13 +42,18 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 	nfs = nfs_init_context();
 	if (nfs == NULL) {
 		NXLOG::ERRORLOG("failed to init context\n");
-		goto finished;
+		errormsg = "failed to init context";
+		return false;
 	}
 	
 	_url = nfs_parse_url_dir(nfs, url.c_str());
 	if (_url == NULL) {
 		NXLOG::ERRORLOG("%s\n", nfs_get_error(nfs));
-		goto finished;
+		errormsg = nfs_get_error(nfs);
+		if (nfs != NULL) {
+			nfs_destroy_context(nfs);
+		}
+		return false;
 	}
 	
 	NXLOG::DEBUGLOG("DIR PATH %s\n",_path.c_str());
@@ -60,7 +65,11 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 	
 	if ((ret = nfs_mount(nfs, client.nfsserver, client.nfsexport)) != 0) {
  		NXLOG::ERRORLOG("Failed to mount nfs share : %s\n", nfs_get_error(nfs));
-		goto finished;
+		errormsg = std::string("Failed to mount nfs share : ") + nfs_get_error(nfs);
+		if (nfs != NULL) {
+			nfs_destroy_context(nfs);
+		}
+		return false;
 	}
 	
 	
@@ -68,7 +77,11 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 	ret = nfs_opendir(nfs, "", &nfsdir);
 	if (ret != 0) {
 		NXLOG::ERRORLOG("Failed to opendir(\"%s\") %s\n", "", nfs_get_error(nfs));
-		goto finished;
+		errormsg = std::string("Failed to opendir : ") + nfs_get_error(nfs);
+		if (nfs != NULL) {
+			nfs_destroy_context(nfs);
+		}
+		return false;
 	}
 	currentlist.clear();
 	while((nfsdirent = nfs_readdir(nfs, nfsdir)) != NULL) {
@@ -143,12 +156,12 @@ void nfsDir::DirList(std::string _path,bool showHidden,const std::vector<std::st
 	}), currentlist.end());
 	
 
-finished:
+
 	
 	if (nfs != NULL) {
 		nfs_destroy_context(nfs);
 	}
-	
+	return true;
 }
 
 

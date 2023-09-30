@@ -67,7 +67,8 @@
 			errormsg = mysamba->errormsg;
 		}
 		if(myssh!= nullptr){
-			myssh->DirList(path,showHidden,extensions);
+			connected = myssh->DirList(path,showHidden,extensions);
+			errormsg = myssh->errormsg;
 		}
 		if(myftp!= nullptr){
 			myftp->DirList(path,extensions);

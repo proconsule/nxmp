@@ -146,8 +146,6 @@ namespace playerWindows{
 					}
 				}
 				
-				//ImGui::Checkbox("Power Stats", &item.showstats);
-				//ImGui::Checkbox("Dec Stats", &item.showdecstats);
 				const ImVec4 green(0.16f, 0.66f, 0.45f, 1.0f);
 				const ImVec4 green_hover(0.0f, 1.0f, 0.57f, 1.0f);
 				const ImVec4 offgreen(0.31f, 0.39f, 0.52f, 1.0f);
@@ -1112,6 +1110,9 @@ namespace playerWindows{
 			ImGui::Text("CPU %s %s %s %s",nxmpstats->CPU_Hz_c ,nxmpstats->CPU_Usage0,nxmpstats->CPU_Usage1,nxmpstats->CPU_Usage2);
 			ImGui::Text("GPU %s %s",nxmpstats->GPU_Hz_c ,nxmpstats->GPU_Load_c);
 			ImGui::Text("%s",nxmpstats->Battery_c);
+			
+			ImGui::Text("%s",nxmpstats->loopstat_c);
+			
 			ImGui::PopStyleColor(2);
 			ImGui::PopStyleVar();
 			

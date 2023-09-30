@@ -19,6 +19,7 @@ typedef struct{
 	int alang = 0;
 	bool useslang = false;
 	int slang = 0;
+	int intlang = 0;
     bool useoc = false;
 	bool hwdec = true;
 	bool vsync = true;
@@ -95,6 +96,9 @@ public:
 
 	int getSubFontSize(bool tmpvalue);
 	void setSubFontSize(int val);
+	
+	int getInterfaceLang(bool tmpvalue);
+	void setInterfaceLang(int lang);
 
 	//subscale
 	float getSubFontScale(bool tmpvalue);

@@ -427,7 +427,27 @@ namespace GUI {
 		
 		
 		uint64_t event_ret = nxmpgfx::Process_UI_Events();
+		
 		if(event_ret>0){
+			
+			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_UP)){
+				//ImGui::PushButtonRepeat(true);
+				//ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadUp,true);
+				//ImGui::PopButtonRepeat();
+			}
+			
+			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_DOWN)){
+				//ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadDown,true);
+			}
+			
+			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_LEFT)){
+				ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadLeft,true);
+			}
+			
+			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_RIGHT)){
+				ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadRight,true);
+			}
+			
 			if(is_bit_set(event_ret,nxmpgfx::BUT_Y)){
 				if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER && item.popupstate == POPUP_STATE_NONE){
 			
@@ -476,13 +496,13 @@ namespace GUI {
 				}
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_DUP)){
+			if (is_bit_set(event_ret,nxmpgfx::BUT_DUP) || is_bit_set(event_ret,nxmpgfx::B_AX_L_UP)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.popupstate == POPUP_STATE_NONE){
 					
 				}
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_DDOWN)){
+			if (is_bit_set(event_ret,nxmpgfx::BUT_DDOWN) || is_bit_set(event_ret,nxmpgfx::B_AX_L_DOWN)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.popupstate == POPUP_STATE_NONE){
 					if(item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
 						item.playercontrolstate = PLAYER_CONTROL_STATE_CONTROLS;
@@ -937,9 +957,13 @@ namespace GUI {
 		item.first_item = true;
 		while (!renderloopdone && appletMainLoop())
 		{
+			nxmpstats->starttime = std::chrono::system_clock::now();
 			HandleEvents();
+			nxmpstats->eventtime = std::chrono::system_clock::now();
 			HandleLayers();
+			nxmpstats->layertime = std::chrono::system_clock::now();
 			HandleRender();
+			nxmpstats->rendertime = std::chrono::system_clock::now();
 			//if(dochangethemefont){
 			//	changeFontTheme();
 			//	dochangethemefont = false;
@@ -978,7 +1002,8 @@ namespace GUI {
 					reinit();
 				}
 			}
-			
+			nxmpstats->endtime = std::chrono::system_clock::now();
+			nxmpstats->CalcDelay();
 		}
 		
 		return 0;	

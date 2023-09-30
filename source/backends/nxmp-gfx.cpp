@@ -42,6 +42,16 @@ namespace nxmpgfx{
 	bool B_PLUS_PRESS = false;
 	bool B_MINUS_PRESS = false;
 	
+	bool B_AX_L_UP_PRESS = false;
+	bool B_AX_L_DOWN_PRESS = false;
+	bool B_AX_L_LEFT_PRESS = false;
+	bool B_AX_L_RIGHT_PRESS = false;
+			
+	bool B_AX_R_UP_PRESS = false;
+	bool B_AX_R_DOWN_PRESS = false;
+	bool B_AX_R_LEFT_PRESS = false;
+	bool B_AX_R_RIGHT_PRESS = false;
+	
 	
 	static void errorCallback(int errorCode, const char* description)
 	{
@@ -165,7 +175,7 @@ namespace nxmpgfx{
 		(void) io;
 		//io.ConfigFlags |= ImGuiConfigFlags_IsTouchScreen;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		
 		io.IniFilename = nullptr;
 		io.MouseDrawCursor = false;
@@ -270,20 +280,20 @@ namespace nxmpgfx{
 			}
 			
 			
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.25f && !B_ZR_PRESS){
+				ret_event = bit_set(ret_event,BUT_ZR);
+			}
+			
+			if(state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0.25f && !B_ZL_PRESS){
+				ret_event = bit_set(ret_event,BUT_ZL);
+			}
+			
 			if(state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && !B_R_PRESS){
 				ret_event = bit_set(ret_event,BUT_R);
 			}
 			
 			if(state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && !B_L_PRESS){
 				ret_event = bit_set(ret_event,BUT_L);
-			}
-			
-			if(state.buttons[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] >0.25f && !B_ZR_PRESS){
-				ret_event = bit_set(ret_event,BUT_ZR);
-			}
-			
-			if(state.buttons[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] >0.25f && !B_ZL_PRESS){
-				ret_event = bit_set(ret_event,BUT_ZL);
 			}
 			
 			if(state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !B_TR_PRESS){
@@ -302,8 +312,36 @@ namespace nxmpgfx{
 				ret_event = bit_set(ret_event,BUT_MINUS);
 			}
 			
-			B_ZL_PRESS = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]>0.25f;
-			B_ZR_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER]>0.25f;
+			
+			if(state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]<-0.25f && !B_AX_L_UP_PRESS){
+				ret_event = bit_set(ret_event,B_AX_L_UP);
+			}
+			if(state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]>0.25f && !B_AX_L_DOWN_PRESS){
+				ret_event = bit_set(ret_event,B_AX_L_DOWN);
+			}
+			if(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]>0.25f && !B_AX_L_RIGHT_PRESS){
+				ret_event = bit_set(ret_event,B_AX_L_RIGHT);
+			}
+			if(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]<-0.25f && !B_AX_L_LEFT_PRESS){
+				ret_event = bit_set(ret_event,B_AX_L_LEFT);
+			}
+			
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]>0.25f && !B_AX_R_UP_PRESS){
+				ret_event = bit_set(ret_event,B_AX_R_UP);
+			}
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]<-0.25f && !B_AX_R_DOWN_PRESS){
+				ret_event = bit_set(ret_event,B_AX_R_DOWN);
+			}
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]>0.25f && !B_AX_R_RIGHT_PRESS){
+				ret_event = bit_set(ret_event,B_AX_R_RIGHT);
+			}
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]<-0.25f && !B_AX_R_LEFT_PRESS){
+				ret_event = bit_set(ret_event,B_AX_R_LEFT);
+			}
+			
+			
+			B_ZL_PRESS = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]>-0.75f;
+			B_ZR_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER]>-0.75f;
 			
 			B_A_PRESS = state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS;
 			B_X_PRESS = state.buttons[GLFW_GAMEPAD_BUTTON_X] == GLFW_PRESS;
@@ -322,6 +360,20 @@ namespace nxmpgfx{
 
 			B_PLUS_PRESS = state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
 			B_MINUS_PRESS = state.buttons[GLFW_GAMEPAD_BUTTON_BACK] == GLFW_PRESS;
+			
+			
+			
+			B_AX_L_UP_PRESS = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]<-0.25f;
+			B_AX_L_DOWN_PRESS = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]>0.25f;
+			B_AX_L_LEFT_PRESS = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]>0.25f;
+			B_AX_L_RIGHT_PRESS = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]<-0.25f;
+			
+			B_AX_R_UP_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]>0.25f;
+			B_AX_R_DOWN_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]<-0.25f;
+			B_AX_R_LEFT_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]>0.25f;
+			B_AX_R_RIGHT_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]<-0.25f;
+			
+			
 		}
 		
 		

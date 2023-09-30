@@ -47,7 +47,18 @@ namespace nxmpgfx{
 		BUT_TL,
 		
 		BUT_PLUS,
-		BUT_MINUS
+		BUT_MINUS,
+		
+		B_AX_L_UP,
+		B_AX_L_DOWN,
+		B_AX_L_LEFT,
+		B_AX_L_RIGHT,
+		
+	
+		B_AX_R_UP,
+		B_AX_R_DOWN,
+		B_AX_R_LEFT,
+		B_AX_R_RIGHT,
 		
 	};
 	

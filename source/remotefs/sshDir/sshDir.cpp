@@ -21,7 +21,7 @@ sshDir::sshDir(std::string _url,Playlist * _playlist){
 }
 
 
-void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions){
+bool sshDir::DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions){
 	int rc, sock;
     struct sockaddr_in sin;
 	//const char *fingerprint;
@@ -37,6 +37,8 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 	hostaddr = inet_addr(thisurl.server.c_str());
     if(rc != 0) {
         NXLOG::ERRORLOG("libssh2 initialization failed (%d)\n", rc);
+		errormsg = "libssh2 initialization failed";
+		return false;
     }
 	sock = socket(AF_INET, SOCK_STREAM, 0);
  
@@ -46,21 +48,29 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
     if(connect(sock, (struct sockaddr*)(&sin),
                sizeof(struct sockaddr_in)) != 0) {
         NXLOG::ERRORLOG("failed to connect!\n");
+		errormsg = "failed to connect!";
+		return false;
     }
 	session = libssh2_session_init();
     if(!session){
 		NXLOG::ERRORLOG("unable to create session\n");
+		errormsg = "failed to connect!";
+		return false;
 	}
 	rc = libssh2_session_handshake(session, sock);
 
     if(rc) {
         NXLOG::ERRORLOG("Failure establishing SSH session: %d\n", rc);
+		errormsg = "Failure establishing SSH session: " + std::to_string(rc);
+		return false;
     }
 	//fingerprint = libssh2_hostkey_hash(session, LIBSSH2_HOSTKEY_HASH_SHA1);
 	
 	if(libssh2_userauth_password(session, thisurl.user.c_str(), thisurl.pass.c_str())) {
 
 		NXLOG::ERRORLOG("\tAuthentication by password failed!\n");
+		errormsg = "Authentication by password failed!";
+		return false;
 	}
     else {
 		NXLOG::DEBUGLOG("\tAuthentication by password succeeded.\n");
@@ -69,6 +79,8 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 	sftp_session = libssh2_sftp_init(session);
 	if(!sftp_session) {
         NXLOG::ERRORLOG("Unable to init SFTP session\n");
+		errormsg = "Unable to init SFTP session";
+		return false;
     }
 	
 	libssh2_session_set_blocking(session, 1);
@@ -87,7 +99,8 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 	
 	if(!sftp_handle) {
 		NXLOG::ERRORLOG("Unable to open dir with SFTP\n");
-
+		errormsg = "Unable to open dir with SFTP";
+		return false;
 	}
 	currentlist.clear();
 	do {
@@ -187,7 +200,7 @@ void sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
     close(sock);
     libssh2_exit();
 
-	
+	return true;
 }
 
 

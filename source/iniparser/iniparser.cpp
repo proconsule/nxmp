@@ -6,6 +6,8 @@
 #include <sstream>
 #include <iterator>
 
+#include "nxmp-i18n.h"
+
 
 bool string_to_bool(std::string boolstring){
 	if(boolstring == "true"){
@@ -212,6 +214,19 @@ void CIniParser::setSlang(int lang){
 	nxmptmpconfig.slang = lang;
 }
 //end Slang
+
+int CIniParser::getInterfaceLang(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.intlang;
+	}
+	return nxmpconfig.intlang; 
+}
+	
+void CIniParser::setInterfaceLang(int lang){
+	isModified = true;
+	nxmptmpconfig.intlang = lang;
+}
+
 
 bool CIniParser::getUseOc(bool tmpvalue){
 	if(tmpvalue){
@@ -526,6 +541,9 @@ void CIniParser::ReadConfig(){
 		if(inidata["Main"].has("slang")){
 			nxmpconfig.slang =  Utility::getLanguagesIdx(inidata.get("Main").get("slang"));
 		}
+		if(inidata["Main"].has("intlang")){
+			nxmpconfig.intlang =  string_to_int(inidata.get("Main").get("intlang"));
+		}
 		if(inidata["Main"].has("subfontsize")){
 			nxmpconfig.subfontsize = string_to_int(inidata.get("Main").get("subfontsize"));
 		}
@@ -584,6 +602,7 @@ void CIniParser::ReadConfig(){
 			nxmpconfig.e2addr = inidata.get("Enigma2").get("e2address");
 		}
 		
+		InitLang((NX_LANGS)nxmpconfig.intlang);
 	
 	}
 	
@@ -616,6 +635,7 @@ void CIniParser::saveSettings(){
 		{"alang", Utility::getLanguages()[nxmpconfig.alang].lang3},
 		{"useslang", bool_to_string(nxmpconfig.useslang)},
 		{"slang",Utility::getLanguages()[nxmpconfig.slang].lang3},
+		{"intlang",int_to_string(nxmpconfig.intlang)},
 		{"subfontsize", int_to_string(nxmpconfig.subfontsize)},
 		{"subfontscale", float_to_string(nxmpconfig.subfontscale)},
 		{"subfontcolor", getSubFontColorHex(true)},

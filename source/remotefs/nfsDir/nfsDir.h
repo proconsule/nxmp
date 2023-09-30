@@ -12,7 +12,7 @@ class nfsDir{
 public:
 	nfsDir(std::string _url,Playlist * _playlist);
 	
-	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
+	bool DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
 	
 	void backDir();
@@ -27,6 +27,8 @@ public:
 	
 	void SetFileDbStatus(int idx,int dbstatus);
 	void ResetDbStatus();
+	
+	std::string errormsg = "";
 	
 private:
 	std::vector<FS::FileEntry> currentlist;

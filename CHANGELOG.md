@@ -1,6 +1,12 @@
 # NXMP Changelog
 
 ## [0.8.2]
+
+### Added
+
+- Added initial i18n (partial)
+- Error messages on network share connection failure
+
 ### Changes
 
 - Update ImGui to last release
@@ -9,7 +15,6 @@
 ### Fixed
 
 - SubFont Color fix
-
 
 ## [0.8.1]
 

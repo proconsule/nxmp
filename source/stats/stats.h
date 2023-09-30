@@ -3,6 +3,7 @@
 
 #include <switch.h>
 #include <string>
+#include <chrono>
 
 #include "max17050.h"
 #include "logger.h"
@@ -103,6 +104,8 @@ public:
 	void StartThreads();
 	void CloseThreads();
 	void UpdateStats();
+	void CalcDelay();
+
 
 	bool threadexit=false;
 	
@@ -206,6 +209,20 @@ public:
 	uint64_t refreshrate = 1;
 	
 	char currentTime[32];
+	
+	
+	
+	char loopstat_c[320];
+	std::chrono::time_point<std::chrono::system_clock> starttime;
+	std::chrono::time_point<std::chrono::system_clock> eventtime;
+	std::chrono::time_point<std::chrono::system_clock> layertime;
+	std::chrono::time_point<std::chrono::system_clock> rendertime;
+	std::chrono::time_point<std::chrono::system_clock> endtime;
+	
+	int event_time_delay;
+	int layer_time_delay;
+	int render_time_delay;
+	
 	
 };
 

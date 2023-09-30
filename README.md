@@ -91,7 +91,7 @@ Thanks to
 - sashka69 @ GBATemp forum for beta testing
 - bodyXY @ GBATemp forum for banner and icons
 - Godorowski @ GBATemp forum for player UI design and icons
-- nWo @ GBATemp for beta testing
+- Jorge E. García "nWo" for beta testing
 - docgold @ GBATemp forum for Enigma2 samples and support on decoders
 - tataniko @ GBATemp forum for suggestions and bug hunting
 - All guys on GBAtemp

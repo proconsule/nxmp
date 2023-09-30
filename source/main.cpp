@@ -23,7 +23,7 @@
 #include "NX-UPNP.h"
 #include "nfsDir.h"
 
-
+#include "nxmp-i18n.h"
 
 
 #include "imgui.h"
@@ -305,6 +305,8 @@ int main() {
 	if(NXLOG::loglevel >0){
 		configini->PrintConfig();
 	}
+	
+	
 	
 	eqpreset = new EQPreset("eqpresets.ini");
 	

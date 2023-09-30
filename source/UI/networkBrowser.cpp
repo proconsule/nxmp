@@ -6,22 +6,28 @@
 #include "localfiles.h"
 #include "Enigma2.h"
 
+#include "nxmp-i18n.h"
+
 namespace Windows {
 	
 	int netwinselected = -1;
+	
+	CFileBrowser * sharecheck = nullptr;
+	
 
 	void ShareAddWindow(bool *focus, bool *first_item){
 		Windows::SetupWindow();
-		if (ImGui::Begin("Add Share", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+		if (ImGui::Begin(Network_STR[NXNET_ADDSHARE], nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
            
 		   
 			if (ImGui::BeginMenuBar()) {
-				ImGui::Text("Add Share Menu");
+				ImGui::Text(Network_STR[NXNET_ADDSHAREMENU]);
 				ImGui::EndMenuBar();
 			}
+			ImGui::SeparatorText(Network_STR[NXNET_SHARECONFIG]);
 			NewNetworkShare->name = InputSwitchKeyboard("##sharename","Share Name:",NewNetworkShare->name);
 			
-			ImGui::Text("Protocol: ");
+			ImGui::Text(Network_STR[NXNET_PROTOCOL]);
 			ImGui::SameLine();
 			static const char* item_current = NULL;
 			if (ImGui::BeginCombo("##protocombo", item_current, 0)) // The second parameter is the label previewed before opening the combo.
@@ -67,29 +73,55 @@ namespace Windows {
 			}
 			
 			if(NewNetworkShare->type >= 1){
-				NewNetworkShare->address = InputSwitchKeyboard("##address","IP Address:",NewNetworkShare->address);
+				ImGui::SeparatorText(Network_STR[NXNET_CREDENTIALS]);
+				NewNetworkShare->address = InputSwitchKeyboard("##address",Network_STR[NXNET_ADDRESS],NewNetworkShare->address);
 				if(NewNetworkShare->type ==3 || NewNetworkShare->type ==4){
 					
 				}else{
-					NewNetworkShare->port = std::stoi(InputSwitchKeyboard("##port","Port:",std::to_string(NewNetworkShare->port)));
+					NewNetworkShare->port = std::stoi(InputSwitchKeyboard("##port",Network_STR[NXNET_PORT],std::to_string(NewNetworkShare->port)));
 				}
 				ImGui::Checkbox("Anonymous", &NewNetworkShare->anon);
 				if(!NewNetworkShare->anon){
-					NewNetworkShare->username = InputSwitchKeyboard("##username","Username:",NewNetworkShare->username);
-					NewNetworkShare->password = InputSwitchKeyboard("##password","Password:",NewNetworkShare->password);
+					NewNetworkShare->username = InputSwitchKeyboard("##username",Network_STR[NXNET_USERNAME],NewNetworkShare->username);
+					NewNetworkShare->password = InputSwitchKeyboard("##password",Network_STR[NXNET_PASSWORD],NewNetworkShare->password);
 			
 				}
-				NewNetworkShare->remoteshare = InputSwitchKeyboard("##remoteshare","Remote Path:",NewNetworkShare->remoteshare);
+				ImGui::SeparatorText("Path");
+				NewNetworkShare->remoteshare = InputSwitchKeyboard("##remoteshare",Network_STR[NXNET_REMOTEPATH],NewNetworkShare->remoteshare);
 				if(NewNetworkShare->type == 3){
-					ImGui::Text("Remote share on server (share not path)");
+					ImGui::Text(Network_STR[NXNET_REMOTESHAREDESC]);
 				}else if(NewNetworkShare->type == 4){
 					ImGui::Text("Remote export on server");
 				}else{
-					ImGui::Text("Remote path on server example: /movie/");
+					ImGui::Text(Network_STR[NXNET_REMOTEPATHDESC]);
 				}
 				
 			}
 			
+			if(!NewNetworkShare->isValidShare()){
+				 ImGui::BeginDisabled();
+			}
+			if (ImGui::Button(Network_STR[NXNET_TESTCONNECTION])){
+				if(sharecheck == nullptr){
+					sharecheck = new CFileBrowser(NewNetworkShare->GenConfigLine().url,NULL,NULL);
+					sharecheck->DirList(sharecheck->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+				}else{
+					delete sharecheck;
+					sharecheck = new CFileBrowser(NewNetworkShare->GenConfigLine().url,NULL,NULL);
+					sharecheck->DirList(sharecheck->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+				}
+			}
+			if(!NewNetworkShare->isValidShare()){
+				 ImGui::EndDisabled();
+			}
+			if(sharecheck != nullptr){
+				if(sharecheck->connected){
+					ImGui::TextColored(ImVec4(0.0f,1.0f,0.0f,1.0f),Network_STR[NXNET_TESTOK]);
+				}else{
+					ImGui::TextColored(ImVec4(1.0f,0.0f,0.0f,1.0f),Network_STR[NXNET_TESTERROR]);
+					ImGui::Text(sharecheck->errormsg.c_str());
+				}
+			}
 			
 			ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2);
 		ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
@@ -102,7 +134,7 @@ namespace Windows {
 			 ImGui::BeginDisabled();
 		}
 		
-		if (ImGui::Button("Save")){
+		if (ImGui::Button(Common_STR[NXCOMMON_SAVE])){
 			configini->addNetworkShare(NewNetworkShare->GenConfigLine());
 			item.state = MENU_STATE_NETWORKBROWSER;
 		}
@@ -111,7 +143,7 @@ namespace Windows {
 		}
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine(0,50);
-		if (ImGui::Button("Cancel")){
+		if (ImGui::Button(Common_STR[NXCOMMON_CANCEL])){
 				
 			item.state = MENU_STATE_NETWORKBROWSER;
 		}
@@ -125,7 +157,7 @@ namespace Windows {
     void NetworkWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		
-        if (ImGui::Begin("Network Source Selection", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+        if (ImGui::Begin(Network_STR[NXNET_NETWORKSOURCESEL], nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
            
 			GUI::cloktimeText(ImVec2((1180.0f*multiplyRes)-ImGui::CalcTextSize(nxmpstats->currentTime).x-(10.0*multiplyRes),2.0f*multiplyRes),true,nxmpstats->currentTime);
 			GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,2.0f*multiplyRes),true,batteryPercent,40,20,true);
@@ -135,7 +167,7 @@ namespace Windows {
 			
 			if(item.networkselect){
 				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
-				if (ImGui::BeginTable("Network Source Menu",1)){
+				if (ImGui::BeginTable(Network_STR[NXNET_NETWORKSOURCEMENU],1)){
 					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (1280.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0);
@@ -143,7 +175,7 @@ namespace Windows {
 					ImGui::SameLine();
 					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});
 					static int selected = -1;
-					if (ImGui::Selectable("Add Share", selected == 0)){
+					if (ImGui::Selectable(Network_STR[NXNET_ADDSHARE], selected == 0)){
 						NewNetworkShare = new CNetworkShare();
 						item.state = MENU_STATE_ADDSHARE;
 					}	
@@ -228,19 +260,19 @@ namespace Windows {
 				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
 				ImGui::SameLine();
 				ImGui::AlignTextToFramePadding();
-				ImGui::Text("Navigation");
+				ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
 				ImGui::SameLine();
 				ImGui::AlignTextToFramePadding();
-				ImGui::Text("Select");
+				ImGui::Text(Common_STR[NXCOMMON_SELECT]);
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
 				ImGui::SameLine();
 				ImGui::AlignTextToFramePadding();
-				ImGui::Text("NXMP Home");
+				ImGui::Text(Common_STR[NXCOMMON_HOME]);
 				
 				
 				ImGui::EndChild();

@@ -8,6 +8,8 @@
 #include "themes.h"
 #include "updater.h"
 
+#include "nxmp-i18n.h"
+
 
 namespace Windows {
 	
@@ -31,19 +33,19 @@ namespace Windows {
 				
 			if (ImGui::BeginTabBar("Settings Tab bar", 0))
             {
-				if (ImGui::BeginTabItem("Generals")) {
-					ImGui::Text("File Browser");
+				if (ImGui::BeginTabItem(SettingsMenu_STR[NXSET_GENERALS])) {
+					ImGui::Text(SettingsMenu_STR[NXSET_FILEBROWSER]);
 					ImGui::Separator();
 					bool showhiddenbool = configini->getshowHidden(true);
-					if(ImGui::Checkbox("Show Hidden Files", &showhiddenbool)){
+					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_HIDDENFILES], &showhiddenbool)){
 						configini->setshowHidden(showhiddenbool);
 						
 					}
-					ImGui::Dummy(ImVec2(0.0f,30.0f));
-					ImGui::Text("Navigation");
+					ImGui::Dummy(ImVec2(0.0f,20.0f));
+					ImGui::Text(SettingsMenu_STR[NXSET_NAVIGATION]);
 					ImGui::Separator();
 					bool touchbool = configini->getTouchEnable(true);
-					if(ImGui::Checkbox("Enable Touch Controls", &touchbool)){
+					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_TOUCHCONTROL], &touchbool)){
 						configini->setTouchEnable(touchbool);
 						if(touchbool){
 							ImGuiIO &io = ImGui::GetIO();
@@ -53,34 +55,65 @@ namespace Windows {
 							io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
 						}
 					}
-					ImGui::Dummy(ImVec2(0.0f,30.0f));
-					ImGui::Text("OverClock");
+					ImGui::Dummy(ImVec2(0.0f,20.0f));
+					ImGui::Text(SettingsMenu_STR[NXSET_OVERCLOCK]);
 					ImGui::Separator();
 					bool ocdefault = configini->getUseOc(true);
-					if(ImGui::Checkbox("OverClock at Startup", &ocdefault)){
+					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_OVERCLOCK_STARTUP], &ocdefault)){
 						configini->setUseOc(ocdefault);	
 					}
-					ImGui::Text("Misc (Need Restart))");
+					ImGui::Dummy(ImVec2(0.0f,20.0f));
+					ImGui::Text(SettingsMenu_STR[NXSET_MISC]);
 					ImGui::Separator();
 					bool vsyncdefault = configini->getVSYNC(true);
-					if(ImGui::Checkbox("VSYNC", &vsyncdefault)){
+					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_VSYNC], &vsyncdefault)){
 						configini->setVSYNC(vsyncdefault);	
 					}
 					
+					ImGui::Dummy(ImVec2(0.0f,20.0f));
+					ImGui::SeparatorText("I18N");
+					ImGui::PushItemWidth(300);
+					if (ImGui::BeginCombo(SettingsMenu_STR[NXSET_INTLANG], NXLANGNAME[configini->getInterfaceLang(true)], 0))
+					{	
+						for (int n = 0; n < NX_LANGS_NR_ITEMS; n++)
+						{
+							const bool is_selected = (configini->getInterfaceLang(true) == n);
+							if(!NXLANGACTIVE[n]){
+								ImGui::BeginDisabled();
+							}
+							if (ImGui::Selectable(NXLANGNAME[n], is_selected)){
+								configini->setInterfaceLang(n);
+								InitLang((NX_LANGS)n);
+							}
+							if(!NXLANGACTIVE[n]){
+								ImGui::EndDisabled();
+							}
+
+							if (is_selected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+					ImGui::Text("%s translation by %s",NXLANGNAME[configini->getInterfaceLang(true)],NXLANGAUTHORS[configini->getInterfaceLang(true)]);
+					if(NXLANGNATIVE[configini->getInterfaceLang(true)]){
+						ImGui::TextColored(ImVec4(0.0f,1.0f,0.0f,1.0f),"Translated into native language");
+					}else{
+						ImGui::TextColored(ImVec4(1.0f,0.7f,0.0f,1.0f),"Translated using online translator");
+					}
 					ImGui::EndTabItem();
 				}
-				if (ImGui::BeginTabItem("Player Settings"))
+				if (ImGui::BeginTabItem(SettingsMenu_STR[NXSET_PLAYERSETTINGS]))
                 {
-					ImGui::Text("Decoder");
+					ImGui::Text(SettingsMenu_STR[NXSET_DECODER]);
 					ImGui::Separator();
 					bool hwdecdefault = configini->getHWDec(true);
-					if(ImGui::Checkbox("HW Decoder", &hwdecdefault)){
+					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_HWDECODER], &hwdecdefault)){
 						configini->setHWDec(hwdecdefault);	
 					}
 					
-					ImGui::Text("Demux Cache");
+					ImGui::Text(SettingsMenu_STR[NXSET_DEMUXCACHE]);
 					ImGui::Separator();
-					ImGui::Text("Demux Cache Sec");
+					ImGui::Text(SettingsMenu_STR[NXSET_DEMUXCACHESEC]);
 					ImGui::SameLine(240,spacing);
 					ImGui::PushButtonRepeat(true);
 					if (ImGui::ArrowButton("##demuxleft", ImGuiDir_Left)) {
@@ -99,11 +132,11 @@ namespace Windows {
 					
 					
 					
-					ImGui::Text("Audio");
+					ImGui::Text(SettingsMenu_STR[NXSET_AUDIO]);
 					ImGui::Separator();
 					std::vector<std::string> aout_preview_value = {"SDL","Audren"};
 					//ImGui::BeginDisabled();
-					if (ImGui::BeginCombo("Audio Output", aout_preview_value[configini->getAout(true)].c_str(), 0))
+					if (ImGui::BeginCombo(SettingsMenu_STR[NXSET_AUDIOOUTPUT], aout_preview_value[configini->getAout(true)].c_str(), 0))
 					{	
 						for (int n = 0; n < aout_preview_value.size(); n++)
 						{
@@ -117,9 +150,9 @@ namespace Windows {
 						ImGui::EndCombo();
 					}
 					//ImGui::EndDisabled();
-				ImGui::Text("Seek");
+				ImGui::Text(SettingsMenu_STR[NXSET_SEEK]);
 				ImGui::Separator();
-				ImGui::Text("Short Seek Time");
+				ImGui::Text(SettingsMenu_STR[NXSET_SHORTSEEK]);
 				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
 				if (ImGui::ArrowButton("##shortleft", ImGuiDir_Left)) {
@@ -135,7 +168,7 @@ namespace Windows {
 				ImGui::SameLine();
 				ImGui::Text("%d sec", configini->getShortSeek(true));
 			
-				ImGui::Text("Long Seek Time");
+				ImGui::Text(SettingsMenu_STR[NXSET_LONGSEEK]);
 				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
 				if (ImGui::ArrowButton("##longleft", ImGuiDir_Left)) {
@@ -174,10 +207,10 @@ namespace Windows {
 				
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
 				
-				ImGui::Text("Language");
+				ImGui::Text(SettingsMenu_STR[NXSET_LANG]);
 				ImGui::Separator();
 				bool alangbool = configini->getUseAlang(true);
-				if(ImGui::Checkbox("Use Auto Audio Language", &alangbool)){
+				if(ImGui::Checkbox(SettingsMenu_STR[NXSET_USEALANG], &alangbool)){
 					configini->setUseAlang(alangbool);
 				}
 				
@@ -187,7 +220,7 @@ namespace Windows {
 
 				const char* combo_preview_value = Utility::getLanguages()[configini->getAlang(true)].lang3.c_str();  // Pass in the preview value visible before opening the combo (it could be anything)
 				ImGui::PushItemWidth(300);
-				if (ImGui::BeginCombo("Audio Language", combo_preview_value, 0))
+				if (ImGui::BeginCombo(SettingsMenu_STR[NXSET_ALANG], combo_preview_value, 0))
 				{	
 					for (int n = 0; n < Utility::getLanguages().size(); n++)
 					{
@@ -207,7 +240,7 @@ namespace Windows {
 				//Slang
 				ImGui::Dummy(ImVec2(0.0f,10.0f));
 				bool slangbool = configini->getUseSlang(true);
-				if(ImGui::Checkbox("Use Auto Subtitles Language", &slangbool)){
+				if(ImGui::Checkbox(SettingsMenu_STR[NXSET_USESLANG], &slangbool)){
 					configini->setUseSlang(slangbool);
 				}
 				
@@ -218,7 +251,7 @@ namespace Windows {
 
 				const char* combo_preview_value_2 = Utility::getLanguages()[configini->getSlang(true)].lang3.c_str();  // Pass in the preview value visible before opening the combo (it could be anything)
 				ImGui::PushItemWidth(300);
-				if (ImGui::BeginCombo("Subtitles Language", combo_preview_value_2, 0))
+				if (ImGui::BeginCombo(SettingsMenu_STR[NXSET_SLANG], combo_preview_value_2, 0))
 				{	
 					for (int n = 0; n < Utility::getLanguages().size(); n++)
 					{
@@ -236,9 +269,9 @@ namespace Windows {
 				}
 				//End Slang
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
-				ImGui::Text("Subtitle");
+				ImGui::Text(SettingsMenu_STR[NXSET_SUBTITLE]);
 				ImGui::Separator();
-				ImGui::Text("Sub Font Size");
+				ImGui::Text(SettingsMenu_STR[NXSET_SUBFONTSIZE]);
 				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
 				if (ImGui::ArrowButton("##subsizeleft", ImGuiDir_Left)) {
@@ -258,7 +291,7 @@ namespace Windows {
 				ImGui::Dummy(ImVec2(0.0f,10.0f));
 
 				//SubFontScale
-				ImGui::Text("Sub Font Scale");
+				ImGui::Text(SettingsMenu_STR[NXSET_SUBFONTSCALE]);
 				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
 				if (ImGui::ArrowButton("##subsizescaleleft", ImGuiDir_Left)) {
@@ -277,12 +310,12 @@ namespace Windows {
 				ImGui::Text("%.2f", configini->getSubFontScale(true));
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
 				//endSubFontScale
-				ImGui::Text("Video");
+				ImGui::Text(SettingsMenu_STR[NXSET_VIDEO]);
 				ImGui::Separator();
 				std::vector<std::string> deintmenu = {"No","Yes","Auto"};
 				const char* combo_deintpreview_value = deintmenu[configini->getDeinterlace(true)].c_str();
 				ImGui::PushItemWidth(300);
-				if (ImGui::BeginCombo("Deinterlace", combo_deintpreview_value, 0))
+				if (ImGui::BeginCombo(SettingsMenu_STR[NXSET_VIDEODEINT], combo_deintpreview_value, 0))
 				{	
 					for (int n = 0; n < deintmenu.size(); n++)
 					{
@@ -300,9 +333,9 @@ namespace Windows {
 				ImGui::PopItemWidth();
 				ImGui::EndTabItem();
 			}
-			if (ImGui::BeginTabItem("Database")) {
+			if (ImGui::BeginTabItem(SettingsMenu_STR[NXSET_DATABASE])) {
 				bool usedbbool = configini->getDbActive(true);
-				if(ImGui::Checkbox("Use Database", &usedbbool)){
+				if(ImGui::Checkbox(SettingsMenu_STR[NXSET_USEDATABASE], &usedbbool)){
 					if(sqlitedb != nullptr){
 						delete sqlitedb;
 						sqlitedb = nullptr;
@@ -317,22 +350,22 @@ namespace Windows {
 					if(sqlitedb->getCorrupted()){
 						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f),"Database File Corrupted");
 					}else{
-						ImGui::Text("Database File Version: ");
+						ImGui::Text(SettingsMenu_STR[NXSET_DATABASEVERSION]);
 						ImGui::SameLine();
 						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f),sqlitedb->getDbVersion().c_str());
 					}
-						ImGui::Text("SQLite Version: ");
+						ImGui::Text(SettingsMenu_STR[NXSET_SQLITEVERSION]);
 						ImGui::SameLine();
 						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f),sqlitedb->getSQLiteVersion().c_str());
 						int recnum = 0;
 						int reccom = 0;
 						if(sqlitedb!=nullptr)sqlitedb->GetDbStats(recnum,reccom);
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+30);
-						ImGui::Text("Resume point count: %d\n",recnum);
-						ImGui::Text("Completed view: %d\n",reccom);
+						ImGui::Text("%s%d\n",SettingsMenu_STR[NXSET_RESUMEPOINTCOUNT],recnum);
+						ImGui::Text("%s%d\n",SettingsMenu_STR[NXSET_COMPLETEDCOUNT],reccom);
 						ImGui::Separator();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY()+50);
-						ImGui::Text("Start saving resume info:");
+						ImGui::Text(SettingsMenu_STR[NXSET_STARTSAVINGINFO]);
 						//ImGui::SameLine(400,spacing);
 						ImGui::PushButtonRepeat(true);
 						if (ImGui::ArrowButton("##resumestartleft", ImGuiDir_Left)) {
@@ -349,7 +382,7 @@ namespace Windows {
 						ImGui::Text("%d%%", configini->getResumeStartPerc(true));
 						
 						
-						ImGui::Text("Stop saving resume info:");
+						ImGui::Text(SettingsMenu_STR[NXSET_STOPSAVINGINFO]);
 						//ImGui::SameLine(400,spacing);
 						ImGui::PushButtonRepeat(true);
 						if (ImGui::ArrowButton("##resumestopleft", ImGuiDir_Left)) {
@@ -370,14 +403,14 @@ namespace Windows {
 						
 						
 				}else{
-					ImGui::Text("Database not active");
+					ImGui::Text(SettingsMenu_STR[NXSET_DATABASENOTACTIVE]);
 				}
 				
 				
 					
 				ImGui::EndTabItem();
 			}
-			if (ImGui::BeginTabItem("Touch Settings")) {
+			if (ImGui::BeginTabItem(SettingsMenu_STR[NXSET_TOUCHSETTINGS])) {
 				
 				ImGui::Text("One Finger Swipe during playback");
 				static int touchseekradio = configini->getPlayerSwipeSeek(true);
@@ -504,69 +537,23 @@ namespace Windows {
 		GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
 		ImGui::SameLine();
 		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Navigation");
+		ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
 		ImGui::SameLine();
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 		GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
 		ImGui::SameLine();
 		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Select");
+		ImGui::Text(Common_STR[NXCOMMON_SELECT]);
 		ImGui::SameLine();
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 		GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
 		ImGui::SameLine();
 		ImGui::AlignTextToFramePadding();
-		ImGui::Text("NXMP Home/Save");
+		ImGui::Text(Common_STR[NXCOMMON_HOMESAVE]);
 				
 				
 		ImGui::EndChild();
 			
-		//ImGui::SetCursorPosX(ImGui::GetWindowSize().x/2);
-		//ImGui::SetCursorPosY(ImGui::GetWindowSize().y -50);
-		
-		/*
-		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
-		if (ImGui::Button("Save")){
-			item.popupstate = POPUP_STATE_SAVE_SETTINGS;
-		}
-		ImGui::PopStyleColor(3);
-		ImGui::SameLine(0,50);
-		if (ImGui::Button("Cancel")){
-				configini->setLongSeek(configini->getLongSeek(false));
-				configini->setShortSeek(configini->getShortSeek(false));
-				configini->setAlang(configini->getAlang(false));
-				//Slang
-				configini->setSlang(configini->getSlang(false));
-				//end Slang
-				
-				configini->setThemeName(configini->getThemeName(false));
-				
-				configini->setSubFontSize(configini->getSubFontSize(false));
-				configini->setSubFontScale(configini->getSubFontScale(false));
-				configini->setSubFontColor(configini->getSubFontColor(false));
-				//bordercolor
-				configini->setSubBorderColor(configini->getSubBorderColor(false));
-				//endbordercolor
-				configini->setDbActive(configini->getDeinterlace(false));
-				
-				
-				configini->setshowHidden(configini->getshowHidden(false));
-				configini->setTouchEnable(configini->getTouchEnable(false));
-				configini->setPlayerSwipeSeek(configini->getPlayerSwipeSeek(false));
-				if(configini->getTouchEnable(false)){
-					ImGuiIO &io = ImGui::GetIO();
-					io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
-				}else{
-					ImGuiIO &io = ImGui::GetIO();
-					io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
-				}
-				
-				
-				item.state = MENU_STATE_HOME;
-			}
-		*/
 		}	
 		Windows::ExitWindow();
 	}
