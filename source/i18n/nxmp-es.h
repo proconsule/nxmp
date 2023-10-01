@@ -1,7 +1,7 @@
 #ifndef NXMP_I18N_ES_H
 #define NXMP_I18N_ES_H
 
-const char *es_i18n_author = "nWo";
+const char *es_i18n_author = "Jorge E. García \"nWo\"";
 bool es_i18n_status = true;
 bool es_i18n_native = true;
 

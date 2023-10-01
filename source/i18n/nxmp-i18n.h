@@ -13,7 +13,8 @@ enum NX_LANGS{
 	French,
 	Portuguese,
 	Japanese,
-	Chinese,
+	Chinese_Simplified,
+	Chinese_Traditional,
 	NX_LANGS_NR_ITEMS
 };
 

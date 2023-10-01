@@ -1,4 +1,3 @@
-
 #ifndef NXMP_I18N_JP_H
 #define NXMP_I18N_JP_H
 

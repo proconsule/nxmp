@@ -5,6 +5,7 @@
 ### Added
 
 - Added initial i18n (partial)
+- Spanish-Japanese-Italian native translation
 - Error messages on network share connection failure
 
 ### Changes

@@ -1,12 +1,11 @@
-#ifndef NXMP_I18N_CN_H
-#define NXMP_I18N_CN_H
+#ifndef NXMP_I18N_CN_T_H
+#define NXMP_I18N_CN_T_H
 
-/* Default Language */
-const char *cn_i18n_author = "proconsule";
-bool cn_i18n_status = true;
-bool cn_i18n_native = false;
+const char *cn_t_i18n_author = "proconsule";
+bool cn_t_i18n_status = true;
+bool cn_t_i18n_native = false;
 
-const char *MainMenu_STR_CN[] = {
+const char *MainMenu_STR_CN_T[] = {
 	"本地文件",
 	"USB",
 	"串流網址",
@@ -19,7 +18,7 @@ const char *MainMenu_STR_CN[] = {
 	"出口"
 };
 
-const char *Common_STR_CN[] = {
+const char *Common_STR_CN_T[] = {
 	"是的",
 	"不",
 	"OK",
@@ -43,7 +42,7 @@ const char *Common_STR_CN[] = {
 };
 
 
-const char *Popup_STR_CN[] = {
+const char *Popup_STR_CN_T[] = {
 	"Save Settings",
 	"Resume Play",
 	"Database Update",
@@ -63,7 +62,7 @@ const char *Popup_STR_CN[] = {
 	"Set as starting element"
 };
 
-const char *SettingsMenu_STR_CN[] = {
+const char *SettingsMenu_STR_CN_T[] = {
 	"Generals",
 	"File Browser",
 	"Show Hidden Files",
@@ -107,7 +106,7 @@ const char *SettingsMenu_STR_CN[] = {
 	"Touch Settings",
 };
 
-const char *Network_STR_CN[] = {
+const char *Network_STR_CN_T[] = {
 	"Add Share",
 	"Add Share Menu",
 	"Share Config",

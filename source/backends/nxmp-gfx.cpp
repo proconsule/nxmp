@@ -1,7 +1,7 @@
 #include "nxmp-gfx.h"
 #include "GLFW/glfw3.h"
 
-
+#include <switch.h>
 
 
 
@@ -222,6 +222,9 @@ namespace nxmpgfx{
 		
 		
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		
+		
+		
 		glfwSwapBuffers(window);
 		
 		//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
