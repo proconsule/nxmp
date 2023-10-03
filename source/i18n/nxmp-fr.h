@@ -2,7 +2,7 @@
 #define NXMP_I18N_FR_H
 
 /* Default Language */
-const char *fr_i18n_author = "proconsule";
+const char *fr_i18n_author = "Zoria, Pharuxtan, Gum";
 bool fr_i18n_status = false;
 bool fr_i18n_native = true;
 
