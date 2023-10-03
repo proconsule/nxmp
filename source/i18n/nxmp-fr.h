@@ -1,12 +1,12 @@
 #ifndef NXMP_I18N_FR_H
-#define NXMP_I18N_FR_H
+#daffiner NXMP_I18N_FR_H
 
-/* Default Language */
-const char *fr_i18n_author = "proconsule";
-bool fr_i18n_status = false;
-bool fr_i18n_native = true;
+/ * Langue par défaut * /
+const char * fr_i18n_author = "proconsule";
+bool fr_i18n_status = faux ;
+bool fr_i18n_native = vrai ;
 
-const char *MainMenu_STR_FR[] = {
+const char * MainMenu_STR_FR[] = {
 	"Fichier locaux",
 	"USB",
 	"Flux URL",
@@ -14,21 +14,21 @@ const char *MainMenu_STR_FR[] = {
 	"UPNP",
 	"Enigma2",
 	"Liste de lecture",
-	"Paramètre",
+	"Paramètres",
 	"Info",
 	"Sortie"
 };
 
-const char *Common_STR_FR[] = {
+const char * Common_STR_FR[] = {
 	"Oui",
 	"Non",
-	"OK",
+	"D'ACCORD",
 	"Auto",
 	"Navigation",
 	"Sélection",
-	"Sélection/Lecture",
+	"Sélection / Connexion",
 	"Accueil",
-	"Accueil/Sauvegarde",
+	"Accueil / Sauvegarde",
 	"Retour",
 	"Menu",
 	"Nom",
@@ -36,18 +36,18 @@ const char *Common_STR_FR[] = {
 	"Date",
 	"Monté",
 	"Diminué",
-	"Supprimer",
+	"Coupleur",
 	"Quitté",
 	"Annulé",
 	"Sauvegardé",
 };
 
 
-const char *Popup_STR_FR[] = {
-	"Sauvegarde des paramètre",
+const char * Popup_STR_FR[] = {
+	"Sauvegarde des paramètres",
 	"Reprise de la lecture",
-	"Mise à jour de la base de donnéese",
-	"La base de donnée à été mis à jour",
+	"Mise à jour de la base de données",
+	"La base de données à été mis à jour",
 	"Menu réseau",
 	"Menu des fichiers",
 	"Tri croissant (nom)",
@@ -59,23 +59,23 @@ const char *Popup_STR_FR[] = {
 	"Ajouter un fichier à la liste de lecture",
 	"Ajouter Vérifié à la liste de lecture",
 	"Supprimer élément",
-	"Supprimé la liste de lecture",
+	"Supprimer la liste de lecture",
 	"Défini comme élément de départ"
 };
 
-const char *SettingsMenu_STR_FR[] = {
-	"Générals",
-	"Parcourir les fichiersr",
-	"Afficher les fichiers cachés",
+const char * SettingsMenu_STR_FR[] = {
+	"Généraux",
+	"Parcourir les fichiers",
+	"Afficher les fiches cachés",
 	"Navigation",
-	"Activer les commandes tactiles",
+	"Active les commandes tactiles",
 	"Overclock",
-	"Activer l'overclock au démarrage",
-	"Divers (besoin de redémarrage)",
+	"Acteur l'horloge au débarquement",
+	"Divers (redémarrage nécessaire)",
 	"VSYNC",
 	"Langue de l'interface",
 	"Paramètres du lecteur",
-	"Decodeur",
+	"Décodeur",
 	"HW Decodeur",
 	"Demux Cache",
 	"Demux Cache Sec",
@@ -92,39 +92,39 @@ const char *SettingsMenu_STR_FR[] = {
 	"Sous-titres",
 	"Taille de la sous-police",
 	"Échelle des sous-polices",
-	"Video",
-	"Video Deinterlace",
+	"Vidéo",
+	"Déhentrelacé vidéo",
 	"Base de données",
 	"Utiliser la base de données",
-	"Version de la base de données :",
-	"Version de SQLite :",
-	"Reprise du décompte des points: ",
-	"Vue complétée : ",
+	"Version de la base de données:",
+	"Version de SQLite:",
+	"Reprise du compte des points:",
+	"Vue complétée:",
 	"La base de données n'est pas active",
 	"Commencer à enregistrer les informations:",
 	"Cesser d'enregistrer les informations:",
 	
-	"Touch Settings",
+	"Paramètres tactiles",
 };
 
-const char *Network_STR_FR[] = {
-	"Ajoute d'un partage",
+const char * Network_STR_FR[] = {
+	"Ajout d'un partage",
 	"Ajout d'un partage au menu",
 	"Configuration du partage",
 	"Nom du partage:",
 	"Protocole:",
-	"Références",
-	"Adresse IPs:",
+	"Identifications",
+	"Adresse IP:",
 	"Port:",
 	"Identifiant:",
 	"Mot de passe:",
 	"Anonyme",
 	"Chemin d'accès à distance:",
-	"Chemin d'accès distant sur le serveur exemple : /movie/",
+	"Chemin d'accès distant sur le serveur exemple: / film /",
 	"Partage à distance sur le serveur (le partage n'est pas le chemin))",
-	"Test de connection",
-	"connection OK",
-	"Connection Erreur",
+	"Test de connexion",
+	"Connexion OK",
+	"Erreur de connexion",
 	"Sélection de la source réseau",
 	"Menu réseau",
 };
