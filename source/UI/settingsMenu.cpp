@@ -341,7 +341,8 @@ namespace Windows {
 						sqlitedb = nullptr;
 					}
 					if(usedbbool){
-						sqlitedb = new SQLiteDB("nxmp.db");
+						sqlitedb = new SQLiteDB(configini->getDbPath());
+						sqlitedb->UpdateDbStats();
 					}
 					configini->setDbActive(usedbbool);	
 					
@@ -460,11 +461,8 @@ namespace Windows {
 				}
 				//ImGui::SameLine(100);
 				if (ImGui::Button("Apply Theme")){
-					if(themeprevidx == 0){
-						themes->setDefault();
-					}else{
-						themes->setTheme(themes->themeslist[themeprevidx-1].path);
-					}
+					GUI::GUI_REINIT = true;
+					
 				}
 				
 				if(lastthemeprevidx != themeprevidx){

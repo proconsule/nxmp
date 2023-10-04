@@ -25,8 +25,8 @@ const char *Common_STR_IT[] = {
 	"OK",
 	"Auto",
 	"Navigazione",
-	"Scegli",
-	"Scegli/Play",
+	"Seleziona",
+	"Seleziona/Play",
 	"Home",
 	"Home/Salva",
 	"Indietro",
@@ -40,6 +40,7 @@ const char *Common_STR_IT[] = {
 	"Esci",
 	"Annulla",
 	"Salva",
+	"Checkbox",
 
 };
 

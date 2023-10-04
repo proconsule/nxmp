@@ -40,6 +40,7 @@ const char *Common_STR_PT[] = {
 	"Exit",
 	"Cancel",
 	"Save",
+	"Checkbox",
 };
 
 

@@ -40,6 +40,7 @@ const char *Common_STR_EN[] = {
 	"Exit",
 	"Cancel",
 	"Save",
+	"Checkbox",
 };
 
 

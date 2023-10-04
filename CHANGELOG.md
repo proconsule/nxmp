@@ -5,17 +5,26 @@
 ### Added
 
 - Added initial i18n (partial)
-- Spanish-Japanese-Italian native translation
+- Spanish-Japanese-Italian-Deutsch-French native translation
 - Error messages on network share connection failure
+- Loading splash screen
 
 ### Changes
 
 - Update ImGui to last release
 - Moved from SDL to GLFW for window context
+- Theme ini structure changes
+- SQLite vfs using native calls
 
 ### Fixed
 
 - SubFont Color fix
+- Database Open/Close Fix
+
+### Knonw Issues
+
+- NXMP start loading times increased due to importing more font glyphs
+
 
 ## [0.8.1]
 

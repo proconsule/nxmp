@@ -130,39 +130,39 @@ namespace Windows {
 							renderloopdone = true;
 						}
 						if(n == MM_STREAM){
+							//i need move this, work in progress.
+							
+							std::string namefile = "Streaming from Url...";
+							std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", tempKbUrl);
+							
+							tempKbUrl = received;
+							curlDownloader Scraper;
+							if (!received.compare("debug"))
+							{
+							}
+
+							if (received.find("https://jk/") != std::string::npos)
+							{
+							Utility::replace(received,"https://jk/","https://jkanime.net/");
+							
+							}
+							if (received.find("https://bit.ly/") != std::string::npos)
+							{//if the response from the address does not arrive within 5 seconds, it sends the direct link.
+							received = Scraper.getRedirection(received,"",false,"",false);
+							}
+
+							if (received.find("https://jkanime.net/") != std::string::npos)
+							{
+							namefile = "Streaming from JKAnime...";
+							received = Utility::Nozomi_Link(received);
+							}
+
+							if(received.find("http") != std::string::npos)
+							{
+							std::cout << "This: "<< received.c_str() << std::endl;
+							libmpv->loadFileLive(received,namefile.c_str());
+							}
 						//i need move this, work in progress.
-					    
-						std::string namefile = "Streaming from Url...";
-						std::string received = Utility::KeyboardCall ("Write the Url to start the streaming\n(Fembed, JKAnime, Bitly or Direct URL...)", tempKbUrl);
-						
-						tempKbUrl = received;
-						curlDownloader Scraper;
-                        if (!received.compare("debug"))
-						{
-						}
-
-						if (received.find("https://jk/") != std::string::npos)
-						{
-						Utility::replace(received,"https://jk/","https://jkanime.net/");
-						
-						}
-						if (received.find("https://bit.ly/") != std::string::npos)
-						{//if the response from the address does not arrive within 5 seconds, it sends the direct link.
-						received = Scraper.getRedirection(received,"",false,"",false);
-						}
-
-						if (received.find("https://jkanime.net/") != std::string::npos)
-						{
-						namefile = "Streaming from JKAnime...";
-						received = Utility::Nozomi_Link(received);
-						}
-
-						if(received.find("http") != std::string::npos)
-						{
-						std::cout << "This: "<< received.c_str() << std::endl;
-						libmpv->loadFileLive(received,namefile.c_str());
-						}
-					//i need move this, work in progress.
 						}
 
 

@@ -9,6 +9,7 @@
 #include "nxmp-jp.h"
 #include "nxmp-cn_s.h"
 #include "nxmp-cn_t.h"
+#include "nxmp-ru.h"
 
 
 char *MainMenu_STR[NX_MAINMENU_STR_NR_ITEMS];
@@ -27,6 +28,7 @@ const char *NXLANGNAME[] = {
 	"日本語",
 	"中国人 （简体）",
 	"中國人 （傳統的）",
+	"Русский",
 	
 };
 
@@ -50,6 +52,7 @@ void InitLang(NX_LANGS mylang){
 	NXLANGAUTHORS[Japanese] = strdup(jp_i18n_author);
 	NXLANGAUTHORS[Chinese_Simplified] = strdup(cn_s_i18n_author);
 	NXLANGAUTHORS[Chinese_Traditional] = strdup(cn_t_i18n_author);
+	NXLANGAUTHORS[Russian] = strdup(ru_i18n_author);
 	
 	
 	NXLANGACTIVE[English] = en_i18n_status;
@@ -61,6 +64,7 @@ void InitLang(NX_LANGS mylang){
 	NXLANGACTIVE[Japanese] = jp_i18n_status;
 	NXLANGACTIVE[Chinese_Simplified] = cn_s_i18n_status;
 	NXLANGACTIVE[Chinese_Traditional] = cn_t_i18n_status;
+	NXLANGACTIVE[Russian] = ru_i18n_status;
 	
 	NXLANGNATIVE[English] = en_i18n_native;
 	NXLANGNATIVE[Italian] = it_i18n_native;
@@ -71,6 +75,7 @@ void InitLang(NX_LANGS mylang){
 	NXLANGNATIVE[Japanese] = jp_i18n_native;
 	NXLANGNATIVE[Chinese_Simplified] = cn_s_i18n_native;
 	NXLANGNATIVE[Chinese_Traditional] = cn_t_i18n_native;
+	NXLANGNATIVE[Russian] = ru_i18n_native;
 	
 	for(int i=0;i<NX_MAINMENU_STR_NR_ITEMS;i++){
 		if(mylang == English){
@@ -91,6 +96,8 @@ void InitLang(NX_LANGS mylang){
 			MainMenu_STR[i] = strdup(MainMenu_STR_CN_S[i]);
 		}else if(mylang == Chinese_Traditional){
 			MainMenu_STR[i] = strdup(MainMenu_STR_CN_T[i]);
+		}else if(mylang == Russian){
+			MainMenu_STR[i] = strdup(MainMenu_STR_RU[i]);
 		}else{
 			MainMenu_STR[i] = strdup(MainMenu_STR_EN[i]);
 		}
@@ -116,6 +123,8 @@ void InitLang(NX_LANGS mylang){
 			Common_STR[i] = strdup(Common_STR_CN_S[i]);
 		}else if(mylang == Chinese_Traditional){
 			Common_STR[i] = strdup(Common_STR_CN_T[i]);
+		}else if(mylang == Russian){
+			Common_STR[i] = strdup(Common_STR_RU[i]);
 		}else{
 			Common_STR[i] = strdup(Common_STR_EN[i]);
 		}
@@ -141,6 +150,8 @@ void InitLang(NX_LANGS mylang){
 			Popup_STR[i] = strdup(Popup_STR_CN_S[i]);
 		}else if(mylang == Chinese_Traditional){
 			Popup_STR[i] = strdup(Popup_STR_CN_T[i]);
+		}else if(mylang == Russian){
+			Popup_STR[i] = strdup(Popup_STR_RU[i]);
 		}else{
 			Popup_STR[i] = strdup(Popup_STR_EN[i]);
 		}
@@ -166,6 +177,8 @@ void InitLang(NX_LANGS mylang){
 			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_CN_S[i]);
 		}else if(mylang == Chinese_Traditional){
 			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_CN_T[i]);
+		}else if(mylang == Russian){
+			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_RU[i]);
 		}else{
 			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_EN[i]);
 		}
@@ -191,6 +204,8 @@ void InitLang(NX_LANGS mylang){
 			Network_STR[i] = strdup(Network_STR_CN_S[i]);
 		}else if(mylang == Chinese_Traditional){
 			Network_STR[i] = strdup(Network_STR_CN_T[i]);
+		}else if(mylang == Russian){
+			Network_STR[i] = strdup(Network_STR_RU[i]);
 		}else{
 			Network_STR[i] = strdup(Network_STR_EN[i]);
 		}

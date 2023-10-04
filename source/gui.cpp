@@ -46,6 +46,8 @@ namespace GUI {
 	
 	int wakeup = 0;
 	
+	bool GUI_REINIT = false;
+	
 	void MpvEvents(void *ctx);
 	void MpvUpdate();
 	
@@ -975,6 +977,9 @@ namespace GUI {
 			
 
     		//rewrite switch state
+			
+			
+			
 			AppletOperationMode stus=appletGetOperationMode();
 			if (stus == AppletOperationMode_Handheld) {
 				if (isHandheld == false) {
@@ -984,9 +989,15 @@ namespace GUI {
 					newResH = handheldHeight;
 					multiplyRes = 1.0f;
 					currFontsize = 20.0f;
+					
+					reinit();
+					/*
+					if(videoout != nullptr)delete videoout;
+					videoout = new CVOUT();
+					videoout->Create_Framebuffer(newResW,newResH);
 					nxmpgfx::Resize(newResW,newResH);
 					videoout->Resize(newResW,newResH);
-					reinit();
+					*/
 				}
 			}
 			if (stus == AppletOperationMode_Console) {
@@ -997,11 +1008,27 @@ namespace GUI {
 					newResH = dockedHeight;
 					multiplyRes = 1.5f;
 					currFontsize = 30.0f;
+					
+					reinit();
+					/*
+					if(videoout != nullptr)delete videoout;
+					videoout = new CVOUT();
+					videoout->Create_Framebuffer(newResW,newResH);
 					nxmpgfx::Resize(newResW,newResH);
 					videoout->Resize(newResW,newResH);
-					reinit();
+					*/
+					
 				}
 			}
+			
+			if(GUI_REINIT){
+				reinit();
+				GUI_REINIT=false;
+			}
+			
+			
+			
+			
 			nxmpstats->endtime = std::chrono::system_clock::now();
 			nxmpstats->CalcDelay();
 		}
@@ -1011,36 +1038,58 @@ namespace GUI {
     void reinit()
 	{
 		
-		
-		
-		
 		if(imgloader != nullptr){
 			delete imgloader;
 		}
 		
-		nxmpgfx::Destroy();
-
-
-		imgloader = new CImgLoader("romfs:");
-
-		nxmpgfx::Init(isHandheld,configini->getVSYNC(false));
+		nxmpgfx::Destory_ImGui();
 		
-		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,ImGui::GetIO());
-		
-		
-	if(configini->getThemeName(false) != "Default"){
 		Themes  *themes = new Themes();
 		themes->getThemes();
-		int themeidx = themes->getThemeIDX(configini->getThemeName(false));
-		if(themeidx >-1){
-			themes->setTheme(themes->themeslist[themeidx].path);
+		int themeidx = themes->getThemeIDX(configini->getThemeName(true));
+		
+		nxmpgfx::Init_Backend_Splash(!isHandheld);
+		nxmpgfx::updateSplash(25);
+		nxmpgfx::Init_ImGui(!isHandheld);
+		
+		
+		if(themeidx == -1){
+			
+			imgloader = new CImgLoader("romfs:");
+			nxmpgfx::updateSplash(50);
+			Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
+			nxmpgfx::updateSplash(100);
+			
+		}else{
+			imgloader = new CImgLoader(themes->themeslist[themeidx].path);
+			themes->setThemeColor(themes->themeslist[themeidx].path);
+			nxmpgfx::updateSplash(50);
+			if(isHandheld){
+				Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].handledfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].handledfontsize);
+				nxmpgfx::updateSplash(100);
+				
+			}else{
+				Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].dockedfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].dockedfontsize);
+				nxmpgfx::updateSplash(100);
+				
+			}
+			
 		}
 		delete themes;
-	}else{
-		Themes  *themes = new Themes();
-		themes->setDefault();
-		delete themes;
-	}
+		
+		nxmpgfx::Resize(newResW,newResH);
+		videoout->Resize(newResW,newResH);
+
+		/*
+
+		if(videoout != nullptr)delete videoout;
+		videoout = new CVOUT();
+		videoout->Create_Framebuffer(newResW,newResH);
+		nxmpgfx::Resize(newResW,newResH);
+		videoout->Resize(newResW,newResH);
+		*/
+		
+		
 		
 	}
 	

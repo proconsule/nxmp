@@ -40,6 +40,7 @@ const char *Common_STR_CN_S[] = {
 	"Exit",
 	"Cancel",
 	"Save",
+	"Checkbox",
 };
 
 

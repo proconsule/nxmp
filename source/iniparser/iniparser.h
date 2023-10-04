@@ -10,6 +10,7 @@
 
 typedef struct{
 	std::string startpath = "/switch/nxmp/";
+	std::string dbpath = "/switch/nxmp/nxmp.db";
 	bool showhidden = false;
 	bool touchenable = false;
 	int playeswipeseek ;
@@ -140,6 +141,7 @@ public:
 	std::vector<std::string> getConfigExtensions();
 	playerconf_struct getConfig(bool tmpvalue);
 	
+	std::string getDbPath();
 	
 	bool Modified();
 	

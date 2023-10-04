@@ -8,8 +8,11 @@ typedef struct {
 	std::string name;
 	std::string author;
 	std::string path;
-	float fontsize;
-	float fontsmallsize;
+	float handledfontsize;
+	float dockedfontsize;
+	std::string latinfontstr;
+	std::string kanjifontstr;
+	ImVec4* colors;
 } themes_struct;
 
 class Themes{
@@ -22,6 +25,7 @@ public:
 	void getThemes();
 	
 	int getThemeIDX(std::string themename);
+	void setThemeColor(std::string themefolder);
 	
 	std::vector<themes_struct> themeslist;
 	

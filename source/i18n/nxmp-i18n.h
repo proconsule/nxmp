@@ -15,6 +15,7 @@ enum NX_LANGS{
 	Japanese,
 	Chinese_Simplified,
 	Chinese_Traditional,
+	Russian,
 	NX_LANGS_NR_ITEMS
 };
 
@@ -58,6 +59,7 @@ enum NX_COMMON_STR{
 	NXCOMMON_EXIT,
 	NXCOMMON_CANCEL,
 	NXCOMMON_SAVE,
+	NXCOMMON_CHECKBOX,
 	
 	NX_COMMON_STR_NR_ITEMS
 };

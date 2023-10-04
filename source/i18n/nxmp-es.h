@@ -37,6 +37,9 @@ const char *Common_STR_ES[] = {
 	"Mover Abajo",
 	"Borrar",
 	"Salir",
+	"Cancel",
+	"Save",
+	"Checkbox",
 
 };
 

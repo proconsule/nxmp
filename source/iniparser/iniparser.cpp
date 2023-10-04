@@ -490,6 +490,9 @@ void CIniParser::ReadConfig(){
 		if(inidata["Main"].has("startpath")){
 			nxmpconfig.startpath = inidata.get("Main").get("startpath");
 		}
+		if(inidata["Main"].has("dbpath")){
+			nxmpconfig.dbpath = inidata.get("Main").get("dbpath");
+		}
 		if(inidata["Main"].has("hwdec")){
 			nxmpconfig.hwdec = string_to_bool(inidata.get("Main").get("hwdec"));
 		}
@@ -620,6 +623,7 @@ void CIniParser::saveSettings(){
 	
 	inidata["Main"].set({
 		{"startpath", nxmpconfig.startpath},
+		{"dbpath", nxmpconfig.dbpath},
 		{"hwdec", bool_to_string(nxmpconfig.hwdec)},
 		{"vsync", bool_to_string(nxmpconfig.vsync)},
 		{"usedb", bool_to_string(nxmpconfig.dbactive)},
@@ -659,8 +663,12 @@ void CIniParser::saveSettings(){
 }
 
 
+std::string CIniParser::getDbPath(){
+	return nxmpconfig.dbpath;
+}
+
 void CIniParser::setThemeName(std::string value){
-	//isModified = true;
+	isModified = true;
 	nxmptmpconfig.themename = value;
 }
 

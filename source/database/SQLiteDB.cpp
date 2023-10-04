@@ -2,21 +2,21 @@
 
 
 SQLiteDB::SQLiteDB(std::string _filename){
+	char cwd[256];
+	
+	NXLOG::DEBUGLOG("Opening DB\n");
+	fflush(stdout);
 	dbfilename = _filename;
 	sqlite3_stmt *res;
 	bool haveversion = false;
 	int rc = sqlite3_open_v2(_filename.c_str(),&db,SQLITE_OPEN_READWRITE,"HOS_VFS");
-	
 	if (rc != SQLITE_OK ) {
-		NXLOG::ERRORLOG("Error Opening DB\n");
+		NXLOG::DEBUGLOG("Error Opening DB: %d\n",rc);
 	}
 	char *err_msg = 0;
 	
 	
-	rc = sqlite3_exec(db, "PRAGMA journal_mode=DELETE;", 0, 0, 0);
-	if (rc != SQLITE_OK ) {
-		NXLOG::ERRORLOG("failed to set journal_mode\n");
-	}
+	
 	
 	char sqlversion[] = "SELECT sqlite_version();";
 	rc = sqlite3_prepare_v2(db, sqlversion, -1, &res, NULL);
@@ -40,6 +40,11 @@ SQLiteDB::SQLiteDB(std::string _filename){
 		NXLOG::ERRORLOG("Error Creating Table FILERESUME\n");
 	}
 	
+	NXLOG::DEBUGLOG("DB JOURNAL MODE\n");
+	rc = sqlite3_exec(db, "PRAGMA journal_mode=DELETE;", 0, 0, 0);
+	if (rc != SQLITE_OK ) {
+		NXLOG::DEBUGLOG("failed to set journal_mode\n");
+	}
 	
 	rc = sqlite3_prepare_v2(db, "SELECT * from NXMP", -1, &res, NULL);
 	if (rc != SQLITE_OK) {
@@ -92,14 +97,15 @@ SQLiteDB::SQLiteDB(std::string _filename){
 		
 	}
 	
-	this->UpdateDbStats();
+	//this->UpdateDbStats();
 	
 	
 }
 
 SQLiteDB::~SQLiteDB(){
-	sqlite3_close(db);
-
+	sqlite3_close_v2(db);
+	sqlite3_os_end();
+	NXLOG::DEBUGLOG("Deallocator SQLITEDB\n");
 }
 
 bool SQLiteDB::dbwasUpdated(){
@@ -148,12 +154,13 @@ bool SQLiteDB::haveResume(std::string path){
 	
 	}
 	rc = sqlite3_step(res);
+	sqlite3_finalize(res);
 	
 	bool _haveresume = false;
 	if (rc == SQLITE_ROW) {
 		_haveresume = true;
     }
-	sqlite3_finalize(res);
+	
 	return _haveresume;
 }
 
@@ -219,18 +226,20 @@ void SQLiteDB::updateResume(std::string path,int64_t position){
 }
 
 int64_t SQLiteDB::getResume(std::string path){
+	int myret = 0;
 	if(haveResume(path)){
 		sqlite3_stmt *res;
 		char sqlquery[2048];
 		sprintf(sqlquery,"SELECT * from FILERESUME WHERE Path = \"%s\"",path.c_str());
 		int rc = sqlite3_prepare_v2(db, sqlquery, -1, &res, NULL);
 		rc = sqlite3_step(res);
+		
 		if (rc == SQLITE_ROW) {
-			return sqlite3_column_int(res, 2);
+			myret =  sqlite3_column_int(res, 2);
 		}
 		sqlite3_finalize(res);
 	}
-	return 0;
+	return myret;
 }
 
 void SQLiteDB::deleteResume(std::string path){

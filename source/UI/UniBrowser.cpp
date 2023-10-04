@@ -212,7 +212,7 @@ namespace Windows {
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_LEFT.id, ImVec2(30,30));
 			ImGui::SameLine();
 			ImGui::AlignTextToFramePadding();
-			ImGui::Text("CheckBox");
+			ImGui::Text(Common_STR[NXCOMMON_CHECKBOX]);
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));

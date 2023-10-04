@@ -584,7 +584,7 @@ std::string KeyboardCall (std::string hint, std::string text){
 		
 }
 
-
+/*
 void Utility::FontLoader(std::string fontpath,float fontSize,ImGuiIO &io){
 	NXLOG::DEBUGLOG("Init Fonts\n");
       
@@ -621,4 +621,42 @@ void Utility::FontLoader(std::string fontpath,float fontSize,ImGuiIO &io){
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bpp);
 	
 	io.Fonts->Build();
+}
+*/
+
+void Utility::FontLoader(std::string latinfontpath,float latinfontSize,std::string japanaesechinesefontpath,float japanaesechinesefontSize){
+	NXLOG::DEBUGLOG("Init Fonts\n");
+      
+	
+	unsigned char *pixels = nullptr;
+	int width = 0, height = 0, bpp = 0;
+	ImFontConfig font_cfg = ImFontConfig();
+		
+	font_cfg.OversampleH = font_cfg.OversampleV = 1;
+	font_cfg.PixelSnapH = true;
+		
+	font_cfg.OversampleH = font_cfg.OversampleV = 1;
+	font_cfg.PixelSnapH = true;
+	NXLOG::DEBUGLOG("Loading TTF\n");
+	
+	font_cfg.OversampleH = font_cfg.OversampleV = 1;
+	
+	ImGui::GetIO().Fonts->AddFontFromFileTTF(latinfontpath.c_str(), latinfontSize, &font_cfg, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+	font_cfg.MergeMode = true;
+	
+	static ImFontGlyphRangesBuilder range;
+	range.Clear();
+	static ImVector<ImWchar> gr;
+	gr.clear();
+	range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
+	range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+	range.BuildRanges(&gr);
+	ImGui::GetIO().Fonts->AddFontFromFileTTF(japanaesechinesefontpath.c_str(), japanaesechinesefontSize, &font_cfg, gr.Data);
+	
+	
+	
+	ImGui::GetIO().Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
+	ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bpp);
+	
+	ImGui::GetIO().Fonts->Build();
 }

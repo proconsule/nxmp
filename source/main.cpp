@@ -45,7 +45,7 @@
 
 #define NDEBUG 1
 
-#define APPLETMODEENA 1
+//#define APPLETMODEENA 1
 
 
 /*	Exit from HB Menu instead fo returning  
@@ -101,14 +101,9 @@ bool renderloopdone = false;
 uint32_t wakeup_on_mpv_render_update;
 uint32_t wakeup_on_mpv_events;
 
-//SysIcons nxmpicons;
-
 bool dochangethemefont = false;
 std::string themefontpath = "";
 float themefontsize;
-//float themefontsmall;
-
-//ImFont* fontSmall;
 
 bool isHandheld = true;
 bool clockoc = false;
@@ -127,23 +122,11 @@ GLuint WIDTH = handheldWidth, HEIGHT = handheldWidth;
 
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO)  + std::string(" ") + (RELEASE_TYPE == 0 ? std::string("Stable"): RELEASE_TYPE == 1 ? std::string("Beta"): std::string("R.C."));
 
-
 int64_t playercachesec =  0;
 int64_t playercachesize = 0;
 
 
-
-
-
-
 void DeallocateExtern(){
-	/*
-	if(nxmpstats != nullptr){
-		nxmpstats->CloseThreads();
-		delete nxmpstats;
-		nxmpstats = nullptr;
-	}
-	*/
 	
 	if(playerTextScroller != nullptr){
 		delete playerTextScroller;
@@ -220,64 +203,53 @@ void DeallocateExtern(){
 	
 }
 
-const char *failtext =  "																			\n"
-						"																			\n"
-						"            ::::    :::       :::    :::         :::   :::       :::::::::\n" 
-						"           :+:+:   :+:       :+:    :+:        :+:+: :+:+:      :+:    :+:\n" 
-						"          :+:+:+  +:+        +:+  +:+        +:+ +:+:+ +:+     +:+    +:+\n"  
-						"         +#+ +:+ +#+         +#++:+         +#+  +:+  +#+     +#++:++#+\n"    
-						"        +#+  +#+#+#        +#+  +#+        +#+       +#+     +#+\n"          
-						"       #+#   #+#+#       #+#    #+#       #+#       #+#     #+#\n"            
-						"      ###    ####       ###    ###       ###       ###     ###\n";
-						
-
-
 int main() {
 	appletLockExit();
+	Result ret = 0;
+	
+	if (R_FAILED(ret = romfsInit())) {
+		NXLOG::ERRORLOG("romfsInit() failed: 0x%x\n", ret);
+		return ret;
+	}
+	
+	AppletOperationMode stus=appletGetOperationMode();
+	if (stus == AppletOperationMode_Handheld) {
+		NXLOG::DEBUGLOG("Handheld Mode\n");
+		isHandheld=true;
+		newResW = handheldWidth;
+		newResH = handheldHeight;
+		multiplyRes = 1.0f;
+		currFontsize = 20.0f;
+	}
+	if (stus == AppletOperationMode_Console) {
+		NXLOG::DEBUGLOG("Docked Mode\n");
+		isHandheld=false;
+		newResW = dockedWidth;
+		newResH = dockedHeight;
+		multiplyRes = 1.5f;
+		currFontsize = 30.0f;
+	}
 	
 #ifndef APPLETMODEENA
 	AppletType at = appletGetAppletType();
     if ( at != AppletType_Application && at != AppletType_SystemApplication) {
 		
-		consoleInit(NULL);
 		
-		printf(failtext,VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO);
-		
-		printf("\x1b[11;17H");
-		printf("NXMP is coded by proconsule and darkxex\n");
-		printf("\x1b[12;25H");
-		printf("\x1b[32mversion: v%d.%d.%d\n",VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO);
-		
-		
-		printf("\x1b[19;23H");
-		printf("\x1b[31mCannot run in Applet mode!\n");
-		printf("\x1b[20;22");
-		printf("\x1b[0mStart a Title Holding R Button\n");
-		printf("\x1b[21;31HPress + to exit\n");
-		
-		 padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+		nxmpgfx::Init_Backend(!isHandheld,true);
+		nxmpgfx::Init_Backend_AppletMode(!isHandheld);
+		nxmpgfx::loopAppletMode();
 
-		PadState pad;
-		padInitializeDefault(&pad);
-	
-		while (appletMainLoop())
-		{
-			
-			padUpdate(&pad);
-			u64 kDown = padGetButtonsDown(&pad);
 
-			if (kDown & HidNpadButton_Plus) break;
-			
-			consoleUpdate(NULL);
-		}
-
-		consoleExit(NULL);
+		
+		nxmpgfx::Destroy_Backend();
+		romfsExit();
 		appletUnlockExit();
 		return 0;
 	}
 #endif
 	SocketInitConfig cfg = *(socketGetDefaultInitConfig());
 	cfg.bsd_service_type = BsdServiceType_System;
+	cfg.bsdsockets_version = 4;
 	socketInitialize(&cfg);
 
 
@@ -286,7 +258,6 @@ int main() {
 #endif	
 	printf("Starting\n");
 	
-	Result ret = 0;
 	if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {
 		NXLOG::ERRORLOG("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
 		return ret;
@@ -307,28 +278,6 @@ int main() {
 	}
 	
 	
-	
-	eqpreset = new EQPreset("eqpresets.ini");
-	
-	playlist = new Playlist();
-	
-	if(configini->getDbActive(false)){
-		sqlitedb = new SQLiteDB("nxmp.db");
-		dbUpdated = sqlitedb->dbwasUpdated();
-	}
-	
-	emuoverrides = configini->getEmuOverrides();
-	
-	
-	shadermania = new shaderMania();
-
-
-	if (R_FAILED(ret = romfsInit())) {
-		NXLOG::ERRORLOG("romfsInit() failed: 0x%x\n", ret);
-		return ret;
-	}
-	
-	
 	appletInitializeGamePlayRecording();
     appletSetWirelessPriorityMode(AppletWirelessPriorityMode_OptimizedForWlan);
 	
@@ -338,33 +287,37 @@ int main() {
     nvInitialize();
     __nx_applet_type = saved_applet_type;
 	
-	printf("Applet type\n");
-	fflush(stdout);
+	nxmpgfx::Init_Backend(!isHandheld,configini->getVSYNC(false));
+	nxmpgfx::Init_Backend_Splash(!isHandheld);
 	
 	
-	AppletOperationMode stus=appletGetOperationMode();
-	if (stus == AppletOperationMode_Handheld) {
-		NXLOG::DEBUGLOG("Handheld Mode\n");
-		isHandheld=true;
-		newResW = handheldWidth;
-		newResH = handheldHeight;
-		multiplyRes = 1.0f;
-		currFontsize = 20.0f;
-	}
-	if (stus == AppletOperationMode_Console) {
-		NXLOG::DEBUGLOG("Docked Mode\n");
-		isHandheld=false;
-		newResW = dockedWidth;
-		newResH = dockedHeight;
-		multiplyRes = 1.5f;
-		currFontsize = 30.0f;
+	
+	
+	eqpreset = new EQPreset("eqpresets.ini");
+	
+	playlist = new Playlist();
+	
+	if(configini->getDbActive(false)){
+		sqlitedb = new SQLiteDB(configini->getDbPath());
+		dbUpdated = sqlitedb->dbwasUpdated();
 	}
 	
+	emuoverrides = configini->getEmuOverrides();
 	
-	nxmpgfx::Init(!isHandheld,configini->getVSYNC(false));
+	
+	shadermania = new shaderMania();
+
+	
+	nxmpgfx::updateSplash(25);
+	
+	
+	
+	
+	
+	nxmpgfx::Init_ImGui(!isHandheld);
 
 
-
+	nxmpgfx::updateSplash(50);
 	if(configini->getConsoleWindow()){
 		ConsoleWindow = new CConsoleWindow();
 	}
@@ -373,29 +326,41 @@ int main() {
 		
 	Utility::setMediaExtensions(extensionlist);
 		
-	Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,ImGui::GetIO());
+	//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,ImGui::GetIO());
 	
-	NXLOG::DEBUGLOG("Loading Textures\n");
 		
-	imgloader = new CImgLoader("romfs:");
+	//mgloader = new CImgLoader("romfs:");
 		
 		
 
-		/*
-		if(configini->getThemeName(false) != "Default"){
-			Themes  *themes = new Themes();
-			themes->getThemes();
-			int themeidx = themes->getThemeIDX(configini->getThemeName(false));
-			if(themeidx >-1){
-				themes->setTheme(themes->themeslist[themeidx].path);
-			}
-			delete themes;
+		
+	Themes  *themes = new Themes();
+	themes->getThemes();
+	int themeidx = themes->getThemeIDX(configini->getThemeName(true));
+	if(themeidx >-1){
+		themes->setTheme(themes->themeslist[themeidx].path);
+	}
+
+	NXLOG::DEBUGLOG("Loading Textures & Fonts\n");
+	
+	if(themeidx == -1){
+		imgloader = new CImgLoader("romfs:");
+		nxmpgfx::updateSplash(50);
+		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
+		nxmpgfx::updateSplash(100);
+	}else{
+		if(isHandheld){
+			Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].handledfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].handledfontsize);
+			nxmpgfx::updateSplash(100);
 		}else{
-			Themes  *themes = new Themes();
-			themes->setDefault();
-			delete themes;
+			Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].dockedfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].dockedfontsize);
+			nxmpgfx::updateSplash(100);
 		}
-		*/
+		imgloader = new CImgLoader(themes->themeslist[themeidx].path);
+		themes->setThemeColor(themes->themeslist[themeidx].path);
+	}
+	delete themes;
+		
 		
 	if (hosversionBefore(8, 0, 0)) {
 		if (R_SUCCEEDED(pcvInitialize())) {
@@ -414,15 +379,10 @@ int main() {
 	NXLOG::DEBUGLOG("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
 	SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
 
-		
-		
-
-		
-	GUI::initMpv();
-		//libmpv->setDemuxCache(configini->getDemuxCache(false));
-
 	
-		
+	GUI::initMpv();
+	
+	
 	videoout = new CVOUT();
 	videoout->Create_Framebuffer(nxmpgfx::WIDTH,nxmpgfx::HEIGHT);
 		
@@ -431,7 +391,8 @@ int main() {
 		nxmpstats->emuoverrides = emuoverrides;
 		nxmpstats->StartThreads();
 	}
-		
+	
+	
 	GUI::RenderLoop();
 	NXLOG::DEBUGLOG("Ending Render Loop\n");
 
@@ -451,12 +412,10 @@ int main() {
 		imgloader = nullptr;
 	}
 	
+	
+	
 	nxmpgfx::Destroy();
 	nxmpgfx::Quit();
-	
-	//window = NULL;
-	
-	
 	
 	
 	if(nxmpstats != nullptr){
@@ -476,13 +435,13 @@ int main() {
     }
 
 	nifmExit();
-	ncmExit();
 	romfsExit();
     
-	NXLOG::DEBUGLOG("Socket End\n");
 	
+	NXLOG::DEBUGLOG("Socket End\n");
+	nvExit();
 	socketExit();
-	__nx_applet_exit_mode = 1;
+	__nx_applet_exit_mode = 0;
 	appletUnlockExit();
     exit(1);
 }

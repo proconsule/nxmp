@@ -421,6 +421,8 @@ char ipv4address[INET_ADDRSTRLEN];
 
 #endif
 
+	struct ip_mreq ssdpMcastAddr;
+
 	memset((char *) &upnpControl, 0, sizeof(upnpControl));
 	upnpControl.sin_family = AF_INET;
     upnpControl.sin_port = htons(0);
@@ -442,6 +444,19 @@ char ipv4address[INET_ADDRSTRLEN];
 
 
 
+	ssdpMcastAddr.imr_interface.s_addr = inet_addr(ipv4address);
+	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
+	memset((void *)&ssdpMcastAddr, 0, sizeof ssdpMcastAddr);
+	ret = setsockopt(discoverSocket,
+		IPPROTO_IP,
+		IP_ADD_MEMBERSHIP,
+		(char *)&ssdpMcastAddr,
+		sizeof(struct ip_mreq));
+		
+	if (ret == -1) {
+		NXLOG::DEBUGLOG("Failed to set Multicast Group\n");
+	}
+
 
 
 	struct in_addr addr;
@@ -456,6 +471,7 @@ char ipv4address[INET_ADDRSTRLEN];
 		NXLOG::DEBUGLOG("Failed to set Multicast IF\n");
 	}
 
+    
 
 
 	struct timeval tv;

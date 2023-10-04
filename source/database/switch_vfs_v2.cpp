@@ -16,6 +16,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <switch.h>
+
+#include "logger.h"
+
 /*
 ** Size of the write buffer used by journal files in bytes.
 */
@@ -36,7 +40,9 @@ typedef struct HOS_File_struct HOS_File;
 struct HOS_File_struct {
   sqlite3_file base;              /* Base class. Must be first. */
   //int fd;                         /* File descriptor */
-  FILE *fp;
+  //FILE *fp;
+  FsFile        fd;
+  int offset;
   char *aBuffer;                  /* Pointer to malloc'd buffer */
   int nBuffer;                    /* Valid bytes of data in zBuffer */
   sqlite3_int64 iBufferOfst;      /* Offset in file of zBuffer[0] */
@@ -46,15 +52,69 @@ struct HOS_File_struct {
 ** Write directly to the file passed as the first argument. Even if the
 ** file has a write-buffer (DemoFile.aBuffer), ignore it.
 */
+
+static ssize_t
+fsdev_write_safe(void          *fd,
+                const char    *ptr,
+                size_t        len)
+{
+  Result      rc;
+  size_t      bytesWritten = 0;
+
+  /* get pointer to our data */
+  HOS_File *p = (HOS_File*)fd;
+
+  /* Copy to internal buffer and transfer in chunks.
+   * You cannot use FS read/write with certain memory.
+   */
+  char tmp_buffer[0x1000];
+  while(len > 0)
+  {
+    size_t toWrite = len;
+    if(toWrite > sizeof(tmp_buffer))
+      toWrite = sizeof(tmp_buffer);
+
+    /* copy to internal buffer */
+    memcpy(tmp_buffer, ptr, toWrite);
+
+    /* write the data */
+    rc = fsFileWrite(&p->fd, p->offset, tmp_buffer, toWrite, FsWriteOption_Flush);
+
+    if(R_FAILED(rc))
+    {
+      /* return partial transfer */
+      if(bytesWritten > 0)
+        return bytesWritten;
+
+      
+      return -1;
+    }
+
+    /* check if this is synchronous or not */
+   // if(p->flags & O_SYNC)
+    //  fsFileFlush(&file->fd);
+
+    p->offset += toWrite;
+    bytesWritten += toWrite;
+    ptr          += toWrite;
+    len          -= toWrite;
+  }
+
+  return bytesWritten;
+}
+
+
+
 static int HOS_DirectWrite(
   HOS_File *p,                    /* File handle */
   const void *zBuf,               /* Buffer containing data to write */
   int iAmt,                       /* Size of data to write in bytes */
   sqlite_int64 iOfst              /* File offset to write to */
 ){
-  off_t ofst;                     /* Return value from lseek() */
-  size_t nWrite;                  /* Return value from write() */
+  //off_t ofst;                     /* Return value from lseek() */
+  //size_t nWrite;                  /* Return value from write() */
 
+/*
   int rc = fseek( p->fp, iOfst, SEEK_SET );
   if(rc!=0){
 	  return SQLITE_IOERR_WRITE;
@@ -64,13 +124,19 @@ static int HOS_DirectWrite(
   if( ofst!=iOfst ){
     return SQLITE_IOERR_WRITE;
   }
+*/
+  p->offset = iOfst;
+  int rc = fsFileWrite(&p->fd, p->offset, zBuf, iAmt, FsWriteOption_None);
+  fsFileFlush(&p->fd);
+  if(R_VALUE(rc) == 0xD401)
+    return fsdev_write_safe(&p->fd, (const char *)zBuf, iAmt);
+  //nWrite = fwrite(zBuf , 1 , iAmt , p->fp );
 
-  nWrite = fwrite(zBuf , 1 , iAmt , p->fp );
-  fseek(p->fp,0,SEEK_SET);
-  if( nWrite!=iAmt ){
-    return SQLITE_IOERR_WRITE;
-  }
-
+  //fseek(p->fp,0,SEEK_SET);
+  //if( nWrite!=iAmt ){
+  //  return SQLITE_IOERR_WRITE;
+  //}
+  
   return SQLITE_OK;
 }
 
@@ -96,13 +162,66 @@ static int HOS_Close(sqlite3_file *pFile){
   HOS_File *p = (HOS_File*)pFile;
   rc = HOS_FlushBuffer(p);
   sqlite3_free(p->aBuffer);
-  fclose(p->fp);
+  fsFileClose(&p->fd);
+  
   return rc;
 }
 
 /*
 ** Read data from a file.
 */
+
+
+static ssize_t
+fsdev_read_safe(void          *fd,
+                char          *ptr,
+                size_t        len)
+{
+  Result      rc;
+  u64         bytesRead = 0, bytes = 0;
+
+  /* get pointer to our data */
+  HOS_File *p = (HOS_File*)fd;
+
+  /* Transfer in chunks with internal buffer.
+   * You cannot use FS read/write with certain memory.
+   */
+  char tmp_buffer[0x1000];
+  while(len > 0)
+  {
+    u64 toRead = len;
+    if(toRead > sizeof(tmp_buffer))
+      toRead = sizeof(tmp_buffer);
+
+    /* read the data */
+    rc = fsFileRead(&p->fd, p->offset, tmp_buffer, toRead, FsReadOption_None, &bytes);
+
+    if(bytes > toRead)
+      bytes = toRead;
+
+    /* copy from internal buffer */
+    memcpy(ptr, tmp_buffer, bytes);
+
+    if(R_FAILED(rc))
+    {
+      /* return partial transfer */
+      if(bytesRead > 0)
+        return bytesRead;
+
+      //r->_errno = fsdev_translate_error(rc);
+      //return -1;
+    }
+
+    p->offset += bytes;
+    bytesRead    += bytes;
+    ptr          += bytes;
+    len          -= bytes;
+  }
+
+  return bytesRead;
+}
+
+
 static int HOS_Read(
   sqlite3_file *pFile, 
   void *zBuf, 
@@ -110,8 +229,8 @@ static int HOS_Read(
   sqlite_int64 iOfst
 ){
   HOS_File *p = (HOS_File*)pFile;
-  off_t ofst;                     /* Return value from lseek() */
-  int nRead;                      /* Return value from read() */
+  //off_t ofst;                     /* Return value from lseek() */
+  u64 nRead;                      /* Return value from read() */
   int rc;                         /* Return code from demoFlushBuffer() */
 
   /* Flush any data in the write buffer to disk in case this operation
@@ -125,15 +244,13 @@ static int HOS_Read(
     return rc;
   }
 
-  rc = fseek(p->fp,iOfst,SEEK_SET);
-  ofst = ftell(p->fp);
   
-  if( ofst!=iOfst ){
-    return SQLITE_IOERR_READ;
-  }
   //nRead = read(p->fd, zBuf, iAmt);
-  nRead = fread(zBuf,1,iAmt,p->fp);
-  fseek(p->fp,0,SEEK_SET);
+  //nRead = fread(zBuf,1,iAmt,p->fp);
+  fsFileRead(&p->fd, iOfst, zBuf, iAmt, FsReadOption_None, &nRead);
+  if(R_VALUE(rc) == 0xD401)
+	  fsdev_read_safe(&p->fd,(char *)zBuf,iAmt);
+  //fseek(p->fp,0,SEEK_SET);
   //size_t fread(void *punt, size_t dim, size_t num, FILE *fp)
 
   if( nRead==iAmt ){
@@ -219,7 +336,7 @@ static int HOS_Sync(sqlite3_file *pFile, int flags){
   if( rc!=SQLITE_OK ){
     return rc;
   }
-  rc = fflush(p->fp);
+  rc = fsFileFlush(&p->fd);
   //rc = fsync(p->fd);
   return (rc==0 ? SQLITE_OK : SQLITE_IOERR_FSYNC);
 }
@@ -242,11 +359,9 @@ static int HOS_FileSize(sqlite3_file *pFile, sqlite_int64 *pSize){
     return rc;
   }
  
-  fseek(p->fp, 0L, SEEK_END);
-  ssize_t sz = ftell(p->fp);
-  fseek(p->fp, 0L, SEEK_SET);
-  
-  //rc = fstat(p->fd, &sStat);
+  ssize_t sz = 0;	
+  fsFileGetSize(&p->fd,&sz);
+
   if( rc!=0 ) return SQLITE_IOERR_FSTAT;
   *pSize = sz;
   return SQLITE_OK;
@@ -314,40 +429,57 @@ static int HOS_Open(
     HOS_DeviceCharacteristics     /* xDeviceCharacteristics */
   };
 
+
   HOS_File *p = (HOS_File*)pFile; /* Populate this structure */
   int oflags = 0;                 /* flags to pass to open() call */
   char *aBuf = 0;
+  memset(p, 0, sizeof(HOS_File));
 
   if( zName==0 ){
     return SQLITE_IOERR;
   }
 
+
   if( flags&SQLITE_OPEN_MAIN_JOURNAL ){
-    aBuf = (char *)sqlite3_malloc(SQLITE_HOS_BUFFERSZ);
+	aBuf = (char *)sqlite3_malloc(SQLITE_HOS_BUFFERSZ);
     if( !aBuf ){
       return SQLITE_NOMEM;
     }
   }
+
 
   if( flags&SQLITE_OPEN_EXCLUSIVE ) oflags |= O_EXCL;
   if( flags&SQLITE_OPEN_CREATE )    oflags |= O_CREAT;
   if( flags&SQLITE_OPEN_READONLY )  oflags |= O_RDONLY;
   if( flags&SQLITE_OPEN_READWRITE ) oflags |= O_RDWR;
 
-  
-  
 
-  memset(p, 0, sizeof(HOS_File));
-  //p->fp = open(zName, oflags, 0600);
-  if (access(zName, F_OK) == 0) {
-		p->fp = fopen(zName,"rb+");
-  } else {
-		p->fp = fopen(zName,"wb+");
-  }
+  int native_flags = (FsOpenMode_Read | FsOpenMode_Write | FsOpenMode_Append );
   
-  //p->fp = fopen(zName,"wb+");
-  fseek(p->fp,0,SEEK_SET);
-  if( p->fp == NULL ){
+  
+  FsFileSystem fsSdmc;
+  if (R_FAILED(fsOpenSdCardFileSystem(&fsSdmc)))
+      return -15;
+
+   fsSdmc = *fsdevGetDeviceFileSystem("sdmc");
+   Result rc;
+   struct stat file_stat = { 0 };
+   if(stat(zName, &file_stat) == 0 && S_ISREG(file_stat.st_mode)){
+	   
+   }else{
+	   rc = fsFsCreateFile(&fsSdmc, zName,0,0);
+	   if( !R_SUCCEEDED(rc) ){
+		sqlite3_free(aBuf);
+		return SQLITE_CANTOPEN;
+	  }
+	   
+   }
+   rc = fsFsOpenFile(&fsSdmc, zName, native_flags, &p->fd);
+  
+  p->offset = 0;
+ 
+ 
+  if( !R_SUCCEEDED(rc) ){
     sqlite3_free(aBuf);
     return SQLITE_CANTOPEN;
   }
@@ -357,7 +489,6 @@ static int HOS_Open(
     *pOutFlags = flags;
   }
   p->base.pMethods = &HOS_io;
-  
   return SQLITE_OK;
 }
 

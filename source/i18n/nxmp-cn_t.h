@@ -39,6 +39,7 @@ const char *Common_STR_CN_T[] = {
 	"出口",
 	"取消",
 	"保存",
+	"Checkbox",
 };
 
 

@@ -102,4 +102,54 @@ CImgLoader::~CImgLoader(){
 	glDeleteTextures(1, &icons.NXMPBannerTexture.id);
 	
 	
+	
+	
+	/* Home Icons */
+	icons.SdCardTexture.id = 0;
+	icons.UsbTexture.id = 0;
+	icons.NetworkTexture.id = 0;
+	icons.Enigma2Texture.id = 0;
+	icons.UPNPTexture.id = 0;
+	icons.PlaylistTexture.id = 0;
+	icons.SettingsTexture.id = 0;
+	icons.InfoTexture.id = 0;
+	icons.ExitTexture.id = 0;
+	
+	/* File Browser Icons */
+	icons.FileTexture.id = 0;
+	icons.FolderTexture.id = 0;
+	icons.GUI_D_UP.id = 0;
+	icons.GUI_D_DOWN.id = 0;
+	icons.GUI_D_LEFT.id = 0;
+	icons.GUI_D_RIGHT.id = 0;
+	icons.GUI_A_BUT.id = 0;
+	icons.GUI_B_BUT.id = 0;
+	icons.GUI_X_BUT.id = 0;
+	icons.GUI_Y_BUT.id = 0;
+	
+	/* Networks Icons */
+	icons.ShareAddTexture.id = 0;
+	icons.HTTPTexture.id = 0;
+	icons.FTPTexture.id = 0;
+	icons.SFTPTexture.id = 0;
+	icons.SMBTexture.id = 0;
+	icons.NFSTexture.id = 0;
+	
+	/* Player Icons */
+	icons.PlayIcon.id = 0;
+	icons.StopIcon.id = 0;
+	icons.PauseIcon.id = 0;
+	icons.MuteIcon.id = 0;
+	icons.VolumeIcon.id = 0;
+	icons.LoopIcon.id = 0;
+	icons.NoLoopIcon.id = 0;
+	
+	/* Info Icons */
+	
+	icons.FFMPEGTexture.id = 0;
+	icons.MPVTexture.id = 0;
+	icons.NXMPBannerTexture.id = 0;
+	
+	
+	
 }

@@ -34,13 +34,12 @@ CStats::CStats(){
 }
 
 CStats::~CStats(){
-	clkrstExit();
-	pcvExit();
 
  	i2cExit();
 	psmExit();
-	nvClose(fd);
-	nvExit();
+	nvClose(fd); 
+	nvChannelClose(&nvdecChannel);
+	nvMapExit();
 }
 
 void CStats::CalcDelay(){
@@ -143,11 +142,9 @@ void CStats::StartThreads() {
 				NXLOG::DEBUGLOG("I2C INIT\n");
 		}
 
-		if (R_SUCCEEDED(nvInitialize())){
-			nvCheck = nvOpen(&fd, "/dev/nvhost-ctrl-gpu");
-		}else{
-			NXLOG::ERRORLOG("Cannot Init ctrl-gpu");
-		}
+		
+		nvCheck = nvOpen(&fd, "/dev/nvhost-ctrl-gpu");
+		
 		
 		if (R_SUCCEEDED(nvMapInit())){
 			nvdecCheck = nvChannelCreate(&nvdecChannel, "/dev/nvhost-nvdec");

@@ -39,6 +39,7 @@ const char *Common_STR_JP[] = {
     "とじる",
     "キャンセル",
     "保存",
+	"Checkbox",
 };
 
 

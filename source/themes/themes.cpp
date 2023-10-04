@@ -104,8 +104,15 @@ void Themes::getThemes(){
 						}
 						const char* namepv = ini->GetValue("Theme", "Name","Anonymous");
 						const char* authorpv = ini->GetValue("Theme", "Author","Anonymous");
-						double fontsize =  ini->GetDoubleValue("Theme","FontSize",30.0f);
-						double smallfontsize =  ini->GetDoubleValue("Theme","FontSmallSize",30.0f);
+						double handledfontsize =  ini->GetDoubleValue("Theme","HandledFontSize",20.0f);
+						double dockedfontsize =  ini->GetDoubleValue("Theme","DockedFontSize",30.0f);
+						
+						const char* latinfontpv = ini->GetValue("Theme", "LatinFont");
+						const char* kanjifontpv = ini->GetValue("Theme", "KanjiFont");
+									
+						std::string latinfontstr = dirpath + std::string("/") + latinfontpv;
+						std::string kanjifontstr = dirpath + std::string("/") + kanjifontpv;
+						
 						
 						delete ini;
 						
@@ -113,8 +120,11 @@ void Themes::getThemes(){
 						tmptheme.name = namepv;
 						tmptheme.author = authorpv;
 						tmptheme.path = dirpath + "/";
-						tmptheme.fontsize = (float)fontsize;
-						tmptheme.fontsmallsize = smallfontsize;
+						tmptheme.handledfontsize = (float)handledfontsize;
+						tmptheme.dockedfontsize = (float)dockedfontsize;
+						tmptheme.latinfontstr = latinfontstr;
+						tmptheme.kanjifontstr = kanjifontstr;
+						
 						themeslist.push_back(tmptheme);
 					}
 				}
@@ -127,23 +137,40 @@ void Themes::getThemes(){
 		
 }
 
-
 void Themes::setDefault(){
 
-	
 	dochangethemefont = true;
-
-	themefontpath = "romfs:/DejaVuSans.ttf";
-	themefontsize = 24.0f;
-	//themefontsmall = 16.0f;
-	
-	
 	if(imgloader != nullptr){
 		delete imgloader;
 	}
+	
 	imgloader = new CImgLoader("romfs:");
+	Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
+	
 	
 }
+
+void Themes::setThemeColor(std::string themefolder){
+	CSimpleIniA *ini;
+	ini = new CSimpleIniA(true,true);
+	ini->SetUnicode();
+	std::string themeinifile = themefolder + "/theme.ini";
+	SI_Error rc = ini->LoadFile(themeinifile.c_str());
+	if(rc<0){
+		delete ini;
+	}
+	ImVec4* colors = ImGui::GetStyle().Colors;
+	for(int i=0;i<configstyles.size();i++){
+		double redval = ini->GetDoubleValue(configstyles[i].configstring.c_str(), "Red");
+		double greenval = ini->GetDoubleValue(configstyles[i].configstring.c_str(), "Green");
+		double blueval = ini->GetDoubleValue(configstyles[i].configstring.c_str(), "Blue");
+		double alphaval = ini->GetDoubleValue(configstyles[i].configstring.c_str(), "Alpha");
+		
+		colors[configstyles[i].colenum] = ImVec4((float)redval,(float)greenval,(float)blueval,(float)alphaval);
+		
+	}
+}
+
 
 void Themes::setTheme(std::string themefolder){
 	
@@ -157,17 +184,23 @@ void Themes::setTheme(std::string themefolder){
 	}
 	//const char* namepv = ini->GetValue("Theme", "Name");
 	//const char* authorpv = ini->GetValue("Theme", "Author");
+	
 	double fontsize =  ini->GetDoubleValue("Theme","FontSize");
 	//double smallfontsize =  ini->GetDoubleValue("Theme","FontSmallSize");
+		
+
+	const char* latinfontpv = ini->GetValue("Theme", "LatinFont");
+	const char* kanjifontpv = ini->GetValue("Theme", "KanjiFont");
 				
-				
+	std::string latinfontstr = themefolder + std::string("/") + latinfontpv;
+	std::string kanjifontstr = themefolder + std::string("/") + kanjifontpv;
+		
 	dochangethemefont = true;
 	themefontpath = themefolder+"/font.ttf";
-	themefontsize = 24.0f;
-	//themefontsmall = 16.0f;
-	
 	themefontsize = fontsize;
-	//themefontsmall = smallfontsize;
+	
+	
+	//Utility::FontLoader(latinfontstr.c_str(),fontsize,kanjifontstr.c_str(),fontsize,ImGui::GetIO());
 	
 	if(imgloader != nullptr){
 		delete imgloader;

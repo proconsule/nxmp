@@ -70,14 +70,23 @@ namespace nxmpgfx{
 	
 	extern GLuint WIDTH;
 	extern GLuint HEIGHT;
+	extern bool docked;
 	
-	void Init(bool docked,bool vsync = true);
+	void loopAppletMode();
+	void Init_Backend(bool docked,bool vsync);
+	void Init_Backend_AppletMode(bool isdocked);
+	void Init_Backend_Splash(bool isdocked);
+	void Init_ImGui(bool isdocked);
 	void NewFrame();
 	void Render();
 	void Resize(float w,float h);
 	void Destroy();
+	void Destory_ImGui();
+	void Destroy_Backend();
 	uint64_t Process_UI_Events();
 	void Quit();
+	
+	void updateSplash(int perc);
 	
 	
 	
