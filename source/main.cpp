@@ -203,14 +203,36 @@ void DeallocateExtern(){
 	
 }
 
+
+extern "C" void userAppInit() {
+	romfsInit();
+	SocketInitConfig cfg = *(socketGetDefaultInitConfig());
+	cfg.bsd_service_type = BsdServiceType_System;
+	socketInitialize(&cfg);
+
+}
+
+extern "C" void userAppExit(void) {
+	
+	romfsExit();
+	socketExit();
+	appletUnlockExit();
+
+}
+
+
+
+
 int main() {
 	appletLockExit();
 	Result ret = 0;
 	
+	/*
 	if (R_FAILED(ret = romfsInit())) {
 		NXLOG::ERRORLOG("romfsInit() failed: 0x%x\n", ret);
 		return ret;
 	}
+	*/
 	
 	AppletOperationMode stus=appletGetOperationMode();
 	if (stus == AppletOperationMode_Handheld) {
@@ -247,10 +269,7 @@ int main() {
 		return 0;
 	}
 #endif
-	SocketInitConfig cfg = *(socketGetDefaultInitConfig());
-	cfg.bsd_service_type = BsdServiceType_System;
-	cfg.bsdsockets_version = 4;
-	socketInitialize(&cfg);
+	
 
 
 #ifdef NDEBUG
@@ -318,9 +337,9 @@ int main() {
 
 
 	nxmpgfx::updateSplash(50);
-	if(configini->getConsoleWindow()){
+	//if(configini->getConsoleWindow()){
 		ConsoleWindow = new CConsoleWindow();
-	}
+	//}
 		
 	std::vector<std::string> extensionlist = configini->getConfigExtensions();
 		
@@ -398,6 +417,8 @@ int main() {
 
 	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
 
+	__nx_applet_exit_mode = configini->getExitMode(true);
+
 	if(videoout!= nullptr){
 		delete videoout;
 		videoout = nullptr;
@@ -435,13 +456,13 @@ int main() {
     }
 
 	nifmExit();
-	romfsExit();
+	
     
 	
 	NXLOG::DEBUGLOG("Socket End\n");
 	nvExit();
-	socketExit();
-	__nx_applet_exit_mode = 0;
-	appletUnlockExit();
-    exit(1);
+	
+	
+	
+    exit(0);
 }

@@ -11,6 +11,7 @@
 typedef struct{
 	std::string startpath = "/switch/nxmp/";
 	std::string dbpath = "/switch/nxmp/nxmp.db";
+	int exitmode = 0;
 	bool showhidden = false;
 	bool touchenable = false;
 	int playeswipeseek ;
@@ -125,6 +126,11 @@ public:
 	bool getDbActive(bool tmpvalue);
 	void setDbActive(bool value);
 	
+	int getExitMode(bool tmpvalue);
+	void setExitMode(int value);
+	
+	
+	
 	int getResumeStartPerc(bool tmpvalue);
 	void setResumeStartPerc(int value);
 	int getResumeStopPerc(bool tmpvalue);
@@ -138,6 +144,7 @@ public:
 	bool getEmuOverrides();
 	int getLogLevel();
 	bool getConsoleWindow();
+	void toggleConsoleWindow();
 	std::vector<std::string> getConfigExtensions();
 	playerconf_struct getConfig(bool tmpvalue);
 	

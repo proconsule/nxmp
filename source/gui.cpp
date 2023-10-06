@@ -726,6 +726,12 @@ namespace GUI {
 						
 			}
 			
+			if (is_bit_set(event_ret,nxmpgfx::BUT_TL) && is_bit_set(event_ret,nxmpgfx::BUT_TR)){
+				if(item.state == MENU_STATE_HOME){
+					configini->toggleConsoleWindow();
+				}
+			}
+			
 			if (is_bit_set(event_ret,nxmpgfx::BUT_TL)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 					toggleOC();
@@ -855,6 +861,11 @@ namespace GUI {
 					}
 					break;
 				
+				case MENU_STATE_APPEXIT:
+					Windows::MainMenuWindow(&item.focus, &item.first_item);
+					Popups::AppExitPopup();
+					break;
+				
 			}
 			
 			switch (item.playercontrolstate) {
@@ -923,7 +934,9 @@ namespace GUI {
 			}
 			
 			if(ConsoleWindow != nullptr){
-				ConsoleWindow->Draw();
+				if(configini->getConsoleWindow()){
+					ConsoleWindow->Draw();
+				}
 			}
 			
 	}

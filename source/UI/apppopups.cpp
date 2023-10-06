@@ -673,4 +673,43 @@ namespace Popups{
 		Popups::ExitPopup();
 	}
 	
+	void AppExitPopup(void) {
+		Popups::SetupPopup("Exit NXMP");
+
+		if (ImGui::BeginPopupModal("Exit NXMP", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			
+			
+			ImVec2 button_size(400.0f, 0.0f);
+			
+			float alignment = 0.5f;
+			
+			float size = 400.0f + ImGui::GetStyle().FramePadding.x * 2.0f;
+			float avail = ImGui::GetContentRegionAvail().x;
+
+			float off = (avail - size) * alignment;
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
+			
+			if (ImGui::Button("Return to HB-Menu",button_size))
+			{
+				ImGui::CloseCurrentPopup();
+				renderloopdone = true;
+				configini->setExitMode(0);
+            }
+			if (off > 0.0f)
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			
+			if (ImGui::Button("Exit to Home",button_size))
+			{
+                ImGui::CloseCurrentPopup();
+				renderloopdone = true;
+				configini->setExitMode(1);
+            }
+			
+			
+		}
+		Popups::ExitPopup();
+	}
+	
 }

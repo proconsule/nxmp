@@ -4,10 +4,11 @@
 
 ### Added
 
-- Added initial i18n (partial)
-- Spanish-Japanese-Italian-Deutsch-French native translation
+- Added initial i18n (More than 50% of text is i18n ready, be patient soon will be 100%)
+- Spanish-Japanese-Italian-Deutsch-French-Chinese(Simplified) native translation
 - Error messages on network share connection failure
 - Loading splash screen
+- Exit Choice between HB-Menu and Home
 
 ### Changes
 
@@ -20,11 +21,18 @@
 
 - SubFont Color fix
 - Database Open/Close Fix
+- Theme support is back
 
 ### Knonw Issues
 
 - NXMP start loading times increased due to importing more font glyphs
 
+### Release Notes
+
+The config.ini file now has a config line for setting db location.
+It will point to default location /switch/nxmp/nxmp.db
+dbpath = /switch/nxmp/nxmp.db
+You can set to any location
 
 ## [0.8.1]
 

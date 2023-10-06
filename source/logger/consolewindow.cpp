@@ -21,7 +21,7 @@ void CConsoleWindow::Draw(){
 	float total_h = ImGui::GetContentRegionAvail().y;
 	if (ImGui::BeginListBox("Console",ImVec2(total_w, total_h))){
 		for(int i=0;i<textbuffer.size();i++){
-			ImGui::TextWrapped("%s",textbuffer[i].c_str());
+			ImGui::TextWrapped("%s",textbuffer.at(i).c_str());
 		}
 		
 	}
@@ -40,5 +40,8 @@ void CConsoleWindow::Draw(){
 
 void CConsoleWindow::AddText(std::string _text){
 	textbuffer.push_back(_text);
+	if(textbuffer.size()>bufferSize){
+			textbuffer.pop_front();
+	}
 	
 }

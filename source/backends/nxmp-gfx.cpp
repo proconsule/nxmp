@@ -529,6 +529,13 @@ namespace nxmpgfx{
 				ret_event = bit_set(ret_event,BUT_TL);
 			}
 			
+			if(state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_THUMB] == GLFW_PRESS && !B_TR_PRESS){
+				ret_event = bit_set(ret_event,BUT_TR);
+				ret_event = bit_set(ret_event,BUT_TL);
+			}
+			
+		
+			
 			if(state.buttons[GLFW_GAMEPAD_BUTTON_START ] == GLFW_PRESS && !B_PLUS_PRESS){
 				ret_event = bit_set(ret_event,BUT_PLUS);
 			}

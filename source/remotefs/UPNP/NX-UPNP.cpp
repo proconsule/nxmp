@@ -55,7 +55,7 @@ Device::Device(std::string _location){
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
 	curlDownloader * curldown = new curlDownloader();
 	curldown->Download(_location.c_str(),chunk);
-	NXLOG::DEBUGLOG("%s\n",chunk->memory);
+	//NXLOG::DEBUGLOG("%s\n",chunk->memory);
 	fflush(stdout);
 	tinyxml2::XMLDocument doc;
 	doc.Parse( chunk->memory );
@@ -73,7 +73,7 @@ Device::Device(std::string _location){
 			std::string tmpiconurl = urltag->GetText();
 			if(mimetype == "image/png"){
 				iconUrl = thisurl.scheme + std::string("://") + thisurl.server + ":" +thisurl.port + tmpiconurl;
-				NXLOG::DEBUGLOG("Icon Url: %s\n",iconUrl.c_str());
+				//NXLOG::DEBUGLOG("Icon Url: %s\n",iconUrl.c_str());
 				
 				break;
 			}
@@ -89,7 +89,7 @@ Device::Device(std::string _location){
 			if(serviceTypestring == "urn:schemas-upnp-org:service:ContentDirectory:1"){
 				XMLElement * controlURLtag = servicenode->FirstChildElement("controlURL");
 				controlUrl = thisurl.scheme + std::string("://") + thisurl.server + ":" +thisurl.port + std::string(controlURLtag->GetText());
-				NXLOG::DEBUGLOG("Control URL: %s\n",controlUrl.c_str());
+				//NXLOG::DEBUGLOG("Control URL: %s\n",controlUrl.c_str());
 				fflush(stdout);
 			}
 			servicenode = servicenode->NextSiblingElement("service");
@@ -98,8 +98,8 @@ Device::Device(std::string _location){
 		
 		friendlyName = friendlyNameTag->GetText();
 		devUDN = UDNNameTag->GetText();
-		NXLOG::DEBUGLOG("UDN: %s\n",friendlyName.c_str());
-		NXLOG::DEBUGLOG("friendlyName: %s\n",devUDN.c_str());
+		//NXLOG::DEBUGLOG("UDN: %s\n",friendlyName.c_str());
+		//NXLOG::DEBUGLOG("friendlyName: %s\n",devUDN.c_str());
 		fflush(stdout);
 	}
 	
@@ -157,12 +157,12 @@ void Device::browseOID(){
 	SOAPcurlDownloader *testcurl = new SOAPcurlDownloader();
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
 	testcurl->Download(controlUrl.c_str(),chunk,parentList.back().c_str());
-	NXLOG::DEBUGLOG("CHUNK MEM\n");
-	NXLOG::DEBUGLOG("RET: %s\n",chunk->memory);
+	//NXLOG::DEBUGLOG("CHUNK MEM\n");
+	//NXLOG::DEBUGLOG("RET: %s\n",chunk->memory);
 	fflush(stdout);
 	char * testret = NULL;
 	decode_html_entities_utf8(chunk->memory,0);
-	NXLOG::DEBUGLOG("RET2: %s\n",chunk->memory);
+	//NXLOG::DEBUGLOG("RET2: %s\n",chunk->memory);
 	fflush(stdout);
 	tinyxml2::XMLDocument doc;
 	doc.Parse( chunk->memory ,strlen(chunk->memory));
@@ -444,21 +444,10 @@ char ipv4address[INET_ADDRSTRLEN];
 
 
 
-	ssdpMcastAddr.imr_interface.s_addr = inet_addr(ipv4address);
-	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
-	memset((void *)&ssdpMcastAddr, 0, sizeof ssdpMcastAddr);
-	ret = setsockopt(discoverSocket,
-		IPPROTO_IP,
-		IP_ADD_MEMBERSHIP,
-		(char *)&ssdpMcastAddr,
-		sizeof(struct ip_mreq));
-		
-	if (ret == -1) {
-		NXLOG::DEBUGLOG("Failed to set Multicast Group\n");
-	}
+	
 
 
-
+/*
 	struct in_addr addr;
 	memset((void *)&addr, 0, sizeof(struct in_addr));
 	addr.s_addr = inet_addr(ipv4address);
@@ -469,6 +458,24 @@ char ipv4address[INET_ADDRSTRLEN];
                 sizeof addr);
     if (ret == -1) {
 		NXLOG::DEBUGLOG("Failed to set Multicast IF\n");
+	}
+*/
+
+
+	ssdpMcastAddr.imr_interface.s_addr =  htonl(INADDR_ANY);
+
+	//ssdpMcastAddr.imr_interface.s_addr = inet_addr(ipv4address);
+	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
+	
+	memset((void *)&ssdpMcastAddr, 0, sizeof ssdpMcastAddr);
+	ret = setsockopt(discoverSocket,
+		IPPROTO_IP,
+		IP_ADD_MEMBERSHIP,
+		(char *)&ssdpMcastAddr,
+		sizeof(struct ip_mreq));
+		
+	if (ret == -1) {
+		NXLOG::DEBUGLOG("Failed to set Multicast Group\n");
 	}
 
     
@@ -516,7 +523,7 @@ void NXUPnP::ListenSSDPResponse()
         while (recvfrom(discoverSocket, buf, MAX_DGRAM_SIZE, 0,  (struct sockaddr*)&broadcast_addr, (socklen_t*)&bcLen) >0)
 		{
 		    
-			NXLOG::DEBUGLOG("buf:%s\n",buf);
+			//NXLOG::DEBUGLOG("buf:%s\n",buf);
 			if(strstr(buf, "LOCATION:")){
 				std::ostringstream ss;
 				int i = 0;
@@ -528,7 +535,7 @@ void NXUPnP::ListenSSDPResponse()
 					++i;
 				}
 				std::string location = ss.str().c_str();
-				NXLOG::DEBUGLOG("location:%s\n",location.c_str());
+				//NXLOG::DEBUGLOG("location:%s\n",location.c_str());
 				Device *tmpdev = new Device(location);
 				addDevice(tmpdev);
 			}

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <queue>
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -18,7 +19,7 @@ public:
 	
 private:
 	std::string consoletitle;
-	std::vector<std::string> textbuffer;
+	std::deque<std::string> textbuffer;
 	int bufferSize;
 	
 };

@@ -430,6 +430,23 @@ bool CIniParser::getConsoleWindow(){
 	return nxmpconfig.consolewindow;
 }
 
+void CIniParser::toggleConsoleWindow(){
+	nxmpconfig.consolewindow = !nxmpconfig.consolewindow;
+	nxmptmpconfig.consolewindow = nxmpconfig.consolewindow;
+}
+
+int CIniParser::getExitMode(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.exitmode;
+	}
+	return nxmpconfig.exitmode;
+}
+
+void CIniParser::setExitMode(int value){
+	isModified = true;
+	nxmptmpconfig.exitmode = value;
+}
+
 std::vector<std::string> CIniParser::getConfigExtensions(){
 	
 	//const char* pv;
@@ -492,6 +509,9 @@ void CIniParser::ReadConfig(){
 		}
 		if(inidata["Main"].has("dbpath")){
 			nxmpconfig.dbpath = inidata.get("Main").get("dbpath");
+		}
+		if(inidata["Main"].has("exitmode")){
+			nxmpconfig.exitmode = string_to_int(inidata.get("Main").get("exitmode"));
 		}
 		if(inidata["Main"].has("hwdec")){
 			nxmpconfig.hwdec = string_to_bool(inidata.get("Main").get("hwdec"));
@@ -648,6 +668,7 @@ void CIniParser::saveSettings(){
 		{"startresumeperc", int_to_string(nxmpconfig.startresumeperc)},
 		{"stopresumeperc", int_to_string(nxmpconfig.stopresumeperc)},
 		{"theme", nxmpconfig.themename},
+		{"consolewindow", bool_to_string(nxmpconfig.consolewindow)},
 		{"enabled_extensions", vector_to_string(nxmpconfig.config_enabled_extensions)}
 		
 		

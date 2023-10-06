@@ -127,7 +127,8 @@ namespace Windows {
 							item.state = MENU_STATE_INFO;
 						}
 						if(n == MM_EXIT){
-							renderloopdone = true;
+							item.state = MENU_STATE_APPEXIT;
+							//renderloopdone = true;
 						}
 						if(n == MM_STREAM){
 							//i need move this, work in progress.

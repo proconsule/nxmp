@@ -35,6 +35,7 @@ namespace Popups {
 	void NetMenuPopup(void);
 	void FileContextPopup(void);
 	void PlaylistContextPopup(void);
+	void AppExitPopup(void);
 	//void PopupScrollText(float w,float h,const char* fmt, ...);
 	
 }
