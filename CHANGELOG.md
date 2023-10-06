@@ -31,7 +31,10 @@
 
 The config.ini file now has a config line for setting db location.
 It will point to default location /switch/nxmp/nxmp.db
+
+```
 dbpath = /switch/nxmp/nxmp.db
+```
 You can set to any location
 
 ## [0.8.1]
