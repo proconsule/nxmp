@@ -296,6 +296,9 @@
 	
 	void CFileBrowser::setSordOrder(FS::FILESORTORDER myorder){
 		sortOrder = myorder;
+		if(timelessFS){
+			if(sortOrder == FS::FS_DATE_ASCENDINGORDER|| sortOrder == FS::FS_DATE_DESCENDINGORDER)sortOrder = FS::FS_NAME_ASCENDINGORDER;
+		}
 		if(mylocal!= nullptr){
 			mylocal->sortOrder = sortOrder;
 			mylocal->DirList(mylocal->getCurrentPath(),currshowHidden,Utility::getMediaExtensions());

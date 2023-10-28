@@ -114,11 +114,13 @@ void CVOUT::SetFullScreen(bool _fullscreen){
 	if(_fullscreen){
 		changevis=true;
 		Rescale_Framebuffer(width,height);
-		
+		current_width = width;
+		current_height = height;
 	}else{
 		changevis=true;
 		Rescale_Framebuffer(windowed_width,windowed_height);
-		
+		current_width = windowed_width;
+		current_height = windowed_height;
 	}
 	fullscreen = _fullscreen;
 }

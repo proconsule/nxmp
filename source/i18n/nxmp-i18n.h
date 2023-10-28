@@ -15,11 +15,13 @@ enum NX_LANGS{
 	Japanese,
 	Chinese_Simplified,
 	Chinese_Traditional,
+	Korean,
 	Russian,
 	NX_LANGS_NR_ITEMS
 };
 
 extern const char *NXLANGNAME[];
+extern const char *NXLANGNAME_ENG[];
 extern char *NXLANGAUTHORS[NX_LANGS_NR_ITEMS];
 extern bool NXLANGACTIVE[NX_LANGS_NR_ITEMS];
 extern bool NXLANGNATIVE[NX_LANGS_NR_ITEMS];

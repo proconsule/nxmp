@@ -35,6 +35,9 @@ public:
 	mpv_render_param params[3];
 	int __fbo_one = 1;
 	
+	float current_width;
+	float current_height;
+	
 	float width=0.0f;
 	float height=0.0f;
 	

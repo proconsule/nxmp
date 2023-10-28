@@ -75,16 +75,18 @@ namespace Windows {
 						if(n == MM_LOCALFILES){
 							item.state = MENU_STATE_FILEBROWSER;
 							filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
+							filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
 							filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 							item.first_item = true;
 						}
 						if(n == MM_USB){
-							usbInit();
 							if(MyUSBMount==nullptr){
 								MyUSBMount=new USBMounter(playlist);
 							}
 							item.state = MENU_STATE_USB_MOUNT;
 							filebrowser = new CFileBrowser("",playlist,MyUSBMount);
+							filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
+							
 							
 						}
 						if(n == MM_NETWORK){
@@ -110,8 +112,6 @@ namespace Windows {
 							}
 						}
 						if(n == MM_SETTINGS){
-							//configini->setLongSeek(configini->getLongSeek(false));
-							//configini->setShortSeek(configini->getShortSeek(false));
 							if(sqlitedb != nullptr)sqlitedb->UpdateDbStats();
 							item.state = MENU_STATE_SETTINGS;
 						}

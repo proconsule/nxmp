@@ -121,6 +121,17 @@ void CIniParser::setshowHidden(bool val){
 	nxmptmpconfig.showhidden = val;
 }
 
+int CIniParser::getsortOrder(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.sortorder;
+	}
+	return nxmpconfig.sortorder;
+}
+void CIniParser::setsortOrder(int val){
+	isModified = true;
+	nxmptmpconfig.sortorder = val;
+}
+
 bool CIniParser::getTouchEnable(bool tmpvalue){
 	if(tmpvalue){
 		return nxmptmpconfig.touchenable;
@@ -225,6 +236,18 @@ int CIniParser::getInterfaceLang(bool tmpvalue){
 void CIniParser::setInterfaceLang(int lang){
 	isModified = true;
 	nxmptmpconfig.intlang = lang;
+}
+
+bool CIniParser::getOnlyLatinRange(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.onlylatinrange;
+	}
+	return nxmpconfig.onlylatinrange; 
+}
+	
+void CIniParser::setOnlyLatinRange(bool latinrange){
+	isModified = true;
+	nxmptmpconfig.onlylatinrange = latinrange;
 }
 
 
@@ -528,6 +551,9 @@ void CIniParser::ReadConfig(){
 		if(inidata["Main"].has("showhidden")){
 			nxmpconfig.showhidden = string_to_bool(inidata.get("Main").get("showhidden"));
 		}
+		if(inidata["Main"].has("sortorder")){
+			nxmpconfig.sortorder = string_to_int(inidata.get("Main").get("sortorder"));
+		}
 		if(inidata["Main"].has("touchenable")){
 			nxmpconfig.touchenable = string_to_bool(inidata.get("Main").get("touchenable"));
 		}
@@ -566,6 +592,9 @@ void CIniParser::ReadConfig(){
 		}
 		if(inidata["Main"].has("intlang")){
 			nxmpconfig.intlang =  string_to_int(inidata.get("Main").get("intlang"));
+		}
+		if(inidata["Main"].has("onlylatinrange")){
+			nxmpconfig.onlylatinrange =  string_to_bool(inidata.get("Main").get("onlylatinrange"));
 		}
 		if(inidata["Main"].has("subfontsize")){
 			nxmpconfig.subfontsize = string_to_int(inidata.get("Main").get("subfontsize"));
@@ -649,6 +678,7 @@ void CIniParser::saveSettings(){
 		{"usedb", bool_to_string(nxmpconfig.dbactive)},
 		{"useoc", bool_to_string(nxmpconfig.useoc)},
 		{"showhidden", bool_to_string(nxmpconfig.showhidden)},
+		{"sortorder", int_to_string(nxmpconfig.sortorder)},
 		{"touchenable", bool_to_string(nxmpconfig.touchenable)},
 		{"demuxcachesec", int_to_string(nxmpconfig.demuxcachesec)},
 		{"playeswipeseek", bool_to_string(nxmpconfig.playeswipeseek)},
@@ -660,6 +690,7 @@ void CIniParser::saveSettings(){
 		{"useslang", bool_to_string(nxmpconfig.useslang)},
 		{"slang",Utility::getLanguages()[nxmpconfig.slang].lang3},
 		{"intlang",int_to_string(nxmpconfig.intlang)},
+		{"onlylatinrange",bool_to_string(nxmpconfig.onlylatinrange)},
 		{"subfontsize", int_to_string(nxmpconfig.subfontsize)},
 		{"subfontscale", float_to_string(nxmpconfig.subfontscale)},
 		{"subfontcolor", getSubFontColorHex(true)},

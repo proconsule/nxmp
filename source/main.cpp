@@ -10,7 +10,6 @@
 #include "nxmp-gfx.h"
 #include "iniparser.h"
 #include "imgloader.h"
-#include "config.h"
 #include "gui.h"
 #include "utils.h"
 #include "localfiles.h"
@@ -364,15 +363,34 @@ int main() {
 	
 	if(themeidx == -1){
 		imgloader = new CImgLoader("romfs:");
+		
+		/*
+		std::vector<nxmpgfx::fonttype_struct> tmpfonts;
+		
+		nxmpgfx::fonttype_struct tmpentry;
+		tmpentry.filename = "romfs:/DejaVuSans.ttf";
+		tmpentry.size = currFontsize;
+		
+		ImFontGlyphRangesBuilder range;
+		range.Clear();
+		tmpentry.charrange.clear();
+		range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+		range.BuildRanges(&tmpentry.charrange);
+		
+		tmpfonts.push_back(tmpentry);
+		*/
 		nxmpgfx::updateSplash(50);
-		Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
+		nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)));
+		//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
 		nxmpgfx::updateSplash(100);
 	}else{
 		if(isHandheld){
-			Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].handledfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].handledfontsize);
+			//Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].handledfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].handledfontsize);
+			nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
 			nxmpgfx::updateSplash(100);
 		}else{
-			Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].dockedfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].dockedfontsize);
+			//Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].dockedfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].dockedfontsize);
+			nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
 			nxmpgfx::updateSplash(100);
 		}
 		imgloader = new CImgLoader(themes->themeslist[themeidx].path);

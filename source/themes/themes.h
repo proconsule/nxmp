@@ -29,6 +29,7 @@ public:
 	
 	std::vector<themes_struct> themeslist;
 	
+	std::vector<nxmpgfx::fonttype_struct> getThemeFonts(int themeidx,bool onlylatinrange);
 	
 };
 

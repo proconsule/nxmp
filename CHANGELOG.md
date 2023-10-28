@@ -5,7 +5,8 @@
 ### Added
 
 - Added initial i18n (More than 50% of text is i18n ready, be patient soon will be 100%)
-- Spanish-Japanese-Italian-Deutsch-French-Chinese(Simplified) native translation
+- Italian-Spanish-Japanese-Deutsch-French-Chinese(Simplified)-Korean native translation
+- Default file ordering can be changed in Settings menu
 - Error messages on network share connection failure
 - Loading splash screen
 - Exit Choice between HB-Menu and Home
@@ -19,6 +20,7 @@
 
 ### Fixed
 
+- Video Ghosting Fixed
 - SubFont Color fix
 - Database Open/Close Fix
 - Theme support is back

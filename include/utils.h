@@ -83,7 +83,9 @@ namespace Utility{
 	std::string trim(const std::string &s);
 	std::string truncateLen(std::string path,int len);
 	//void FontLoader(std::string fontpath,float fontSize,ImGuiIO &io);
-	void FontLoader(std::string latinfontpath,float latinfontSize,std::string japanaesechinesefontpath,float japanaesechinesefontSize);
+	//void FontLoader(std::string latinfontpath,float latinfontSize,std::string japanaesechinesefontpath,float japanaesechinesefontSize);
+	
+	
 
 }
 

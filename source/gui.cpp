@@ -108,7 +108,6 @@ namespace GUI {
 	
 	void HandleEvents(){
 		
-		
 		while (1) {
 			mpv_event *mp_event = (mpv_event*) mpv_wait_event(libmpv->getHandle(), 0);
 			if (mp_event->event_id == MPV_EVENT_NONE){
@@ -122,9 +121,8 @@ namespace GUI {
 				continue;
 			}
 			if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
-				item.state = MENU_STATE_PLAYER;
 				libmpv->getfileInfo();
-				printf("LOADED\n");
+				item.state = MENU_STATE_PLAYER;
 				
 				if(libmpv->getFileInfo()->videos.size() == 0 || (libmpv->getFileInfo()->videos.size() == 1 && libmpv->getFileInfo()->videos[0].albumart) ){
 					item.playerstate = PLAYER_STATE_AUDIO;
@@ -171,6 +169,7 @@ namespace GUI {
 				appletSetMediaPlaybackState(true);
 				item.laststate = item.state;
 				item.state = MENU_STATE_PLAYERCACHING;
+				
 						
 			}
 			if (mp_event->event_id == MPV_EVENT_END_FILE) {
@@ -212,17 +211,21 @@ namespace GUI {
 						}
 					}
 				}
+				//item.state = item.laststate;
 				item.state = item.laststate;
+				
 				item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
 				item.playercontrolstate = PLAYER_CONTROL_STATE_NONE;
 				item.masterlock = false;
 						
 			}
+			
 			if(mp_event->event_id == MPV_EVENT_PROPERTY_CHANGE){
 				mpv_event_property *prop = (mpv_event_property*)mp_event->data;
+				if(prop == NULL)continue;
 				if(std::string(prop->name) == "metadata" && !libmpv->Stopped()) 
 				{
-					//if(prop->data == nullptr)continue;
+					if(prop->data == nullptr)continue;
 					mpv_node node = *(mpv_node *)prop->data;
 					if (node.format == MPV_FORMAT_NODE_MAP) {
 						for (int n = 0; n < node.u.list->num; n++) {
@@ -389,14 +392,14 @@ namespace GUI {
 					if(prop->format == MPV_FORMAT_FLAG)
 					{
 						bool playchache = *(bool *)prop->data;
-						/*
-						if(playchache){
-							item.laststate = item.state;
-							item.state = MENU_STATE_PLAYERCACHING;
-						}else{
-							item.state = MENU_STATE_PLAYER;
-						}
-						*/
+						
+						//if(playchache){
+						//	item.laststate = item.state;
+						//	item.state = MENU_STATE_PLAYERCACHING;
+						//}else{
+						//	item.state = MENU_STATE_PLAYER;
+						//}
+						
 								
 					}
 				}
@@ -421,6 +424,7 @@ namespace GUI {
 						
 						
 			}
+			
 			if(mp_event->event_id!=22){
 				//printf("event: %s %d\n", mpv_event_name(mp_event->event_id),mp_event->event_id);
 			}
@@ -428,7 +432,7 @@ namespace GUI {
 		mpvevent=false;
 		
 		
-		uint64_t event_ret = nxmpgfx::Process_UI_Events();
+		uint64_t event_ret = nxmpgfx::Process_UI_Events(std::chrono::system_clock::now());
 		
 		if(event_ret>0){
 			
@@ -757,7 +761,9 @@ namespace GUI {
 					{
 								
 						item.state = MENU_STATE_FILEBROWSER;
-						filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
+						if(filebrowser==NULL){
+							filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
+						}
 						filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 						item.first_item = true;
 					}
@@ -767,6 +773,26 @@ namespace GUI {
 				}
 			}
 			
+			if(is_bit_set(event_ret,nxmpgfx::B_AX_R_DOWN)){
+				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+					item.showVolume = true;
+					ImGuiContext& g = *GImGui;
+					item.VolumeHide = g.Time;
+					if(libmpv->getVolume()-1>=0){
+						libmpv->setVolume(libmpv->getVolume()-1,false);
+					}
+				}
+			}
+			if(is_bit_set(event_ret,nxmpgfx::B_AX_R_UP)){
+				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
+					item.showVolume = true;
+					ImGuiContext& g = *GImGui;
+					item.VolumeHide = g.Time;
+					if(libmpv->getVolume()+1<=100){
+						libmpv->setVolume(libmpv->getVolume()+1,false);
+					}
+				}
+			}
 		}
 	
 	}
@@ -947,17 +973,10 @@ namespace GUI {
 		
 		
 		if(GUI::wakeup == 1){
-			//if ((mpv_render_context_update(libmpv->getContext()) & MPV_RENDER_UPDATE_FRAME))
-            //{
-                mpv_render_context_render(libmpv->getContext(), videoout->params); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
-                glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));  // we have to set the Viewport on every cycle because mpv_render_context_render internally rescales the fb of the context(?!)...
-				mpv_render_context_report_swap(libmpv->getContext());
-			//}
+			mpv_render_context_render(libmpv->getContext(), videoout->params); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
+			glViewport(0, 0, static_cast<int>(videoout->current_width), static_cast<int>(videoout->current_height));  // we have to set the Viewport on every cycle because mpv_render_context_render internally rescales the fb of the context(?!)...
+			mpv_render_context_report_swap(libmpv->getContext());
 			GUI::wakeup = 0;
-			//mpv_render_context_render(libmpv->getContext(), videoout->params); 
-			//glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
-			//mpv_render_context_report_swap(libmpv->getContext());
-			//GUI::wakeup = 0;
 		}
 		
 		
@@ -970,7 +989,7 @@ namespace GUI {
 			item.popupstate = POPUP_STATE_DBUPDATED;
 		}
 		item.first_item = true;
-		while (!renderloopdone && appletMainLoop())
+		while (!renderloopdone && appletMainLoop() && !nxmpgfx::WindowShouldClose())
 		{
 			nxmpstats->starttime = std::chrono::system_clock::now();
 			HandleEvents();
@@ -1070,7 +1089,8 @@ namespace GUI {
 			
 			imgloader = new CImgLoader("romfs:");
 			nxmpgfx::updateSplash(50);
-			Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
+			//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
+			nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)));
 			nxmpgfx::updateSplash(100);
 			
 		}else{
@@ -1078,11 +1098,13 @@ namespace GUI {
 			themes->setThemeColor(themes->themeslist[themeidx].path);
 			nxmpgfx::updateSplash(50);
 			if(isHandheld){
-				Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].handledfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].handledfontsize);
+				//Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].handledfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].handledfontsize);
+				nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
 				nxmpgfx::updateSplash(100);
 				
 			}else{
-				Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].dockedfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].dockedfontsize);
+				//Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].dockedfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].dockedfontsize);
+				nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
 				nxmpgfx::updateSplash(100);
 				
 			}
@@ -1107,12 +1129,3 @@ namespace GUI {
 	}
 	
 }	
-
-/*
-static void on_mpv_render_update(void *ctx)
-{
-    // we set the wakeup flag here to enable the mpv_render_context_render path in the main loop.
-    GUI::wakeup = 1;
-}
-*/
-

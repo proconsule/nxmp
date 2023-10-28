@@ -211,26 +211,31 @@ namespace Windows {
 							
 							if(thisurl.scheme == "http" || thisurl.scheme == "https"){
 								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
 								filebrowser->DirList(filebrowser->getBasePath(),false,Utility::getMediaExtensions());
 								item.state = MENU_STATE_HTTPBROWSER;
 							}
 							if(thisurl.scheme == "ftp"){
 								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
 								filebrowser->DirList(filebrowser->getBasePath(),false,Utility::getMediaExtensions());	
 								item.state = MENU_STATE_FTPBROWSER;
 							}
 							if(thisurl.scheme == "sftp"){
 								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
 								filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
 								item.state = MENU_STATE_SSHBROWSER;
 							}
 							if(thisurl.scheme == "smb"){
 								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
 								filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
 								item.state = MENU_STATE_SAMBABROWSER;
 							}
 							if(thisurl.scheme == "nfs"){
 								filebrowser = new CFileBrowser(item.networksources[n].url,playlist);
+								filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
 								filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
 								item.state = MENU_STATE_NFSBROWSER;
 							}

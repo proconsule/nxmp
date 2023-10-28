@@ -2,7 +2,7 @@
 #define NXMP_I18N_CN_T_H
 
 const char *cn_t_i18n_author = "proconsule";
-bool cn_t_i18n_status = true;
+bool cn_t_i18n_status = false;
 bool cn_t_i18n_native = false;
 
 const char *MainMenu_STR_CN_T[] = {

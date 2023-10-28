@@ -11,6 +11,10 @@
 #include "playlist.h"
 
 
+//#define USB_USE_EVENT_SYSTEM
+#define USB_USE_CALLBACK_SYSTEM
+
+
 
 struct usb_devices{
 	std::string mount_point;
@@ -19,7 +23,10 @@ struct usb_devices{
 	size_t capacity;
 };
 
+
+#ifdef USB_USE_EVENT_SYSTEM
 int usbThread(void *arg);
+#endif
 
 class USBMounter{
 public:
@@ -45,6 +52,14 @@ public:
 	
 	Playlist * playlist;
 	
+	//UsbHsFsDevice *g_usbDevices;
+	//u32 g_usbDeviceCount;
+
+#ifdef USB_USE_CALLBACK_SYSTEM	
+	
+	void usbMscTestDevices(void);
+#endif
+
 private:
 	
 	std::string basepath = "";
@@ -52,8 +67,5 @@ private:
 	std::vector<FS::FileEntry> currentlist;
 	
 };
-
-
-void usbInit();
 
 #endif

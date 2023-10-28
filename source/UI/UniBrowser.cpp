@@ -29,7 +29,8 @@ namespace Windows {
 			float total_h = ImGui::GetContentRegionAvail().y;
 			std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 			bool triggerselect = false;
-			if(!libmpv->Stopped()){
+			
+			if(!libmpv->Stopped() && item.state != MENU_STATE_PLAYER){
 				
 				ImVec2 image_pnew	= ImVec2((1280.0*multiplyRes-videoout->windowed_width*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x),(720.0*multiplyRes-videoout->windowed_height*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
 				ImVec2 image_p1 = ImVec2((1280.0*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x), (720.0*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
@@ -185,6 +186,7 @@ namespace Windows {
 							//ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
 							
 							if(thislist[n].is_valid){
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
 								std::string strdate = Utility::formatTimeStamp(thislist[n].modified);
 								//ImVec2 textSize = ImGui::CalcTextSize(strdate.c_str());
 								ImGui::TextColored(textcolor,"%s",strdate.c_str());
@@ -270,14 +272,17 @@ namespace Windows {
 
 	void USBMountWindow(bool *focus, bool *first_item){
 		Windows::SetupWindow();
-		
+#ifdef USB_USE_CALLBACK_SYSTEM
+		if(MyUSBMount != nullptr)MyUSBMount->usbMscTestDevices();
+#endif
         if (ImGui::Begin("USB Mount", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
             ImGui::SetNextWindowFocus();
             	float total_w = ImGui::GetContentRegionAvail().x;
 				float total_h = ImGui::GetContentRegionAvail().y;
 				if (ImGui::BeginListBox("USB Browser Menu",ImVec2(total_w, total_h))){
 					bool triggerselect = false;
-					static int selected = -1;	
+					static int selected = -1;
+					
 					//std::vector<usb_devices> thislist = usbmounter->mounted_devs;
 					std::vector<usb_devices> thislist = filebrowser->getUsbDev();
 					for (unsigned int n = 0; n < thislist.size(); n++){

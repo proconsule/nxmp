@@ -42,6 +42,24 @@ namespace Windows {
 						
 					}
 					ImGui::Dummy(ImVec2(0.0f,20.0f));
+					char *orderlistcombo[] = {Popup_STR[NXPOPUP_SORTASC_NAME],Popup_STR[NXPOPUP_SORTDESC_NAME],Popup_STR[NXPOPUP_SORTASC_DATE],Popup_STR[NXPOPUP_SORTDESC_DATE],Popup_STR[NXPOPUP_SORTASC_SIZE],Popup_STR[NXPOPUP_SORTDESC_SIZE]};
+					if (ImGui::BeginCombo("Default File Ordering", orderlistcombo[configini->getsortOrder(true)], 0))
+					{	
+						for (int n = 0; n < IM_ARRAYSIZE(orderlistcombo); n++)
+						{
+							const bool is_selected = (configini->getInterfaceLang(true) == n);
+							
+							if (ImGui::Selectable(orderlistcombo[n], is_selected)){
+								configini->setsortOrder(n);
+							}
+							
+
+							if (is_selected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+					ImGui::Dummy(ImVec2(0.0f,20.0f));
 					ImGui::Text(SettingsMenu_STR[NXSET_NAVIGATION]);
 					ImGui::Separator();
 					bool touchbool = configini->getTouchEnable(true);
@@ -73,7 +91,7 @@ namespace Windows {
 					ImGui::Dummy(ImVec2(0.0f,20.0f));
 					ImGui::SeparatorText("I18N");
 					ImGui::PushItemWidth(300);
-					if (ImGui::BeginCombo(SettingsMenu_STR[NXSET_INTLANG], NXLANGNAME[configini->getInterfaceLang(true)], 0))
+					if (ImGui::BeginCombo(SettingsMenu_STR[NXSET_INTLANG], NXLANGNAME_ENG[configini->getInterfaceLang(true)], 0))
 					{	
 						for (int n = 0; n < NX_LANGS_NR_ITEMS; n++)
 						{
@@ -81,7 +99,7 @@ namespace Windows {
 							if(!NXLANGACTIVE[n]){
 								ImGui::BeginDisabled();
 							}
-							if (ImGui::Selectable(NXLANGNAME[n], is_selected)){
+							if (ImGui::Selectable(NXLANGNAME_ENG[n], is_selected)){
 								configini->setInterfaceLang(n);
 								InitLang((NX_LANGS)n);
 							}
@@ -94,7 +112,7 @@ namespace Windows {
 						}
 						ImGui::EndCombo();
 					}
-					ImGui::Text("%s translation by %s",NXLANGNAME[configini->getInterfaceLang(true)],NXLANGAUTHORS[configini->getInterfaceLang(true)]);
+					ImGui::Text("%s translation by %s",NXLANGNAME_ENG[configini->getInterfaceLang(true)],NXLANGAUTHORS[configini->getInterfaceLang(true)]);
 					if(NXLANGNATIVE[configini->getInterfaceLang(true)]){
 						ImGui::TextColored(ImVec4(0.0f,1.0f,0.0f,1.0f),"Translated into native language");
 					}else{

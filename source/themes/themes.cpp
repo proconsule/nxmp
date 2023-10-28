@@ -145,8 +145,8 @@ void Themes::setDefault(){
 	}
 	
 	imgloader = new CImgLoader("romfs:");
-	Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
-	
+	//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
+	nxmpgfx::UniFontLoader(getThemeFonts(-1,configini->getOnlyLatinRange(false)));
 	
 }
 
@@ -231,5 +231,98 @@ int Themes::getThemeIDX(std::string themename){
 		}
 	}
 	return -1;
+}
+
+std::vector<nxmpgfx::fonttype_struct> Themes::getThemeFonts(int themeidx,bool onlylatinrange){
+	std::vector<nxmpgfx::fonttype_struct> tmpfonts;
+	if(themeidx == -1){
+		
+		nxmpgfx::fonttype_struct tmpentry;
+		tmpentry.filename = "romfs:/DejaVuSans.ttf";
+		tmpentry.size = currFontsize;
+		
+		ImFontGlyphRangesBuilder range;
+		range.Clear();
+		tmpentry.charrange.clear();
+		range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+		range.BuildRanges(&tmpentry.charrange);
+		tmpfonts.push_back(tmpentry);
+		
+		if(!onlylatinrange){
+			tmpentry.filename = "romfs:/Source Han Sans CN Light.otf";
+			tmpentry.size = currFontsize;
+			
+			range.Clear();
+			range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
+			range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+			tmpentry.charrange.clear();
+			range.BuildRanges(&tmpentry.charrange);
+			tmpfonts.push_back(tmpentry);
+			
+			
+			tmpentry.filename = "romfs:/un-graphic.ttf";
+			tmpentry.size = currFontsize;
+			
+			range.Clear();
+			range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesKorean());
+			tmpentry.charrange.clear();
+			range.BuildRanges(&tmpentry.charrange);
+			tmpfonts.push_back(tmpentry);
+		}
+		
+		
+	} else {
+		
+		
+		nxmpgfx::fonttype_struct tmpentry;
+		tmpentry.filename = themeslist[themeidx].latinfontstr;
+		if(isHandheld){
+			tmpentry.size = themeslist[themeidx].handledfontsize;
+		} else {
+			tmpentry.size = themeslist[themeidx].dockedfontsize;
+		}
+		
+		ImFontGlyphRangesBuilder range;
+		range.Clear();
+		tmpentry.charrange.clear();
+		range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+		range.BuildRanges(&tmpentry.charrange);
+		tmpfonts.push_back(tmpentry);
+		
+		if(!onlylatinrange){
+		
+			tmpentry.filename = themeslist[themeidx].kanjifontstr;
+			if(isHandheld){
+				tmpentry.size = themeslist[themeidx].handledfontsize;
+			} else {
+				tmpentry.size = themeslist[themeidx].dockedfontsize;
+			}
+			
+			range.Clear();
+			range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
+			range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+			tmpentry.charrange.clear();
+			range.BuildRanges(&tmpentry.charrange);
+			tmpfonts.push_back(tmpentry);
+			
+			
+			tmpentry.filename = "romfs:/un-graphic.ttf";
+			if(isHandheld){
+				tmpentry.size = themeslist[themeidx].handledfontsize;
+			} else {
+				tmpentry.size = themeslist[themeidx].dockedfontsize;
+			}
+			
+			range.Clear();
+			range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesKorean());
+			tmpentry.charrange.clear();
+			range.BuildRanges(&tmpentry.charrange);
+			tmpfonts.push_back(tmpentry);
+		}
+		
+		
+		
+	}
+	return tmpfonts;
 }
 

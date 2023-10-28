@@ -75,7 +75,7 @@ CXXFLAGS	:= $(CFLAGS) -std=gnu++17 -fno-rtti -fexceptions -fpermissive -DIMGUI_I
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:=  `curl-config --libs` `freetype-config --libs` -lssh2 -lmpv `sdl2-config --libs` -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lusbhsfs -lntfs-3g -llwext4 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lnfs -lglfw3 -lnx -ljansson -lc -lz
+LIBS	:=  -lmpv `sdl2-config --libs` `curl-config --libs` `freetype-config --libs` -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua5.1 -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lssh2 -lnfs -lglfw3 -ljansson -lusbhsfs -lntfs-3g -llwext4 -lnx -lc -lz
 
 
 

@@ -25,6 +25,8 @@
 
 
 
+
+
 namespace nxmpgfx{
 	
 	enum BUT_FLAGS{
@@ -62,6 +64,11 @@ namespace nxmpgfx{
 		
 	};
 	
+	struct fonttype_struct{
+		std::string filename = "";
+		float size;
+		ImVector<ImWchar> charrange;
+	};
 	
 	//extern SDL_Window *window;
 	//extern SDL_GLContext context;
@@ -83,13 +90,14 @@ namespace nxmpgfx{
 	void Destroy();
 	void Destory_ImGui();
 	void Destroy_Backend();
-	uint64_t Process_UI_Events();
+	uint64_t Process_UI_Events(std::chrono::time_point<std::chrono::system_clock> myeventtime);
+	bool WindowShouldClose();
 	void Quit();
 	
 	void updateSplash(int perc);
 	
 	
-	
+	void UniFontLoader(std::vector<fonttype_struct> fontsarray);
 	
 }
 

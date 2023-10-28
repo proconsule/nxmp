@@ -13,6 +13,7 @@ typedef struct{
 	std::string dbpath = "/switch/nxmp/nxmp.db";
 	int exitmode = 0;
 	bool showhidden = false;
+	int sortorder = 0;
 	bool touchenable = false;
 	int playeswipeseek ;
 	int shortseek = 10;
@@ -22,6 +23,7 @@ typedef struct{
 	bool useslang = false;
 	int slang = 0;
 	int intlang = 0;
+	bool onlylatinrange = false;
     bool useoc = false;
 	bool hwdec = true;
 	bool vsync = true;
@@ -63,6 +65,9 @@ public:
 	bool getshowHidden(bool tmpvalue);
 	void setshowHidden(bool val);
 	
+	int getsortOrder(bool tmpvalue);
+	void setsortOrder(int val);
+	
 	bool getTouchEnable(bool tmpvalue);
 	void setTouchEnable(bool val);
 	
@@ -101,6 +106,10 @@ public:
 	
 	int getInterfaceLang(bool tmpvalue);
 	void setInterfaceLang(int lang);
+	
+	bool getOnlyLatinRange(bool tmpvalue);
+	
+	void setOnlyLatinRange(bool latinrange);
 
 	//subscale
 	float getSubFontScale(bool tmpvalue);

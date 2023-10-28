@@ -58,11 +58,23 @@ namespace nxmpgfx{
 	bool B_AX_L_DOWN_PRESS = false;
 	bool B_AX_L_LEFT_PRESS = false;
 	bool B_AX_L_RIGHT_PRESS = false;
-			
+	
+/*	
 	bool B_AX_R_UP_PRESS = false;
 	bool B_AX_R_DOWN_PRESS = false;
 	bool B_AX_R_LEFT_PRESS = false;
 	bool B_AX_R_RIGHT_PRESS = false;
+*/
+	
+	typedef struct{
+		bool pressed = false;
+		std::chrono::time_point<std::chrono::system_clock> eventchrono;
+	}axixstate_struct;
+	
+	axixstate_struct AX_R_UP;
+	axixstate_struct AX_R_DOWN;
+	axixstate_struct AX_R_LEFT;
+	axixstate_struct AX_R_RIGHT;
 	
 	
 	static void errorCallback(int errorCode, const char* description)
@@ -463,12 +475,13 @@ namespace nxmpgfx{
 		
 	}
 	
-	uint64_t Process_UI_Events(){
+	uint64_t Process_UI_Events(std::chrono::time_point<std::chrono::system_clock> myeventtime){
 		
 		uint64_t ret_event = 0;
 		
 		glfwPollEvents();
 		GLFWgamepadstate state;
+		
 		
 		
 		if ((GLFW_TRUE == glfwGetGamepadState(GLFW_JOYSTICK_1, &state)))
@@ -558,16 +571,16 @@ namespace nxmpgfx{
 				ret_event = bit_set(ret_event,B_AX_L_LEFT);
 			}
 			
-			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]>0.25f && !B_AX_R_UP_PRESS){
-				ret_event = bit_set(ret_event,B_AX_R_UP);
-			}
-			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]<-0.25f && !B_AX_R_DOWN_PRESS){
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]>0.25f && !AX_R_DOWN.pressed){
 				ret_event = bit_set(ret_event,B_AX_R_DOWN);
 			}
-			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]>0.25f && !B_AX_R_RIGHT_PRESS){
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]<-0.25f && !AX_R_UP.pressed){
+				ret_event = bit_set(ret_event,B_AX_R_UP);
+			}
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]>0.25f && !AX_R_RIGHT.pressed){
 				ret_event = bit_set(ret_event,B_AX_R_RIGHT);
 			}
-			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]<-0.25f && !B_AX_R_LEFT_PRESS){
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]<-0.25f && !AX_R_LEFT.pressed){
 				ret_event = bit_set(ret_event,B_AX_R_LEFT);
 			}
 			
@@ -600,10 +613,20 @@ namespace nxmpgfx{
 			B_AX_L_LEFT_PRESS = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]>0.25f;
 			B_AX_L_RIGHT_PRESS = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]<-0.25f;
 			
+			/*
 			B_AX_R_UP_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]>0.25f;
 			B_AX_R_DOWN_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]<-0.25f;
 			B_AX_R_LEFT_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]>0.25f;
 			B_AX_R_RIGHT_PRESS = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]<-0.25f;
+			*/
+			
+			//AX_R_UP.pressed = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]>0.25f;
+			//AX_R_DOWN.pressed = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]<-0.25f;
+			//AX_R_LEFT.pressed = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]>0.25f;
+			//AX_R_RIGHT.pressed = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]<-0.25f;
+			
+			
+			//auto AX_R_UP_CHRONO = std::chrono::duration_cast<std::chrono::microseconds>(myeventtime-AX_R_UP.eventchrono);
 			
 			
 		}
@@ -613,5 +636,55 @@ namespace nxmpgfx{
 	return ret_event;
 	}
 	
+	bool WindowShouldClose(){
+		return glfwWindowShouldClose(window);
+	}
+	
+	void UniFontLoader(std::vector<fonttype_struct> fontsarray){
+		NXLOG::DEBUGLOG("Init Font Array\n");
+      
+		
+	
+		unsigned char *pixels = nullptr;
+		int width = 0, height = 0, bpp = 0;
+		ImFontConfig font_cfg = ImFontConfig();
+			
+		font_cfg.OversampleH = font_cfg.OversampleV = 1;
+		font_cfg.PixelSnapH = true;
+			
+		font_cfg.OversampleH = font_cfg.OversampleV = 1;
+		font_cfg.PixelSnapH = true;
+		NXLOG::DEBUGLOG("Loading TTF\n");
+		
+		font_cfg.OversampleH = font_cfg.OversampleV = 1;
+		
+		
+		for(int i=0;i<fontsarray.size();i++){
+			ImGui::GetIO().Fonts->AddFontFromFileTTF(fontsarray[i].filename.c_str(), fontsarray[i].size, &font_cfg, fontsarray[i].charrange.Data);
+			font_cfg.MergeMode = true;
+		}
+		
+		/*
+		
+		ImGui::GetIO().Fonts->AddFontFromFileTTF(latinfontpath.c_str(), latinfontSize, &font_cfg, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+		font_cfg.MergeMode = true;
+		
+		static ImFontGlyphRangesBuilder range;
+		range.Clear();
+		static ImVector<ImWchar> gr;
+		gr.clear();
+		range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
+		range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+		range.BuildRanges(&gr);
+		ImGui::GetIO().Fonts->AddFontFromFileTTF(japanaesechinesefontpath.c_str(), japanaesechinesefontSize, &font_cfg, gr.Data);
+		
+		ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Maplestory OTF Bold.otf", 20.0 ,&font_cfg,ImGui::GetIO().Fonts->GetGlyphRangesKorean());
+		
+		*/
+		
+		ImGui::GetIO().Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
+		
+		ImGui::GetIO().Fonts->Build();
+	}
 	
 }

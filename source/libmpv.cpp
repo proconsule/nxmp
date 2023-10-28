@@ -44,7 +44,7 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "fbo-format", "rgba16f");
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());
 	mpv_set_option_string(handle, "volume-max", "200");
-	//mpv_set_option_string(handle, "opengl-pbo", "yes"); // HDR FIX
+	//mpv_set_option_string(handle, "opengl-pbo", "yes"); // HDR DROP FIX
 	mpv_set_option_string(handle, "vd-lavc-dr", "yes");
 	//default Font Style
 	mpv_set_option_string(handle, "sub-border-size", "3");
@@ -149,25 +149,7 @@ libMpv::libMpv(const std::string &configDir) {
 	
 	std::sort(decoderlist.begin(),decoderlist.end(),codecSort);
 	
-	/*
-    mpv_get_property(handle, "demuxer-list", MPV_FORMAT_NODE, &node);
-    if (node.format == MPV_FORMAT_NODE_ARRAY) {
-        for (int i = 0; i < node.u.list->num; i++) {
-            if (node.u.list->values[i].format == MPV_FORMAT_NODE_MAP) {
-				decoderlist_struct decoderentry{};
-				for (int n = 0; n < node.u.list->values[i].u.list->num; n++) {
-					std::string key = node.u.list->values[i].u.list->keys[n];
-					printf("KEY: %s\r\n",key.c_str());
-					printf("DESC: %s\r\n",node.u.list->values[i].u.list->values[n].u.string);
-				}
-				decoderlist.push_back(decoderentry);
-				
-			}
-			
-		}
-		
-	}
-	*/
+	
 	NXLOG::DEBUGLOG("MPV Init Completed\n");
 	
 }
@@ -175,7 +157,12 @@ libMpv::libMpv(const std::string &configDir) {
 void libMpv::loadFile(std::string _path){
 	
 	if(!Stopped()){
-		resetFileInfo();
+		
+		if(fileinfo != nullptr){
+			delete fileinfo;
+			fileinfo = nullptr;
+		}
+		fileinfo = new fileInfo();
 	}else{
 		if(fileinfo != nullptr){
 			delete fileinfo;
@@ -188,7 +175,7 @@ void libMpv::loadFile(std::string _path){
 	fileinfo->path = _path;
 	const char *cmd[] = {"loadfile",  _path.c_str(), NULL};
 	mpv_command_async(handle, 0, cmd);
-
+//	mpv_wait_async_requests(handle);
 	
 	setLoop(false);
 	initSize = configini->getSubFontSize(false);
