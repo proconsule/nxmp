@@ -47,11 +47,6 @@
 //#define APPLETMODEENA 1
 
 
-/*	Exit from HB Menu instead fo returning  
-	__nx_applet_exit_mode = 1;
-	
-*/
-
 extern u32 __nx_applet_exit_mode;
 
 static bool init();
@@ -343,14 +338,7 @@ int main() {
 	std::vector<std::string> extensionlist = configini->getConfigExtensions();
 		
 	Utility::setMediaExtensions(extensionlist);
-		
-	//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,ImGui::GetIO());
 	
-		
-	//mgloader = new CImgLoader("romfs:");
-		
-		
-
 		
 	Themes  *themes = new Themes();
 	themes->getThemes();
@@ -364,32 +352,14 @@ int main() {
 	if(themeidx == -1){
 		imgloader = new CImgLoader("romfs:");
 		
-		/*
-		std::vector<nxmpgfx::fonttype_struct> tmpfonts;
-		
-		nxmpgfx::fonttype_struct tmpentry;
-		tmpentry.filename = "romfs:/DejaVuSans.ttf";
-		tmpentry.size = currFontsize;
-		
-		ImFontGlyphRangesBuilder range;
-		range.Clear();
-		tmpentry.charrange.clear();
-		range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
-		range.BuildRanges(&tmpentry.charrange);
-		
-		tmpfonts.push_back(tmpentry);
-		*/
 		nxmpgfx::updateSplash(50);
 		nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)));
-		//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
 		nxmpgfx::updateSplash(100);
 	}else{
 		if(isHandheld){
-			//Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].handledfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].handledfontsize);
 			nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
 			nxmpgfx::updateSplash(100);
 		}else{
-			//Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].dockedfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].dockedfontsize);
 			nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
 			nxmpgfx::updateSplash(100);
 		}

@@ -107,7 +107,8 @@ Thanks to
 - Averne for HW Decoding on Tegra X1 https://github.com/averne/FFmpeg and for all the hints and help (thanks a lot!)
 - xfangfang for https://github.com/xfangfang/wiliwili (for Audren audio mpv patch)
 - Jorge E. García "nWo" for beta testing and suggestions
-- Djakku for beta testing and suggestions
+- Djakku @ GBATemp for beta testing and suggestions
+- spkatsi @ GBATemp for splash screen, themes and more
 - Chocola @ GBATemp forum for usage guide and beta testing
 - sashka69 @ GBATemp forum for beta testing
 - bodyXY @ GBATemp forum for banner and icons
