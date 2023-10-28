@@ -81,17 +81,37 @@ FAQ
 
 **A:** ShaderMania is an useless but fun feature of NXMP, it uses the ability of MPV to load custom shader into the video output chain. I adopt some shaders from https://www.shadertoy.com/ to make shaders effects to the video. Some like grayscale may be usefull for someone others (like the sea shaders) is only for fun. Users can also make their custom shaders and place in mpv/shaders directory.
 
+
+Translations
+-----
+
+If you want to have NXMP translated to your native language use this
+https://github.com/proconsule/nxmp/blob/master/source/i18n/nxmp-en.h
+as reference,create a file for your lang and send it to me.
+
+- Spanish thanks to Jorge E. García "nWo"
+- French thanks to Zoria, Pharuxtan, Gum
+- Deutsch thanks to Extreme
+- Italian thanks to proconsule 
+- Japanese thanks to mossan0101
+- Chinese thanks to dragonflybee
+- Korean thanks to Asadayot
+
+
+
+
 Thanks to
 -----
 - Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv and Overclock part)
 - DarkMatterCore for libusbhsfs https://github.com/DarkMatterCore/libusbhsfs (this gives NXMP USB support)
 - Averne for HW Decoding on Tegra X1 https://github.com/averne/FFmpeg and for all the hints and help (thanks a lot!)
 - xfangfang for https://github.com/xfangfang/wiliwili (for Audren audio mpv patch)
+- Jorge E. García "nWo" for beta testing and suggestions
+- Djakku for beta testing and suggestions
 - Chocola @ GBATemp forum for usage guide and beta testing
 - sashka69 @ GBATemp forum for beta testing
 - bodyXY @ GBATemp forum for banner and icons
 - Godorowski @ GBATemp forum for player UI design and icons
-- Jorge E. García "nWo" for beta testing
 - docgold @ GBATemp forum for Enigma2 samples and support on decoders
 - tataniko @ GBATemp forum for suggestions and bug hunting
 - All guys on GBAtemp

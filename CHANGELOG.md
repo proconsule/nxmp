@@ -39,6 +39,9 @@ dbpath = /switch/nxmp/nxmp.db
 ```
 You can set to any location
 
+Special thanks goes to Djakku and Jorge E. García "nWo" for helping me a lot for this release
+
+
 ## [0.8.1]
 
 ### Fixed
