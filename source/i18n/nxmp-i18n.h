@@ -12,6 +12,7 @@ enum NX_LANGS{
 	Deutsch,
 	French,
 	Portuguese,
+	Portuguese_Br,
 	Japanese,
 	Chinese_Simplified,
 	Chinese_Traditional,

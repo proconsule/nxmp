@@ -6,6 +6,7 @@
 #include "nxmp-de.h"
 #include "nxmp-fr.h"
 #include "nxmp-pt.h"
+#include "nxmp-pt_br.h"
 #include "nxmp-jp.h"
 #include "nxmp-cn_s.h"
 #include "nxmp-cn_t.h"
@@ -26,6 +27,7 @@ const char *NXLANGNAME[] = {
 	"Deutsch",
 	"Français",
 	"Português",
+	"Português (Br)",
 	"日本語",
 	"中国人 （简体）",
 	"中國人 （傳統的）",
@@ -40,6 +42,7 @@ const char *NXLANGNAME_ENG[] = {
 	"Deutsch",
 	"French",
 	"Portuguese",
+	"Brazilian Portuguese",
 	"Japanese",
 	"Chinese Simplified",
 	"Chinese Traditional",
@@ -65,6 +68,7 @@ void InitLang(NX_LANGS mylang){
 	NXLANGAUTHORS[Deutsch] = strdup(de_i18n_author);
 	NXLANGAUTHORS[French] = strdup(fr_i18n_author);
 	NXLANGAUTHORS[Portuguese] = strdup(pt_i18n_author);
+	NXLANGAUTHORS[Portuguese_Br] = strdup(pt_br_i18n_author);
 	NXLANGAUTHORS[Japanese] = strdup(jp_i18n_author);
 	NXLANGAUTHORS[Chinese_Simplified] = strdup(cn_s_i18n_author);
 	NXLANGAUTHORS[Chinese_Traditional] = strdup(cn_t_i18n_author);
@@ -78,6 +82,7 @@ void InitLang(NX_LANGS mylang){
 	NXLANGACTIVE[Deutsch] = de_i18n_status;
 	NXLANGACTIVE[French] = fr_i18n_status;
 	NXLANGACTIVE[Portuguese] = pt_i18n_status;
+	NXLANGACTIVE[Portuguese_Br] = pt_br_i18n_status;
 	NXLANGACTIVE[Japanese] = jp_i18n_status;
 	NXLANGACTIVE[Chinese_Simplified] = cn_s_i18n_status;
 	NXLANGACTIVE[Chinese_Traditional] = cn_t_i18n_status;
@@ -90,6 +95,7 @@ void InitLang(NX_LANGS mylang){
 	NXLANGNATIVE[Deutsch] = de_i18n_native;
 	NXLANGNATIVE[French] = fr_i18n_native;
 	NXLANGNATIVE[Portuguese] = pt_i18n_native;
+	NXLANGNATIVE[Portuguese_Br] = pt_br_i18n_native;
 	NXLANGNATIVE[Japanese] = jp_i18n_native;
 	NXLANGNATIVE[Chinese_Simplified] = cn_s_i18n_native;
 	NXLANGNATIVE[Chinese_Traditional] = cn_t_i18n_native;
@@ -109,6 +115,8 @@ void InitLang(NX_LANGS mylang){
 			MainMenu_STR[i] = strdup(MainMenu_STR_FR[i]);
 		}else if(mylang == Portuguese){
 			MainMenu_STR[i] = strdup(MainMenu_STR_PT[i]);
+		}else if(mylang == Portuguese_Br){
+			MainMenu_STR[i] = strdup(MainMenu_STR_PT_BR[i]);
 		}else if(mylang == Japanese){
 			MainMenu_STR[i] = strdup(MainMenu_STR_JP[i]);
 		}else if(mylang == Chinese_Simplified){
@@ -138,6 +146,8 @@ void InitLang(NX_LANGS mylang){
 			Common_STR[i] = strdup(Common_STR_FR[i]);
 		}else if(mylang == Portuguese){
 			Common_STR[i] = strdup(Common_STR_PT[i]);
+		}else if(mylang == Portuguese_Br){
+			Common_STR[i] = strdup(Common_STR_PT_BR[i]);
 		}else if(mylang == Japanese){
 			Common_STR[i] = strdup(Common_STR_JP[i]);
 		}else if(mylang == Chinese_Simplified){
@@ -167,6 +177,8 @@ void InitLang(NX_LANGS mylang){
 			Popup_STR[i] = strdup(Popup_STR_FR[i]);
 		}else if(mylang == Portuguese){
 			Popup_STR[i] = strdup(Popup_STR_PT[i]);
+		}else if(mylang == Portuguese_Br){
+			Popup_STR[i] = strdup(Popup_STR_PT_BR[i]);
 		}else if(mylang == Japanese){
 			Popup_STR[i] = strdup(Popup_STR_JP[i]);
 		}else if(mylang == Chinese_Simplified){
@@ -196,6 +208,8 @@ void InitLang(NX_LANGS mylang){
 			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_FR[i]);
 		}else if(mylang == Portuguese){
 			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_PT[i]);
+		}else if(mylang == Portuguese_Br){
+			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_PT_BR[i]);
 		}else if(mylang == Japanese){
 			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_JP[i]);
 		}else if(mylang == Chinese_Simplified){
@@ -225,6 +239,8 @@ void InitLang(NX_LANGS mylang){
 			Network_STR[i] = strdup(Network_STR_FR[i]);
 		}else if(mylang == Portuguese){
 			Network_STR[i] = strdup(Network_STR_PT[i]);
+		}else if(mylang == Portuguese_Br){
+			Network_STR[i] = strdup(Network_STR_PT_BR[i]);
 		}else if(mylang == Japanese){
 			Network_STR[i] = strdup(Network_STR_JP[i]);
 		}else if(mylang == Chinese_Simplified){
