@@ -53,7 +53,7 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());
 	mpv_set_option_string(handle, "volume-max", "200");
 	//mpv_set_option_string(handle, "opengl-pbo", "yes"); // HDR DROP FIX
-	mpv_set_option_string(handle, "vd-lavc-dr", "no");
+	mpv_set_option_string(handle, "vd-lavc-dr", "yes");
 	//default Font Style
 	mpv_set_option_string(handle, "sub-border-size", "3");
 	mpv_set_option_string(handle, "sub-shadow-offset", "1");

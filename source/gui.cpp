@@ -127,8 +127,10 @@ namespace GUI {
 				continue;
 			}
 			if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
+				
 				libmpv->getfileInfo();
 				item.state = MENU_STATE_PLAYER;
+				appletSetMediaPlaybackState(true);
 				
 				if(libmpv->getFileInfo()->videos.size() == 0 || (libmpv->getFileInfo()->videos.size() == 1 && libmpv->getFileInfo()->videos[0].albumart) ){
 					item.playerstate = PLAYER_STATE_AUDIO;
