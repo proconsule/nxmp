@@ -34,8 +34,9 @@ namespace Windows {
 			if (ImGui::BeginTabBar("Settings Tab bar", 0))
             {
 				if (ImGui::BeginTabItem(SettingsMenu_STR[NXSET_GENERALS])) {
-					ImGui::Text(SettingsMenu_STR[NXSET_FILEBROWSER]);
-					ImGui::Separator();
+					//ImGui::Text(SettingsMenu_STR[NXSET_FILEBROWSER]);
+					//ImGui::Separator();
+					ImGui::SeparatorText(SettingsMenu_STR[NXSET_FILEBROWSER]);
 					bool showhiddenbool = configini->getshowHidden(true);
 					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_HIDDENFILES], &showhiddenbool)){
 						configini->setshowHidden(showhiddenbool);
@@ -60,8 +61,9 @@ namespace Windows {
 						ImGui::EndCombo();
 					}
 					ImGui::Dummy(ImVec2(0.0f,20.0f));
-					ImGui::Text(SettingsMenu_STR[NXSET_NAVIGATION]);
-					ImGui::Separator();
+					//ImGui::Text(SettingsMenu_STR[NXSET_NAVIGATION]);
+					//ImGui::Separator();
+					ImGui::SeparatorText(SettingsMenu_STR[NXSET_NAVIGATION]);
 					bool touchbool = configini->getTouchEnable(true);
 					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_TOUCHCONTROL], &touchbool)){
 						configini->setTouchEnable(touchbool);
@@ -74,15 +76,19 @@ namespace Windows {
 						}
 					}
 					ImGui::Dummy(ImVec2(0.0f,20.0f));
-					ImGui::Text(SettingsMenu_STR[NXSET_OVERCLOCK]);
-					ImGui::Separator();
+					//ImGui::Text(SettingsMenu_STR[NXSET_OVERCLOCK]);
+					//ImGui::Separator();
+					ImGui::SeparatorText(SettingsMenu_STR[NXSET_OVERCLOCK]);
+					
 					bool ocdefault = configini->getUseOc(true);
 					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_OVERCLOCK_STARTUP], &ocdefault)){
 						configini->setUseOc(ocdefault);	
 					}
 					ImGui::Dummy(ImVec2(0.0f,20.0f));
-					ImGui::Text(SettingsMenu_STR[NXSET_MISC]);
-					ImGui::Separator();
+					//ImGui::Text(SettingsMenu_STR[NXSET_MISC]);
+					//ImGui::Separator();
+					ImGui::SeparatorText(SettingsMenu_STR[NXSET_MISC]);
+					
 					bool vsyncdefault = configini->getVSYNC(true);
 					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_VSYNC], &vsyncdefault)){
 						configini->setVSYNC(vsyncdefault);	
@@ -122,15 +128,18 @@ namespace Windows {
 				}
 				if (ImGui::BeginTabItem(SettingsMenu_STR[NXSET_PLAYERSETTINGS]))
                 {
-					ImGui::Text(SettingsMenu_STR[NXSET_DECODER]);
-					ImGui::Separator();
+					//ImGui::Text(SettingsMenu_STR[NXSET_DECODER]);
+					//ImGui::Separator();
+					ImGui::SeparatorText(SettingsMenu_STR[NXSET_DECODER]);
 					bool hwdecdefault = configini->getHWDec(true);
 					if(ImGui::Checkbox(SettingsMenu_STR[NXSET_HWDECODER], &hwdecdefault)){
 						configini->setHWDec(hwdecdefault);	
 					}
 					
-					ImGui::Text(SettingsMenu_STR[NXSET_DEMUXCACHE]);
-					ImGui::Separator();
+					//ImGui::Text(SettingsMenu_STR[NXSET_DEMUXCACHE]);
+					//ImGui::Separator();
+					ImGui::SeparatorText(SettingsMenu_STR[NXSET_DEMUXCACHE]);
+					
 					ImGui::Text(SettingsMenu_STR[NXSET_DEMUXCACHESEC]);
 					ImGui::SameLine(240,spacing);
 					ImGui::PushButtonRepeat(true);
@@ -147,11 +156,9 @@ namespace Windows {
 					ImGui::SameLine();
 					ImGui::Text("%d sec", configini->getDemuxCache(true));
 					
-					
-					
-					
-					ImGui::Text(SettingsMenu_STR[NXSET_AUDIO]);
-					ImGui::Separator();
+					//ImGui::Text(SettingsMenu_STR[NXSET_AUDIO]);
+					//ImGui::Separator();
+					ImGui::SeparatorText(SettingsMenu_STR[NXSET_AUDIO]);
 					std::vector<std::string> aout_preview_value = {"SDL","Audren"};
 					//ImGui::BeginDisabled();
 					if (ImGui::BeginCombo(SettingsMenu_STR[NXSET_AUDIOOUTPUT], aout_preview_value[configini->getAout(true)].c_str(), 0))
@@ -168,8 +175,10 @@ namespace Windows {
 						ImGui::EndCombo();
 					}
 					//ImGui::EndDisabled();
-				ImGui::Text(SettingsMenu_STR[NXSET_SEEK]);
-				ImGui::Separator();
+				//ImGui::Text(SettingsMenu_STR[NXSET_SEEK]);
+				//ImGui::Separator();
+				ImGui::SeparatorText(SettingsMenu_STR[NXSET_SEEK]);
+				
 				ImGui::Text(SettingsMenu_STR[NXSET_SHORTSEEK]);
 				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
@@ -204,6 +213,7 @@ namespace Windows {
 				
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
 				
+				/*
 				ImGui::Text("Cache");
 				ImGui::Separator();
 				ImGui::SameLine(240,spacing);
@@ -213,6 +223,7 @@ namespace Windows {
 						configini->setDemuxCache(configini->getDemuxCache(true)-1);
 					}
 				}
+				
 				ImGui::SameLine(0.0f, spacing);
 				if (ImGui::ArrowButton("##cacheright", ImGuiDir_Right)) { 
 					configini->setDemuxCache(configini->getDemuxCache(true)+1);
@@ -220,13 +231,13 @@ namespace Windows {
 				ImGui::PopButtonRepeat();
 				ImGui::SameLine();
 				ImGui::Text("%d sec", configini->getDemuxCache(true));
-				
-				
-				
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
+				*/
 				
-				ImGui::Text(SettingsMenu_STR[NXSET_LANG]);
-				ImGui::Separator();
+				
+				//ImGui::Text(SettingsMenu_STR[NXSET_LANG]);
+				//ImGui::Separator();
+				ImGui::SeparatorText(SettingsMenu_STR[NXSET_LANG]);
 				bool alangbool = configini->getUseAlang(true);
 				if(ImGui::Checkbox(SettingsMenu_STR[NXSET_USEALANG], &alangbool)){
 					configini->setUseAlang(alangbool);
@@ -287,8 +298,10 @@ namespace Windows {
 				}
 				//End Slang
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
-				ImGui::Text(SettingsMenu_STR[NXSET_SUBTITLE]);
-				ImGui::Separator();
+				//ImGui::Text(SettingsMenu_STR[NXSET_SUBTITLE]);
+				//ImGui::Separator();
+				ImGui::SeparatorText(SettingsMenu_STR[NXSET_SUBTITLE]);
+				
 				ImGui::Text(SettingsMenu_STR[NXSET_SUBFONTSIZE]);
 				ImGui::SameLine(240,spacing);
 				ImGui::PushButtonRepeat(true);
@@ -328,8 +341,10 @@ namespace Windows {
 				ImGui::Text("%.2f", configini->getSubFontScale(true));
 				ImGui::Dummy(ImVec2(0.0f,30.0f));
 				//endSubFontScale
-				ImGui::Text(SettingsMenu_STR[NXSET_VIDEO]);
-				ImGui::Separator();
+				//ImGui::Text(SettingsMenu_STR[NXSET_VIDEO]);
+				//ImGui::Separator();
+				ImGui::SeparatorText(SettingsMenu_STR[NXSET_VIDEO]);
+				
 				std::vector<std::string> deintmenu = {"No","Yes","Auto"};
 				const char* combo_deintpreview_value = deintmenu[configini->getDeinterlace(true)].c_str();
 				ImGui::PushItemWidth(300);

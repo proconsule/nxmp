@@ -2,16 +2,24 @@
 #define NXMP_GFX_H
 
 
-/*
-#include <SDL.h>
-#include "imgui_impl_sdl2.h"
-#include "imgui_impl_opengl3.h"
-*/
+//#define OPENGL_BACKEND
+//#define DEKO3D_BACKEND
+
+
+#ifdef OPENGL_BACKEND
 #include "glad/glad.h"
 #include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include <mpv/render_gl.h>
+#endif
+#include <switch.h>
 #include <chrono>
 
+#ifdef DEKO3D_BACKEND
+#include "deko3d.hpp"
+#include "imgui_deko3d.h"
+#include "imgui_nx.h"
+#include <mpv/render_dk3d.h>
+#endif
 #include "logger.h"
 
 
@@ -24,8 +32,51 @@
 
 
 
+#define FONT_A_BUTTON "\xEE\x80\x80"
+#define FONT_B_BUTTON "\xEE\x80\x81"
+#define FONT_X_BUTTON "\xEE\x80\x82"
+#define FONT_Y_BUTTON "\xEE\x80\x83"
+
+#define FONT_A_BUTTON_FILLED "\xEE\x83\xA0"
+#define FONT_B_BUTTON_FILLED "\xEE\x83\xA1"
+#define FONT_X_BUTTON_FILLED "\xEE\x83\xA2"
+#define FONT_Y_BUTTON_FILLED "\xEE\x83\xA3"
 
 
+
+#define FONT_CHECKED_ICON "\xEE\x85\x8B"
+
+#define FONT_DPADUP_BUTTON "\xEE\x82\xAF"
+#define FONT_DPADDOWN_BUTTON "\xEE\x82\xB0"
+
+#define FONT_DPADUP_BUTTON_FILLED "\xEE\x83\xAB"
+#define FONT_DPADDOWN_BUTTON_FILLED "\xEE\x83\xAC"
+
+#define FONT_DPADLEFT_BUTTON_FILLED "\xEE\x83\xAD"
+#define FONT_DPADRIGHT_BUTTON_FILLED "\xEE\x83\xAE"
+
+#define FONT_LOADING_ICON0 "\xEE\x80\xA0"
+#define FONT_LOADING_ICON1 "\xEE\x80\xA1"
+#define FONT_LOADING_ICON2 "\xEE\x80\xA2"
+#define FONT_LOADING_ICON3 "\xEE\x80\xA3"
+#define FONT_LOADING_ICON4 "\xEE\x80\xA4"
+#define FONT_LOADING_ICON5 "\xEE\x80\xA5"
+#define FONT_LOADING_ICON6 "\xEE\x80\xA6"
+#define FONT_LOADING_ICON7 "\xEE\x80\xA7"
+
+#define FONT_SPEAKER_ICON "\xEE\x84\xBC"
+
+
+#ifdef DEKO3D_BACKEND
+struct Texture {
+		dk::Image image;
+		dk::UniqueMemBlock memblock;
+		DkResHandle id = -1;
+		unsigned int width;
+		unsigned int height;
+	};
+
+#endif
 
 namespace nxmpgfx{
 	
@@ -70,14 +121,29 @@ namespace nxmpgfx{
 		ImVector<ImWchar> charrange;
 	};
 	
-	//extern SDL_Window *window;
-	//extern SDL_GLContext context;
+
+	
+#ifdef OPENGL_BACKEND
+	extern GLuint WIDTH;
+	extern GLuint HEIGHT;
 	extern GLFWwindow *window;
 	
 	
-	extern GLuint WIDTH;
-	extern GLuint HEIGHT;
+#endif
+
+#ifdef DEKO3D_BACKEND
+	
+	//extern unsigned int WIDTH;
+	//extern unsigned int HEIGHT; 
+	
+	Texture load_texture(std::string path,DkImageFormat format, std::uint32_t flags,int desc_slot);
+	
+	
+#endif
+
 	extern bool docked;
+	extern float windowed_width;
+	extern float windowed_height;
 	
 	void loopAppletMode();
 	void Init_Backend(bool docked,bool vsync);
@@ -85,7 +151,11 @@ namespace nxmpgfx{
 	void Init_Backend_Splash(bool isdocked);
 	void Init_ImGui(bool isdocked);
 	void NewFrame();
-	void Render();
+	
+	void Render_PreMPV();
+	void Render_PostMPV();
+	
+	//void Render();
 	void Resize(float w,float h);
 	void Destroy();
 	void Destory_ImGui();
@@ -97,8 +167,35 @@ namespace nxmpgfx{
 	void updateSplash(int perc);
 	
 	
-	void UniFontLoader(std::vector<fonttype_struct> fontsarray);
+	void UniFontLoader(std::vector<fonttype_struct> fontsarray,bool LoadSystemFonts = false,bool latinonly = false);
 	
+	
+	
+	void Create_VO_FrameBuffer(float w,float h);
+	void Rescale_VO_Framebuffer(float width, float height);
+	void SetFullScreen(bool fullscreen);
+	void Draw_VO();
+	void Resize_VO(float w,float h);
+	mpv_render_param * getMPV_Params();
+	unsigned int getWidth();
+	unsigned int getHeight();
+	
+	void setEnableTouch(bool value);
+	
+#ifdef OPENGL_BACKEND
+	GLuint getFBO_Texture();
+#endif
+	
+#ifdef DEKO3D_BACKEND
+	dk::Device getDeko3dDevice();
+	dk::Image* getFramebuffer();
+	void UpdateFBO();
+	void queueWaitFence(DkFence* fence);
+	void queueWaitDoneFence();
+	void queueSignalFence(DkFence* fence, bool flash = false);
+	void queueFlush();
+	
+#endif
 }
 
 

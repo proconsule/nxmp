@@ -881,6 +881,8 @@ namespace playerWindows{
 		playerWindows::ExitWindow();
 	}
 	
+	const char * buffericon[] = {FONT_LOADING_ICON0,FONT_LOADING_ICON1,FONT_LOADING_ICON2,FONT_LOADING_ICON3,FONT_LOADING_ICON4,FONT_LOADING_ICON5,FONT_LOADING_ICON6,FONT_LOADING_ICON7};
+	
 	void CacheWindow(){
 		playerWindows::SetupCacheWindow();
 		if (ImGui::Begin("Caching", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
@@ -888,7 +890,7 @@ namespace playerWindows{
 			auto windowheight = ImGui::GetWindowSize().y;
 			ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Buffering Media - ", NULL, true).x) * 0.5f);
 			ImGui::SetCursorPosY((windowheight - 24) * 0.5f);
-			ImGui::Text("Buffering Media %c","|/-\\"[(int)(ImGui::GetTime() / 0.05f) & 3]);
+			ImGui::Text("Buffering Media %s",buffericon[(int)(ImGui::GetTime() / 0.05f) & 3]);
 		}
 		playerWindows::ExitWindow();
 	}
@@ -1085,12 +1087,24 @@ namespace playerWindows{
 			
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
+			//ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0,0.0,0.0,1.0));
+			//ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.66f, 0.66f, 0.66f, 1.00f));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+			
+			float oldsize = ImGui::GetFont()->Scale;
+			ImGui::GetFont()->Scale *=2.0;
+			ImGui::PushFont(ImGui::GetFont());
 			ImGui::ProgressBar(libmpv->getVolume()/100.0, ImVec2(150.0, 25.0f),"");
-			ImGui::PopStyleColor(2);
-			ImGui::PopStyleVar();
+			
 			ImGui::SameLine();
-			ImGui::Image((void*)(intptr_t)imgloader->icons.VolumeIcon.id, ImVec2(25,25));
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()-10.0f*multiplyRes);
+			ImGui::Text("%s",FONT_SPEAKER_ICON);
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar(2);
+			ImGui::GetFont()->Scale = oldsize;
+			ImGui::PopFont();
+			//ImGui::Image((void*)(intptr_t)imgloader->icons.VolumeIcon.id, ImVec2(25,25));
 			ImGuiContext& g = *GImGui;
 			if(item.VolumeHide +2 < g.Time){
 				item.showVolume = false;
@@ -1128,7 +1142,7 @@ namespace playerWindows{
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 			if(libmpv->getFileInfo()->videos.size()>0){
-				ImGui::Text("Video Codec: %s (%s)",nxmpstats->decodingstats.videodecstats.codec.c_str(),nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("tx1-copy")?"HW":"SW");
+				ImGui::Text("Video Codec: %s (%s)",nxmpstats->decodingstats.videodecstats.codec.c_str(),nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("tx1")?"HW (GPU)":nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("tx1-copy")?"HW (Copy)" : "SW");
 				ImGui::Text("Video Resolution: %dx%d",nxmpstats->decodingstats.videodecstats.width,nxmpstats->decodingstats.videodecstats.height);
 				ImGui::Text("Video Bitrate: %.0f kbps/s",nxmpstats->decodingstats.videodecstats.bitrate/1024.0);
 				ImGui::Text("Pixel Format: %s Color Matrix: %s",nxmpstats->decodingstats.videodecstats.pixelformat.c_str(),nxmpstats->decodingstats.videodecstats.colormatrix.c_str());

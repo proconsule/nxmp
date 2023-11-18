@@ -44,7 +44,7 @@
 
 #define NDEBUG 1
 
-//#define APPLETMODEENA 1
+#define APPLETMODEENA 1
 
 
 extern u32 __nx_applet_exit_mode;
@@ -83,7 +83,7 @@ Playlist *playlist = nullptr;
 CStats *nxmpstats = nullptr;
 CConsoleWindow *ConsoleWindow = nullptr;
 
-CVOUT *videoout = nullptr;
+//CVOUT *videoout = nullptr;
 
 /* VARS */
 
@@ -114,10 +114,20 @@ float currFontsize = 20.0f;
 
 GLuint WIDTH = handheldWidth, HEIGHT = handheldWidth;
 
-std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO)  + std::string(" ") + (RELEASE_TYPE == 0 ? std::string("Stable"): RELEASE_TYPE == 1 ? std::string("Beta"): std::string("R.C."));
+#ifdef OPENGL_BACKEND
+std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO)  + std::string(" ") + (RELEASE_TYPE == 0 ? std::string("Stable"): RELEASE_TYPE == 1 ? std::string("Beta"): std::string("R.C.")+ (" (OpenGL)"));
+#endif
+#ifdef DEKO3D_BACKEND
+std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO)  + std::string(" ") + (RELEASE_TYPE == 0 ? std::string("Stable"): RELEASE_TYPE == 1 ? std::string("Beta"): std::string("R.C."))+ (" (deko3d)");
+#endif
+
 
 int64_t playercachesec =  0;
 int64_t playercachesize = 0;
+
+
+bool slaveplayer = false;
+std::string slaveplayer_file = "";
 
 
 void DeallocateExtern(){
@@ -208,6 +218,7 @@ extern "C" void userAppInit() {
 
 extern "C" void userAppExit(void) {
 	
+	plExit();
 	romfsExit();
 	socketExit();
 	appletUnlockExit();
@@ -217,7 +228,7 @@ extern "C" void userAppExit(void) {
 
 
 
-int main() {
+int main(int argc, char* argv[]) {
 	appletLockExit();
 	Result ret = 0;
 	
@@ -235,7 +246,7 @@ int main() {
 		newResW = handheldWidth;
 		newResH = handheldHeight;
 		multiplyRes = 1.0f;
-		currFontsize = 20.0f;
+		currFontsize = 18.0f;
 	}
 	if (stus == AppletOperationMode_Console) {
 		NXLOG::DEBUGLOG("Docked Mode\n");
@@ -243,7 +254,7 @@ int main() {
 		newResW = dockedWidth;
 		newResH = dockedHeight;
 		multiplyRes = 1.5f;
-		currFontsize = 30.0f;
+		currFontsize = 27.0f;
 	}
 	
 #ifndef APPLETMODEENA
@@ -264,6 +275,10 @@ int main() {
 	}
 #endif
 	
+	if(argc>1){
+		slaveplayer=true;
+		slaveplayer_file = argv[1];
+	}
 
 
 #ifdef NDEBUG
@@ -273,6 +288,11 @@ int main() {
 	
 	if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {
 		NXLOG::ERRORLOG("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
+		return ret;
+	}
+	
+	if (R_FAILED(ret = plInitialize(PlServiceType_User))) {
+		NXLOG::ERRORLOG("plInitialize(PlServiceType_User) failed: 0x%x\n", ret);
 		return ret;
 	}
 	
@@ -303,7 +323,7 @@ int main() {
 	nxmpgfx::Init_Backend(!isHandheld,configini->getVSYNC(false));
 	nxmpgfx::Init_Backend_Splash(!isHandheld);
 	
-	
+
 	
 	
 	eqpreset = new EQPreset("eqpresets.ini");
@@ -324,10 +344,9 @@ int main() {
 	nxmpgfx::updateSplash(25);
 	
 	
-	
-	
-	
 	nxmpgfx::Init_ImGui(!isHandheld);
+	
+	nxmpgfx::setEnableTouch(false);
 
 
 	nxmpgfx::updateSplash(50);
@@ -339,7 +358,7 @@ int main() {
 		
 	Utility::setMediaExtensions(extensionlist);
 	
-		
+	/*	
 	Themes  *themes = new Themes();
 	themes->getThemes();
 	int themeidx = themes->getThemeIDX(configini->getThemeName(true));
@@ -348,12 +367,15 @@ int main() {
 	}
 
 	NXLOG::DEBUGLOG("Loading Textures & Fonts\n");
-	
+
+	themeidx = -1;
 	if(themeidx == -1){
 		imgloader = new CImgLoader("romfs:");
 		
 		nxmpgfx::updateSplash(50);
-		nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)));
+#ifdef OPENGL_BACKEND
+		nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)),true,configini->getOnlyLatinRange(false));
+#endif
 		nxmpgfx::updateSplash(100);
 	}else{
 		if(isHandheld){
@@ -366,8 +388,13 @@ int main() {
 		imgloader = new CImgLoader(themes->themeslist[themeidx].path);
 		themes->setThemeColor(themes->themeslist[themeidx].path);
 	}
+
 	delete themes;
-		
+*/		
+	imgloader = new CImgLoader("romfs:");
+#ifdef OPENGL_BACKEND
+		nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)),true,configini->getOnlyLatinRange(false));
+#endif
 		
 	if (hosversionBefore(8, 0, 0)) {
 		if (R_SUCCEEDED(pcvInitialize())) {
@@ -386,12 +413,13 @@ int main() {
 	NXLOG::DEBUGLOG("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
 	SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
 
+
+	nxmpgfx::Create_VO_FrameBuffer(nxmpgfx::getWidth(),nxmpgfx::getHeight());
 	
 	GUI::initMpv();
-	
-	
-	videoout = new CVOUT();
-	videoout->Create_Framebuffer(nxmpgfx::WIDTH,nxmpgfx::HEIGHT);
+		
+	//videoout = new CVOUT();
+	//videoout->Create_Framebuffer(nxmpgfx::WIDTH,nxmpgfx::HEIGHT);
 		
 	if(nxmpstats == nullptr){
 		nxmpstats = new CStats();
@@ -407,10 +435,12 @@ int main() {
 
 	__nx_applet_exit_mode = configini->getExitMode(true);
 
+/*
 	if(videoout!= nullptr){
 		delete videoout;
 		videoout = nullptr;
 	}
+*/
 	delete libmpv;
 	libmpv = nullptr;
 	NXLOG::DEBUGLOG("Ending MPV\n");

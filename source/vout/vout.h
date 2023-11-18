@@ -4,7 +4,14 @@
 #include <glad/glad.h>
 #include <string>
 #include <mpv/client.h>
+#include "nxmp-gfx.h"
+#ifdef OPENGL_BACKEND
 #include <mpv/render_gl.h>
+#endif
+#ifdef DEKO3D_BACKEND
+#include <mpv/render_dk3d.h>
+#include <mpv/render.h>
+#endif
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "logger.h"
@@ -26,13 +33,19 @@ public:
 	void Draw();
 	void Resize(float w,float h);
 	
-	
+#ifdef OPENGL_BACKEND
 	GLuint mpv_fbo;
-	GLuint mpv_fbotexture;
-	//GLuint mpv_rbo;
-	
+	GLuint mpv_fbotexture;	
 	mpv_opengl_fbo fbo;
 	mpv_render_param params[3];
+#endif
+#ifdef DEKO3D_BACKEND
+	
+ 
+ 
+#endif	
+
+	
 	int __fbo_one = 1;
 	
 	float current_width;

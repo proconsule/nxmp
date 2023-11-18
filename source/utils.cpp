@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "nxmp-gfx.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -67,8 +68,11 @@ namespace Utility{
 		}
 		return str_tolower(a.name) < str_tolower(b.name);
 	}
-	
+
+
+
 	bool TxtLoadFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height){
+#ifdef OPENGL_BACKEND
 		int image_width = 0;
 		int image_height = 0;
 		unsigned char* image_data = stbi_load(filename.c_str(), &image_width, &image_height, NULL, 4);
@@ -90,15 +94,17 @@ namespace Utility{
 		*out_texture = id;
 		*out_width = image_width;
 		*out_height = image_height;
-		
+#endif		
 		return true;
+
 	}
 	
 	bool TxtLoadFromMemory(unsigned char* data,size_t image_size, GLuint* out_texture, int* out_width, int* out_height){
+
 		int image_width = 0;
 		int image_height = 0;
 		int comp = 0;
-		
+#ifdef OPENGL_BACKEND		
 		unsigned char* image_data = stbi_load_from_memory((const stbi_uc *)data, image_size, &image_width, &image_height, &comp, 0); 
 		
 		if (image_data == NULL){
@@ -123,10 +129,12 @@ namespace Utility{
 		*out_texture = id;
 		*out_width = image_width;
 		*out_height = image_height;
-		
+#endif
 		return true;
 	}
-	
+
+
+
 	std::string humanSize(size_t bytes)
 	{
 		std::vector<std::string>suffix = {"B", "KB", "MB", "GB", "TB"};

@@ -3,7 +3,14 @@
 
 #include <string>
 #include <mpv/client.h>
+#include "nxmp-gfx.h"
+#ifdef OPENGL_BACKEND
 #include <mpv/render_gl.h>
+#endif
+#ifdef DEKO3D_BACKEND
+#include <mpv/render_dk3d.h>
+#endif
+
 
 #include "fileInfo.h"
 //#include "config.h"

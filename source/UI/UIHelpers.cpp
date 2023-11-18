@@ -6,15 +6,24 @@
 #include "localfiles.h"
 #include "Enigma2.h"
 
+#include "nxmp-gfx.h"
 
 namespace GUI {
 	
 	// For auto scale images using multiplyRes
 	void NXMPImage(ImTextureID user_texture_id, const ImVec2& size){
 		ImVec2 newsize = ImVec2(size.x*multiplyRes,size.y*multiplyRes);
+#ifdef OPENGL_BACKEND
 		//size.x = size.x*multiplyRes;
 		//size.y = size.y*multiplyRes;
 		ImGui::Image((void*)(intptr_t)user_texture_id, newsize);
+#endif
+#ifdef DEKO3D_BACKEND
+		ImGui::Image(user_texture_id, newsize);
+		//ImGui::Image(ImGui::GetIO().Fonts->TexID, newsize);
+		
+#endif
+
 	}
 	
 	void cloktimeText(ImVec2 pos,bool absolute,std::string mytext){
@@ -75,6 +84,69 @@ namespace GUI {
 
 
 namespace Windows {
+	
+	SwkbdTextCheckResult validate_text_ISINT(char* tmp_string, size_t tmp_string_size,bool numeric) {
+		std::string s = tmp_string;
+		bool checkstring = !s.empty() && std::find_if(s.begin(), 
+        s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
+		
+		if (!checkstring) {
+			return SwkbdTextCheckResult_Bad;
+		}
+
+		return SwkbdTextCheckResult_OK;
+	}
+	
+	
+	std::string ShowSWKeyboard(std::string InitialValueStr,std::string headertext,bool numeric){
+		SwkbdConfig kbd;
+		int rc = 0;
+		char tmpoutstr[16] = {0};
+		rc = swkbdCreate(&kbd, 0);
+		printf("swkbdCreate(): 0x%x\n", rc);
+
+		if (R_SUCCEEDED(rc)) {
+			// Select a Preset to use, if any.
+			swkbdConfigMakePresetDefault(&kbd);
+			if(numeric){
+				swkbdConfigSetType(&kbd, SwkbdType_NumPad);
+			}
+			//swkbdConfigMakePresetPassword(&kbd);
+			//swkbdConfigMakePresetUserName(&kbd);
+			//swkbdConfigMakePresetDownloadCode(&kbd);
+
+			// Optional, set any text if you want (see swkbd.h).
+			//swkbdConfigSetOkButtonText(&kbd, "Submit");
+			//swkbdConfigSetLeftOptionalSymbolKey(&kbd, "a");
+			//swkbdConfigSetRightOptionalSymbolKey(&kbd, "b");
+			if(headertext.size()>0){
+				swkbdConfigSetHeaderText(&kbd, headertext.c_str());
+			}
+			//swkbdConfigSetSubText(&kbd, "Sub");
+			//swkbdConfigSetGuideText(&kbd, "Guide");
+			if(numeric){
+				swkbdConfigSetTextCheckCallback(&kbd, validate_text_ISINT);//Optional, can be removed if not using TextCheck.
+			}
+			
+			//swkbdConfigSetTextCheckCallback(&kbd, validate_text);//Optional, can be removed if not using TextCheck.
+
+			// Set the initial string if you want.
+			//swkbdConfigSetOkButtonText(&kbd, "Submit");
+			swkbdConfigSetInitialText(&kbd, InitialValueStr.c_str());
+
+			// You can also use swkbdConfigSet*() funcs if you want.
+
+			rc = swkbdShow(&kbd, tmpoutstr, sizeof(tmpoutstr));
+			
+			if (R_SUCCEEDED(rc)) {
+				swkbdClose(&kbd);
+				return tmpoutstr;
+			}
+			swkbdClose(&kbd);
+			
+		}
+		return InitialValueStr;
+	}		
 	
 	std::string InputSwitchKeyboard(std::string uuid,std::string label,std::string data){
 		ImGui::Text(label.c_str());

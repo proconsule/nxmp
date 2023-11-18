@@ -30,9 +30,10 @@ namespace Windows {
 			std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 			bool triggerselect = false;
 			
+#ifdef OPENGL_BACKEND
 			if(!libmpv->Stopped() && item.state != MENU_STATE_PLAYER){
-				
-				ImVec2 image_pnew	= ImVec2((1280.0*multiplyRes-videoout->windowed_width*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x),(720.0*multiplyRes-videoout->windowed_height*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
+
+				ImVec2 image_pnew	= ImVec2((1280.0*multiplyRes-300.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x),(720.0*multiplyRes-200.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
 				ImVec2 image_p1 = ImVec2((1280.0*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x), (720.0*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
 		
 				image_pnew = image_pnew - ImVec2(10,10);
@@ -42,14 +43,15 @@ namespace Windows {
 				ImVec2 image_p1_border = image_p1 + ImVec2(1,1);
 				
 				ImGui::GetForegroundDrawList()->AddRect(image_pnew_border, image_p1_border, ImGui::GetColorU32(ImVec4(1.0f,0.0f,0.0f,1.0f)), 0.0f);
-				ImGui::GetForegroundDrawList()->AddImage((void*)(intptr_t)videoout->mpv_fbotexture, image_pnew, image_p1, {0, 1}, {1, 0});
+				ImGui::GetForegroundDrawList()->AddImage((void*)(intptr_t)nxmpgfx::getFBO_Texture(), image_pnew, image_p1, {0, 1}, {1, 0});
 				
-				//ImGui::Image((void*)(intptr_t)videoout->mpv_fbotexture, ImVec2(videoout->windowed_width,videoout->windowed_height),{0, 1}, {1, 0});
+				//ImGui::Image((void*)(intptr_t)nxmpgfx::getFBO_Texture(), ImVec2(nxmpgfx::windowed_width,nxmpgfx::windowed_height),{0, 1}, {1, 0});
+
 			}
+#endif
 			
 			
-			
-			ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
+			ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-45*multiplyRes));
 			if(!filebrowser->connected){
 				ImGui::SetCursorPosX( (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Error Connecting").x) / 2.f);
 				ImGui::TextColored(ImVec4(1.0f,0.0f,0.0f,1.0f),"Error Connecting");
@@ -202,6 +204,50 @@ namespace Windows {
 				}
 			}
 			ImGui::EndChild();
+			ImGui::BeginChild("##helpchild",ImVec2(total_w,ImGui::GetContentRegionAvail().y));
+			ImGuiWindow* window = ImGui::GetCurrentWindow();
+			
+			ImGui::Dummy(ImVec2(0,5));
+			ImVec2 startpos =  ImGui::GetCursorScreenPos();
+			ImGui::Dummy(ImVec2(0,5));
+			ImGui::Text(FONT_DPADUP_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_DPADLEFT_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_CHECKBOX]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_A_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_SELECTPLAY]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_B_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_BACK]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_X_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_CONTEXTMENU]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_Y_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_HOME]);
+			
+			window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f)), 1.0f);
+			
+			ImGui::EndChild();
+			
+			
+			
+			/*
 			ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
 			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
 			ImGui::SameLine();
@@ -242,6 +288,8 @@ namespace Windows {
 			
 			
 			ImGui::EndChild();
+			*/
+			
 			
 			if (*first_item && thislist.size() >0) {
 				std::string itemid = "##" + std::to_string(0);

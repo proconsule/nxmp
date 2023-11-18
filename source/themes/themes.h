@@ -31,6 +31,8 @@ public:
 	
 	std::vector<nxmpgfx::fonttype_struct> getThemeFonts(int themeidx,bool onlylatinrange);
 	
+	
+	
 };
 
 

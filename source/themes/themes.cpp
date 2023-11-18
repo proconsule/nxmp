@@ -144,9 +144,14 @@ void Themes::setDefault(){
 		delete imgloader;
 	}
 	
+	ImVec4* colors = ImGui::GetStyle().Colors;
+	colors[ImGuiCol_Header]                 = ImVec4(0.0f, 0.8f, 0.1f, 0.31f);
+	colors[ImGuiCol_HeaderHovered]          = ImVec4(0.0f, 0.8f, 0.1f, 0.80f);
+	colors[ImGuiCol_HeaderActive]           = ImVec4(0.0f, 0.8f, 0.1f, 1.00f);
+	
 	imgloader = new CImgLoader("romfs:");
 	//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
-	nxmpgfx::UniFontLoader(getThemeFonts(-1,configini->getOnlyLatinRange(false)));
+	nxmpgfx::UniFontLoader(getThemeFonts(-1,configini->getOnlyLatinRange(false)),true,configini->getOnlyLatinRange(false));
 	
 }
 
@@ -239,13 +244,13 @@ std::vector<nxmpgfx::fonttype_struct> Themes::getThemeFonts(int themeidx,bool on
 		
 		nxmpgfx::fonttype_struct tmpentry;
 		tmpentry.filename = "romfs:/DejaVuSans.ttf";
-		tmpentry.size = currFontsize;
-		
+
 		ImFontGlyphRangesBuilder range;
 		range.Clear();
 		tmpentry.charrange.clear();
 		range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
 		range.BuildRanges(&tmpentry.charrange);
+		tmpentry.size = currFontsize;
 		tmpfonts.push_back(tmpentry);
 		
 		if(!onlylatinrange){

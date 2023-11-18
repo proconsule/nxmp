@@ -24,8 +24,15 @@ namespace Windows {
 		GUI::cloktimeText(ImVec2((1180.0f*multiplyRes)-ImGui::CalcTextSize(nxmpstats->currentTime).x-(10.0*multiplyRes),5.0f*multiplyRes),true,nxmpstats->currentTime);
 		GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,5.0f*multiplyRes),true,batteryPercent,40*multiplyRes,20*multiplyRes,true);
 		
-		
 		if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
+			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
+			//ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.26f, 0.59f, 0.98f, 0.00f));
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.00f));
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, ImVec4(0, 162, 199, 1.00f));
+			
+			//ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.26f, 0.59f, 0.98f, 0.00f));
+
+			
 			if (ImGui::BeginTable("##table1", 2)){
 				ImGui::TableSetupColumn("icon", ImGuiTableColumnFlags_WidthFixed, ((80.0f+ImGui::GetStyle().FramePadding.x) *multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
 				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthStretch); // Default to 200.0f
@@ -35,6 +42,11 @@ namespace Windows {
 					ImGui::TableNextRow();
 					std::string itemid = "##" + std::to_string(n);
 					ImGui::TableSetColumnIndex(0);
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
+    				
+					
+					
+					
 					if(n == MM_LOCALFILES){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SdCardTexture.id, ImVec2(50,50));
 					}
@@ -65,13 +77,11 @@ namespace Windows {
 					else if(n == MM_EXIT){
 						GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ExitTexture.id, ImVec2(50,50));
 					}
+					 
+					ImGui::SameLine();
+					ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
 							
-															
-					ImGui::TableSetColumnIndex(1);
-					
-					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
-									
-					if (ImGui::Selectable(itemid.c_str(), selected == n)){
+					if (ImGui::Selectable(itemid.c_str(), selected == n,selectable_flags,ImVec2(1280*multiplyRes,50*multiplyRes))){
 						if(n == MM_LOCALFILES){
 							item.state = MENU_STATE_FILEBROWSER;
 							filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
@@ -114,6 +124,7 @@ namespace Windows {
 						if(n == MM_SETTINGS){
 							if(sqlitedb != nullptr)sqlitedb->UpdateDbStats();
 							item.state = MENU_STATE_SETTINGS;
+							settingsview_open=true;
 						}
 						if(n == MM_PLAYLIST){
 							item.state = MENU_STATE_PLAYLISTBROWSER;
@@ -168,11 +179,20 @@ namespace Windows {
 
 
 					}
-					ImGui::SameLine();
+							
+															
+					ImGui::TableSetColumnIndex(1);
+					
+					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
+					
+					
+					
+					
+					
 					//ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
 					
 					ImGui::Text("%s",MainMenu_STR[n]);
-					
+					ImGui::PopStyleVar();
 					
 					
 				}
@@ -186,6 +206,8 @@ namespace Windows {
 					*first_item = false;
 				}
 				ImGui::EndTable();
+				ImGui::PopStyleVar();
+				ImGui::PopStyleColor(2);
 			}	
 		}
 		

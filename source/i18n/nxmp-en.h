@@ -30,7 +30,7 @@ const char *Common_STR_EN[] = {
 	"Home",
 	"Home/Save",
 	"Back",
-	"Conext Menu",
+	"Context Menu",
 	"Name",
 	"Size",
 	"Date",

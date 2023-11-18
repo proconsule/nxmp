@@ -4,7 +4,10 @@
 #include "libmpv.h"
 #include "utils.h"
 #include "SwitchSys.h"
+
+#ifdef OPENGL_BACKEND
 #include "GLFW/glfw3.h"
+#endif
 
 
 bool codecSort(const decoderlist_struct &a, const decoderlist_struct &b) {
@@ -12,11 +15,13 @@ bool codecSort(const decoderlist_struct &a, const decoderlist_struct &b) {
 		return Utility::str_tolower(a.codecname) < Utility::str_tolower(b.codecname);
 }
 
+#ifdef OPENGL_BACKEND
 
 static void *get_proc_address_mpv(void *fn_ctx, const char *name) {
 		glfwGetCurrentContext();
 		return reinterpret_cast<void *>(glfwGetProcAddress(name));
 	}
+#endif
 
 libMpv::libMpv(const std::string &configDir) {
 
@@ -41,11 +46,14 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "audio-channels", "stereo");
 	mpv_set_option_string(handle, "video-timing-offset", "0");
 	mpv_set_option_string(handle, "osd-bar-align-y", "0.9");
-	mpv_set_option_string(handle, "fbo-format", "rgba16f");
+#ifdef DEKO3D_BACKEND
+	mpv_set_option_string(handle, "fbo-format", "rg11b10");
+	//mpv_set_option_string(handle, "video-timing-offset", "0");
+#endif
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());
 	mpv_set_option_string(handle, "volume-max", "200");
 	//mpv_set_option_string(handle, "opengl-pbo", "yes"); // HDR DROP FIX
-	mpv_set_option_string(handle, "vd-lavc-dr", "yes");
+	mpv_set_option_string(handle, "vd-lavc-dr", "no");
 	//default Font Style
 	mpv_set_option_string(handle, "sub-border-size", "3");
 	mpv_set_option_string(handle, "sub-shadow-offset", "1");
@@ -58,14 +66,23 @@ libMpv::libMpv(const std::string &configDir) {
 
 	
 	mpv_set_option_string(handle, "image-display-duration", "inf");
+#ifdef OPENGL_BACKEND
 	mpv_set_option_string(handle, "hdr-compute-peak", "no");
-	
+#endif
+#ifdef DEKO3D_BACKEND
+	mpv_set_option_string(handle, "hdr-compute-peak", "yes");
+#endif
 	mpv_set_option_string(handle, "demuxer-seekable-cache", "yes");
 	mpv_set_option_string(handle, "demuxer-readahead-secs", std::to_string(configini->getDemuxCache(false)).c_str());
 	
 
 	if(configini->getHWDec(false)){
+#ifdef DEKO3D_BACKEND
+		mpv_set_option_string(handle, "hwdec", "tx1");
+#endif
+#ifdef OPENGL_BACKEND
 		mpv_set_option_string(handle, "hwdec", "tx1-copy");
+#endif
 		mpv_set_option_string(handle, "hwdec-codecs", "all");
 	
 	}
@@ -101,20 +118,40 @@ libMpv::libMpv(const std::string &configDir) {
 	
 	NXLOG::DEBUGLOG("MPV Init Renderer\n");
 	 
-	 
-	
+	int advanced_control = 1;
+	if(configini->getEmuOverrides()){
+		advanced_control = 0;
+	} 
+#ifdef OPENGL_BACKEND
 	mpv_opengl_init_params mpv_gl_init_params = {
 	.get_proc_address = get_proc_address_mpv,
 	};
 	
-	
-	
 	mpv_render_param params[]{
 		{MPV_RENDER_PARAM_API_TYPE, (void *) MPV_RENDER_API_TYPE_OPENGL},
 		{MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &mpv_gl_init_params},
-		{(mpv_render_param_type)0}
+		{MPV_RENDER_PARAM_ADVANCED_CONTROL, &advanced_control},
+		 {MPV_RENDER_PARAM_INVALID, nullptr}
 	};
 	NXLOG::DEBUGLOG("MPV Init Context\n");
+	
+	
+#endif		
+	
+#ifdef DEKO3D_BACKEND
+	
+    
+    mpv_deko3d_init_params deko_init_params{nxmpgfx::getDeko3dDevice()};
+    mpv_render_param params[]{
+        {MPV_RENDER_PARAM_API_TYPE,
+         const_cast<char *>(MPV_RENDER_API_TYPE_DEKO3D)},
+        {MPV_RENDER_PARAM_DEKO3D_INIT_PARAMS, &deko_init_params},
+        {MPV_RENDER_PARAM_ADVANCED_CONTROL, &advanced_control},
+        {MPV_RENDER_PARAM_INVALID, nullptr}};
+	
+	
+#endif
+	
 	if (mpv_render_context_create(&context, handle, params) < 0) {
 		NXLOG::ERRORLOG("error: mpv_render_context_create: %s\n", mpv_error_string(res));
 		mpv_terminate_destroy(handle);

@@ -1,5 +1,23 @@
 # NXMP Changelog
 
+## [0.8.3]
+
+### Added
+
+- Added Brazilian Portuguese language
+- Added deko3d Backend capable of 4K HDR 60fps decoding (experimental)
+
+## Changes
+- New Settings UI
+
+## Fixed
+
+- Ghosting was mitigated but still present in 0.8.2 now is fixed
+
+### Knonw Issues
+
+- deko3d Backend is experimental and can have issues
+
 ## [0.8.2]
 
 ### Added

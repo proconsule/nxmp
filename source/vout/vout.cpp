@@ -8,20 +8,25 @@ CVOUT::CVOUT(){
 }
 
 CVOUT::~CVOUT(){
-	
+
+#ifdef OPENGL_BACKEND
 	glDeleteFramebuffers(1, &mpv_fbo);
 	glDeleteTextures(1, &mpv_fbotexture);
+
 	mpv_fbo = 0;
 	mpv_fbotexture = 0;
 	//glDeleteRenderbuffers(1,&mpv_rbo);
+#endif
+
 }
 
 void CVOUT::Create_Framebuffer(float w,float h)
 {
-	
-	
 	width = w;
 	height = h;
+	
+#ifdef OPENGL_BACKEND	
+	
 	glGenFramebuffers(1, &mpv_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, mpv_fbo);
 
@@ -57,12 +62,24 @@ void CVOUT::Create_Framebuffer(float w,float h)
 	params[0] = {MPV_RENDER_PARAM_OPENGL_FBO, &fbo};
 	params[1] = {MPV_RENDER_PARAM_FLIP_Y, &__fbo_one};
 	params[2] = {(mpv_render_param_type)0};
-	
-	
+
+#endif
+
+	//DkFence doneFence;
+    //DkFence readyFence;
+    //mpv_deko3d_fbo mpv_fbo{nullptr, &readyFence, &doneFence,
+    //                       1280,    720,         DkImageFormat_RGBA8_Unorm};
+	//params[0] = {MPV_RENDER_PARAM_DEKO3D_FBO, &mpv_fbo};
+	//params[1] = {MPV_RENDER_PARAM_INVALID};
+	//params[2] = {(mpv_render_param_type)0};
+    
+		
 }
 
 void CVOUT::Rescale_Framebuffer(float _width, float _height)
 {
+	
+#ifdef OPENGL_BACKEND	
 	glBindTexture(GL_TEXTURE_2D, mpv_fbotexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -78,7 +95,8 @@ void CVOUT::Rescale_Framebuffer(float _width, float _height)
 				.w = static_cast<int>(_width),
 				.h = static_cast<int>(_height),
 		};
-		
+#endif
+
 }
 
 
@@ -89,7 +107,8 @@ void CVOUT::Resize(float w,float h){
 }
 
 void CVOUT::Draw(){
-	
+
+#ifdef OPENGL_BACKEND
 	ImGui::SetNextWindowPos(fullscreen_videopos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(width,height),ImGuiCond_Always);
 	
@@ -105,8 +124,14 @@ void CVOUT::Draw(){
 	ImGui::End();
 	ImGui::PopStyleVar(3);
 	ImGui::PopStyleColor();
+#endif
+
+#ifdef DEKO3D_BACKEND
 
 	
+
+#endif
+
 }
 
 void CVOUT::SetFullScreen(bool _fullscreen){

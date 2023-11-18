@@ -20,6 +20,11 @@ namespace Windows {
 	extern int netwinselected;
 	extern int lastthemeprevidx;
 	
+	
+	extern bool settingsview_open;
+	extern bool settingsview_page;
+	extern int settingsview_combopopup;
+	
 	inline void SetupMainWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
@@ -67,7 +72,10 @@ namespace Windows {
 	void PlaylistWindow(bool *focus, bool *first_item);
 	void MTPServerWindow(bool *focus, bool *first_item);
     
+	void SettingsUIWindow(bool *focus, bool *first_item);
 	
+	
+	std::string ShowSWKeyboard(std::string InitialValueStr,std::string headertext = "",bool numeric = false);
 	
 }
 

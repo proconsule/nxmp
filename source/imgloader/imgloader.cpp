@@ -1,8 +1,12 @@
 #include "imgloader.h"
+#include "nxmp-gfx.h"
+#include "logger.h"
 
 CImgLoader::CImgLoader(std::string basepath){
-	
+
+#ifdef OPENGL_BACKEND
 	/* Home Icons */
+	
 	Utility::TxtLoadFromFile(basepath+"/sdcard.png",&icons.SdCardTexture.id,&icons.SdCardTexture.width,&icons.SdCardTexture.height);
 	Utility::TxtLoadFromFile(basepath+"/usb.png",&icons.UsbTexture.id,&icons.UsbTexture.width,&icons.UsbTexture.height);
 	Utility::TxtLoadFromFile(basepath+"/network.png",&icons.NetworkTexture.id,&icons.NetworkTexture.width,&icons.NetworkTexture.height);
@@ -47,14 +51,58 @@ CImgLoader::CImgLoader(std::string basepath){
 	Utility::TxtLoadFromFile(basepath+"/nxmp-banner.jpg",&icons.NXMPBannerTexture.id,&icons.NXMPBannerTexture.width,&icons.NXMPBannerTexture.height);
 	Utility::TxtLoadFromFile(basepath+"/ffmpeg.png",&icons.FFMPEGTexture.id,&icons.FFMPEGTexture.width,&icons.FFMPEGTexture.height);
 	Utility::TxtLoadFromFile(basepath+"/mpv.png",&icons.MPVTexture.id,&icons.MPVTexture.width,&icons.MPVTexture.height);
+
+#endif
+	
+#ifdef DEKO3D_BACKEND
+	/* Home Icons */
 	
 	
+	icons.SdCardTexture =  nxmpgfx::load_texture(basepath+"/sdcard.png",DkImageFormat_RGBA8_Unorm, 0,1);
+	
+	icons.UsbTexture =  nxmpgfx::load_texture(basepath+"/usb.png",DkImageFormat_RGBA8_Unorm, 0,2);
+	icons.NetworkTexture =  nxmpgfx::load_texture(basepath+"/network.png",DkImageFormat_RGBA8_Unorm, 0,3);
+	icons.Enigma2Texture =  nxmpgfx::load_texture(basepath+"/enigma2.png",DkImageFormat_RGBA8_Unorm, 0,4);
+	
+	icons.PlaylistTexture = nxmpgfx::load_texture(basepath+"/playlist.png",DkImageFormat_RGBA8_Unorm, 0,5);
+	icons.UPNPTexture =  nxmpgfx::load_texture(basepath+"/upnp.png",DkImageFormat_RGBA8_Unorm, 0,6);
+	icons.InfoTexture =  nxmpgfx::load_texture(basepath+"/info.png",DkImageFormat_RGBA8_Unorm, 0,7);
+	icons.SettingsTexture =  nxmpgfx::load_texture(basepath+"/settings.png",DkImageFormat_RGBA8_Unorm, 0,8);
+	icons.ExitTexture =  nxmpgfx::load_texture(basepath+"/exit.png",DkImageFormat_RGBA8_Unorm, 0,9);
+
+	icons.FolderTexture =  nxmpgfx::load_texture(basepath+"/folder.png",DkImageFormat_RGBA8_Unorm, 0,10);
+	icons.FileTexture =  nxmpgfx::load_texture(basepath+"/file.png",DkImageFormat_RGBA8_Unorm, 0,11);
+
+
+	icons.ShareAddTexture =  nxmpgfx::load_texture(basepath+"/shareadd.png",DkImageFormat_RGBA8_Unorm, 0,12);
+	icons.HTTPTexture =  nxmpgfx::load_texture(basepath+"/http.png",DkImageFormat_RGBA8_Unorm, 0,13);
+	icons.FTPTexture =  nxmpgfx::load_texture(basepath+"/ftp.png",DkImageFormat_RGBA8_Unorm, 0,14);
+	icons.SFTPTexture =  nxmpgfx::load_texture(basepath+"/sftp.png",DkImageFormat_RGBA8_Unorm, 0,15);
+	icons.SMBTexture =  nxmpgfx::load_texture(basepath+"/smb.png",DkImageFormat_RGBA8_Unorm, 0,16);
+	icons.NFSTexture =  nxmpgfx::load_texture(basepath+"/nfs.png",DkImageFormat_RGBA8_Unorm, 0,17);
+
+	icons.PlayIcon =  nxmpgfx::load_texture(basepath+"/player/play.png",DkImageFormat_RGBA8_Unorm, 0,18);
+	icons.StopIcon =  nxmpgfx::load_texture(basepath+"/player/stop.png",DkImageFormat_RGBA8_Unorm, 0,19);
+	icons.PauseIcon =  nxmpgfx::load_texture(basepath+"/player/pause.png",DkImageFormat_RGBA8_Unorm, 0,20);
+	icons.MuteIcon =  nxmpgfx::load_texture(basepath+"/player/mute.png",DkImageFormat_RGBA8_Unorm, 0,21);
+	icons.VolumeIcon =  nxmpgfx::load_texture(basepath+"/player/volume.png",DkImageFormat_RGBA8_Unorm, 0,22);
+	icons.LoopIcon =  nxmpgfx::load_texture(basepath+"/player/loop.png",DkImageFormat_RGBA8_Unorm, 0,23);
+	icons.NoLoopIcon =  nxmpgfx::load_texture(basepath+"/player/noloop.png",DkImageFormat_RGBA8_Unorm, 0,24);
+
+	icons.NXMPBannerTexture =  nxmpgfx::load_texture(basepath+"/nxmp-banner.jpg",DkImageFormat_RGBA8_Unorm, 0,25);
+	icons.FFMPEGTexture =  nxmpgfx::load_texture(basepath+"/ffmpeg.png",DkImageFormat_RGBA8_Unorm, 0,26);
+	icons.MPVTexture =  nxmpgfx::load_texture(basepath+"/mpv.png",DkImageFormat_RGBA8_Unorm, 0,27);
+
+
 	
 	
+#endif
 }
 
 CImgLoader::~CImgLoader(){
-	
+
+#ifdef OPENGL_BACKEND
+
 	/* Home Icons */
 	glDeleteTextures(1, &icons.SdCardTexture.id);
 	glDeleteTextures(1, &icons.UsbTexture.id);
@@ -151,5 +199,9 @@ CImgLoader::~CImgLoader(){
 	icons.NXMPBannerTexture.id = 0;
 	
 	
+	
+	
+	
+#endif
 	
 }

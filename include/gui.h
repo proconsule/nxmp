@@ -58,7 +58,6 @@
 #include "themes.h"
 #include "logger.h"
 
-#include "vout.h"
 
 
 
@@ -82,7 +81,8 @@ enum MENU_STATES {
 	MENU_STATE_SETTINGS,
 	MENU_STATE_PLAYER,
 	MENU_STATE_PLAYERCACHING,
-	MENU_STATE_APPEXIT
+	MENU_STATE_APPEXIT,
+	MENU_STATE_GUILESS
 };
 
 enum FILE_SELECTION_STATES {
@@ -303,7 +303,7 @@ extern float currFontsize;
 //extern GLuint mpv_fbotexture;
 //extern GLuint mpv_rbo;
 
-extern CVOUT *videoout;
+
 
 extern int64_t playercachesec;
 extern int64_t playercachesize;
@@ -317,7 +317,8 @@ extern float themefontsize;
 extern float themefontsmall;
 
 
-
+extern bool slaveplayer;
+extern std::string slaveplayer_file;
 
 
 /*

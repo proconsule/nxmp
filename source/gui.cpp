@@ -65,12 +65,17 @@ namespace GUI {
 	
 	
 	void initMpv(){
+
 		libmpv = new libMpv("mpv");
 		mpv_set_wakeup_callback(libmpv->getHandle(), on_mpv_events, NULL);
 		mpv_render_context_set_update_callback(libmpv->getContext(),  on_mpv_update, nullptr);
-	
+		if(slaveplayer){
+			libmpv->loadFile(slaveplayer_file.c_str());
+			item.state = MENU_STATE_GUILESS;
+		}
+
 	}
-	
+
 	void toggleMasterLock(){
 		item.masterlock = !item.masterlock;
 		if(item.masterlock){
@@ -109,6 +114,7 @@ namespace GUI {
 	void HandleEvents(){
 		
 		while (1) {
+			if(libmpv == nullptr)break;
 			mpv_event *mp_event = (mpv_event*) mpv_wait_event(libmpv->getHandle(), 0);
 			if (mp_event->event_id == MPV_EVENT_NONE){
 				break;
@@ -177,6 +183,10 @@ namespace GUI {
 				appletSetMediaPlaybackState(false);
 				struct mpv_event_end_file *eof = (struct mpv_event_end_file *)mp_event->data;
 				libmpv->setLoop(false);
+				if(slaveplayer){
+					renderloopdone = true;
+				}
+				
 				if(item.playerstate == PLAYER_STATE_VIDEO  && libmpv->getFileInfo()->playbackInfo.islive == false && sqlitedb != nullptr){
 					if(libmpv->getFileInfoPerc() >= configini->getResumeStartPerc(false) && 100-libmpv->getFileInfoPerc() >= configini->getResumeStopPerc(false)){
 						sqlitedb->writeResume(libmpv->getFileInfo()->path,libmpv->getFileInfo()->playbackInfo.position);
@@ -211,7 +221,6 @@ namespace GUI {
 						}
 					}
 				}
-				//item.state = item.laststate;
 				item.state = item.laststate;
 				
 				item.rightmenustate = PLAYER_RIGHT_MENU_PLAYER;
@@ -564,6 +573,11 @@ namespace GUI {
 				}
 			}
 			if (is_bit_set(event_ret,nxmpgfx::BUT_B)){
+				
+					if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup != -1){
+						Windows::settingsview_combopopup = -1;
+					}
+				
 					if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 						item.selectionstate =FILE_SELECTION_NONE;
 					}
@@ -660,6 +674,10 @@ namespace GUI {
 			
 			if (is_bit_set(event_ret,nxmpgfx::BUT_DRIGHT)){
 				
+				if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup == -1){
+					Windows::settingsview_page = true;
+				}
+				
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.playercontrolstate != PLAYER_CONTROL_STATE_CONTROLS && item.popupstate == POPUP_STATE_NONE){
 					if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
 						if(item.rightmenustate != PLAYER_RIGHT_MENU_CUSTOMARATIO && item.rightmenustate != PLAYER_RIGHT_MENU_IMAGE && item.rightmenustate != PLAYER_RIGHT_MENU_AUDIO && item.rightmenustate != PLAYER_RIGHT_MENU_SUB && item.rightmenustate != PLAYER_AUDIOEQ && item.rightmenustate != PLAYER_SUPERAUDIOEQ){
@@ -675,6 +693,11 @@ namespace GUI {
 			}
 			
 			if (is_bit_set(event_ret,nxmpgfx::BUT_DLEFT)){
+				
+				if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup == -1){
+					Windows::settingsview_page = false;
+				}
+				
 				if((item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_USB_BROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER) && item.popupstate == POPUP_STATE_NONE){
 					if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 						item.focus = true;
@@ -701,6 +724,9 @@ namespace GUI {
 			}
 			
 			if (is_bit_set(event_ret,nxmpgfx::BUT_R)){
+				
+				
+				
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 					libmpv->seek(libmpv->getPosition() + configini->getShortSeek(false),item.playershowcontrols);
 				
@@ -716,6 +742,7 @@ namespace GUI {
 			}
 			
 			if (is_bit_set(event_ret,nxmpgfx::BUT_L)){
+				
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 					libmpv->seek(libmpv->getPosition() - configini->getShortSeek(false),item.playershowcontrols);
 						
@@ -753,7 +780,7 @@ namespace GUI {
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
 					item.savestate = item.laststate;
 					item.state = item.laststate;	
-					videoout->SetFullScreen(false);
+					nxmpgfx::SetFullScreen(false);
 				}else if(item.state != MENU_STATE_PLAYER && !libmpv->Stopped()){
 					std::cout << std::endl <<" State is?: " << item.state << std::endl;
 					//fix crash
@@ -767,7 +794,7 @@ namespace GUI {
 						filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 						item.first_item = true;
 					}
-					videoout->SetFullScreen(true);
+					nxmpgfx::SetFullScreen(true);
 					item.state = MENU_STATE_PLAYER;
 							
 				}
@@ -801,7 +828,7 @@ namespace GUI {
 		nxmpgfx::NewFrame();
         ImGui::NewFrame();
 			if(item.state == MENU_STATE_PLAYER){
-				videoout->Draw();
+				nxmpgfx::Draw_VO();
 			}
 		
 			switch (item.state) {
@@ -847,7 +874,7 @@ namespace GUI {
 					Windows::EnigmaWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_SETTINGS:
-					Windows::SettingsMenuWindow(&item.focus, &item.first_item);
+					Windows::SettingsUIWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_SAVE_SETTINGS){
 						Popups::SaveSettingsPopup();
 					}
@@ -968,21 +995,34 @@ namespace GUI {
 	}
 	
 	void HandleRender(){
-		ImGui::Render();
-		ImGuiIO &io = ImGui::GetIO();
 		
+		
+		nxmpgfx::Render_PreMPV();
 		
 		if(GUI::wakeup == 1){
-			mpv_render_context_render(libmpv->getContext(), videoout->params); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
-			glViewport(0, 0, static_cast<int>(videoout->current_width), static_cast<int>(videoout->current_height));  // we have to set the Viewport on every cycle because mpv_render_context_render internally rescales the fb of the context(?!)...
-			mpv_render_context_report_swap(libmpv->getContext());
+
+
 			GUI::wakeup = 0;
 		}
+#ifdef OPENGL_BACKEND
+			mpv_render_context_render(libmpv->getContext(), nxmpgfx::getMPV_Params()); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
+			mpv_render_context_report_swap(libmpv->getContext());
+#endif	
+#ifdef DEKO3D_BACKEND
+			
+			nxmpgfx::UpdateFBO();
+			mpv_render_context_render(libmpv->getContext(), nxmpgfx::getMPV_Params());
+			nxmpgfx::queueWaitDoneFence();
+			mpv_render_context_report_swap(libmpv->getContext());
+			
+			
+			
+#endif	
 		
-		
-		nxmpgfx::Render();
+		nxmpgfx::Render_PostMPV();
 
 	}
+	
 
 	int RenderLoop(void) {
 		if(dbUpdated){
@@ -1070,12 +1110,15 @@ namespace GUI {
     void reinit()
 	{
 		
+		/*
 		if(imgloader != nullptr){
 			delete imgloader;
 		}
+		*/
 		
 		nxmpgfx::Destory_ImGui();
 		
+		/*
 		Themes  *themes = new Themes();
 		themes->getThemes();
 		int themeidx = themes->getThemeIDX(configini->getThemeName(true));
@@ -1090,7 +1133,7 @@ namespace GUI {
 			imgloader = new CImgLoader("romfs:");
 			nxmpgfx::updateSplash(50);
 			//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
-			nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)));
+			nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)),true,configini->getOnlyLatinRange(false));
 			nxmpgfx::updateSplash(100);
 			
 		}else{
@@ -1111,18 +1154,10 @@ namespace GUI {
 			
 		}
 		delete themes;
-		
-		nxmpgfx::Resize(newResW,newResH);
-		videoout->Resize(newResW,newResH);
-
-		/*
-
-		if(videoout != nullptr)delete videoout;
-		videoout = new CVOUT();
-		videoout->Create_Framebuffer(newResW,newResH);
-		nxmpgfx::Resize(newResW,newResH);
-		videoout->Resize(newResW,newResH);
 		*/
+		nxmpgfx::Resize(newResW,newResH);
+		nxmpgfx::Resize_VO(newResW,newResH);
+
 		
 		
 		

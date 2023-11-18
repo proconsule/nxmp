@@ -430,15 +430,25 @@ playerconf_struct CIniParser::getConfig(bool tmpvalue){
 }
 
 int CIniParser::getAout(bool tmpvalue){
+#ifdef OPENGL_BACKEND
 	if(tmpvalue){
 		return nxmptmpconfig.aout;
 	}
 	return nxmpconfig.aout;
+#endif
+#ifdef DEKO3D_BACKEND
+	return 1;
+#endif
 }
 
 void CIniParser::setAout(int value){
 	isModified = true;
+#ifdef OPENGL_BACKEND	
 	nxmptmpconfig.aout = value;
+#endif
+#ifdef DEKO3D_BACKEND
+	nxmptmpconfig.aout = 1;
+#endif
 }
 
 bool CIniParser::getEmuOverrides(){

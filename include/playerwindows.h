@@ -31,10 +31,10 @@ namespace playerWindows{
 	
 	inline void SetupVolumeWindow(void){
 		ImGui::SetNextWindowPos(ImVec2(10.0f*multiplyRes, 10.0f*multiplyRes), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(200.0f, 50.0f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(220.0f*multiplyRes, 50.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.5));
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.0));
 	}
 	
 	inline void SetupStatsWindow(void){
