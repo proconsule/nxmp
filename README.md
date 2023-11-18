@@ -105,6 +105,7 @@ Thanks to
 - Cpasjuste for pPlay https://github.com/Cpasjuste/pplay some code was taken here (mpv and Overclock part)
 - DarkMatterCore for libusbhsfs https://github.com/DarkMatterCore/libusbhsfs (this gives NXMP USB support)
 - Averne for HW Decoding on Tegra X1 https://github.com/averne/FFmpeg and for all the hints and help (thanks a lot!)
+- mtheall https://github.com/mtheall/ftpd and averne https://github.com/averne/Turnips for deko imgui backend 
 - xfangfang for https://github.com/xfangfang/wiliwili (for Audren audio mpv patch)
 - Jorge E. García "nWo" for beta testing and suggestions
 - Djakku @ GBATemp for beta testing and suggestions
