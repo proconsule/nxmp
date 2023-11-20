@@ -94,14 +94,33 @@ namespace Popups{
 	}
 	
 	void SaveSettingsPopup(void) {
-		Popups::SetupPopup(Popup_STR[NXPOPUP_SAVESETTINGS]);
+		Popups::SetupNativePopup(Popup_STR[NXPOPUP_SAVESETTINGS]);
 
-		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_SAVESETTINGS], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_SAVESETTINGS], nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
+			
+			ImGui::SetWindowFontScale(1.5f);
+			ImVec2 textsize = ImGui::CalcTextSize(Popup_STR[NXPOPUP_SAVESETTINGS]);
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize.x)/2.0);
+			ImGui::SetCursorPosY((292.0f*multiplyRes-70-textsize.y)/2.0);
 			
 			ImGui::Text("%s?",Popup_STR[NXPOPUP_SAVESETTINGS]);
-               
-			ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
-            if (ImGui::Button(Common_STR[NXCOMMON_YES], button_size))
+			
+			ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
+			ImVec2 button_size(771.0f*multiplyRes/2.0, 70.0f);
+			
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			
+            
+			if (ImGui::Button(Common_STR[NXCOMMON_NO], button_size))
+			{
+				configini->ReadConfig();
+				item.state = MENU_STATE_HOME;
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(Common_STR[NXCOMMON_YES], button_size))
             {
 				item.state = MENU_STATE_HOME;
 				item.popupstate = POPUP_STATE_NONE;
@@ -110,48 +129,56 @@ namespace Popups{
 				delete libmpv;
 				GUI::initMpv();
 					
-				}
-				ImGui::SameLine();
-				if (ImGui::Button(Common_STR[NXCOMMON_NO], button_size))
-				{
-                    configini->ReadConfig();
-					item.state = MENU_STATE_HOME;
-					item.popupstate = POPUP_STATE_NONE;
-					ImGui::CloseCurrentPopup();
-                }
+			}
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor();
+			
 			
 		}
-		Popups::ExitPopup();
+		Popups::ExitNativePopup();
 	}
 	
 	void ResumePopup(void) {
-		Popups::SetupPopup(Popup_STR[NXPOPUP_RESUMEPLAY]);
+		Popups::SetupNativePopup("##resumeplaybackpopup");
 
-		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_RESUMEPLAY], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal("##resumeplaybackpopup", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
 			
+			ImGui::SetWindowFontScale(1.5f);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+25.0f);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+25.0f);
 			ImGui::Text("%s?",Popup_STR[NXPOPUP_RESUMEPLAY]);
 			
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+25.0f);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+25.0f);
+			
 			ImGui::Text("%s @ %s",Popup_STR[NXPOPUP_RESUMEPLAY],Utility::formatTimeShort(libmpv->getFileInfo()->resume).c_str());
-               
-			ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
-            if (ImGui::Button(Common_STR[NXCOMMON_YES], button_size))
-            {
-				libmpv->seek(libmpv->getFileInfo()->resume,false);
-				item.popupstate = POPUP_STATE_NONE;
-				ImGui::CloseCurrentPopup();
-					
-			}
-			ImGui::SameLine();
+            
+			
+			ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
+			ImVec2 button_size(771.0f*multiplyRes/2.0, 70.0f);
+			
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			if (ImGui::Button(Common_STR[NXCOMMON_NO], button_size))
 			{
                     
 				
 				item.popupstate = POPUP_STATE_NONE;
 				ImGui::CloseCurrentPopup();
-             }
+            }
+			ImGui::SameLine();
+			if (ImGui::Button(Common_STR[NXCOMMON_YES], button_size))
+            {
+				libmpv->seek(libmpv->getFileInfo()->resume,false);
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+					
+			}
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor();
 			
 		}
-		Popups::ExitPopup();
+		Popups::ExitNativePopup();
 	}
 	
 	static ImVec4 backup_color;
@@ -674,42 +701,44 @@ namespace Popups{
 	}
 	
 	void AppExitPopup(void) {
-		Popups::SetupPopup("Exit NXMP");
+		Popups::SetupNativePopup("Exit NXMP");
 
-		if (ImGui::BeginPopupModal("Exit NXMP", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal("Exit NXMP", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
 			
 			
-			ImVec2 button_size(400.0f, 0.0f);
+			ImGui::SetWindowFontScale(1.5f);
+			ImVec2 textsize = ImGui::CalcTextSize("Exit NXMP");
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize.x)/2.0);
+			ImGui::SetCursorPosY((292.0f*multiplyRes-70-textsize.y)/2.0);
 			
-			float alignment = 0.5f;
+			ImGui::Text("%s?","Exit NXMP");
 			
-			float size = 400.0f + ImGui::GetStyle().FramePadding.x * 2.0f;
-			float avail = ImGui::GetContentRegionAvail().x;
-
-			float off = (avail - size) * alignment;
-			if (off > 0.0f)
-				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+			ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
+			ImVec2 button_size(771.0f*multiplyRes/2.0, 70.0f);
 			
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			
-			if (ImGui::Button("Return to HB-Menu",button_size))
+            
+			if (ImGui::Button("Return to HB-Menu", button_size))
 			{
 				ImGui::CloseCurrentPopup();
 				renderloopdone = true;
 				configini->setExitMode(0);
-            }
-			if (off > 0.0f)
-				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-			
-			if (ImGui::Button("Exit to Home",button_size))
-			{
-                ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Exit to Home", button_size))
+            {
+				ImGui::CloseCurrentPopup();
 				renderloopdone = true;
 				configini->setExitMode(1);
-            }
-			
+					
+			}
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor();
 			
 		}
-		Popups::ExitPopup();
+		Popups::ExitNativePopup();
 	}
 	
 }

@@ -67,6 +67,9 @@
 #define FONT_SPEAKER_ICON "\xEE\x84\xBC"
 
 
+
+
+
 #ifdef DEKO3D_BACKEND
 struct Texture {
 		dk::Image image;
@@ -121,6 +124,20 @@ namespace nxmpgfx{
 		ImVector<ImWchar> charrange;
 	};
 	
+			
+	
+	
+	extern ImVec4 Text_color;
+	extern ImVec4 Active_color;
+	extern ImVec4 Disabled_color;
+	
+	extern ImVec4 NavHover_color;
+	extern ImVec4 HeaderHover_color;
+	extern ImVec4 Window_Bg_color;
+	extern ImVec4 OptsTab_Bg_color;
+	extern ImVec4 Popup_Bg_color;
+	extern ImVec4 Button_color;
+	extern ImVec4 ButtonActive_color;
 
 	
 #ifdef OPENGL_BACKEND
@@ -181,6 +198,10 @@ namespace nxmpgfx{
 	unsigned int getHeight();
 	
 	void setEnableTouch(bool value);
+	
+	void SetColorTheme(int themecolor);
+	void SetDarkTheme();
+	void SetLightTheme();
 	
 #ifdef OPENGL_BACKEND
 	GLuint getFBO_Texture();

@@ -415,6 +415,18 @@ void CIniParser::setResumeStopPerc(int value){
 	nxmptmpconfig.stopresumeperc = value;
 }
 
+int CIniParser::getThemeColor(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.themecolor;
+	}
+	return nxmpconfig.themecolor;
+}
+void CIniParser::setThemeColor(int value){
+	isModified = true;
+	nxmptmpconfig.themecolor = value;
+}
+
+
 std::string CIniParser::getThemeName(bool tmpvalue){
 	if(tmpvalue){
 		return nxmptmpconfig.themename;
@@ -567,6 +579,9 @@ void CIniParser::ReadConfig(){
 		if(inidata["Main"].has("touchenable")){
 			nxmpconfig.touchenable = string_to_bool(inidata.get("Main").get("touchenable"));
 		}
+		if(inidata["Main"].has("themecolor")){
+			nxmpconfig.themecolor = string_to_int(inidata.get("Main").get("themecolor"));
+		}
 		if(inidata["Main"].has("deinterlace")){
 			std::string deintstring = inidata.get("Main").get("deinterlace");
 			if(deintstring == "no")nxmpconfig.deint = 0;
@@ -690,6 +705,7 @@ void CIniParser::saveSettings(){
 		{"showhidden", bool_to_string(nxmpconfig.showhidden)},
 		{"sortorder", int_to_string(nxmpconfig.sortorder)},
 		{"touchenable", bool_to_string(nxmpconfig.touchenable)},
+		{"themecolor", int_to_string(nxmpconfig.themecolor)},
 		{"demuxcachesec", int_to_string(nxmpconfig.demuxcachesec)},
 		{"playeswipeseek", bool_to_string(nxmpconfig.playeswipeseek)},
 		{"longseek", int_to_string(nxmpconfig.longseek)},

@@ -6,9 +6,13 @@
 
 - Added Brazilian Portuguese language
 - Added deko3d Backend capable of 4K HDR 60fps decoding (experimental)
+- Light/Dark Theme (mimic the native HOS UI)
 
 ## Changes
+
 - New Settings UI
+- Removed old themes class (will be replaced with new one when ready)
+- Removed old ttf font used (now it uses the system default font)
 
 ## Fixed
 
@@ -16,7 +20,7 @@
 
 ### Knonw Issues
 
-- deko3d Backend is experimental and can have issues
+- deko3d Backend is experimental and can have issues or missing some features
 
 ## [0.8.2]
 

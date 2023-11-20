@@ -5,7 +5,7 @@
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
-#include "themes.h"
+//#include "themes.h"
 #include "updater.h"
 
 #include "nxmp-i18n.h"
@@ -13,7 +13,7 @@
 
 namespace Windows {
 	
-	Themes *themes = nullptr;
+	//Themes *themes = nullptr;
 	Updater *updater = nullptr;
 	Tex thempreview;
 	
@@ -460,70 +460,6 @@ namespace Windows {
 					configini->setPlayerSwipeSeek(touchseekradio);
 				}
 				ImGui::SameLine();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Themes")) {
-				if(themes == nullptr){
-					themes = new Themes();
-					themes->getThemes();
-				}
-				std::vector<std::string> themescombomenu;
-				themescombomenu.push_back("Default");
-				for(int i=0;i<themes->themeslist.size();i++){
-					themescombomenu.push_back(themes->themeslist[i].name);
-				}
-				int themeprevidx = themes->getThemeIDX(configini->getThemeName(true))+1;
-				const char* combo_themepreview_value = themescombomenu[themeprevidx].c_str();
-				
-				if (ImGui::BeginCombo("Themes", combo_themepreview_value, 0)){
-					for (int n = 0; n < themescombomenu.size(); n++)
-					{
-						const bool is_selected = false;
-						if (ImGui::Selectable(themescombomenu[n].c_str(), is_selected)){
-							if(n ==0){
-								configini->setThemeName("Default");
-								//themes->setDefault();
-							}else{
-								//themes->setTheme(themes->themeslist[n-1].path);
-								configini->setThemeName(themes->themeslist[n-1].name);
-							}
-						}
-					}
-					ImGui::EndCombo();
-					
-				}
-				//ImGui::SameLine(100);
-				if (ImGui::Button("Apply Theme")){
-					GUI::GUI_REINIT = true;
-					
-				}
-				
-				if(lastthemeprevidx != themeprevidx){
-				
-					if(themeprevidx == 0){
-						Utility::TxtLoadFromFile("romfs:/preview.jpg",&thempreview.id,&thempreview.width,&thempreview.height);
-									
-					}else{
-						Utility::TxtLoadFromFile(themes->themeslist[themeprevidx-1].path+"preview.jpg",&thempreview.id,&thempreview.width,&thempreview.height);
-								
-					}
-					
-				}
-				
-				if(themeprevidx == 0){
-					ImGui::Text("Name: %s","Default");
-					ImGui::Text("Author: %s","proconsule/bodyXY");			
-				}else{
-					ImGui::Text("Name: %s",themes->themeslist[themeprevidx-1].name.c_str());
-					ImGui::Text("Author: %s",themes->themeslist[themeprevidx-1].author.c_str());
-						
-				}
-				
-				
-				
-				ImGui::Image((void*)(intptr_t)thempreview.id, ImVec2(thempreview.width/2,thempreview.height/2));
-				lastthemeprevidx = themeprevidx;
-					
 				ImGui::EndTabItem();
 			}
 			if (ImGui::BeginTabItem("Updates")) {

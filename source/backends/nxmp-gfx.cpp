@@ -30,6 +30,17 @@ using namespace glm;
 
 namespace nxmpgfx{
 	
+	ImVec4 Text_color = ImVec4(255, 255, 255, 1.00f);
+	ImVec4 Active_color = ImVec4(0, 255, 203, 1.00f);
+	ImVec4 Disabled_color = ImVec4(0.41f, 0.40f, 0.40f, 1.00f);
+	ImVec4 Window_Bg_color = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
+	ImVec4 OptsTab_Bg_color = ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
+	ImVec4 Popup_Bg_color = ImVec4(0.27f, 0.27f, 0.27f, 1.00f);
+	ImVec4 NavHover_color = ImVec4(0.0f, 0.0f, 0.0f, 0.20f);
+	ImVec4 HeaderHover_color = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+	ImVec4 Button_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
+	ImVec4 ButtonActive_color = ImVec4(0, 255, 203, 0.30f);
+	
 	
 #ifdef OPENGL_BACKEND	
 	const char* glsl_version = "#version 430 core";
@@ -764,6 +775,8 @@ void deko3dExit() {
 		ImGui::StyleColorsDark();
 		imgui::nx::init();
 		ImGuiIO &io = ImGui::GetIO();
+		//ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, ImVec4(0.0f,0.0f,0.0f,0.0f));
+		
 		io.BackendPlatformName = "Switch";
 		io.BackendRendererName = "imgui_impl_deko3d";
 		io.IniFilename = nullptr;
@@ -785,7 +798,9 @@ void deko3dExit() {
 		
 		
 #endif
-
+		//ImGuiStyle& style = ImGui::GetStyle();
+		//style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.62f);
+		
 	}
 	
 	
@@ -1392,7 +1407,7 @@ void deko3dExit() {
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.0));
 		
 		if(ImGui::Begin("##videowindow",nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoNavFocus)){
-					ImGui::Image((void*)(intptr_t)mpv_fbotexture, ImVec2(WIDTH,HEIGHT),{0, 1}, {1, 0});
+					ImGui::Image((void*)(intptr_t)mpv_fbotexture, ImVec2(WIDTH,HEIGHT));
 		}
 		ImGui::End();
 		ImGui::PopStyleVar(3);
@@ -1477,4 +1492,61 @@ void deko3dExit() {
 		imgui::nx::setEnableTouch(value);
 #endif
 	}
+	
+	
+	void SetColorTheme(int themecolor){
+		
+		ColorSetId currentTheme;
+		Result sysGetColorSetIdResult = setsysGetColorSetId(&currentTheme);
+		
+		
+		if(themecolor == 0){
+			SetDarkTheme();
+		}else if(themecolor == 1){
+			SetLightTheme();
+		} else{
+			if(ColorSetId::ColorSetId_Light){
+				SetDarkTheme();
+			}else{
+				SetLightTheme();
+			}
+		}
+	}
+	
+	
+	void SetDarkTheme(){
+		Text_color = ImVec4(255, 255, 255, 1.00f);
+		Active_color = ImVec4(0, 255, 203, 1.00f);
+		Disabled_color = ImVec4(0.41f, 0.40f, 0.40f, 1.00f);
+		Window_Bg_color = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
+		OptsTab_Bg_color = ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
+		Popup_Bg_color = ImVec4(0.27f, 0.27f, 0.27f, 1.00f);
+		NavHover_color = ImVec4(0.0f, 0.0f, 0.0f, 0.20f);
+		HeaderHover_color = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+		Button_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
+		ButtonActive_color = ImVec4(0, 255, 203, 0.30f);
+		
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.62f);
+		style.Colors[ImGuiCol_Text] = Text_color;
+		
+	}
+	void SetLightTheme(){
+		Text_color = ImVec4(0, 0, 0, 1.00f);
+		Active_color = ImVec4(0, 0, 255, 1.00f);
+		Disabled_color = ImVec4(0.41f, 0.40f, 0.40f, 1.00f);
+		Window_Bg_color = ImVec4(0.92f, 0.92f, 0.92f, 1.00f);
+		OptsTab_Bg_color = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
+		Popup_Bg_color = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
+		NavHover_color = ImVec4(1.0f, 1.0f, 1.0f, 0.20f);
+		HeaderHover_color = ImVec4(0.98f, 0.98f, 0.98f, 1.00f);
+		Button_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
+		ButtonActive_color = ImVec4(0, 0, 255, 0.30f);
+		
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.62f);
+		style.Colors[ImGuiCol_Text] = Text_color;
+		
+	}
+	
 }

@@ -20,7 +20,10 @@ namespace Windows {
 		GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,2.0f*multiplyRes),true,batteryPercent,40,20,true);
 		
 		 if (ImGui::Begin(filebrowser->getTitle().c_str(), nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar )) {
-            
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
+			
 			if (ImGui::BeginMenuBar()) {
 				ImGui::Text("current path: %s",filebrowser->getCurrentPath().c_str());
 				ImGui::EndMenuBar();
@@ -60,7 +63,7 @@ namespace Windows {
 				ImGui::SetCursorPosY( (ImGui::GetWindowHeight() - ImGui::CalcTextSize(filebrowser->errormsg.c_str()).y) / 2.f);
 				ImGui::Text("%s",filebrowser->errormsg.c_str());
 			}else{
-				if (ImGui::BeginTable("table1", 3,ImGuiTableFlags_RowBg|ImGuiTableFlags_ScrollY)){
+				if (ImGui::BeginTable("table1", 3,/*ImGuiTableFlags_RowBg|*/ImGuiTableFlags_ScrollY)){
 					ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
 					ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 125.0f*multiplyRes); // Default to 200.0f
 					ImGui::TableSetupColumn("Date", ImGuiTableColumnFlags_WidthFixed,215.f*multiplyRes);       // Default to auto
@@ -76,6 +79,7 @@ namespace Windows {
 					
 					ImGuiListClipper clipper;
 					clipper.Begin(thislist.size());
+					
 					while (clipper.Step())
 					{
 						for (unsigned int n = clipper.DisplayStart; n < clipper.DisplayEnd; n++){
@@ -83,6 +87,7 @@ namespace Windows {
 							
 							ImGui::TableNextRow();
 							ImGui::TableSetColumnIndex(0);
+							
 							std::string itemid = "##" + std::to_string(n);
 							
 							ImGui::Dummy(ImVec2(0,30 + ImGui::GetStyle().FramePadding.y * 2));
@@ -312,7 +317,8 @@ namespace Windows {
 				*first_item = true;
 			}
 				
-			
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
         }
         Windows::ExitWindow();
 		 

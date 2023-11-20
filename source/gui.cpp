@@ -676,7 +676,7 @@ namespace GUI {
 			
 			if (is_bit_set(event_ret,nxmpgfx::BUT_DRIGHT)){
 				
-				if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup == -1){
+				if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup == -1 && item.popupstate == POPUP_STATE_NONE){
 					Windows::settingsview_page = true;
 				}
 				
@@ -696,7 +696,7 @@ namespace GUI {
 			
 			if (is_bit_set(event_ret,nxmpgfx::BUT_DLEFT)){
 				
-				if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup == -1){
+				if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup == -1 && item.popupstate == POPUP_STATE_NONE){
 					Windows::settingsview_page = false;
 				}
 				

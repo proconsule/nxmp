@@ -15,6 +15,7 @@ typedef struct{
 	bool showhidden = false;
 	int sortorder = 0;
 	bool touchenable = false;
+	int themecolor = 2;
 	int playeswipeseek ;
 	int shortseek = 10;
 	int longseek = 60;
@@ -138,7 +139,8 @@ public:
 	int getExitMode(bool tmpvalue);
 	void setExitMode(int value);
 	
-	
+	int getThemeColor(bool tmpvalue);
+	void setThemeColor(int value);
 	
 	int getResumeStartPerc(bool tmpvalue);
 	void setResumeStartPerc(int value);

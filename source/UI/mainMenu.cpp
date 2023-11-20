@@ -27,15 +27,15 @@ namespace Windows {
 		if (ImGui::Begin(nxmpTitle.c_str(), nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
 			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
 			//ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.26f, 0.59f, 0.98f, 0.00f));
-			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.00f));
-			ImGui::PushStyleColor(ImGuiCol_NavHighlight, ImVec4(0, 162, 199, 1.00f));
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 			
 			//ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.26f, 0.59f, 0.98f, 0.00f));
 
 			
 			if (ImGui::BeginTable("##table1", 2)){
-				ImGui::TableSetupColumn("icon", ImGuiTableColumnFlags_WidthFixed, ((80.0f+ImGui::GetStyle().FramePadding.x) *multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
-				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthStretch); // Default to 200.0f
+				ImGui::TableSetupColumn("icon", ImGuiTableColumnFlags_WidthFixed, ((80.0f+ImGui::GetStyle().FramePadding.x) *multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); 
+				ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthStretch); 
 				
 				static int selected = -1;					
 				for (unsigned int n = 0; n < NX_MAINMENU_STR_NR_ITEMS; n++){

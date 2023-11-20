@@ -5,7 +5,7 @@
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
-#include "themes.h"
+
 #include "updater.h"
 
 #include "nxmp-i18n.h"
@@ -19,16 +19,13 @@ namespace Windows {
 	int settingsview_combopopup = -1;
 	bool settingsview_open;
 	
-	ImVec4 highlight_color = ImVec4(0, 255, 203, 1.00f);
-	ImVec4 disable_color = ImVec4(0.41f, 0.40f, 0.40f, 1.00f);
-	
-	
 	enum {
 		SETTINGSPOPUP_FILEORDERING = 0,
 		SETTINGSPOPUP_I18N,
 		SETTINGSPOPUP_AUDIOOUT,
 		SETTINGSPOPUP_ALANG,
-		SETTINGSPOPUP_SLANG
+		SETTINGSPOPUP_SLANG,
+		SETTINGSPOPUP_THEMECOLOR
 		
 		
 		
@@ -69,9 +66,9 @@ namespace Windows {
 			
 		
 		
-		ImGui::PushStyleColor(ImGuiCol_ChildBg,ImVec4(0.16f, 0.16f, 0.16f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_NavHighlight, highlight_color);
+		ImGui::PushStyleColor(ImGuiCol_ChildBg,nxmpgfx::OptsTab_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+		ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(40.0f,0));
 		
 		ImGui::BeginChild("##settingsoptions", ImVec2(300-2 * ImGui::GetStyle().ItemSpacing.x, 0),false,ImGuiWindowFlags_AlwaysUseWindowPadding);
@@ -115,7 +112,7 @@ namespace Windows {
 			
 			ImGui::SameLine();
 			if(settings_focused == i){
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 
 			}
 			ImGui::SetCursorPosX(itemx);
@@ -125,7 +122,7 @@ namespace Windows {
 			}
 			if(settings_focused == i){
 				ImGuiWindow* window = ImGui::GetCurrentWindow();
-				window->DrawList->AddLine(ImVec2(itemx,itemy),ImVec2(itemx,itemy+35.0f*multiplyRes) , ImGui::GetColorU32(highlight_color), 2.0f);
+				window->DrawList->AddLine(ImVec2(itemx,itemy),ImVec2(itemx,itemy+35.0f*multiplyRes) , ImGui::GetColorU32(nxmpgfx::Active_color), 2.0f);
 			}
 				
 		}
@@ -152,9 +149,8 @@ namespace Windows {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
     	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(30.0f,0));
 		
-		//ImGui::PushStyleColor(ImGuiCol_ChildBg,ImVec4(0.16f, 0.16f, 0.16f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_NavHighlight, highlight_color);
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+		ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 		
 		
 		ImGui::BeginChild("##settingview", ImVec2(ImGui::GetContentRegionAvail().x, 0),false,ImGuiWindowFlags_AlwaysUseWindowPadding);
@@ -174,9 +170,9 @@ namespace Windows {
 			ImVec2 textsize = ImGui::CalcTextSize(showhiddentext.c_str());
 			ImGui::SameLine(900-textsize.x);
 			if(configini->getshowHidden(true)){
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			}else{
-				ImGui::PushStyleColor(ImGuiCol_Text, disable_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color);
 			}
 			ImGui::Text(showhiddentext.c_str());
 			ImGui::PopStyleColor();
@@ -190,8 +186,26 @@ namespace Windows {
 			std::string fileorderingtext = orderlistcombo[configini->getsortOrder(true)];
 			textsize = ImGui::CalcTextSize(fileorderingtext.c_str());
 			ImGui::SameLine(900*multiplyRes-textsize.x);
-			ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(fileorderingtext.c_str());
+			ImGui::PopStyleColor();
+			
+			ImGui::Separator();
+			if (ImGui::Selectable("##touchenablesel", false)){
+				configini->setTouchEnable(!configini->getTouchEnable(true));
+				nxmpgfx::setEnableTouch(configini->getTouchEnable(true));
+			}
+			ImGui::SameLine();
+			ImGui::Text(SettingsMenu_STR[NXSET_TOUCHCONTROL]);
+			std::string touchenabletext = configini->getTouchEnable(true)? Common_STR[NXCOMMON_YES]:Common_STR[NXCOMMON_NO];
+			textsize = ImGui::CalcTextSize(touchenabletext.c_str());
+			ImGui::SameLine(900-textsize.x);
+			if(configini->getTouchEnable(true)){
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			}else{
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color);
+			}
+			ImGui::Text(touchenabletext.c_str());
 			ImGui::PopStyleColor();
 			
 			ImGui::Separator();
@@ -204,9 +218,9 @@ namespace Windows {
 			textsize = ImGui::CalcTextSize(showocstartuptext.c_str());
 			ImGui::SameLine(900-textsize.x);
 			if(configini->getUseOc(true)){
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			}else{
-				ImGui::PushStyleColor(ImGuiCol_Text, disable_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color);
 			}
 			ImGui::Text(showocstartuptext.c_str());
 			ImGui::PopStyleColor();
@@ -220,10 +234,22 @@ namespace Windows {
 			std::string i18nsettingtext = NXLANGNAME_ENG[configini->getInterfaceLang(true)];
 			textsize = ImGui::CalcTextSize(i18nsettingtext.c_str());
 			ImGui::SameLine(900-textsize.x);
-			ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(i18nsettingtext.c_str());
 			ImGui::PopStyleColor();
 			
+			ImGui::Separator();
+			if (ImGui::Selectable("##themecolorsel", false)){
+				settingsview_combopopup = SETTINGSPOPUP_THEMECOLOR;
+			}
+			ImGui::SameLine();
+			ImGui::Text("Theme Color");
+			std::string themecolorsettingtext = (configini->getThemeColor(true) == 0) ? "Dark": (configini->getThemeColor(true) == 1) ? "Light" : "Auto";
+			textsize = ImGui::CalcTextSize(themecolorsettingtext.c_str());
+			ImGui::SameLine(900-textsize.x);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::Text(themecolorsettingtext.c_str());
+			ImGui::PopStyleColor();
 			
 		}
 		else if(settings_focused == 1){
@@ -242,9 +268,9 @@ namespace Windows {
 			ImVec2 textsize = ImGui::CalcTextSize(showhiddentext.c_str());
 			ImGui::SameLine(900-textsize.x);
 			if(configini->getHWDec(true)){
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			}else{
-				ImGui::PushStyleColor(ImGuiCol_Text, disable_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color);
 			}
 			ImGui::Text(showhiddentext.c_str());
 			ImGui::PopStyleColor();
@@ -259,7 +285,7 @@ namespace Windows {
 			std::string curr_audioout = audiooutlist[configini->getAout(true)];
 			textsize = ImGui::CalcTextSize(curr_audioout.c_str());
 			ImGui::SameLine(900*multiplyRes-textsize.x);
-			ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(curr_audioout.c_str());
 			ImGui::PopStyleColor();
 			
@@ -273,7 +299,7 @@ namespace Windows {
 			ImGui::Text(SettingsMenu_STR[NXSET_DEMUXCACHE]);
 			textsize = ImGui::CalcTextSize(curr_demuxcachestr.c_str());
 			ImGui::SameLine(900*multiplyRes-textsize.x);
-			ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(curr_demuxcachestr.c_str());
 			ImGui::PopStyleColor();
 			
@@ -288,7 +314,7 @@ namespace Windows {
 			ImGui::Text(SettingsMenu_STR[NXSET_SHORTSEEK]);
 			textsize = ImGui::CalcTextSize(curr_shortseekstr.c_str());
 			ImGui::SameLine(900*multiplyRes-textsize.x);
-			ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(curr_shortseekstr.c_str());
 			ImGui::PopStyleColor();
 			
@@ -302,7 +328,7 @@ namespace Windows {
 			ImGui::Text(SettingsMenu_STR[NXSET_LONGSEEK]);
 			textsize = ImGui::CalcTextSize(curr_longseekstr.c_str());
 			ImGui::SameLine(900*multiplyRes-textsize.x);
-			ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(curr_longseekstr.c_str());
 			ImGui::PopStyleColor();
 			
@@ -317,9 +343,9 @@ namespace Windows {
 			textsize = ImGui::CalcTextSize(curr_usealangstr.c_str());
 			ImGui::SameLine(900-textsize.x);
 			if(configini->getUseAlang(true)){
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			}else{
-				ImGui::PushStyleColor(ImGuiCol_Text, disable_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color);
 			}
 			ImGui::Text(curr_usealangstr.c_str());
 			ImGui::PopStyleColor();
@@ -333,7 +359,7 @@ namespace Windows {
 				std::string curr_alang = Utility::getLanguages()[configini->getAlang(true)].lang3.c_str();
 				textsize = ImGui::CalcTextSize(curr_alang.c_str());
 				ImGui::SameLine(900*multiplyRes-textsize.x);
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 				ImGui::Text(curr_alang.c_str());
 				ImGui::PopStyleColor();
 			}
@@ -348,9 +374,9 @@ namespace Windows {
 			textsize = ImGui::CalcTextSize(curr_useslangstr.c_str());
 			ImGui::SameLine(900-textsize.x);
 			if(configini->getUseSlang(true)){
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			}else{
-				ImGui::PushStyleColor(ImGuiCol_Text, disable_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color);
 			}
 			ImGui::Text(curr_useslangstr.c_str());
 			ImGui::PopStyleColor();
@@ -364,7 +390,7 @@ namespace Windows {
 				std::string curr_slang = Utility::getLanguages()[configini->getSlang(true)].lang3.c_str();
 				textsize = ImGui::CalcTextSize(curr_slang.c_str());
 				ImGui::SameLine(900*multiplyRes-textsize.x);
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 				ImGui::Text(curr_slang.c_str());
 				ImGui::PopStyleColor();
 			}
@@ -379,7 +405,7 @@ namespace Windows {
 			ImGui::Text(SettingsMenu_STR[NXSET_SUBFONTSIZE]);
 			textsize = ImGui::CalcTextSize(curr_subfontsizestr.c_str());
 			ImGui::SameLine(900*multiplyRes-textsize.x);
-			ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(curr_subfontsizestr.c_str());
 			ImGui::PopStyleColor();
 			
@@ -393,7 +419,7 @@ namespace Windows {
 			ImGui::Text(SettingsMenu_STR[NXSET_SUBFONTSCALE]);
 			textsize = ImGui::CalcTextSize(curr_subfontscalestr.c_str());
 			ImGui::SameLine(900*multiplyRes-textsize.x);
-			ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(curr_subfontscalestr.c_str());
 			ImGui::PopStyleColor();
 			
@@ -423,9 +449,9 @@ namespace Windows {
 			ImVec2 textsize = ImGui::CalcTextSize(usedbtext.c_str());
 			ImGui::SameLine(900-textsize.x);
 			if(configini->getDbActive(true)){
-				ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			}else{
-				ImGui::PushStyleColor(ImGuiCol_Text, disable_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color);
 			}
 			ImGui::Text(usedbtext.c_str());
 			ImGui::PopStyleColor();
@@ -507,7 +533,7 @@ namespace Windows {
 		ImGui::SameLine();
 		ImGui::Text(Common_STR[NXCOMMON_HOMESAVE]);
 		
-		window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f)), 1.0f);
+		window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(nxmpgfx::Text_color), 1.0f);
 		
 		ImGui::EndChild();
 		
@@ -520,9 +546,9 @@ namespace Windows {
 				SetupComboPopup("##fileorderingcombo");
 				char *orderlistcombo[] = {Popup_STR[NXPOPUP_SORTASC_NAME],Popup_STR[NXPOPUP_SORTDESC_NAME],Popup_STR[NXPOPUP_SORTASC_DATE],Popup_STR[NXPOPUP_SORTDESC_DATE],Popup_STR[NXPOPUP_SORTASC_SIZE],Popup_STR[NXPOPUP_SORTDESC_SIZE]};
 				
-				ImGui::PushStyleColor(ImGuiCol_ChildBg,ImVec4(0.16f, 0.16f, 0.16f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_NavHighlight, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+				ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 		
 				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {20.0f*multiplyRes, 15.0f*multiplyRes});
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
@@ -545,7 +571,7 @@ namespace Windows {
 							
 							ImVec2 optstextsize = ImGui::CalcTextSize(orderlistcombo[n]);
 							ImGui::SameLine(1000*multiplyRes);
-							ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+							ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 							ImGui::Text(FONT_CHECKED_ICON);
 							ImGui::PopStyleColor();
 							
@@ -561,9 +587,9 @@ namespace Windows {
 				SetupComboPopup("##i18nsettingscombo");
 				char *orderlistcombo[] = {Popup_STR[NXPOPUP_SORTASC_NAME],Popup_STR[NXPOPUP_SORTDESC_NAME],Popup_STR[NXPOPUP_SORTASC_DATE],Popup_STR[NXPOPUP_SORTDESC_DATE],Popup_STR[NXPOPUP_SORTASC_SIZE],Popup_STR[NXPOPUP_SORTDESC_SIZE]};
 				
-				ImGui::PushStyleColor(ImGuiCol_ChildBg,ImVec4(0.16f, 0.16f, 0.16f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_NavHighlight, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+				ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 		
 				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {20.0f*multiplyRes, 15.0f*multiplyRes});
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
@@ -587,7 +613,7 @@ namespace Windows {
 							
 							ImVec2 optstextsize = ImGui::CalcTextSize(NXLANGNAME_ENG[n]);
 							ImGui::SameLine(1000*multiplyRes);
-							ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+							ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 							ImGui::Text(FONT_CHECKED_ICON);
 							ImGui::PopStyleColor();
 							
@@ -602,9 +628,9 @@ namespace Windows {
 			}else if(settingsview_combopopup == SETTINGSPOPUP_AUDIOOUT){
 				SetupComboPopup("##audiooutcombo");
 				
-				ImGui::PushStyleColor(ImGuiCol_ChildBg,ImVec4(0.16f, 0.16f, 0.16f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_NavHighlight, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+				ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 		
 				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {20.0f*multiplyRes, 15.0f*multiplyRes});
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
@@ -630,7 +656,7 @@ namespace Windows {
 							
 							ImVec2 optstextsize = ImGui::CalcTextSize(audiooutlist[n]);
 							ImGui::SameLine(1000*multiplyRes);
-							ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+							ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 							ImGui::Text(FONT_CHECKED_ICON);
 							ImGui::PopStyleColor();
 							
@@ -649,9 +675,9 @@ namespace Windows {
 			}else if(settingsview_combopopup == SETTINGSPOPUP_ALANG){
 				SetupComboPopup("##alangcombo");
 				
-				ImGui::PushStyleColor(ImGuiCol_ChildBg,ImVec4(0.16f, 0.16f, 0.16f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_NavHighlight, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+				ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 		
 				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {20.0f*multiplyRes, 15.0f*multiplyRes});
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
@@ -674,7 +700,7 @@ namespace Windows {
 							
 							ImVec2 optstextsize = ImGui::CalcTextSize(tmplangs[n].lang3.c_str());
 							ImGui::SameLine(1000*multiplyRes);
-							ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+							ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 							ImGui::Text(FONT_CHECKED_ICON);
 							ImGui::PopStyleColor();
 							
@@ -690,9 +716,9 @@ namespace Windows {
 			}else if(settingsview_combopopup == SETTINGSPOPUP_SLANG){
 				SetupComboPopup("##slangcombo");
 				
-				ImGui::PushStyleColor(ImGuiCol_ChildBg,ImVec4(0.16f, 0.16f, 0.16f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_NavHighlight, highlight_color);
+				ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+				ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 		
 				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {20.0f*multiplyRes, 15.0f*multiplyRes});
 				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
@@ -715,7 +741,49 @@ namespace Windows {
 							
 							ImVec2 optstextsize = ImGui::CalcTextSize(tmplangs[n].lang3.c_str());
 							ImGui::SameLine(1000*multiplyRes);
-							ImGui::PushStyleColor(ImGuiCol_Text, highlight_color);
+							ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+							ImGui::Text(FONT_CHECKED_ICON);
+							ImGui::PopStyleColor();
+							
+							
+						}
+					}
+					
+				} 
+				ExitComboPopup();
+				ImGui::PopStyleColor(3);
+				ImGui::PopStyleVar(2);	
+					
+			}else if(settingsview_combopopup == SETTINGSPOPUP_THEMECOLOR){
+				SetupComboPopup("##themecolorcombo");
+				
+				ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+				ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+		
+				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {20.0f*multiplyRes, 15.0f*multiplyRes});
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
+    	
+				if (ImGui::BeginPopupModal("##themecolorcombo", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+					ImGui::Text(SettingsMenu_STR[NXSET_SLANG]);
+					ImGui::Separator();
+					char *themecolorlist[] = {"Dark","Light","Auto"};
+					for (int n = 0; n < IM_ARRAYSIZE(themecolorlist); n++){
+						ImGui::Dummy(ImVec2(300*multiplyRes,0));
+						ImGui::SameLine();
+						std::string ordercomboid = "##themecoloritem" + std::to_string(n);
+						if(ImGui::Selectable(ordercomboid.c_str(),false)){
+							settingsview_combopopup = -1;
+							configini->setThemeColor(n);
+							nxmpgfx::SetColorTheme(configini->getThemeColor(true));
+						}	
+						ImGui::SameLine();
+						ImGui::Text(themecolorlist[n]);	
+						if(n  == configini->getThemeColor(true)){
+							
+							ImVec2 optstextsize = ImGui::CalcTextSize(themecolorlist[n]);
+							ImGui::SameLine(1000*multiplyRes);
+							ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 							ImGui::Text(FONT_CHECKED_ICON);
 							ImGui::PopStyleColor();
 							

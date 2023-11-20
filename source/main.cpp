@@ -70,7 +70,6 @@ USBMounter *MyUSBMount = nullptr;
 
 shaderMania* shadermania = nullptr;
 
-Themes *themes = nullptr;
 
 CIniParser *configini = nullptr;
 CImgLoader *imgloader = nullptr;
@@ -189,10 +188,6 @@ void DeallocateExtern(){
 	if(playlist != nullptr){
 		delete playlist;
 		playlist=nullptr;
-	}
-	if(themes != nullptr){
-		delete themes;
-		themes=nullptr;
 	}
 	if(shadermania != nullptr){
 		delete shadermania;
@@ -346,7 +341,8 @@ int main(int argc, char* argv[]) {
 	
 	nxmpgfx::Init_ImGui(!isHandheld);
 	
-	nxmpgfx::setEnableTouch(false);
+	nxmpgfx::SetColorTheme(configini->getThemeColor(false));
+	nxmpgfx::setEnableTouch(configini->getTouchEnable(false));
 
 
 	nxmpgfx::updateSplash(50);

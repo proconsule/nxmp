@@ -6,6 +6,7 @@
 #include "imgui_internal.h"
 #include "UIHelpers.h"
 #include "textscroller.h"
+#include "nxmp-gfx.h"
 
 extern int newResW;
 extern int newResH;
@@ -29,6 +30,7 @@ namespace Windows {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg,nxmpgfx::Window_Bg_color);
     };
 	
 	
@@ -36,16 +38,19 @@ namespace Windows {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Once);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg,nxmpgfx::Window_Bg_color);
     };
 
     inline void ExitMainWindow(void) {
         ImGui::End();
-		//ImGui::PopStyleColor();
-        ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
+		ImGui::PopStyleColor();
+        
     };
 	inline void ExitWindow(void) {
         ImGui::End();
         ImGui::PopStyleVar();
+		ImGui::PopStyleColor();
     };
 	
 	void UniBrowserWindow(bool *focus, bool *first_item);
