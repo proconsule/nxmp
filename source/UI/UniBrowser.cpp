@@ -64,9 +64,9 @@ namespace Windows {
 				ImGui::Text("%s",filebrowser->errormsg.c_str());
 			}else{
 				if (ImGui::BeginTable("table1", 3,/*ImGuiTableFlags_RowBg|*/ImGuiTableFlags_ScrollY)){
-					ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); // Default to 100.0f
-					ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 125.0f*multiplyRes); // Default to 200.0f
-					ImGui::TableSetupColumn("Date", ImGuiTableColumnFlags_WidthFixed,215.f*multiplyRes);       // Default to auto
+					ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); 
+					ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 125.0f*multiplyRes);
+					ImGui::TableSetupColumn("Date", ImGuiTableColumnFlags_WidthFixed,215.f*multiplyRes);       
 					ImGui::TableSetupScrollFreeze(0, 1);
 					//ImGui::TableHeadersRow();
 					ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
@@ -252,50 +252,6 @@ namespace Windows {
 			
 			
 			
-			/*
-			ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
-			ImGui::SameLine();
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_LEFT.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text(Common_STR[NXCOMMON_CHECKBOX]);
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text(Common_STR[NXCOMMON_SELECTPLAY]);
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_B_BUT.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text(Common_STR[NXCOMMON_BACK]);
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_X_BUT.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text(Common_STR[NXCOMMON_CONTEXTMENU]);
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text(Common_STR[NXCOMMON_HOME]);
-			
-			
-			ImGui::EndChild();
-			*/
-			
-			
 			if (*first_item && thislist.size() >0) {
 				std::string itemid = "##" + std::to_string(0);
 				ImGui::SetFocusID(ImGui::GetID(itemid.c_str()), ImGui::GetCurrentWindow());
@@ -330,15 +286,19 @@ namespace Windows {
 		if(MyUSBMount != nullptr)MyUSBMount->usbMscTestDevices();
 #endif
         if (ImGui::Begin("USB Mount", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
-            ImGui::SetNextWindowFocus();
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
+			ImGui::SetNextWindowFocus();
             	float total_w = ImGui::GetContentRegionAvail().x;
 				float total_h = ImGui::GetContentRegionAvail().y;
-				if (ImGui::BeginListBox("USB Browser Menu",ImVec2(total_w, total_h))){
+				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-45*multiplyRes));
+				//if (ImGui::BeginListBox("USB Browser Menu",ImVec2(total_w, total_h))){
 					bool triggerselect = false;
 					static int selected = -1;
 					
 					//std::vector<usb_devices> thislist = usbmounter->mounted_devs;
-					std::vector<usb_devices> thislist = filebrowser->getUsbDev();
+					std::vector<usb_devices> thislist = filebrowser->getUsbDev(configini->getEmuOverrides());
 					for (unsigned int n = 0; n < thislist.size(); n++){
 						std::string itemid = "##" + std::to_string(n);
 						ImGui::SameLine();
@@ -374,8 +334,38 @@ namespace Windows {
 					if(triggerselect == true){
 						*first_item = true;
 					}
-				}	
-				ImGui::EndListBox();	
+				//}	
+				//ImGui::EndListBox();
+				
+				ImGui::EndChild();
+				ImGui::BeginChild("##helpchild",ImVec2(total_w,ImGui::GetContentRegionAvail().y));
+				ImGuiWindow* window = ImGui::GetCurrentWindow();
+				
+				ImGui::Dummy(ImVec2(0,5));
+				ImVec2 startpos =  ImGui::GetCursorScreenPos();
+				ImGui::Dummy(ImVec2(0,5));
+				ImGui::Text(FONT_DPADUP_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+				ImGui::Text(FONT_A_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(Common_STR[NXCOMMON_SELECT]);
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+				ImGui::Text(FONT_Y_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(Common_STR[NXCOMMON_HOME]);
+				
+				window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f)), 1.0f);
+				
+				ImGui::EndChild();
+				
+				ImGui::PopStyleColor(2);
+				ImGui::PopStyleVar();
         }
         Windows::ExitWindow();
 	}

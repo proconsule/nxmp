@@ -705,6 +705,7 @@ void CIniParser::saveSettings(){
 		{"showhidden", bool_to_string(nxmpconfig.showhidden)},
 		{"sortorder", int_to_string(nxmpconfig.sortorder)},
 		{"touchenable", bool_to_string(nxmpconfig.touchenable)},
+		{"exitmode", int_to_string(nxmpconfig.exitmode)},
 		{"themecolor", int_to_string(nxmpconfig.themecolor)},
 		{"demuxcachesec", int_to_string(nxmpconfig.demuxcachesec)},
 		{"playeswipeseek", bool_to_string(nxmpconfig.playeswipeseek)},

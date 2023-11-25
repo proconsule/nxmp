@@ -54,7 +54,7 @@ public:
 	bool timelessFS = false;
 	bool connected = true;
 	std::string errormsg = "";
-	std::vector<usb_devices> getUsbDev();
+	std::vector<usb_devices> getUsbDev(bool dummy = false);
 
 private:
 	std::string title;

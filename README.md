@@ -5,6 +5,7 @@ NXMP
 NXMP is a video player for Nintendo Switch based on [MPV](https://mpv.io/).
 NXMP support most popular video format , it support HTTP,FTP,SFTP,Samba,NFS streaming and it also support Enigma2 decoders.
 Starting from 0.7.0 Version it features HW Decoding for H264,HEVC,VP8,VP9,MPEG2 up to 4K HDR@30fps
+Starting from 0.8.3 the deko3d version features HW Decoding for H264,HEVC,VP8,VP9,MPEG2 up to 4K HDR@60fps
 
 NXMP is coded by proconsule and darkxex
 

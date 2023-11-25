@@ -91,7 +91,9 @@ namespace Windows {
 						}
 						if(n == MM_USB){
 							if(MyUSBMount==nullptr){
-								MyUSBMount=new USBMounter(playlist);
+								if(!configini->getEmuOverrides()){
+									MyUSBMount=new USBMounter(playlist);
+								}
 							}
 							item.state = MENU_STATE_USB_MOUNT;
 							filebrowser = new CFileBrowser("",playlist,MyUSBMount);
@@ -138,8 +140,13 @@ namespace Windows {
 							item.state = MENU_STATE_INFO;
 						}
 						if(n == MM_EXIT){
-							item.state = MENU_STATE_APPEXIT;
-							//renderloopdone = true;
+							if(configini->getExitMode(false) == 0){
+								item.state = MENU_STATE_APPEXIT;
+							}else{
+								renderloopdone = true;
+							}
+							
+							//
 						}
 						if(n == MM_STREAM){
 							//i need move this, work in progress.

@@ -47,7 +47,7 @@ libMpv::libMpv(const std::string &configDir) {
 	mpv_set_option_string(handle, "video-timing-offset", "0");
 	mpv_set_option_string(handle, "osd-bar-align-y", "0.9");
 #ifdef DEKO3D_BACKEND
-	mpv_set_option_string(handle, "fbo-format", "rg11b10");
+	mpv_set_option_string(handle, "fbo-format", "rg11b10f");
 	//mpv_set_option_string(handle, "video-timing-offset", "0");
 #endif
 	mpv_set_option_string(handle, "gpu-nxmp-deint", std::to_string(configini->getDeinterlace(false)).c_str());

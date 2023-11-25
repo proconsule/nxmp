@@ -396,9 +396,21 @@
 		}
 	}
 	
-	std::vector<usb_devices> CFileBrowser::getUsbDev(){
+	std::vector<usb_devices> CFileBrowser::getUsbDev(bool dummy){
 		if(myusb != nullptr){
 			return myusb->mounted_devs;
+		}
+		
+		if(dummy){
+			std::vector<usb_devices> retdevicearray;
+			usb_devices dummy;
+			dummy.mount_point = "";
+			dummy.name = "DUMMY";
+			dummy.fstype = "FAT32";
+			dummy.capacity = 1073741824;
+			std::string mount_point;
+			retdevicearray.push_back(dummy);
+			return  retdevicearray;
 		}
 		return std::vector<usb_devices>();
 	}

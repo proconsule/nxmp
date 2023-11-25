@@ -16,6 +16,7 @@ extern CTextScroller * FilePopupTextScroller;
 namespace Popups {
     inline void SetupPopup(const char *id) {
         ImGui::OpenPopup(id);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f,1.0f,1.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(15, 15));
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
         ImGui::SetNextWindowPos(ImVec2(640.0f*multiplyRes, 360.0f*multiplyRes), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -23,6 +24,7 @@ namespace Popups {
     
     inline void ExitPopup(void) {
         ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor();
 		ImGui::EndPopup();
         
     };

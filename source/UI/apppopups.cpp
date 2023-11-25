@@ -393,25 +393,8 @@ namespace Popups{
 				ImGui::EndPopup();
 		}
 	}
-	//bordercolorend
 
-	void DBUpdatedPopup(void) {
-		Popups::SetupPopup(Popup_STR[NXPOPUP_DBUPDATED]);
-		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_DBUPDATED], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			ImGui::Text(Popup_STR[NXPOPUP_DBWASUPDATED]);
-			ImGui::Text("%s %s",SettingsMenu_STR[NXSET_DATABASEVERSION],sqlitedb->getDbVersion().c_str());
-			
-			if(ImGui::Button(Common_STR[NXCOMMON_OK],ImVec2(ImGui::GetContentRegionAvail().x,0.0f))){
-				item.popupstate = POPUP_STATE_NONE;
-			}
-			ImGui::SetFocusID(ImGui::GetID(Common_STR[NXCOMMON_OK]), ImGui::GetCurrentWindow()); 
-			ImGuiContext& g = *ImGui::GetCurrentContext();
-			g.NavDisableHighlight = false;
-			
-		}
-		Popups::ExitPopup();
-	}
-	
+
 	void NetMenuPopup(void) {
 		Popups::SetupPopup(Popup_STR[NXPOPUP_NETWORKPOPUP]);
 
@@ -700,6 +683,47 @@ namespace Popups{
 		Popups::ExitPopup();
 	}
 	
+	void DBUpdatedPopup(void) {
+		Popups::SetupNativePopup("##dbutpadted");
+		if (ImGui::BeginPopupModal("##dbutpadted", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
+			
+			
+			ImGui::SetWindowFontScale(1.5f);
+			std::string dbversionstr = SettingsMenu_STR[NXSET_DATABASEVERSION] + std::string(" ") + sqlitedb->getDbVersion().c_str();
+			ImVec2 textsize = ImGui::CalcTextSize(Popup_STR[NXPOPUP_DBWASUPDATED]);
+			ImVec2 textsize2 = ImGui::CalcTextSize(dbversionstr.c_str());
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize.x)/2.0);
+			ImGui::SetCursorPosY((292.0f*multiplyRes-70-textsize.y-textsize2.y)/2.0);
+			
+			ImGui::Text(Popup_STR[NXPOPUP_DBWASUPDATED]);
+			
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize2.x)/2.0);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0*multiplyRes);
+			ImGui::Text("%s %s",SettingsMenu_STR[NXSET_DATABASEVERSION],sqlitedb->getDbVersion().c_str());
+			
+			ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
+			ImVec2 button_size(771.0f*multiplyRes, 70.0f);
+		
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			
+			
+			if(ImGui::Button(Common_STR[NXCOMMON_OK],button_size)){
+				item.popupstate = POPUP_STATE_NONE;
+			}
+			ImGui::SetFocusID(ImGui::GetID(Common_STR[NXCOMMON_OK]), ImGui::GetCurrentWindow()); 
+			ImGuiContext& g = *ImGui::GetCurrentContext();
+			g.NavDisableHighlight = false;
+			
+			
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor();
+			
+			
+		}
+		Popups::ExitNativePopup();
+	}
+	
 	void AppExitPopup(void) {
 		Popups::SetupNativePopup("Exit NXMP");
 
@@ -724,14 +748,16 @@ namespace Popups{
 			{
 				ImGui::CloseCurrentPopup();
 				renderloopdone = true;
-				configini->setExitMode(0);
+				app_exit_mode = 0;
+				//configini->setExitMode(0);
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Exit to Home", button_size))
             {
 				ImGui::CloseCurrentPopup();
 				renderloopdone = true;
-				configini->setExitMode(1);
+				app_exit_mode = 1;
+				//configini->setExitMode(1);
 					
 			}
 			ImGui::PopStyleVar();

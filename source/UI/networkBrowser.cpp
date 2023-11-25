@@ -165,25 +165,38 @@ namespace Windows {
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
+			
 			if(item.networkselect){
-				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
-				if (ImGui::BeginTable(Network_STR[NXNET_NETWORKSOURCEMENU],1)){
-					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (1280.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
+				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-45*multiplyRes));
+				ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
+				if (ImGui::BeginTable(Network_STR[NXNET_NETWORKSOURCEMENU],2)){
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
+    				
+					ImGui::TableSetupColumn("icon", ImGuiTableColumnFlags_WidthFixed, ((80.0f+ImGui::GetStyle().FramePadding.x) *multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); 
+					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthStretch); 
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0);
+					
 					GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ShareAddTexture.id, ImVec2(50,50));
 					ImGui::SameLine();
-					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});
+					//ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50 - ImGui::GetFont()->FontSize) / 2});
 					static int selected = -1;
-					if (ImGui::Selectable(Network_STR[NXNET_ADDSHARE], selected == 0)){
+					if (ImGui::Selectable("##addsharesel", selected == 0,selectable_flags,ImVec2(1280*multiplyRes,50*multiplyRes))){
 						NewNetworkShare = new CNetworkShare();
 						item.state = MENU_STATE_ADDSHARE;
 					}	
 					if(ImGui::IsItemHovered()){
 						netwinselected = -1;
 					}
+					ImGui::TableSetColumnIndex(1);
+					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
+					ImGui::Text(Network_STR[NXNET_ADDSHARE]);
 					
 					for(unsigned int n=0;n<item.networksources.size();n++){
+						
 						ImGui::TableNextRow();
 						ImGui::TableSetColumnIndex(0);
 						urlschema thisurl = Utility::parseUrl(item.networksources[n].url);
@@ -203,9 +216,9 @@ namespace Windows {
 							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NFSTexture.id, ImVec2(50,50));
 						}
 						ImGui::SameLine();
-						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50*multiplyRes - ImGui::GetFont()->FontSize) / 2});
-						
-						if (ImGui::Selectable(std::string(item.networksources[n].name + " @ " +thisurl.server).c_str(), selected == n+1)){
+						//ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + (50*multiplyRes - ImGui::GetFont()->FontSize) / 2});
+						std::string itemid = "##itemid" + std::to_string(n);
+						if (ImGui::Selectable(itemid.c_str(), selected == n+1,selectable_flags,ImVec2(1280*multiplyRes,50*multiplyRes))){
 							item.first_item = true;		
 							item.networkselect = false;
 							
@@ -245,12 +258,17 @@ namespace Windows {
 								ImGui::SetItemDefaultFocus();
 							}
 						}
+						ImGui::TableSetColumnIndex(1);
+						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
+						ImGui::Text(std::string(item.networksources[n].name + " @ " +thisurl.server).c_str());
 						if(ImGui::IsItemHovered()){
 								netwinselected = n;
 						}
+						
 								
 					}
-								
+					
+					ImGui::PopStyleVar();			
 					if (*first_item) {
                         ImGui::SetFocusID(ImGui::GetID((item.networksources[0].name.c_str())), ImGui::GetCurrentWindow());
                         *first_item = false;
@@ -259,29 +277,34 @@ namespace Windows {
 					ImGui::SetWindowFocus();
 				}
 				ImGui::EndChild();
-				ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
-				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
+				ImGui::BeginChild("##helpchild",ImVec2(total_w,ImGui::GetContentRegionAvail().y));
+				ImGuiWindow* window = ImGui::GetCurrentWindow();
+				
+				ImGui::Dummy(ImVec2(0,5));
+				ImVec2 startpos =  ImGui::GetCursorScreenPos();
+				ImGui::Dummy(ImVec2(0,5));
+				ImGui::Text(FONT_DPADUP_BUTTON_FILLED);
 				ImGui::SameLine();
-				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
+				ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::AlignTextToFramePadding();
 				ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
+				ImGui::Text(FONT_A_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::AlignTextToFramePadding();
 				ImGui::Text(Common_STR[NXCOMMON_SELECT]);
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
+				ImGui::Text(FONT_Y_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::AlignTextToFramePadding();
 				ImGui::Text(Common_STR[NXCOMMON_HOME]);
 				
+				window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f)), 1.0f);
 				
 				ImGui::EndChild();
 			}
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
 		}
 		Windows::ExitWindow();
 	}

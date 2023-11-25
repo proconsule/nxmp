@@ -124,7 +124,15 @@ namespace nxmpgfx{
 		ImVector<ImWchar> charrange;
 	};
 	
-			
+	
+	/* a but ugly to put here audio stuff, just to quick test */
+	
+	constexpr static float MasterVolumeMin     = 0.0f;
+	constexpr static float MasterVolumeMax     = 5.0f;
+	constexpr static float MasterVolumeDefault = 1.0f;
+	constexpr static float MasterVolumeExp     = 2.0f;
+	extern float CurrentVolume;
+	
 	
 	
 	extern ImVec4 Text_color;
@@ -184,7 +192,7 @@ namespace nxmpgfx{
 	void updateSplash(int perc);
 	
 	
-	void UniFontLoader(std::vector<fonttype_struct> fontsarray,bool LoadSystemFonts = false,bool latinonly = false);
+	void UniFontLoader(bool latinonly = false);
 	
 	
 	
@@ -217,6 +225,11 @@ namespace nxmpgfx{
 	void queueFlush();
 	
 #endif
+
+	void getSystemVolume(float &value);
+	void setSystemVolume(float value);
+
+
 }
 
 

@@ -30,6 +30,9 @@ using namespace glm;
 
 namespace nxmpgfx{
 	
+	
+	float CurrentVolume = 0.0f;
+	
 	ImVec4 Text_color = ImVec4(255, 255, 255, 1.00f);
 	ImVec4 Active_color = ImVec4(0, 255, 203, 1.00f);
 	ImVec4 Disabled_color = ImVec4(0.41f, 0.40f, 0.40f, 1.00f);
@@ -119,6 +122,8 @@ namespace nxmpgfx{
 	/* SHADERS moved out from imgui backend*/
 	dk::Shader s_shaders[2];
 	dk::UniqueMemBlock s_codeMemBlock;
+	
+	dk::UniqueMemBlock splash_transfer;
 	
 #endif
 	
@@ -335,16 +340,24 @@ void rebuildSwapchain(unsigned const width_, unsigned const height_) {
     s_swapchain = dk::SwapchainMaker{s_device, nwindowGetDefault(), swapchainImages}.create();
 }
 
-
-void deko3dInit(bool docked_) {
+void deko3dInit_splash(bool docked_) {
+	docked = docked;
     // create deko3d device
 	s_device = dk::DeviceMaker{}.create();
-
+	int splash_width, splash_height;
+	unsigned char* image_data = NULL;
+	
     // initialize swapchain with maximum resolution
 	if(docked_){
 		rebuildSwapchain(1920, 1080);
+		image_data = stbi_load("romfs:/appletmode.png", &splash_width, &splash_height, NULL, 4);
+			if (image_data == NULL)
+				return;
 	}else{
 		rebuildSwapchain(1280, 720);
+		image_data = stbi_load("romfs:/appletmode-720.png", &splash_width, &splash_height, NULL, 4);
+			if (image_data == NULL)
+				return;
 	}
     // create memblocks for each image slot
     for (std::size_t i = 0; i < FB_NUM; ++i) {
@@ -391,6 +404,186 @@ void deko3dInit(bool docked_) {
     cmdBuf.clear();
 	loadShaders(s_device);
 	
+	
+	auto &cmdbuf = s_cmdBuf[0];
+		 
+		
+		
+		
+		 
+
+		splash_transfer = dk::MemBlockMaker(s_device, imgui::deko3d::align(splash_width*splash_height*4, DK_MEMBLOCK_ALIGNMENT))
+			.setFlags(DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached)
+			.create();
+
+		
+		memcpy(splash_transfer.getCpuAddr(),image_data,splash_width*splash_height*4);
+
+		s_queue.submitCommands(cmdbuf.finishList());
+		s_queue.waitIdle();
+		
+		imageSlot = s_queue.acquireImage(s_swapchain);
+		auto &cmdBuf2    = s_cmdBuf[imageSlot];
+
+		cmdBuf2.clear();
+
+		// bind frame/depth buffers and clear them
+		dk::ImageView colorTarget{s_frameBuffers[imageSlot]};
+		
+		dk::ImageView depthTarget{s_depthBuffer};
+		
+		cmdBuf2.bindRenderTargets(&colorTarget, &depthTarget);
+		
+		cmdBuf2.setScissors(0, DkScissor{0, 0, s_width, s_height});
+		cmdBuf2.clearColor(0, DkColorMask_RGBA, 0.35f, 0.30f, 0.35f, 1.0f);
+		cmdBuf2.clearDepthStencil(true, 1.0f, 0xFF, 0);
+		
+		s_queue.submitCommands(cmdBuf2.finishList());
+		s_queue.waitIdle();
+		
+		//cmdBuf2.copyImage(out_view,DkImageRect{0, 0, 0, std::uint32_t(width), std::uint32_t(height)},colorTarget,DkImageRect{0, 0, 0, std::uint32_t(s_width), std::uint32_t(s_height)});
+		
+		cmdBuf2.copyBufferToImage (DkCopyBuf{splash_transfer.getGpuAddr ()}, colorTarget,
+		{0, 0, 0, static_cast<std::uint32_t>(s_width), static_cast<std::uint32_t>(s_height), 1});
+		
+
+		s_queue.submitCommands(cmdBuf2.finishList());
+		s_queue.waitIdle();
+		
+		
+		
+		
+		
+		cmdBuf2.barrier(DkBarrier_Fragments, 0);
+		cmdBuf2.discardDepthStencil();
+
+		// present image
+		s_queue.presentImage(s_swapchain, imageSlot);
+		
+	
+}
+
+
+void deko3dInit(bool docked_) {
+	docked = docked;
+    // create deko3d device
+	s_device = dk::DeviceMaker{}.create();
+	int splash_width, splash_height;
+	unsigned char* image_data = NULL;
+	
+    // initialize swapchain with maximum resolution
+	if(docked_){
+		rebuildSwapchain(1920, 1080);
+		image_data = stbi_load("romfs:/splash.png", &splash_width, &splash_height, NULL, 4);
+			if (image_data == NULL)
+				return;
+	}else{
+		rebuildSwapchain(1280, 720);
+		image_data = stbi_load("romfs:/splash-720.png", &splash_width, &splash_height, NULL, 4);
+			if (image_data == NULL)
+				return;
+	}
+    // create memblocks for each image slot
+    for (std::size_t i = 0; i < FB_NUM; ++i) {
+        // create command buffer memblock
+        s_cmdMemBlock[i] =
+            dk::MemBlockMaker{s_device, imgui::deko3d::align(CMDBUF_SIZE, DK_MEMBLOCK_ALIGNMENT)}
+                .setFlags(DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached)
+                .create();
+
+        // create command buffer
+        s_cmdBuf[i] = dk::CmdBufMaker{s_device}.create();
+        s_cmdBuf[i].addMemory(s_cmdMemBlock[i], 0, s_cmdMemBlock[i].getSize());
+    }
+
+    // create image/sampler memblock
+    static_assert(sizeof(dk::ImageDescriptor)   == DK_IMAGE_DESCRIPTOR_ALIGNMENT);
+    static_assert(sizeof(dk::SamplerDescriptor) == DK_SAMPLER_DESCRIPTOR_ALIGNMENT);
+    static_assert(DK_IMAGE_DESCRIPTOR_ALIGNMENT == DK_SAMPLER_DESCRIPTOR_ALIGNMENT);
+    s_descriptorMemBlock = dk::MemBlockMaker{s_device,
+        imgui::deko3d::align(
+            (MAX_SAMPLERS + MAX_IMAGES) * sizeof(dk::ImageDescriptor), DK_MEMBLOCK_ALIGNMENT)}
+                               .setFlags(DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached)
+                               .create();
+
+    // get cpu address for descriptors
+    s_samplerDescriptors =
+        static_cast<dk::SamplerDescriptor *> (s_descriptorMemBlock.getCpuAddr());
+    s_imageDescriptors =
+        reinterpret_cast<dk::ImageDescriptor *> (&s_samplerDescriptors[MAX_SAMPLERS]);
+
+    // create queue
+    s_queue = dk::QueueMaker{s_device}.setFlags(DkQueueFlags_Graphics).create();
+
+    auto &cmdBuf = s_cmdBuf[0];
+
+    // bind image/sampler descriptors
+    cmdBuf.bindSamplerDescriptorSet(s_descriptorMemBlock.getGpuAddr(), MAX_SAMPLERS);
+    cmdBuf.bindImageDescriptorSet(
+        s_descriptorMemBlock.getGpuAddr() + MAX_SAMPLERS * sizeof(dk::SamplerDescriptor),
+        MAX_IMAGES);
+    s_queue.submitCommands(cmdBuf.finishList());
+    s_queue.waitIdle();
+
+    cmdBuf.clear();
+	loadShaders(s_device);
+	
+	
+	auto &cmdbuf = s_cmdBuf[0];
+		 
+		
+		
+		
+		 
+
+		splash_transfer = dk::MemBlockMaker(s_device, imgui::deko3d::align(splash_width*splash_height*4, DK_MEMBLOCK_ALIGNMENT))
+			.setFlags(DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached)
+			.create();
+
+		
+		memcpy(splash_transfer.getCpuAddr(),image_data,splash_width*splash_height*4);
+
+		s_queue.submitCommands(cmdbuf.finishList());
+		s_queue.waitIdle();
+		
+		imageSlot = s_queue.acquireImage(s_swapchain);
+		auto &cmdBuf2    = s_cmdBuf[imageSlot];
+
+		cmdBuf2.clear();
+
+		// bind frame/depth buffers and clear them
+		dk::ImageView colorTarget{s_frameBuffers[imageSlot]};
+		
+		dk::ImageView depthTarget{s_depthBuffer};
+		
+		cmdBuf2.bindRenderTargets(&colorTarget, &depthTarget);
+		
+		cmdBuf2.setScissors(0, DkScissor{0, 0, s_width, s_height});
+		cmdBuf2.clearColor(0, DkColorMask_RGBA, 0.35f, 0.30f, 0.35f, 1.0f);
+		cmdBuf2.clearDepthStencil(true, 1.0f, 0xFF, 0);
+		
+		s_queue.submitCommands(cmdBuf2.finishList());
+		s_queue.waitIdle();
+		
+		//cmdBuf2.copyImage(out_view,DkImageRect{0, 0, 0, std::uint32_t(width), std::uint32_t(height)},colorTarget,DkImageRect{0, 0, 0, std::uint32_t(s_width), std::uint32_t(s_height)});
+		
+		cmdBuf2.copyBufferToImage (DkCopyBuf{splash_transfer.getGpuAddr ()}, colorTarget,
+		{0, 0, 0, static_cast<std::uint32_t>(s_width), static_cast<std::uint32_t>(s_height), 1});
+		
+
+		s_queue.submitCommands(cmdBuf2.finishList());
+		s_queue.waitIdle();
+		
+		
+		
+		
+		
+		cmdBuf2.barrier(DkBarrier_Fragments, 0);
+		cmdBuf2.discardDepthStencil();
+
+		// present image
+		s_queue.presentImage(s_swapchain, imageSlot);
+		
 	
 }
 
@@ -530,6 +723,61 @@ void deko3dExit() {
 			glfwSwapBuffers(window);
 		}
 #endif
+#ifdef DEKO3D_BACKEND
+		PadState s_pad;
+		padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+		padInitializeDefault(&s_pad);
+
+		while (appletMainLoop())
+		{
+			padUpdate(&s_pad);
+
+			u64 kDown = padGetButtonsDown(&s_pad);
+			if (kDown & HidNpadButton_Plus)
+				break; // break in order to return to hbmenu
+			
+			
+			imageSlot = s_queue.acquireImage(s_swapchain);
+			auto &cmdBuf2    = s_cmdBuf[imageSlot];
+
+			cmdBuf2.clear();
+
+			// bind frame/depth buffers and clear them
+			dk::ImageView colorTarget{s_frameBuffers[imageSlot]};
+			
+			dk::ImageView depthTarget{s_depthBuffer};
+			
+			cmdBuf2.bindRenderTargets(&colorTarget, &depthTarget);
+			
+			cmdBuf2.setScissors(0, DkScissor{0, 0, s_width, s_height});
+			cmdBuf2.clearColor(0, DkColorMask_RGBA, 0.35f, 0.30f, 0.35f, 1.0f);
+			cmdBuf2.clearDepthStencil(true, 1.0f, 0xFF, 0);
+			
+			s_queue.submitCommands(cmdBuf2.finishList());
+			s_queue.waitIdle();
+			
+			//cmdBuf2.copyImage(out_view,DkImageRect{0, 0, 0, std::uint32_t(width), std::uint32_t(height)},colorTarget,DkImageRect{0, 0, 0, std::uint32_t(s_width), std::uint32_t(s_height)});
+			
+			cmdBuf2.copyBufferToImage (DkCopyBuf{splash_transfer.getGpuAddr ()}, colorTarget,
+			{0, 0, 0, static_cast<std::uint32_t>(s_width), static_cast<std::uint32_t>(s_height), 1});
+			
+
+			s_queue.submitCommands(cmdBuf2.finishList());
+			s_queue.waitIdle();
+			
+			
+			
+			
+			
+			cmdBuf2.barrier(DkBarrier_Fragments, 0);
+			cmdBuf2.discardDepthStencil();
+
+			// present image
+			s_queue.presentImage(s_swapchain, imageSlot);
+			
+			
+		}
+#endif
 	}
 	
 	
@@ -614,6 +862,10 @@ void deko3dExit() {
 			glViewport(0,0,1280,720);
 		
 		}
+#endif
+
+#ifdef DEKO3D_BACKEND
+		deko3dInit_splash(docked);
 #endif
 		
 	}
@@ -703,6 +955,8 @@ void deko3dExit() {
 #ifdef DEKO3D_BACKEND
 		deko3dInit(isdocked);
 		
+		
+		
 #endif
 	
 	}
@@ -738,7 +992,68 @@ void deko3dExit() {
         glfwSwapBuffers(window);
 		
 #endif
+
+#ifdef DEKO3D_BACKEND
 		
+		int barsizex = 980;
+		int barsizey = 30;
+		int barx = 1280-150;
+		int bary = 720-40-barsizey;
+		if(docked){
+			barsizex=1620;
+			int barx = 1920-150;
+		}
+		
+		unsigned int wsize = perc*barsizex/100;
+
+
+		imageSlot = s_queue.acquireImage(s_swapchain);
+		auto &cmdBuf2    = s_cmdBuf[imageSlot];
+
+		cmdBuf2.clear();
+
+		// bind frame/depth buffers and clear them
+		dk::ImageView colorTarget{s_frameBuffers[imageSlot]};
+		
+		dk::ImageView depthTarget{s_depthBuffer};
+		
+		cmdBuf2.bindRenderTargets(&colorTarget, &depthTarget);
+		
+		cmdBuf2.setScissors(0, DkScissor{0,0, s_width, s_height});
+		cmdBuf2.clearColor(0, DkColorMask_RGBA, 0.35f, 0.30f, 0.35f, 1.0f);
+		cmdBuf2.clearDepthStencil(true, 1.0f, 0xFF, 0);
+		
+		cmdBuf2.copyBufferToImage (DkCopyBuf{splash_transfer.getGpuAddr ()}, colorTarget,
+		{0, 0, 0, static_cast<std::uint32_t>(s_width), static_cast<std::uint32_t>(s_height), 1});
+		
+		
+		s_queue.submitCommands(cmdBuf2.finishList());
+		s_queue.waitIdle();
+		
+		cmdBuf2.setScissors(0, DkScissor{150,bary, wsize, barsizey});
+		cmdBuf2.clearColor(0, DkColorMask_RGBA, 0.859f, 0.118f, 0.29f, 1.0f);
+		
+		
+		//cmdBuf2.copyImage(out_view,DkImageRect{0, 0, 0, std::uint32_t(width), std::uint32_t(height)},colorTarget,DkImageRect{0, 0, 0, std::uint32_t(s_width), std::uint32_t(s_height)});
+		
+		//cmdBuf2.copyBufferToImage (DkCopyBuf{transfer.getGpuAddr ()}, colorTarget,
+		//{0, 0, 0, static_cast<std::uint32_t>(s_width), static_cast<std::uint32_t>(s_height), 1});
+		
+
+		s_queue.submitCommands(cmdBuf2.finishList());
+		s_queue.waitIdle();
+		
+		
+		
+		
+		
+		cmdBuf2.barrier(DkBarrier_Fragments, 0);
+		cmdBuf2.discardDepthStencil();
+
+		// present image
+		s_queue.presentImage(s_swapchain, imageSlot);
+#endif
+
 	}
 	
 	
@@ -911,6 +1226,11 @@ void deko3dExit() {
 	
 	void Resize(float w,float h){
 #ifdef OPENGL_BACKEND
+		if(w == 1280.0){
+			ImGui::GetIO().FontGlobalScale = 1.0f;
+		}else{
+			ImGui::GetIO().FontGlobalScale = 1.5f;
+		}
 		WIDTH = static_cast<int>(w);
 		HEIGHT = static_cast<int>(h);
 		glfwSetWindowSize(window,w,h);
@@ -1182,10 +1502,11 @@ void deko3dExit() {
 #endif
 	}
 	
-	void UniFontLoader(std::vector<fonttype_struct> fontsarray,bool LoadSystemFonts,bool latinonly){
+	void UniFontLoader(bool latinonly){
 		NXLOG::DEBUGLOG("Init Font Array\n");
+		/*
 		if(LoadSystemFonts){
-			
+		*/
 			PlFontData standard, extended, chinese, korean;
 			static ImWchar extended_range[] = {0xE000, 0xE152};
         
@@ -1199,15 +1520,15 @@ void deko3dExit() {
 				ImFontConfig font_cfg;
 				
 				font_cfg.FontDataOwnedByAtlas = false;
-				ImGui::GetIO().Fonts->AddFontFromMemoryTTF(standard.address, standard.size, fontsarray[0].size, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+				ImGui::GetIO().Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 20.0, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
 				font_cfg.MergeMode = true;
 				
-				ImGui::GetIO().Fonts->AddFontFromMemoryTTF(extended.address, extended.size, fontsarray[0].size, std::addressof(font_cfg), extended_range);
+				ImGui::GetIO().Fonts->AddFontFromMemoryTTF(extended.address, extended.size, 20.0, std::addressof(font_cfg), extended_range);
 				
 				if (!latinonly) {
-					ImGui::GetIO().Fonts->AddFontFromMemoryTTF(standard.address, standard.size, fontsarray[0].size, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
-					ImGui::GetIO().Fonts->AddFontFromMemoryTTF(chinese.address,  chinese.size,  fontsarray[0].size, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
-					ImGui::GetIO().Fonts->AddFontFromMemoryTTF(korean.address,   korean.size,   fontsarray[0].size, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesKorean());
+					ImGui::GetIO().Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 20.0, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+					ImGui::GetIO().Fonts->AddFontFromMemoryTTF(chinese.address,  chinese.size,  20.0, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
+					ImGui::GetIO().Fonts->AddFontFromMemoryTTF(korean.address,   korean.size,   20.0, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesKorean());
 					
 					
 				}
@@ -1217,7 +1538,7 @@ void deko3dExit() {
 				ImGui::GetIO().Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
 				ImGui::GetIO().Fonts->Build();
 			}
-			
+		/*	
 		}else{
 			
 			unsigned char *pixels = nullptr;
@@ -1245,6 +1566,7 @@ void deko3dExit() {
 			ImGui::GetIO().Fonts->Build();
 		
 		}
+		*/
 	}
 
 #ifdef DEKO3D_BACKEND	
@@ -1407,7 +1729,7 @@ void deko3dExit() {
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.0));
 		
 		if(ImGui::Begin("##videowindow",nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoNavFocus)){
-					ImGui::Image((void*)(intptr_t)mpv_fbotexture, ImVec2(WIDTH,HEIGHT));
+					ImGui::Image((void*)(intptr_t)mpv_fbotexture, ImVec2(WIDTH,HEIGHT),{0, 1}, {1, 0});
 		}
 		ImGui::End();
 		ImGui::PopStyleVar(3);
@@ -1497,15 +1819,17 @@ void deko3dExit() {
 	void SetColorTheme(int themecolor){
 		
 		ColorSetId currentTheme;
-		Result sysGetColorSetIdResult = setsysGetColorSetId(&currentTheme);
-		
+		Result rc = setsysInitialize();
+		if (R_SUCCEEDED(rc)) {
+		setsysGetColorSetId(&currentTheme);
+		}
 		
 		if(themecolor == 0){
 			SetDarkTheme();
 		}else if(themecolor == 1){
 			SetLightTheme();
 		} else{
-			if(ColorSetId::ColorSetId_Light){
+			if(currentTheme == 1){
 				SetDarkTheme();
 			}else{
 				SetLightTheme();

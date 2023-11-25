@@ -64,7 +64,7 @@ void handleAppletHook(AppletHookType type, void *param) {
             // use handheld mode resolution (720p) and scale
             s_width  = 1280.0f, s_height = 720.0f;
             //ImGui::GetStyle().ScaleAllSizes(1.9f / 2.6f);
-            //ImGui::GetIO().FontGlobalScale = 0.9f;
+            ImGui::GetIO().FontGlobalScale = 1.0f;
             break;
 
         case AppletOperationMode_Console:

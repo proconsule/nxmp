@@ -336,7 +336,9 @@ void imgui::deko3d::init (dk::UniqueDevice &device_,
 	// load shader code
 	//loadShaders (device_);
 
-	// create UBO memblock
+	// create UBO memblockù
+	
+	
 	s_uboMemBlock = dk::MemBlockMaker{device_,
 	    align (align (sizeof (VertUBO), DK_UNIFORM_BUF_ALIGNMENT) +
 	               align (sizeof (FragUBO), DK_UNIFORM_BUF_ALIGNMENT),

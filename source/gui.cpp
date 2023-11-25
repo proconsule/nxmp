@@ -402,14 +402,14 @@ namespace GUI {
 				{
 					if(prop->format == MPV_FORMAT_FLAG)
 					{
-						bool playchache = *(bool *)prop->data;
+						bool playcache = *(bool *)prop->data;
 						
-						//if(playchache){
-						//	item.laststate = item.state;
-						//	item.state = MENU_STATE_PLAYERCACHING;
-						//}else{
-						//	item.state = MENU_STATE_PLAYER;
-						//}
+						if(playcache){
+							item.laststate = item.state;
+							item.state = MENU_STATE_PLAYERCACHING;
+						}else{
+							item.state = MENU_STATE_PLAYER;
+						}
 						
 								
 					}
@@ -501,10 +501,12 @@ namespace GUI {
 					item.networkselect = true;
 					item.first_item = true;
 					if(item.state == MENU_STATE_SETTINGS){
-						if(configini->Modified()){
-							item.popupstate = POPUP_STATE_SAVE_SETTINGS;
-						}else{
-							item.state = MENU_STATE_HOME;
+						if(Windows::settingsview_combopopup==-1){
+							if(configini->Modified()){
+								item.popupstate = POPUP_STATE_SAVE_SETTINGS;
+							}else{
+								item.state = MENU_STATE_HOME;
+							}
 						}
 					}else{
 						item.state = MENU_STATE_HOME;
@@ -575,6 +577,10 @@ namespace GUI {
 				}
 			}
 			if (is_bit_set(event_ret,nxmpgfx::BUT_B)){
+				
+					if(item.state == MENU_STATE_APPEXIT){
+						item.state = MENU_STATE_HOME;
+					}
 				
 					if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup != -1){
 						Windows::settingsview_combopopup = -1;
@@ -1112,51 +1118,7 @@ namespace GUI {
     void reinit()
 	{
 		
-		/*
-		if(imgloader != nullptr){
-			delete imgloader;
-		}
-		*/
 		
-		nxmpgfx::Destory_ImGui();
-		
-		/*
-		Themes  *themes = new Themes();
-		themes->getThemes();
-		int themeidx = themes->getThemeIDX(configini->getThemeName(true));
-		
-		nxmpgfx::Init_Backend_Splash(!isHandheld);
-		nxmpgfx::updateSplash(25);
-		nxmpgfx::Init_ImGui(!isHandheld);
-		
-		
-		if(themeidx == -1){
-			
-			imgloader = new CImgLoader("romfs:");
-			nxmpgfx::updateSplash(50);
-			//Utility::FontLoader("romfs:/DejaVuSans.ttf",currFontsize,"romfs:/Source Han Sans CN Light.otf",currFontsize);
-			nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)),true,configini->getOnlyLatinRange(false));
-			nxmpgfx::updateSplash(100);
-			
-		}else{
-			imgloader = new CImgLoader(themes->themeslist[themeidx].path);
-			themes->setThemeColor(themes->themeslist[themeidx].path);
-			nxmpgfx::updateSplash(50);
-			if(isHandheld){
-				//Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].handledfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].handledfontsize);
-				nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
-				nxmpgfx::updateSplash(100);
-				
-			}else{
-				//Utility::FontLoader(themes->themeslist[themeidx].latinfontstr,themes->themeslist[themeidx].dockedfontsize,themes->themeslist[themeidx].kanjifontstr,themes->themeslist[themeidx].dockedfontsize);
-				nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
-				nxmpgfx::updateSplash(100);
-				
-			}
-			
-		}
-		delete themes;
-		*/
 		nxmpgfx::Resize(newResW,newResH);
 		nxmpgfx::Resize_VO(newResW,newResH);
 

@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
+#include "nxmp-i18n.h"
 
 
 namespace Windows {
@@ -12,6 +13,11 @@ namespace Windows {
         Windows::SetupWindow();
 		
         if (ImGui::Begin("Enigma2", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
+			
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
+			
 			
 			if(enigma2->getUrl().empty()){
 				std::string emptytext = "Not Configured";
@@ -34,10 +40,12 @@ namespace Windows {
 				
 				float total_w = ImGui::GetContentRegionAvail().x;
 				float total_h = ImGui::GetContentRegionAvail().y;
-				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
-				if (ImGui::BeginListBox("Enigma2 Browser Menu",ImVec2(total_w, total_h))){
+				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-45*multiplyRes));
+				if (ImGui::BeginTable("Enigma2 Browser Menu",1)){
 					if(enigma2->getCurrBouquet().bouquetref == ""){
 						for (unsigned int n = 0; n < enigma2->e2services.size(); n++){
+							ImGui::TableNextRow();
+							ImGui::TableSetColumnIndex(0);
 							static int selected = -1;
 							
 							if (ImGui::Selectable(std::string("##item" + std::to_string(n)).c_str(), selected == n)){
@@ -57,6 +65,8 @@ namespace Windows {
 						}
 					}else if(enigma2->getCurrBouquet().bouquetref != ""){
 						for (unsigned int n = 0; n < enigma2->e2currbouqet.size(); n++){
+							ImGui::TableNextRow();
+							ImGui::TableSetColumnIndex(0);
 							static int selected = -1;
 							std::string itemid = "##" + std::to_string(n);
 							float currstartpos = ImGui::GetCursorPosX();
@@ -92,9 +102,57 @@ namespace Windows {
 				if(item.popupstate == POPUP_STATE_NONE){
 					ImGui::SetWindowFocus();
 				}
-				ImGui::EndListBox();
+				ImGui::EndTable();
 				
 				ImGui::EndChild();
+				
+				
+				ImGui::BeginChild("##helpchild",ImVec2(total_w,ImGui::GetContentRegionAvail().y));
+				ImGuiWindow* window = ImGui::GetCurrentWindow();
+				
+				ImGui::Dummy(ImVec2(0,5));
+				ImVec2 startpos =  ImGui::GetCursorScreenPos();
+				ImGui::Dummy(ImVec2(0,5));
+				ImGui::Text(FONT_DPADUP_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+				ImGui::Text(FONT_DPADLEFT_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(Common_STR[NXCOMMON_CHECKBOX]);
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+				ImGui::Text(FONT_A_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(Common_STR[NXCOMMON_SELECTPLAY]);
+				if(enigma2->getCurrBouquet().bouquetref != ""){
+					ImGui::SameLine();
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+					ImGui::Text(FONT_B_BUTTON_FILLED);
+					ImGui::SameLine();
+					ImGui::Text(Common_STR[NXCOMMON_BACK]);
+				}
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+				ImGui::Text(FONT_X_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(Common_STR[NXCOMMON_CONTEXTMENU]);
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+				ImGui::Text(FONT_Y_BUTTON_FILLED);
+				ImGui::SameLine();
+				ImGui::Text(Common_STR[NXCOMMON_HOME]);
+				
+				window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f)), 1.0f);
+				
+				ImGui::EndChild();
+				
+				
+				/*
+				
 				ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
 				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
 				ImGui::SameLine();
@@ -125,7 +183,12 @@ namespace Windows {
 				
 				
 				ImGui::EndChild();
+				
+				*/
+				
 			}
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
 		}
 		Windows::ExitWindow();
 	}

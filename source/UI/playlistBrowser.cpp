@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "localfiles.h"
 #include "Enigma2.h"
+#include "nxmp-i18n.h"
 
 
 namespace Windows {
@@ -15,12 +16,16 @@ namespace Windows {
 	void PlaylistWindow(bool *focus, bool *first_item){
 		Windows::SetupWindow();
 		if (ImGui::Begin("Playlist Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
+			
 			
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			std::vector<Playlist::playlist_struct> thislist = playlist->getPlaylist();
 			if(thislist.size() >0){
-				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-30*multiplyRes));
+				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-45*multiplyRes));
 			
 				if (ImGui::BeginTable("##tableplaylist", 3)){
 					ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed, (1150.0f-2 * ImGui::GetStyle().ItemSpacing.x)*multiplyRes); // Default to 100.0f
@@ -75,42 +80,57 @@ namespace Windows {
 				ImGuiContext& g = *GImGui;
 				ImGui::NavMoveRequestTryWrapping(g.CurrentWindow, ImGuiNavMoveFlags_LoopY);
 			}else{
-				ImGui::BeginChild("##tableemptycontainer",ImVec2(total_w,total_h-30*multiplyRes));
+				ImGui::BeginChild("##tableemptycontainer",ImVec2(total_w,total_h-45*multiplyRes));
 				ImGui::SetCursorPosX((total_w - ImGui::CalcTextSize("Empty Playlist", NULL, true).x) * 0.5f);
 				ImGui::SetCursorPosY(total_h  * 0.5f);
 				ImGui::Text("Empty Playlist");
 				ImGui::EndChild();
 			}
 			
-			ImGui::BeginChild("##helpchild",ImVec2(total_w,total_h-30-2*ImGui::GetStyle().FramePadding.y*multiplyRes));
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_UP.id, ImVec2(30,30));
-			ImGui::SameLine();
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_D_DOWN.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Navigation");
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_A_BUT.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Select/Play");
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_X_BUT.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Context Menu");
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
-			GUI::NXMPImage((void*)(intptr_t)imgloader->icons.GUI_Y_BUT.id, ImVec2(30,30));
-			ImGui::SameLine();
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("NXMP Home");
+			ImGui::BeginChild("##helpchild",ImVec2(total_w,ImGui::GetContentRegionAvail().y));
+			ImGuiWindow* window = ImGui::GetCurrentWindow();
 			
+			ImGui::Dummy(ImVec2(0,5));
+			ImVec2 startpos =  ImGui::GetCursorScreenPos();
+			ImGui::Dummy(ImVec2(0,5));
+			ImGui::Text(FONT_DPADUP_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_DPADLEFT_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_CHECKBOX]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_A_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_SELECTPLAY]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_B_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_BACK]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_X_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_CONTEXTMENU]);
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+			ImGui::Text(FONT_Y_BUTTON_FILLED);
+			ImGui::SameLine();
+			ImGui::Text(Common_STR[NXCOMMON_HOME]);
+			
+			window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f)), 1.0f);
 			
 			ImGui::EndChild();
 			
+			
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
 		}
 		Windows::ExitWindow();
 	}

@@ -25,7 +25,8 @@ namespace Windows {
 		SETTINGSPOPUP_AUDIOOUT,
 		SETTINGSPOPUP_ALANG,
 		SETTINGSPOPUP_SLANG,
-		SETTINGSPOPUP_THEMECOLOR
+		SETTINGSPOPUP_THEMECOLOR,
+		SETTINGSPOPUP_EXITMODE
 		
 		
 		
@@ -249,6 +250,20 @@ namespace Windows {
 			ImGui::SameLine(900-textsize.x);
 			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 			ImGui::Text(themecolorsettingtext.c_str());
+			ImGui::PopStyleColor();
+			
+			ImGui::Separator();
+			if (ImGui::Selectable("##exitmodesel", false)){
+				settingsview_combopopup = SETTINGSPOPUP_EXITMODE;
+			}
+			ImGui::SameLine();
+			ImGui::Text("Exit Behaviour");
+			char * exitmodearray[] = {"Ask","Exit to Hb-Menu","Exit to Home"};
+			std::string exitmodetext = exitmodearray[configini->getExitMode(true)];
+			textsize = ImGui::CalcTextSize(exitmodetext.c_str());
+			ImGui::SameLine(900-textsize.x);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::Text(exitmodetext.c_str());
 			ImGui::PopStyleColor();
 			
 		}
@@ -782,6 +797,47 @@ namespace Windows {
 						if(n  == configini->getThemeColor(true)){
 							
 							ImVec2 optstextsize = ImGui::CalcTextSize(themecolorlist[n]);
+							ImGui::SameLine(1000*multiplyRes);
+							ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+							ImGui::Text(FONT_CHECKED_ICON);
+							ImGui::PopStyleColor();
+							
+							
+						}
+					}
+					
+				} 
+				ExitComboPopup();
+				ImGui::PopStyleColor(3);
+				ImGui::PopStyleVar(2);	
+					
+			}else if(settingsview_combopopup == SETTINGSPOPUP_EXITMODE){
+				SetupComboPopup("##exitmodecombo");
+				
+				ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+				ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+		
+				ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {20.0f*multiplyRes, 15.0f*multiplyRes});
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
+    	
+				if (ImGui::BeginPopupModal("##exitmodecombo", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+					ImGui::Text(SettingsMenu_STR[NXSET_SLANG]);
+					ImGui::Separator();
+					char *exitmodearray[] = {"Ask","Exit to Hb-Menu","Exit to Home"};
+					for (int n = 0; n < IM_ARRAYSIZE(exitmodearray); n++){
+						ImGui::Dummy(ImVec2(300*multiplyRes,0));
+						ImGui::SameLine();
+						std::string ordercomboid = "##exitmodeitem" + std::to_string(n);
+						if(ImGui::Selectable(ordercomboid.c_str(),false)){
+							settingsview_combopopup = -1;
+							configini->setExitMode(n);
+						}	
+						ImGui::SameLine();
+						ImGui::Text(exitmodearray[n]);	
+						if(n  == configini->getExitMode(true)){
+							
+							ImVec2 optstextsize = ImGui::CalcTextSize(exitmodearray[n]);
 							ImGui::SameLine(1000*multiplyRes);
 							ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
 							ImGui::Text(FONT_CHECKED_ICON);

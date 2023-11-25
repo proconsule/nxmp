@@ -320,6 +320,8 @@ extern float themefontsmall;
 extern bool slaveplayer;
 extern std::string slaveplayer_file;
 
+extern unsigned int app_exit_mode;
+
 
 /*
 extern float swipex;

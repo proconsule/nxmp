@@ -44,7 +44,7 @@
 
 #define NDEBUG 1
 
-#define APPLETMODEENA 1
+//#define APPLETMODEENA 1
 
 
 extern u32 __nx_applet_exit_mode;
@@ -108,6 +108,7 @@ int initSize = 55;
 int batteryPercent = 0;
 std::string tempKbUrl = "https://";
 
+unsigned int app_exit_mode = 0;
 
 float currFontsize = 20.0f; 
 
@@ -260,8 +261,6 @@ int main(int argc, char* argv[]) {
 		nxmpgfx::Init_Backend(!isHandheld,true);
 		nxmpgfx::Init_Backend_AppletMode(!isHandheld);
 		nxmpgfx::loopAppletMode();
-
-
 		
 		nxmpgfx::Destroy_Backend();
 		romfsExit();
@@ -305,6 +304,11 @@ int main(int argc, char* argv[]) {
 		configini->PrintConfig();
 	}
 	
+	if(configini->getExitMode(false) == 1){
+		app_exit_mode = 0;
+	}else if(configini->getExitMode(false) == 2){
+		app_exit_mode = 0;
+	}
 	
 	appletInitializeGamePlayRecording();
     appletSetWirelessPriorityMode(AppletWirelessPriorityMode_OptimizedForWlan);
@@ -318,7 +322,6 @@ int main(int argc, char* argv[]) {
 	nxmpgfx::Init_Backend(!isHandheld,configini->getVSYNC(false));
 	nxmpgfx::Init_Backend_Splash(!isHandheld);
 	
-
 	
 	
 	eqpreset = new EQPreset("eqpresets.ini");
@@ -331,7 +334,10 @@ int main(int argc, char* argv[]) {
 	}
 	
 	emuoverrides = configini->getEmuOverrides();
-	
+	if(!emuoverrides){
+		audctlInitialize(); // Master Volume Test
+		audctlGetSystemOutputMasterVolume(&nxmpgfx::CurrentVolume); 
+	}
 	
 	shadermania = new shaderMania();
 
@@ -354,42 +360,12 @@ int main(int argc, char* argv[]) {
 		
 	Utility::setMediaExtensions(extensionlist);
 	
-	/*	
-	Themes  *themes = new Themes();
-	themes->getThemes();
-	int themeidx = themes->getThemeIDX(configini->getThemeName(true));
-	if(themeidx >-1){
-		themes->setTheme(themes->themeslist[themeidx].path);
-	}
-
-	NXLOG::DEBUGLOG("Loading Textures & Fonts\n");
-
-	themeidx = -1;
-	if(themeidx == -1){
-		imgloader = new CImgLoader("romfs:");
-		
-		nxmpgfx::updateSplash(50);
-#ifdef OPENGL_BACKEND
-		nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)),true,configini->getOnlyLatinRange(false));
-#endif
-		nxmpgfx::updateSplash(100);
-	}else{
-		if(isHandheld){
-			nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
-			nxmpgfx::updateSplash(100);
-		}else{
-			nxmpgfx::UniFontLoader(themes->getThemeFonts(themeidx,configini->getOnlyLatinRange(false)));
-			nxmpgfx::updateSplash(100);
-		}
-		imgloader = new CImgLoader(themes->themeslist[themeidx].path);
-		themes->setThemeColor(themes->themeslist[themeidx].path);
-	}
-
-	delete themes;
-*/		
+	
+	
 	imgloader = new CImgLoader("romfs:");
 #ifdef OPENGL_BACKEND
-		nxmpgfx::UniFontLoader(themes->getThemeFonts(-1,configini->getOnlyLatinRange(false)),true,configini->getOnlyLatinRange(false));
+		std::vector<nxmpgfx::fonttype_struct> nullfonts;
+		nxmpgfx::UniFontLoader(configini->getOnlyLatinRange(false));
 #endif
 		
 	if (hosversionBefore(8, 0, 0)) {
@@ -405,7 +381,7 @@ int main(int argc, char* argv[]) {
 			SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
 		}
 	}
-
+	nxmpgfx::updateSplash(100);
 	NXLOG::DEBUGLOG("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
 	SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
 
@@ -413,10 +389,8 @@ int main(int argc, char* argv[]) {
 	nxmpgfx::Create_VO_FrameBuffer(nxmpgfx::getWidth(),nxmpgfx::getHeight());
 	
 	GUI::initMpv();
-		
-	//videoout = new CVOUT();
-	//videoout->Create_Framebuffer(nxmpgfx::WIDTH,nxmpgfx::HEIGHT);
-		
+	
+	
 	if(nxmpstats == nullptr){
 		nxmpstats = new CStats();
 		nxmpstats->emuoverrides = emuoverrides;
@@ -429,14 +403,9 @@ int main(int argc, char* argv[]) {
 
 	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
 
-	__nx_applet_exit_mode = configini->getExitMode(true);
+	//__nx_applet_exit_mode = configini->getExitMode(true);
 
-/*
-	if(videoout!= nullptr){
-		delete videoout;
-		videoout = nullptr;
-	}
-*/
+	__nx_applet_exit_mode = app_exit_mode;
 	delete libmpv;
 	libmpv = nullptr;
 	NXLOG::DEBUGLOG("Ending MPV\n");
@@ -459,7 +428,9 @@ int main(int argc, char* argv[]) {
 		nxmpstats = nullptr;
 	}
 	
-	
+	if(!emuoverrides){
+		audctlExit();
+	}
 	NXLOG::DEBUGLOG("Exit Services\n");
 	
 

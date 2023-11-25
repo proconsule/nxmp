@@ -888,9 +888,11 @@ namespace playerWindows{
 		if (ImGui::Begin("Caching", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			auto windowWidth = ImGui::GetWindowSize().x;
 			auto windowheight = ImGui::GetWindowSize().y;
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Buffering Media - ", NULL, true).x) * 0.5f);
 			ImGui::SetCursorPosY((windowheight - 24) * 0.5f);
 			ImGui::Text("Buffering Media %s",buffericon[(int)(ImGui::GetTime() / 0.05f) & 3]);
+			ImGui::PopStyleColor();
 		}
 		playerWindows::ExitWindow();
 	}
@@ -915,18 +917,10 @@ namespace playerWindows{
 		}
 		static bool selected = -1;
 		if (ImGui::Begin("Player Controls", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
-			
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0,1.0,1.0,1.0));
 			float centerposition = ImGui::GetWindowSize().x*0.5;
 			
-			/*
-			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.0));
-			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.0,1.0,0.0,0.5));
 			
-			ImGui::ProgressBar(libmpv->getFileInfo()->playbackInfo.getplayPercCache(playercachesec), ImVec2(-1.0f, 10.0f*multiplyRes),"");
-			ImGui::PopStyleColor(2);
-			
-			ImGui::SameLine();
-			*/
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
@@ -1029,7 +1023,7 @@ namespace playerWindows{
 			ImGui::Text("%s",timetext);
 			GUI::cloktimeText(ImVec2((1180.0f*multiplyRes)-ImGui::CalcTextSize(nxmpstats->currentTime).x-(10.0*multiplyRes),5.0f),true,nxmpstats->currentTime);
 			GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,5.0f),true,batteryPercent,40*multiplyRes,20*multiplyRes,true);
-			
+			ImGui::PopStyleColor();
 		}
 		playerWindows::ExitControlsWindow();
 	}
@@ -1087,8 +1081,7 @@ namespace playerWindows{
 			
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
-			//ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0,0.0,0.0,1.0));
-			//ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.66f, 0.66f, 0.66f, 1.00f));
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
 			
@@ -1100,7 +1093,7 @@ namespace playerWindows{
 			ImGui::SameLine();
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()-10.0f*multiplyRes);
 			ImGui::Text("%s",FONT_SPEAKER_ICON);
-			ImGui::PopStyleColor(2);
+			ImGui::PopStyleColor(3);
 			ImGui::PopStyleVar(2);
 			ImGui::GetFont()->Scale = oldsize;
 			ImGui::PopFont();
@@ -1120,6 +1113,8 @@ namespace playerWindows{
 		if (ImGui::Begin("Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0,1.0,1.0,1.0));
+			
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 			ImGui::Text("CPU %s %s %s %s",nxmpstats->CPU_Hz_c ,nxmpstats->CPU_Usage0,nxmpstats->CPU_Usage1,nxmpstats->CPU_Usage2);
 			ImGui::Text("GPU %s %s",nxmpstats->GPU_Hz_c ,nxmpstats->GPU_Load_c);
@@ -1127,7 +1122,7 @@ namespace playerWindows{
 			
 			ImGui::Text("%s",nxmpstats->loopstat_c);
 			
-			ImGui::PopStyleColor(2);
+			ImGui::PopStyleColor(3);
 			ImGui::PopStyleVar();
 			
 		}
@@ -1140,6 +1135,7 @@ namespace playerWindows{
 		if (ImGui::Begin("Decoding Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
 			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 			if(libmpv->getFileInfo()->videos.size()>0){
 				ImGui::Text("Video Codec: %s (%s)",nxmpstats->decodingstats.videodecstats.codec.c_str(),nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("tx1")?"HW (GPU)":nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("tx1-copy")?"HW (Copy)" : "SW");
@@ -1156,7 +1152,7 @@ namespace playerWindows{
 				ImGui::Text("Audio Channels: %s",nxmpstats->decodingstats.audiodecstats.hrchannels.c_str());
 			}
 			
-			ImGui::PopStyleColor(2);
+			ImGui::PopStyleColor(3);
 			ImGui::PopStyleVar();
 			
 		}
