@@ -269,16 +269,18 @@ int main(int argc, char* argv[]) {
 	}
 #endif
 	
-	if(argc>1){
-		slaveplayer=true;
-		slaveplayer_file = argv[1];
-	}
+	
 
 
 #ifdef NDEBUG
 	nxlinkStdio();
 #endif	
 	printf("Starting\n");
+	if(argc>1){
+		slaveplayer=true;
+		printf("File: %s\n",argv[1]);
+		slaveplayer_file = argv[1];
+	}
 	
 	if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {
 		NXLOG::ERRORLOG("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
@@ -328,7 +330,7 @@ int main(int argc, char* argv[]) {
 	
 	playlist = new Playlist();
 	
-	if(configini->getDbActive(false)){
+	if(configini->getDbActive(false) && !slaveplayer){
 		sqlitedb = new SQLiteDB(configini->getDbPath());
 		dbUpdated = sqlitedb->dbwasUpdated();
 	}
