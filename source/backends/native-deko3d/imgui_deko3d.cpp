@@ -426,6 +426,14 @@ void imgui::deko3d::init (dk::UniqueDevice &device_,
 
 void imgui::deko3d::exit ()
 {
+	s_fontImageMemBlock.destroy();
+	
+	s_idxMemBlock.clear ();
+	s_vtxMemBlock.clear ();
+	
+	s_uboMemBlock.destroy();
+	
+/*	
 	s_fontImageMemBlock = nullptr;
 
 	s_idxMemBlock.clear ();
@@ -433,6 +441,7 @@ void imgui::deko3d::exit ()
 
 	s_uboMemBlock  = nullptr;
 	//s_codeMemBlock = nullptr;
+*/
 }
 
 void imgui::deko3d::render (dk::UniqueDevice &device_,

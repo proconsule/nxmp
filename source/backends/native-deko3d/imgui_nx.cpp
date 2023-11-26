@@ -151,8 +151,6 @@ bool imgui::nx::init(bool latinonly) {
         font_cfg.MergeMode            = true;
         io.Fonts->AddFontFromMemoryTTF(extended.address, extended.size, 20.0f, &font_cfg, extended_range);
         if(!latinonly){
-			//io.Fonts->AddFontFromMemoryTTF(chinese.address,  chinese.size,  20.0f, &font_cfg, nxFontRanges);
-			//io.Fonts->AddFontFromMemoryTTF(korean.address,   korean.size,   20.0f, &font_cfg, nxFontRanges);
 			ImGui::GetIO().Fonts->AddFontFromMemoryTTF(standard.address, standard.size, 20.0f, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
 			ImGui::GetIO().Fonts->AddFontFromMemoryTTF(chinese.address,  chinese.size,  20.0f, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
 			ImGui::GetIO().Fonts->AddFontFromMemoryTTF(korean.address,   korean.size,   20.0f, std::addressof(font_cfg), ImGui::GetIO().Fonts->GetGlyphRangesKorean());

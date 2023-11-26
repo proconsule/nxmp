@@ -1039,26 +1039,6 @@ namespace GUI {
 		item.first_item = true;
 		while (!renderloopdone && appletMainLoop() && !nxmpgfx::WindowShouldClose())
 		{
-			nxmpstats->starttime = std::chrono::system_clock::now();
-			HandleEvents();
-			nxmpstats->eventtime = std::chrono::system_clock::now();
-			HandleLayers();
-			nxmpstats->layertime = std::chrono::system_clock::now();
-			HandleRender();
-			nxmpstats->rendertime = std::chrono::system_clock::now();
-			//if(dochangethemefont){
-			//	changeFontTheme();
-			//	dochangethemefont = false;
-			//}
-			
-			if(GUI::wakeup == 0){
-				batteryPercent = nxmpstats->batpercentage;
-			}
-			
-
-    		//rewrite switch state
-			
-			
 			
 			AppletOperationMode stus=appletGetOperationMode();
 			if (stus == AppletOperationMode_Handheld) {
@@ -1071,13 +1051,7 @@ namespace GUI {
 					currFontsize = 20.0f;
 					
 					reinit();
-					/*
-					if(videoout != nullptr)delete videoout;
-					videoout = new CVOUT();
-					videoout->Create_Framebuffer(newResW,newResH);
-					nxmpgfx::Resize(newResW,newResH);
-					videoout->Resize(newResW,newResH);
-					*/
+					
 				}
 			}
 			if (stus == AppletOperationMode_Console) {
@@ -1090,16 +1064,30 @@ namespace GUI {
 					currFontsize = 30.0f;
 					
 					reinit();
-					/*
-					if(videoout != nullptr)delete videoout;
-					videoout = new CVOUT();
-					videoout->Create_Framebuffer(newResW,newResH);
-					nxmpgfx::Resize(newResW,newResH);
-					videoout->Resize(newResW,newResH);
-					*/
 					
 				}
 			}
+			
+			
+			nxmpstats->starttime = std::chrono::system_clock::now();
+			HandleEvents();
+			nxmpstats->eventtime = std::chrono::system_clock::now();
+			HandleLayers();
+			nxmpstats->layertime = std::chrono::system_clock::now();
+			HandleRender();
+			nxmpstats->rendertime = std::chrono::system_clock::now();
+			
+			
+			if(GUI::wakeup == 0){
+				batteryPercent = nxmpstats->batpercentage;
+			}
+			
+
+    		//rewrite switch state
+			
+			
+			
+			
 			
 			if(GUI_REINIT){
 				reinit();

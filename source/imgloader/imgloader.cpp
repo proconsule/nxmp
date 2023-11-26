@@ -198,10 +198,58 @@ CImgLoader::~CImgLoader(){
 	icons.MPVTexture.id = 0;
 	icons.NXMPBannerTexture.id = 0;
 	
+#endif
+
+#ifdef DEKO3D_BACKEND
+	
+	/* Home Icons */
+	icons.SdCardTexture.memblock.destroy();
+	icons.UsbTexture.memblock.destroy();
+	icons.NetworkTexture.memblock.destroy();
+	icons.Enigma2Texture.memblock.destroy();
+	icons.UPNPTexture.memblock.destroy();
+	icons.PlaylistTexture.memblock.destroy();
+	icons.SettingsTexture.memblock.destroy();
+	icons.InfoTexture.memblock.destroy();
+	icons.ExitTexture.memblock.destroy();
+	
+	/* File Browser Icons */
+	icons.FileTexture.memblock.destroy();
+	icons.FolderTexture.memblock.destroy();
+	icons.GUI_D_UP.memblock.destroy();
+	icons.GUI_D_DOWN.memblock.destroy();
+	icons.GUI_D_LEFT.memblock.destroy();
+	icons.GUI_D_RIGHT.memblock.destroy();
+	icons.GUI_A_BUT.memblock.destroy();
+	icons.GUI_B_BUT.memblock.destroy();
+	icons.GUI_X_BUT.memblock.destroy();
+	icons.GUI_Y_BUT.memblock.destroy();
+	
+	/* Networks Icons */
+	icons.ShareAddTexture.memblock.destroy();
+	icons.HTTPTexture.memblock.destroy();
+	icons.FTPTexture.memblock.destroy();
+	icons.SFTPTexture.memblock.destroy();
+	icons.SMBTexture.memblock.destroy();
+	icons.NFSTexture.memblock.destroy();
+	
+	/* Player Icons */
+	icons.PlayIcon.memblock.destroy();
+	icons.StopIcon.memblock.destroy();
+	icons.PauseIcon.memblock.destroy();
+	icons.MuteIcon.memblock.destroy();
+	icons.VolumeIcon.memblock.destroy();
+	icons.LoopIcon.memblock.destroy();
+	icons.NoLoopIcon.memblock.destroy();
+	
+	/* Info Icons */
+	
+	icons.FFMPEGTexture.memblock.destroy();
+	icons.MPVTexture.memblock.destroy();
+	icons.NXMPBannerTexture.memblock.destroy();
 	
 	
-	
-	
+
 #endif
 	
 }

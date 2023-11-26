@@ -44,7 +44,7 @@ namespace Windows {
 					ImGui::TableSetColumnIndex(0);
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
     				
-					
+					if(n == MM_UPNP)ImGui::BeginDisabled();
 					
 					
 					if(n == MM_LOCALFILES){
@@ -201,6 +201,7 @@ namespace Windows {
 					ImGui::Text("%s",MainMenu_STR[n]);
 					ImGui::PopStyleVar();
 					
+					if(n == MM_UPNP)ImGui::EndDisabled();
 					
 				}
 				

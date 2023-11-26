@@ -588,6 +588,24 @@ void deko3dInit(bool docked_) {
 }
 
 void deko3dExit() {
+	
+	s_queue.waitIdle();
+	
+	splash_transfer.destroy();
+	
+	s_descriptorMemBlock.destroy();
+	for (unsigned i = 0; i < FB_NUM; ++i) {
+        s_cmdBuf[i].destroy();
+        s_cmdMemBlock[i].destroy();
+    }
+	s_codeMemBlock.destroy();
+	s_queue.destroy();
+    s_swapchain.destroy();
+    s_fbMemBlock.destroy();
+    s_depthMemBlock.destroy();
+    s_device.destroy();
+	
+	/*
     // clean up all of the deko3d objects
     s_descriptorMemBlock = nullptr;
 
@@ -601,6 +619,7 @@ void deko3dExit() {
     s_fbMemBlock    = nullptr;
     s_depthMemBlock = nullptr;
     s_device        = nullptr;
+	*/
 }
 
 
@@ -1001,7 +1020,8 @@ void deko3dExit() {
 		int bary = 720-40-barsizey;
 		if(docked){
 			barsizex=1620;
-			int barx = 1920-150;
+			barsizey=45;
+			bary = 1080-60-barsizey;
 		}
 		
 		unsigned int wsize = perc*barsizex/100;
@@ -1079,6 +1099,7 @@ void deko3dExit() {
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		NXLOG::DEBUGLOG("Init IMGUI OPENGL BACKEND\n");
 		ImGui_ImplOpenGL3_Init(glsl_version);
+		
 #endif
 
 #ifdef DEKO3D_BACKEND
@@ -1111,8 +1132,9 @@ void deko3dExit() {
 		s_shaders,
         FB_NUM);
 		
-		
 #endif
+		if(docked)ImGui::GetIO().FontGlobalScale = 1.5f;
+		if(!docked)ImGui::GetIO().FontGlobalScale = 1.0f;
 		//ImGuiStyle& style = ImGui::GetStyle();
 		//style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.62f);
 		
@@ -1126,10 +1148,10 @@ void deko3dExit() {
 		ImGui::DestroyContext();
 #endif
 #ifdef DEKO3D_BACKEND
-		
+		ImGui::DestroyContext();
 		
 #endif
-
+		
 	}
 	
 	void Destroy_Backend(){
@@ -1157,7 +1179,16 @@ void deko3dExit() {
 		glfwDestroyWindow(window);
 		glfwTerminate();
 #endif
-	
+#ifdef DEKO3D_BACKEND
+		ImGui::DestroyContext();
+		imgui::nx::exit();
+
+		// wait for queue to be idle
+		s_queue.waitIdle();
+
+		imgui::deko3d::exit();
+		deko3dExit();
+#endif
 	}
 	
 	void NewFrame(){
@@ -1183,12 +1214,15 @@ void deko3dExit() {
 #endif
 #ifdef DEKO3D_BACKEND
 
+		
 		if (s_width != io.DisplaySize.x || s_height != io.DisplaySize.y) {
 			s_width  = io.DisplaySize.x;
 			s_height = io.DisplaySize.y;
+			//if(s_width == 1280.0f)ImGui::GetIO().FontGlobalScale = 1.0f;
+			//if(s_width == 1920.0f)ImGui::GetIO().FontGlobalScale = 1.5f;
 			rebuildSwapchain(s_width, s_height);
 		}
-
+		
 		// get image from queue
 		imageSlot = s_queue.acquireImage(s_swapchain);
 		auto &cmdBuf    = s_cmdBuf[imageSlot];
@@ -1235,11 +1269,17 @@ void deko3dExit() {
 		HEIGHT = static_cast<int>(h);
 		glfwSetWindowSize(window,w,h);
 #endif
+#ifdef DEKO3D_BACKEND
+		//s_width  = w;
+		//s_height = h;
+		if(s_width == 1280.0f)ImGui::GetIO().FontGlobalScale = 1.0f;
+		if(s_width == 1920.0f)ImGui::GetIO().FontGlobalScale = 1.5f;
+		
+#endif
+
 	
 	}
-	void Quit(){
-		
-	}
+	
 	
 	uint64_t Process_UI_Events(std::chrono::time_point<std::chrono::system_clock> myeventtime){
 		
@@ -1729,7 +1769,7 @@ void deko3dExit() {
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0,0.0,0.0,0.0));
 		
 		if(ImGui::Begin("##videowindow",nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoNavFocus)){
-					ImGui::Image((void*)(intptr_t)mpv_fbotexture, ImVec2(WIDTH,HEIGHT),{0, 1}, {1, 0});
+					ImGui::Image((void*)(intptr_t)mpv_fbotexture, ImVec2(WIDTH,HEIGHT));
 		}
 		ImGui::End();
 		ImGui::PopStyleVar(3);
@@ -1813,6 +1853,15 @@ void deko3dExit() {
 #ifdef DEKO3D_BACKEND
 		imgui::nx::setEnableTouch(value);
 #endif
+#ifdef OPENGL_BACKEND
+		if(value){
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}else {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		}
+#endif
+
+
 	}
 	
 	

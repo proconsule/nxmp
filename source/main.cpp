@@ -306,11 +306,7 @@ int main(int argc, char* argv[]) {
 		configini->PrintConfig();
 	}
 	
-	if(configini->getExitMode(false) == 1){
-		app_exit_mode = 0;
-	}else if(configini->getExitMode(false) == 2){
-		app_exit_mode = 0;
-	}
+	
 	
 	appletInitializeGamePlayRecording();
     appletSetWirelessPriorityMode(AppletWirelessPriorityMode_OptimizedForWlan);
@@ -321,6 +317,11 @@ int main(int argc, char* argv[]) {
     nvInitialize();
     __nx_applet_type = saved_applet_type;
 	
+	if(configini->getDbActive(false) && !slaveplayer){
+		sqlitedb = new SQLiteDB(configini->getDbPath());
+		dbUpdated = sqlitedb->dbwasUpdated();
+	}
+	
 	nxmpgfx::Init_Backend(!isHandheld,configini->getVSYNC(false));
 	nxmpgfx::Init_Backend_Splash(!isHandheld);
 	
@@ -330,10 +331,7 @@ int main(int argc, char* argv[]) {
 	
 	playlist = new Playlist();
 	
-	if(configini->getDbActive(false) && !slaveplayer){
-		sqlitedb = new SQLiteDB(configini->getDbPath());
-		dbUpdated = sqlitedb->dbwasUpdated();
-	}
+	
 	
 	emuoverrides = configini->getEmuOverrides();
 	if(!emuoverrides){
@@ -345,6 +343,7 @@ int main(int argc, char* argv[]) {
 
 	
 	nxmpgfx::updateSplash(25);
+	
 	
 	
 	nxmpgfx::Init_ImGui(!isHandheld);
@@ -401,6 +400,13 @@ int main(int argc, char* argv[]) {
 	
 	
 	GUI::RenderLoop();
+	
+	if(configini->getExitMode(false) == 1){
+		app_exit_mode = 0;
+	}else if(configini->getExitMode(false) == 2){
+		app_exit_mode = 1;
+	}
+	
 	NXLOG::DEBUGLOG("Ending Render Loop\n");
 
 	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
@@ -413,15 +419,6 @@ int main(int argc, char* argv[]) {
 	NXLOG::DEBUGLOG("Ending MPV\n");
 		
 	DeallocateExtern();	
-	if(imgloader != nullptr){
-		delete imgloader;
-		imgloader = nullptr;
-	}
-	
-	
-	
-	nxmpgfx::Destroy();
-	nxmpgfx::Quit();
 	
 	
 	if(nxmpstats != nullptr){
@@ -429,6 +426,13 @@ int main(int argc, char* argv[]) {
 		delete nxmpstats;
 		nxmpstats = nullptr;
 	}
+	
+	if(imgloader != nullptr){
+		delete imgloader;
+		imgloader = nullptr;
+	}
+	
+	nxmpgfx::Destroy();
 	
 	if(!emuoverrides){
 		audctlExit();
@@ -443,7 +447,7 @@ int main(int argc, char* argv[]) {
     }
 
 	nifmExit();
-	
+	plExit();
     
 	
 	NXLOG::DEBUGLOG("Socket End\n");
