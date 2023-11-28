@@ -21,6 +21,8 @@ public:
 	void ResetDbStatus();
 	
 	int sortOrder = 0;
+	
+	bool getfileContents(std::string filepath,unsigned char ** _filedata,int &_size);
 
 private:
 	Playlist * playlist;

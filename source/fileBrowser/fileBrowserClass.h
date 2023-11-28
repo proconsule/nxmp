@@ -40,6 +40,8 @@ public:
 	void clearChecked();
 	bool *checked(int pos);
 	
+	bool getfileContents(std::string filepath,unsigned char ** _filedata,int &_size);
+	
 	void setSordOrder(FS::FILESORTORDER myorder);
 	void SetFileDbStatus(int idx,int dbstatus);
 	void ResetDbStatus();

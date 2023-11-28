@@ -61,11 +61,16 @@ namespace Windows {
 						if(thislist[n].type == UPNPTYPE::UPNPContainer){
 							ImGui::Image((void*)(intptr_t)imgloader->icons.FolderTexture.id, ImVec2(40,40));
 						}else{
+#ifdef OPENGL_BACKEND
 							if(thislist[n].albumart.id ==0){
 								ImGui::Image((void*)(intptr_t)imgloader->icons.FileTexture.id, ImVec2(40,40));
 							}else{
 								ImGui::Image((void*)(intptr_t)thislist[n].albumart.id, ImVec2(thislist[n].albumart.width/2,thislist[n].albumart.height/2));
 							}
+#endif
+#ifdef DEKO3D_BACKEND		
+							ImGui::Dummy(ImVec2(40.0f,40.0f));
+#endif
 						}
 						ImGui::SameLine();
 						std::string itemid = "##" + std::to_string(n);

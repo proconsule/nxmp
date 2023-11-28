@@ -1,5 +1,5 @@
 #include "localFs.h"
-
+#include <stdio.h>
 
 localFs::localFs(std::string _path,Playlist * _playlist){
 	currentpath = _path;
@@ -37,6 +37,8 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 
 		if (!path.empty()) {
 			if ((dir = opendir(path.c_str())) != nullptr) {
+				FsFileSystem sdmc;
+				fsOpenSdCardFileSystem(&sdmc);
 				while ((ent = readdir(dir)) != nullptr) {
 					if ((path == "/" || strlen(ent->d_name) == 1) && ent->d_name[0] == '.') {
 						continue;
@@ -58,14 +60,23 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 					
 					
 					
+					//FsFileSystem sdmc;
+					FsTimeStampRaw timestamp = {0};
+					//fsOpenSdCardFileSystem(&sdmc);
+					char safe_buf[FS_MAX_PATH];
+					strcpy(safe_buf, file.path.c_str());
+					fsFsGetFileTimeStampRaw(&sdmc, safe_buf, &timestamp);
+					
+					
+					
 					struct stat st{0};
 					if (stat(file.path.c_str(), &st) == 0) {
 						file.size = (size_t) st.st_size;
 						file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
-						file.is_valid = 0;
-						file.created = (time_t)st.st_ctime;
-						file.modified = (time_t)st.st_mtime;
-						file.accessed = (time_t)st.st_atime;
+						file.is_valid = 1;
+						file.created = timestamp.created;
+						file.modified = timestamp.modified;
+						file.accessed = timestamp.accessed;
 					}
 					
 					
@@ -84,7 +95,7 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 					}
 
 				}
-			
+				fsFsClose(&sdmc);
 				closedir(dir);
 				if(sortOrder == FS::FS_NAME_ASCENDINGORDER){
 					std::sort(currentlist.begin(), currentlist.end(), FS::SortNameAsc);
@@ -127,4 +138,16 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 		for(int i=0;i<currentlist.size();i++){
 			currentlist[i].dbread = -1;
 		}
+	}
+	
+	
+	bool localFs::getfileContents(std::string filepath,unsigned char ** _filedata,int &_size){
+		FILE * infile = fopen(filepath.c_str(), "rb");
+		fseek(infile, 0L, SEEK_END);
+		_size = ftell(infile);
+		fseek(infile, 0L, SEEK_SET);
+		*_filedata = (unsigned char*)malloc(_size*sizeof(unsigned char)); 
+		fread(*_filedata, sizeof(unsigned char), _size, infile);
+		fclose(infile);
+		return true;
 	}

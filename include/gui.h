@@ -82,6 +82,7 @@ enum MENU_STATES {
 	MENU_STATE_PLAYER,
 	MENU_STATE_PLAYERCACHING,
 	MENU_STATE_APPEXIT,
+	MENU_STATE_IMGVIEWER,
 	MENU_STATE_GUILESS
 };
 
@@ -176,6 +177,7 @@ typedef struct {
     
 } MenuItem;
 
+#ifdef OPENGL_BACKEND
 typedef struct {
 	Tex SdCardTexture;
 	Tex UsbTexture;
@@ -225,7 +227,7 @@ typedef struct {
 		
 } SysIcons;
 
-
+#endif
 
 //extern SDL_Window *window;
 extern MenuItem item;

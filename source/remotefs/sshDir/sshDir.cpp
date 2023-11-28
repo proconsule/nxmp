@@ -230,7 +230,84 @@ void sshDir::clearChecked(){
 	}
 }
 
+bool sshDir::getfileContents(std::string filepath,unsigned char ** _filedata,int &_size){
+	
+	int rc, sock;
+    struct sockaddr_in sin;
+	//const char *fingerprint;
+	LIBSSH2_SESSION *session;
+    LIBSSH2_SFTP *sftp_session;
+    LIBSSH2_SFTP_HANDLE *sftp_handle;
+	LIBSSH2_CHANNEL *channel;
+    libssh2_struct_stat fileinfo;
+	
+	urlschema thisurl = Utility::parseUrl(url);
+	
+	rc = libssh2_init(0);
+	unsigned long hostaddr;
+	hostaddr = inet_addr(thisurl.server.c_str());
+    if(rc != 0) {
+        NXLOG::ERRORLOG("libssh2 initialization failed (%d)\n", rc);
+		errormsg = "libssh2 initialization failed";
+		return false;
+    }
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+ 
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(thisurl.port.empty() ? 22 : std::stoi(thisurl.port));
+    sin.sin_addr.s_addr = hostaddr;
+    if(connect(sock, (struct sockaddr*)(&sin),
+               sizeof(struct sockaddr_in)) != 0) {
+        NXLOG::ERRORLOG("failed to connect!\n");
+		errormsg = "failed to connect!";
+		return false;
+    }
+	session = libssh2_session_init();
+    if(!session){
+		NXLOG::ERRORLOG("unable to create session\n");
+		errormsg = "failed to connect!";
+		return false;
+	}
+	rc = libssh2_session_handshake(session, sock);
 
+    if(rc) {
+        NXLOG::ERRORLOG("Failure establishing SSH session: %d\n", rc);
+		errormsg = "Failure establishing SSH session: " + std::to_string(rc);
+		return false;
+    }
+	//fingerprint = libssh2_hostkey_hash(session, LIBSSH2_HOSTKEY_HASH_SHA1);
+	
+	if(libssh2_userauth_password(session, thisurl.user.c_str(), thisurl.pass.c_str())) {
+
+		NXLOG::ERRORLOG("\tAuthentication by password failed!\n");
+		errormsg = "Authentication by password failed!";
+		return false;
+	}
+    else {
+		NXLOG::DEBUGLOG("\tAuthentication by password succeeded.\n");
+	}
+	
+	
+	libssh2_session_set_blocking(session, 1);
+	channel = libssh2_scp_recv2(session, filepath.c_str(), &fileinfo);
+	
+	_size = fileinfo.st_size;
+	*_filedata = (unsigned char *)malloc(fileinfo.st_size);
+	
+	libssh2_channel_read(channel, *_filedata, fileinfo.st_size);
+	
+	libssh2_channel_free(channel);
+
+	libssh2_session_disconnect(session, "Normal Shutdown");
+
+    libssh2_session_free(session);
+
+    close(sock);
+    libssh2_exit();
+	
+	NXLOG::DEBUGLOG("\tFile Read OK\n");
+	return true;
+}
 
 void sshDir::backDir(){
 	if(currentpath.find_last_of("/") == 0)currentpath = basepath;

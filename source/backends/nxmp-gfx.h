@@ -66,9 +66,8 @@
 
 #define FONT_SPEAKER_ICON "\xEE\x84\xBC"
 
-
-
-
+#define FONT_LEFTSTICK "\xEE\x83\x81"
+#define FONT_RIGHTSTICK "\xEE\x83\x82"
 
 #ifdef DEKO3D_BACKEND
 struct Texture {
@@ -78,6 +77,16 @@ struct Texture {
 		unsigned int width;
 		unsigned int height;
 	};
+
+#endif
+
+#ifdef OPENGL_BACKEND
+
+typedef struct {
+    GLuint id = 0;
+    int width = 0;
+    int height = 0;
+} Tex;
 
 #endif
 
@@ -156,15 +165,6 @@ namespace nxmpgfx{
 	
 #endif
 
-#ifdef DEKO3D_BACKEND
-	
-	//extern unsigned int WIDTH;
-	//extern unsigned int HEIGHT; 
-	
-	Texture load_texture(std::string path,DkImageFormat format, std::uint32_t flags,int desc_slot);
-	
-	
-#endif
 
 	extern bool docked;
 	extern float windowed_width;
@@ -223,8 +223,17 @@ namespace nxmpgfx{
 	void queueWaitDoneFence();
 	void queueSignalFence(DkFence* fence, bool flash = false);
 	void queueFlush();
+	unsigned int getMaxSamplers();
+	
+	
+	Texture load_texture(std::string path,DkImageFormat format, std::uint32_t flags,int desc_slot);
+	Texture load_texture_from_mem(unsigned char *image_data,int img_size,DkImageFormat format, std::uint32_t flags,int desc_slot);
+	
+	
 	
 #endif
+
+	void setBGAlpha(float value);
 
 	void getSystemVolume(float &value);
 	void setSystemVolume(float value);

@@ -7,10 +7,11 @@
 - Added Brazilian Portuguese language
 - Added deko3d Backend capable of 4K HDR 60fps decoding (experimental)
 - Light/Dark Theme (mimic the native HOS UI)
+- Added a trivial image viewer instead of using mpv
 
-## Changes
+# Removed
 
-- New Settings UI
+- UPNP is disabled since need major rewrite of code
 - Removed old themes class (will be replaced with new one when ready)
 - Removed old ttf font used (now it uses the system default font)
 
@@ -21,6 +22,10 @@
 ### Knonw Issues
 
 - deko3d Backend is experimental and can have issues or missing some features
+- Shader deinterlace is not working on deko3d backend
+- Shadermania is not working on deko3d backend
+- Miniplayer is not working on deko3dbackend
+
 
 ## [0.8.2]
 

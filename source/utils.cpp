@@ -105,7 +105,7 @@ namespace Utility{
 		int image_height = 0;
 		int comp = 0;
 #ifdef OPENGL_BACKEND		
-		unsigned char* image_data = stbi_load_from_memory((const stbi_uc *)data, image_size, &image_width, &image_height, &comp, 0); 
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc *)data, image_size, &image_width, &image_height, 0, 4); 
 		
 		if (image_data == NULL){
 			NXLOG::ERRORLOG("Failed to load IMG from memory\n");
@@ -119,10 +119,10 @@ namespace Utility{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		
 		
-		if(comp == 3)
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
-		else if(comp == 4)
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+		//if(comp == 3)
+		//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+		//else if(comp == 4)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 
 		
 		

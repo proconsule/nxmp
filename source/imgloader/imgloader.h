@@ -116,6 +116,17 @@ public:
 		CImgLoader(std::string basepath);
 		~CImgLoader();
 		nxmpicon_struct icons;
+		
+		bool isImageExtension(std::string path);
+		
+#ifdef OPENGL_BACKEND
+		Tex OpenImageFile(std::string path);
+		Tex OpenImageMemory(unsigned char *_img_data,int _size);
+#endif
+#ifdef DEKO3D_BACKEND
+		Texture OpenImageFile(std::string path);
+		Texture OpenImageMemory(unsigned char *_img_data,int _size);
+#endif
 
 };
 

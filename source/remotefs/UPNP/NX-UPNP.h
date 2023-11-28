@@ -24,7 +24,7 @@
 #ifdef __SWITCH__
 #include <switch.h>
 
-
+#include "nxmp-gfx.h"
 
 using namespace tinyxml2;
 
@@ -43,7 +43,11 @@ struct upnpres_struct{
 	std::string uri;
 	int64_t size;
 	UPNPTYPE type;
+#ifdef OPENGL_BACKEND
 	Tex albumart;
+#endif
+
+
 	int duration;
 	std::string albumarturi;
 };
@@ -55,7 +59,12 @@ public:
 	std::string getIP();
 	std::string getfriendlyName();
 	std::string getUDN();
+#ifdef OPENGL_BACKEND
 	Tex devIcon;
+#endif
+#ifdef DEKO3D_BACKEND
+	Texture devIcon;
+#endif
 	std::string iconUrl;
 	void browseOID();
 	void back();

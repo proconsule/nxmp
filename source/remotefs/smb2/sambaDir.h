@@ -36,6 +36,8 @@ public:
 	void SetFileDbStatus(int idx,int dbstatus);
 	void ResetDbStatus();
 	
+	bool getfileContents(std::string filepath,unsigned char ** _filedata,int &_size);
+	
 	std::string errormsg = "";
 	
 private:

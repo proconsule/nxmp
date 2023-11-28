@@ -392,3 +392,15 @@ void USBMounter::ResetDbStatus(){
 		currentlist[i].dbread = -1;
 	}
 }
+
+
+bool USBMounter::getfileContents(std::string filepath,unsigned char ** _filedata,int &_size){
+	FILE * infile = fopen(filepath.c_str(), "rb");
+	fseek(infile, 0L, SEEK_END);
+	_size = ftell(infile);
+	fseek(infile, 0L, SEEK_SET);
+	*_filedata = (unsigned char*)malloc(_size*sizeof(unsigned char)); 
+	fread(*_filedata, sizeof(unsigned char), _size, infile);
+	fclose(infile);
+	return true;
+}

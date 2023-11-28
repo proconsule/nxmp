@@ -18,6 +18,14 @@ extern CTextScroller * playerTextScroller;
 
 namespace Windows {
 
+#ifdef DEKO3D_BACKEND
+	extern Texture currentImg;
+#endif
+#ifdef OPENGL_BACKEND
+	extern Tex currentImg;
+#endif		
+
+
 	extern int netwinselected;
 	extern int lastthemeprevidx;
 	
@@ -79,6 +87,9 @@ namespace Windows {
     
 	void SettingsUIWindow(bool *focus, bool *first_item);
 	
+	void imageViewer();
+	void setImageZoom(float zoomfactor);
+	float getImageZoom();
 	
 	std::string ShowSWKeyboard(std::string InitialValueStr,std::string headertext = "",bool numeric = false);
 	

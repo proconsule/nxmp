@@ -414,3 +414,28 @@
 		}
 		return std::vector<usb_devices>();
 	}
+	
+	bool CFileBrowser::getfileContents(std::string filepath,unsigned char ** _filedata,int &_size){
+		if(mylocal!= nullptr){
+			return mylocal->getfileContents(filepath,_filedata,_size); 
+		}
+		if(mysamba!= nullptr){
+			mysamba->getfileContents(filepath,_filedata,_size); 
+		}
+		if(myssh!= nullptr){
+			return myssh->getfileContents(filepath,_filedata,_size); 
+		}
+		if(myftp!= nullptr){
+			//myftp->SetFileDbStatus(idx,dbstatus);
+		}
+		if(myhttp!= nullptr){
+			//myhttp->SetFileDbStatus(idx,dbstatus);
+		}
+		if(mynfs!= nullptr){
+			//mynfs->SetFileDbStatus(idx,dbstatus);
+		}
+		if(myusb!= nullptr){
+			myusb->getfileContents(filepath,_filedata,_size);
+		}
+		return false;
+	}

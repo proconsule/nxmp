@@ -73,8 +73,8 @@ namespace nxmpgfx{
 	//unsigned int WIDTH = 1920;
 	//unsigned int HEIGHT = 1080;
 	
-	constexpr auto MAX_SAMPLERS = 28;
-	constexpr auto MAX_IMAGES   = 28;
+	constexpr auto MAX_SAMPLERS = 29;
+	constexpr auto MAX_IMAGES   = 29;
 
 	constexpr auto FB_NUM       = 2u;
 
@@ -1341,6 +1341,9 @@ void deko3dExit() {
 		if (keydown & HidNpadButton_Minus && !B_MINUS_PRESS){
 			ret_event = bit_set(ret_event,BUT_MINUS);
 		}
+		if (keydown & HidNpadButton_Plus && !B_PLUS_PRESS){
+			ret_event = bit_set(ret_event,BUT_PLUS);
+		}
 		   
 		   
 		B_ZL_PRESS = keydown & HidNpadButton_ZL;
@@ -1361,7 +1364,7 @@ void deko3dExit() {
 		B_TR_PRESS = keydown & HidNpadButton_StickR;
 		B_TL_PRESS = keydown & HidNpadButton_StickL;
 
-		//B_PLUS_PRESS = state.buttons[GLFW_GAMEPAD_BUTTON_START] == GLFW_PRESS;
+		B_PLUS_PRESS =  keydown & HidNpadButton_Plus;
 		B_MINUS_PRESS = keydown & HidNpadButton_Minus;
 			
 			
@@ -1468,10 +1471,10 @@ void deko3dExit() {
 				ret_event = bit_set(ret_event,B_AX_L_LEFT);
 			}
 			
-			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]>0.25f && !AX_R_DOWN.pressed){
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]>0.25f /*&& !AX_R_DOWN.pressed*/){
 				ret_event = bit_set(ret_event,B_AX_R_DOWN);
 			}
-			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]<-0.25f && !AX_R_UP.pressed){
+			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]<-0.25f /*&& !AX_R_UP.pressed*/){
 				ret_event = bit_set(ret_event,B_AX_R_UP);
 			}
 			if(state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]>0.25f && !AX_R_RIGHT.pressed){
@@ -1673,6 +1676,64 @@ void deko3dExit() {
 		return Texture{out_image, std::move(out_memblock), out_handle,width,height};
 	}
 
+	Texture load_texture_from_mem(unsigned char *_image_data,int _img_size,DkImageFormat format, std::uint32_t flags,int desc_slot) {
+		
+		if(_image_data == NULL)return {};
+		auto &cmdbuf = s_cmdBuf[0];
+		 
+		int width, height, channels;
+		unsigned char* image_data = stbi_load_from_memory(_image_data,_img_size, &width, &height, NULL, 4);
+			if (image_data == NULL)
+				return {};
+		
+		 
+
+		dk::UniqueMemBlock transfer = dk::MemBlockMaker(s_device, imgui::deko3d::align(width*height*4, DK_MEMBLOCK_ALIGNMENT))
+			.setFlags(DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached)
+			.create();
+
+		
+		memcpy(transfer.getCpuAddr(),image_data,width*height*4);
+		
+
+		dk::ImageLayout layout;
+		dk::ImageLayoutMaker(s_device)
+			.setFlags(flags)
+			.setFormat(format)
+			.setDimensions(width, height)
+			.initialize(layout);
+
+		dk::UniqueMemBlock out_memblock = dk::MemBlockMaker(s_device,
+				imgui::deko3d::align(layout.getSize(), std::max(layout.getAlignment(), std::uint32_t(DK_MEMBLOCK_ALIGNMENT))))
+			.setFlags(DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached | DkMemBlockFlags_Image)
+			.create();
+		if (!out_memblock) {
+			std::printf("Failed to allocate memblock\n");
+			return {};
+		}
+
+		dk::Image out_image;
+		out_image.initialize(layout, out_memblock, 0);
+
+		auto out_view = dk::ImageView(out_image);
+		auto sampler = dk::Sampler()
+			.setFilter(DkFilter_Linear, DkFilter_Linear)
+			.setWrapMode(DkWrapMode_ClampToEdge, DkWrapMode_ClampToEdge, DkWrapMode_ClampToEdge);
+
+		
+		s_samplerDescriptors[desc_slot].initialize(sampler);
+		s_imageDescriptors  [desc_slot].initialize(out_view);
+		auto out_handle = dkMakeTextureHandle(desc_slot, desc_slot);
+
+		cmdbuf.copyBufferToImage(DkCopyBuf{transfer.getGpuAddr()}, out_view,
+			DkImageRect{0, 0, 0, std::uint32_t(width), std::uint32_t(height), 1});
+		cmdbuf.barrier(DkBarrier_None, DkInvalidateFlags_Descriptors);
+		s_queue.submitCommands(cmdbuf.finishList());
+		s_queue.waitIdle();
+
+		return Texture{out_image, std::move(out_memblock), out_handle,width,height};
+	}
+
 #endif
 	
 	void Create_VO_FrameBuffer(float w,float h){
@@ -1813,6 +1874,11 @@ void deko3dExit() {
 	void queueWaitDoneFence(){
 		dkQueueWaitFence(s_queue, &doneFence);
 	}
+	
+	unsigned int getMaxSamplers(){
+		return MAX_SAMPLERS;
+	}
+	
 		
 
 #endif
@@ -1864,6 +1930,11 @@ void deko3dExit() {
 
 	}
 	
+	
+	void setBGAlpha(float value){
+		Window_Bg_color.w = value;
+	}
+
 	
 	void SetColorTheme(int themecolor){
 		

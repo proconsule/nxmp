@@ -32,6 +32,8 @@ public:
 	
 	std::string errormsg = "";
 	
+	bool getfileContents(std::string filepath,unsigned char ** _filedata,int &_size);
+	
 private:
 	std::vector<FS::FileEntry> currentlist;
 	std::string url;

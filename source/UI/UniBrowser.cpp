@@ -33,9 +33,9 @@ namespace Windows {
 			std::vector<FS::FileEntry> thislist = filebrowser->getCurrList();
 			bool triggerselect = false;
 			
-#ifdef OPENGL_BACKEND
-			if(!libmpv->Stopped() && item.state != MENU_STATE_PLAYER){
 
+			if(!libmpv->Stopped() && item.state != MENU_STATE_PLAYER){
+#ifdef OPENGL_BACKEND
 				ImVec2 image_pnew	= ImVec2((1280.0*multiplyRes-300.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x),(720.0*multiplyRes-200.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
 				ImVec2 image_p1 = ImVec2((1280.0*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.x), (720.0*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y));
 		
@@ -46,12 +46,11 @@ namespace Windows {
 				ImVec2 image_p1_border = image_p1 + ImVec2(1,1);
 				
 				ImGui::GetForegroundDrawList()->AddRect(image_pnew_border, image_p1_border, ImGui::GetColorU32(ImVec4(1.0f,0.0f,0.0f,1.0f)), 0.0f);
-				ImGui::GetForegroundDrawList()->AddImage((void*)(intptr_t)nxmpgfx::getFBO_Texture(), image_pnew, image_p1, {0, 1}, {1, 0});
+				ImGui::GetForegroundDrawList()->AddImage((void*)(intptr_t)nxmpgfx::getFBO_Texture(), image_pnew, image_p1);
 				
-				//ImGui::Image((void*)(intptr_t)nxmpgfx::getFBO_Texture(), ImVec2(nxmpgfx::windowed_width,nxmpgfx::windowed_height),{0, 1}, {1, 0});
-
-			}
 #endif
+			}
+
 			
 			
 			ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-45*multiplyRes));
@@ -119,15 +118,31 @@ namespace Windows {
 										filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 									} else{
 										item.laststate = item.state;
-										playlist->clearPlaylist();
-										filebrowser->clearChecked();
-										NXLOG::DEBUGLOG("OPEN FILE: %s\n",(filebrowser->getOpenUrlPart()+thislist[n].path).c_str());
-										libmpv->loadFile(filebrowser->getOpenUrlPart()+thislist[n].path);
-										if(configini->getDbActive(true)){
-											libmpv->getFileInfo()->resume = sqlitedb->getResume(filebrowser->getOpenUrlPart()+thislist[n].path);
-											if(libmpv->getFileInfo()->resume>0){
-												item.popupstate = POPUP_STATE_RESUME;
+										
+										if(imgloader->isImageExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
+											unsigned char * img_data = NULL;
+											int img_size;
+											if(filebrowser->getfileContents(thislist[n].path,&img_data,img_size)){
+												NXLOG::DEBUGLOG("filesize %d\n",img_size);
+												item.state = MENU_STATE_IMGVIEWER;
+												Windows::setImageZoom(1.0f);
+												Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
+												if(img_data!=NULL)free(img_data);
 											}
+											
+										}else{
+										
+											playlist->clearPlaylist();
+											filebrowser->clearChecked();
+											NXLOG::DEBUGLOG("OPEN FILE: %s\n",(filebrowser->getOpenUrlPart()+thislist[n].path).c_str());
+											libmpv->loadFile(filebrowser->getOpenUrlPart()+thislist[n].path);
+											if(configini->getDbActive(true)){
+												libmpv->getFileInfo()->resume = sqlitedb->getResume(filebrowser->getOpenUrlPart()+thislist[n].path);
+												if(libmpv->getFileInfo()->resume>0){
+													item.popupstate = POPUP_STATE_RESUME;
+												}
+											}
+										
 										}
 									}
 								}
@@ -272,7 +287,7 @@ namespace Windows {
 			if(triggerselect == true){
 				*first_item = true;
 			}
-				
+			
 			ImGui::PopStyleColor(2);
 			ImGui::PopStyleVar();
         }

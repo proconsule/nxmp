@@ -2,6 +2,18 @@
 #include "nxmp-gfx.h"
 #include "logger.h"
 
+
+enum{
+	JPGFILE,
+	PNGFILE,
+	BMPFILE,
+	WEBPFILE,
+	GIFFILE
+	
+};
+
+
+
 CImgLoader::CImgLoader(std::string basepath){
 
 #ifdef OPENGL_BACKEND
@@ -253,3 +265,102 @@ CImgLoader::~CImgLoader(){
 #endif
 	
 }
+
+int guessImageFormat(std::string path){
+	char testread[5];
+	FILE *fptr = fopen(path.c_str(), "rb");
+	int guessret = -1;
+	
+	
+	
+	if(fgets(testread,5,fptr)) {
+		testread[4]=0;
+		NXLOG::DEBUGLOG("AAAA: %d %d %d %d",testread[0],testread[1],testread[2],testread[3]);
+		if(!strcmp((char *)testread,"GIF8")) {
+			guessret = GIFFILE;
+		}
+		else if(testread[0]==0xff && testread[1]==0xd8){
+			guessret = JPGFILE;
+		}
+		else if(testread[0]==0x89 && testread[1]==0x50 && testread[2]==0x4e && testread[3]==0x47) {
+			guessret = PNGFILE;
+		}
+		else if(testread[0]==0x42 && testread[1]==0x4d) {
+			guessret = BMPFILE;
+		}
+	}
+	fclose(fptr);
+	return guessret;
+}	
+
+
+#ifdef OPENGL_BACKEND
+Tex CImgLoader::OpenImageFile(std::string path){
+	int myformat = guessImageFormat(path);
+	if(myformat == -1){
+		return {};
+	}
+	GLuint img_id = 0;
+    int img_width = 0;
+    int img_height = 0;
+	
+	if(myformat == JPGFILE || myformat == PNGFILE || myformat == BMPFILE || myformat == GIFFILE){
+		Utility::TxtLoadFromFile(path,&img_id,&img_width,&img_height);
+		
+		return {img_id,img_width,img_height};
+	}
+	
+	return {};
+	
+}
+
+Tex CImgLoader::OpenImageMemory(unsigned char *_img_data,int _size){
+	GLuint img_id = 0;
+    int img_width = 0;
+    int img_height = 0;
+	Utility::TxtLoadFromMemory(_img_data,_size,&img_id,&img_width,&img_height);
+	return {img_id,img_width,img_height};
+}
+
+
+#endif
+#ifdef DEKO3D_BACKEND
+
+
+Texture CImgLoader::OpenImageMemory(unsigned char *_img_data,int _size){
+	return nxmpgfx::load_texture_from_mem(_img_data,_size,DkImageFormat_RGBA8_Unorm, 0,nxmpgfx::getMaxSamplers()-1);
+}
+
+
+Texture CImgLoader::OpenImageFile(std::string path){
+	
+	int myformat = guessImageFormat(path);
+	if(myformat == -1){
+		return {};
+	}
+	
+	//if(guessImageFormat(path) == -1){
+	//	return {};
+	//}			
+	
+	int width, height;
+	unsigned char* image_data;
+	
+	
+	if(myformat == JPGFILE || myformat == PNGFILE || myformat == BMPFILE || myformat == GIFFILE){
+		return nxmpgfx::load_texture(path,DkImageFormat_RGBA8_Unorm, 0,nxmpgfx::getMaxSamplers()-1);
+	} 
+	
+	return {};
+}
+
+#endif
+
+bool CImgLoader::isImageExtension(std::string path){
+	if(Utility::endsWith(path,".jpg",false) || Utility::endsWith(path,".png",false) || Utility::endsWith(path,".bmp",false)){
+		return true;
+	}
+										
+	return false;
+}
+

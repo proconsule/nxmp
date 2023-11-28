@@ -766,8 +766,8 @@ static void ImGui_ImplGlfw_UpdateGamepads()
 	MAP_ANALOG(ImGuiKey_LeftArrow,    GLFW_GAMEPAD_AXIS_LEFT_X,0,      -0.25f,  -1.0f);
 	MAP_ANALOG(ImGuiKey_RightArrow,    GLFW_GAMEPAD_AXIS_LEFT_Y,           1,      +0.25f,  +1.0f);
 	
-	MAP_ANALOG(ImGuiKey_GamepadLStickUp,    GLFW_GAMEPAD_AXIS_RIGHT_Y,           3,      -0.25f,  -1.0f);
-    MAP_ANALOG(ImGuiKey_GamepadLStickDown,  GLFW_GAMEPAD_AXIS_RIGHT_Y,           3,      +0.25f,  +1.0f);
+	//MAP_ANALOG(ImGuiKey_GamepadLStickUp,    GLFW_GAMEPAD_AXIS_RIGHT_Y,           3,      -0.25f,  -1.0f);
+    //MAP_ANALOG(ImGuiKey_GamepadLStickDown,  GLFW_GAMEPAD_AXIS_RIGHT_Y,           3,      +0.25f,  +1.0f);
 	
 	#undef MAP_BUTTON
     #undef MAP_ANALOG

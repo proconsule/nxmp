@@ -1,4 +1,7 @@
 #include "sambaDir.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define MAX_URL_SIZE 1024
 
@@ -235,3 +238,90 @@ void sambaDir::SetFileDbStatus(int idx,int dbstatus){
 			currentlist[i].dbread = -1;
 		}
 	}
+	
+	
+bool sambaDir::getfileContents(std::string filepath,unsigned char ** _filedata,int &_size){
+	struct smb2_context *smb2;
+	
+	
+	struct smb2fh *fh;
+	struct smb2_stat_64 st;
+	
+
+	urlschema thisurl = Utility::parseUrl(url);
+
+	
+	
+	smb2 = smb2_init_context();
+	if (smb2 == NULL) {
+		NXLOG::ERRORLOG("SMB2 Failed to init context\n");
+		errormsg = "SMB2 Failed to init context";
+		return false;
+	
+	}
+	
+	
+	struct smb2_url *myurl = smb2_parse_url(smb2,url.c_str());
+	
+	NXLOG::DEBUGLOG("user: %s\n",myurl->user);
+	NXLOG::DEBUGLOG("pass: %s\n",myurl->pass);
+	fflush(stdout);
+	if(myurl->user != NULL){
+		smb2_set_user(smb2,myurl->user); 
+	}else{
+		smb2_set_user(smb2,"Guest"); 
+	}
+	//token = strtok(NULL, search);
+	if(myurl->pass != NULL){
+		smb2_set_password(smb2,myurl->pass); 
+	}
+	smb2_set_security_mode(smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
+	
+	NXLOG::DEBUGLOG("SMBURL: %s %s %s\n",myurl->share,myurl->path,filepath.c_str());
+	
+	
+	if (smb2_connect_share(smb2, myurl->server, myurl->share, NULL) < 0) {
+		NXLOG::ERRORLOG("smb2_connect_share failed. %s\n", smb2_get_error(smb2));
+		errormsg = std::string("smb2_connect_share failed. ") + std::string(smb2_get_error(smb2));
+		return false;
+	}
+	NXLOG::DEBUGLOG("SMB2: Share Connected\n");
+	
+	if (smb2_stat(smb2, filepath.c_str(), &st) < 0) {
+		NXLOG::DEBUGLOG("smb2_stat failed. %s", smb2_get_error(smb2));
+		return false;
+	}
+	
+	
+	
+	
+	
+	fh = smb2_open(smb2, filepath.c_str(), O_RDONLY);
+	if (fh == NULL) {
+		NXLOG::DEBUGLOG("smb2_open failed. %s\n", smb2_get_error(smb2));
+		return false;
+	}
+	
+	_size = st.smb2_size;
+	*_filedata = (unsigned char *)malloc(st.smb2_size);
+	int count = smb2_pread(smb2, fh, *_filedata, st.smb2_size, 0);
+	
+	if (count < 0) {
+		smb2_close(smb2, fh);
+		smb2_disconnect_share(smb2);
+		smb2_destroy_url(myurl);
+		smb2_destroy_context(smb2);
+		NXLOG::DEBUGLOG("SMB2 Failed to read file");
+		return false;
+	}
+	
+
+	
+	smb2_close(smb2, fh);
+	smb2_disconnect_share(smb2);
+	smb2_destroy_url(myurl);
+	smb2_destroy_context(smb2);
+	
+	return true;
+	
+}

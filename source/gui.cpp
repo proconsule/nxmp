@@ -185,6 +185,9 @@ namespace GUI {
 				appletSetMediaPlaybackState(false);
 				struct mpv_event_end_file *eof = (struct mpv_event_end_file *)mp_event->data;
 				libmpv->setLoop(false);
+#ifdef DEKO3D_BACKEND
+				nxmpgfx::setBGAlpha(1.0f);
+#endif
 				if(slaveplayer){
 					renderloopdone = true;
 				}
@@ -447,21 +450,47 @@ namespace GUI {
 		
 		if(event_ret>0){
 			
+			if(is_bit_set(event_ret,nxmpgfx::B_AX_R_UP)){
+				if(item.state == MENU_STATE_IMGVIEWER){
+					Windows::setImageZoom(Windows::getImageZoom()+0.1);
+				}else{
+					ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadLStickUp,true);
+				}
+			}
+			
+			if(is_bit_set(event_ret,nxmpgfx::B_AX_R_DOWN)){
+				if(item.state == MENU_STATE_IMGVIEWER){
+					if(Windows::getImageZoom()>=1.1f){
+						Windows::setImageZoom(Windows::getImageZoom()-0.1);
+					}
+				}else{
+					ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadLStickDown,true);
+				}
+			}
+			
 			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_UP)){
-				//ImGui::PushButtonRepeat(true);
-				//ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadUp,true);
-				//ImGui::PopButtonRepeat();
+				if(item.state == MENU_STATE_IMGVIEWER){
+					
+				}
 			}
 			
 			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_DOWN)){
-				//ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadDown,true);
+				if(item.state == MENU_STATE_IMGVIEWER){
+					
+				}
 			}
 			
 			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_LEFT)){
+				if(item.state == MENU_STATE_IMGVIEWER){
+					
+				}
 				ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadLeft,true);
 			}
 			
 			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_RIGHT)){
+				if(item.state == MENU_STATE_IMGVIEWER){
+					
+				}
 				ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadRight,true);
 			}
 			
@@ -574,23 +603,22 @@ namespace GUI {
 							libmpv->Pause();
 						}
 					}
+				}else if(item.state == MENU_STATE_IMGVIEWER){
+					Windows::setImageZoom(1.0f);
 				}
+				
 			}
 			if (is_bit_set(event_ret,nxmpgfx::BUT_B)){
 				
-					if(item.state == MENU_STATE_APPEXIT){
+					if(item.state == MENU_STATE_IMGVIEWER){
+						item.state = item.laststate;
+					}else if(item.state == MENU_STATE_APPEXIT){
 						item.state = MENU_STATE_HOME;
-					}
-				
-					if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup != -1){
+					}else if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup != -1){
 						Windows::settingsview_combopopup = -1;
-					}
-				
-					if(item.selectionstate == FILE_SELECTION_CHECKBOX){
+					}else if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 						item.selectionstate =FILE_SELECTION_NONE;
-					}
-						
-					if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER|| item.state == MENU_STATE_USB_BROWSER){
+					}else if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER|| item.state == MENU_STATE_USB_BROWSER){
 						if(item.popupstate != POPUP_STATE_NONE){
 							item.popupstate = POPUP_STATE_NONE;
 						}else{
@@ -600,27 +628,20 @@ namespace GUI {
 							
 						}
 							
-					}
-					if(item.state == MENU_STATE_ENIGMABROWSER){
+					}else if(item.state == MENU_STATE_ENIGMABROWSER){
 						item.first_item = true;
 						enigma2->backToTop();
-					}
-						
-					if(item.state == MENU_STATE_UPNPBROWSER){
+					}else if(item.state == MENU_STATE_UPNPBROWSER){
 						item.first_item = true;
 						if(nxupnp->getSelDevice()>-1){
 							nxupnp->getDevice(nxupnp->getSelDevice())->back();
 							
 							nxupnp->getDevice(nxupnp->getSelDevice())->browseOID();
 						}
-					}
-						
-					if(item.state == MENU_STATE_USB_MOUNT){
+					}else if(item.state == MENU_STATE_USB_MOUNT){
 						
 						
-					}
-						
-					if(item.state == MENU_STATE_PLAYER || item.state == MENU_STATE_PLAYERCACHING){
+					}else if(item.state == MENU_STATE_PLAYER || item.state == MENU_STATE_PLAYERCACHING){
 						if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
 							if(!libmpv->Stopped()  && !item.masterlock){
 								item.state = item.laststate;
@@ -789,6 +810,9 @@ namespace GUI {
 					item.savestate = item.laststate;
 					item.state = item.laststate;	
 					nxmpgfx::SetFullScreen(false);
+#ifdef DEKO3D_BACKEND
+					nxmpgfx::setBGAlpha(0.3f);
+#endif
 				}else if(item.state != MENU_STATE_PLAYER && !libmpv->Stopped()){
 					std::cout << std::endl <<" State is?: " << item.state << std::endl;
 					//fix crash
@@ -804,6 +828,9 @@ namespace GUI {
 					}
 					nxmpgfx::SetFullScreen(true);
 					item.state = MENU_STATE_PLAYER;
+#ifdef DEKO3D_BACKEND
+					nxmpgfx::setBGAlpha(1.0f);
+#endif
 							
 				}
 			}
@@ -828,6 +855,9 @@ namespace GUI {
 					}
 				}
 			}
+		}else{
+			ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadLStickUp,false);
+			ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadLStickDown,false);
 		}
 	
 	}
@@ -898,6 +928,9 @@ namespace GUI {
 					break;
 				case MENU_STATE_MTPSERVER:
 					Windows::MTPServerWindow(&item.focus, &item.first_item);
+					break;
+				case MENU_STATE_IMGVIEWER:
+					Windows::imageViewer();
 					break;
 				case MENU_STATE_PLAYERCACHING:
 					playerWindows::CacheWindow();
