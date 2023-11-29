@@ -15,7 +15,7 @@ public:
 	bool DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
 	
-	void backDir();
+	std::string backDir();
 	std::string getUrl();
 	std::string getCurrPath();
 	std::string getBasePath();

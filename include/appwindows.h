@@ -61,7 +61,9 @@ namespace Windows {
 		ImGui::PopStyleColor();
     };
 	
-	void UniBrowserWindow(bool *focus, bool *first_item);
+	void UniBrowserWindow(/*bool *focus, bool *first_item*/);
+	void SetBrowserNav(std::string foldername);
+	
 	void USBMountWindow(bool *focus, bool *first_item);
 
     void FileBrowserWindow(bool *focus, bool *first_item);

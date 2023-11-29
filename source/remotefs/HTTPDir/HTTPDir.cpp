@@ -130,10 +130,16 @@ bool *HTTPDir::checked(int pos){
 	return &currentlist[pos].checked;
 }
 
-void HTTPDir::backDir(){
-	if(currentpath == basepath)return;
-	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
-	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/")+1);
+std::string HTTPDir::backDir(){
+	
+	if(currentpath.find_last_of("/") == 0)currentpath = basepath;
+	if(currentpath.find_last_of("/") == -1)currentpath = basepath;
+	if(currentpath == basepath)return "";
+	currentpath = FS::removeLastSlash(currentpath);
+	std::string retpath = currentpath.substr(currentpath.find_last_of("\\/")+1);
+	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
+	return retpath;
+	
 }
 
 void HTTPDir::SetFileDbStatus(int idx,int dbstatus){

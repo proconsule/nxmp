@@ -623,7 +623,8 @@ namespace GUI {
 							item.popupstate = POPUP_STATE_NONE;
 						}else{
 							item.first_item = true;
-							filebrowser->backDir();
+							std::string mybackdir = filebrowser->backDir();
+							Windows::SetBrowserNav(mybackdir);
 							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}
@@ -883,7 +884,7 @@ namespace GUI {
 				case MENU_STATE_SAMBABROWSER:
 				case MENU_STATE_NFSBROWSER:
 				case MENU_STATE_USB_BROWSER:
-					Windows::UniBrowserWindow(&item.focus, &item.first_item);
+					Windows::UniBrowserWindow(/*&item.focus, &item.first_item*/);
 					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
 						Popups::FileContextPopup();
 					}

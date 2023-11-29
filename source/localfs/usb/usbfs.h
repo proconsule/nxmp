@@ -37,7 +37,7 @@ public:
 	void setBasePath(std::string _basepath);
 	std::string getBasePath();
 	std::string getCurrentPath();
-	void backPath();
+	std::string backDir();
 	std::vector<FS::FileEntry> getCurrList();
 	void DirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
 	void clearChecked();

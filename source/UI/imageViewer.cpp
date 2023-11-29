@@ -16,10 +16,13 @@ namespace Windows {
 	Tex currentImg;
 #endif	
 	float imgzoom = 1.0f;
+	float oldimgzoom = 1.0f;
 	float zoomposx = 0.0f;
 	float zoomposy = 0.0f;
 	
 	double imgControlsHide = 0.0f;
+	
+	bool zooming = false;
 	
 	
 	void SetupImgViewerWindow(void) {
@@ -65,6 +68,8 @@ namespace Windows {
 			ImVec2 mouse_delta = ImGui::GetIO().MouseDelta;
 			ScrollWhenDraggingOnVoid(ImVec2(-mouse_delta.x, -mouse_delta.y));
 			
+			float x_scroll_normalized = ImGui::GetScrollX()/ImGui::GetScrollMaxX();
+			float y_scroll_normalized = ImGui::GetScrollY()/ImGui::GetScrollMaxY();
 			
 			float imgx = currentImg.width;
 			float imgy = currentImg.height;
@@ -72,22 +77,44 @@ namespace Windows {
 			double dAspectRatio = 1280.0f/720.0f;
 			double dPictureAspectRatio = imgx/imgy;
 			
+			ImGuiContext& g = *GImGui;
+			
+			int nCenteringFactor;
+			
 			if (dPictureAspectRatio > dAspectRatio){
 				int nNewHeight = (int)((1280.0f*multiplyRes)/imgx*imgy);
-				int nCenteringFactor = ((720.0f*multiplyRes) - nNewHeight) / 2;
-				ImGui::SetCursorPos(ImVec2(0,nCenteringFactor));
+				nCenteringFactor = ((720.0f*multiplyRes) - nNewHeight*imgzoom) / 2;
+				ImGui::SetCursorPos(ImVec2(0,nCenteringFactor>=0.0f?nCenteringFactor:0.0f));
 				ImGui::Image((void*)(intptr_t)currentImg.id, ImVec2((1280.0f*multiplyRes)*imgzoom,(nNewHeight)*imgzoom));
 				
 			} else if (dPictureAspectRatio < dAspectRatio){
 				int nNewWidth =  (int)((720.0f*multiplyRes)/imgy*imgx);
-				int nCenteringFactor = ((1280.0f*multiplyRes) - nNewWidth) / 2;
-				ImGui::SetCursorPos(ImVec2(nCenteringFactor,0));
+				nCenteringFactor = ((1280.0f*multiplyRes) - nNewWidth*imgzoom) / 2;
+				
+				ImGui::SetCursorPos(ImVec2(nCenteringFactor>=0.0f?nCenteringFactor:0.0f,0));
 				ImGui::Image((void*)(intptr_t)currentImg.id, ImVec2((nNewWidth)*imgzoom,(720.0f*multiplyRes)*imgzoom));
 			} else{
 				ImGui::Image((void*)(intptr_t)currentImg.id, ImVec2((1280.0f*multiplyRes*imgzoom),(720.0f*multiplyRes*imgzoom)));
 			}
+			if(zooming){
+				ImVec2 currentscroll = ImVec2(ImGui::GetScrollX(),ImGui::GetScrollY());
+				
+				//ImGui::SetScrollX(x_scroll_normalized * ImGui::GetScrollMaxX());
+				//ImGui::SetScrollY(y_scroll_normalized * ImGui::GetScrollMaxY());
+				//ImGuiWindow* window = g.CurrentWindow;
+				//window->ScrollTarget.x = window->Scroll.x * imgzoom / oldimgzoom;
+				//window->ScrollTarget.y = window->Scroll.y * imgzoom / oldimgzoom;
+				
+				
+				ImGui::SetScrollX((ImGui::GetScrollMaxX()-currentscroll.x*(imgzoom-oldimgzoom))/2.0f);
+				ImGui::SetScrollY((ImGui::GetScrollMaxY()-currentscroll.y*(imgzoom-oldimgzoom))/2.0f);
+				
+				oldimgzoom = imgzoom;
+				zooming = false;
+				
+			}
 			
-			ImGuiContext& g = *GImGui;
+			
 			if(imgControlsHide+5 > g.Time){
 				
 				ImVec4 buttextcol = ImVec4(1.0f,1.0f,1.0f,1.0f);
@@ -136,6 +163,7 @@ namespace Windows {
 		ImGuiContext& g = *GImGui;
 		imgControlsHide = g.Time;
 		imgzoom = zoomfactor;
+		zooming = true;
 	}
 	
 	float getImageZoom(){

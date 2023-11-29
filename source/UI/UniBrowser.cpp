@@ -10,8 +10,15 @@
 
 namespace Windows {
 	
+	bool movenavfocus = false;
+	std::string navfocusstring = "";
 	
-	void UniBrowserWindow(bool *focus, bool *first_item) {
+	void SetBrowserNav(std::string foldername){
+		movenavfocus = true;
+		navfocusstring = foldername;
+	}
+	
+	void UniBrowserWindow(/*bool *focus, bool *first_item*/) {
 		 Windows::SetupWindow();
 		 if(BrowserTextScroller == nullptr){
 			 BrowserTextScroller=new CTextScroller("##filescroller");
@@ -79,10 +86,33 @@ namespace Windows {
 					ImGuiListClipper clipper;
 					clipper.Begin(thislist.size());
 					
+					
+					int navfocusid = 0;
+					if(movenavfocus){
+						for(int i=0;i<thislist.size();i++){
+							NXLOG::DEBUGLOG("%s %s",thislist[i].name.c_str(),navfocusstring.c_str());
+						
+							if(thislist[i].name == navfocusstring){
+								navfocusid = i;
+							}
+						}
+						//movenavfocus=false;
+						//clipper.StartPosY = navfocusid;
+					}
+					
+					
 					while (clipper.Step())
 					{
 						for (unsigned int n = clipper.DisplayStart; n < clipper.DisplayEnd; n++){
 							static int selected = -1;
+							
+							if(movenavfocus){
+								if(navfocusid == n){
+									ImGui::SetKeyboardFocusHere();
+									NXLOG::DEBUGLOG("FOCUS ON %d",n);
+								}
+							}
+							
 							
 							ImGui::TableNextRow();
 							ImGui::TableSetColumnIndex(0);
@@ -151,6 +181,7 @@ namespace Windows {
 								ImGui::SameLine();
 							
 							}
+							
 							if (ImGui::IsItemHovered()){
 								if(item.fileHoveredidx != n){
 									BrowserTextScroller->ResetPosition();
@@ -216,6 +247,7 @@ namespace Windows {
 							
 						}
 					}
+					movenavfocus = false;
 					if(item.popupstate == POPUP_STATE_NONE){
 						ImGui::SetWindowFocus();
 					}
@@ -265,7 +297,7 @@ namespace Windows {
 			
 			ImGui::EndChild();
 			
-			
+			/*
 			
 			if (*first_item && thislist.size() >0) {
 				std::string itemid = "##" + std::to_string(0);
@@ -287,6 +319,9 @@ namespace Windows {
 			if(triggerselect == true){
 				*first_item = true;
 			}
+			*/
+			
+			
 			
 			ImGui::PopStyleColor(2);
 			ImGui::PopStyleVar();

@@ -367,10 +367,11 @@ bool *USBMounter::checked(int pos){
 	return &currentlist[pos].checked;
 }
 
-void USBMounter::backPath(){
-		currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
-		if(currentpath == "")currentpath = "/";
-
+std::string USBMounter::backDir(){
+	std::string retpath = currentpath.substr(currentpath.find_last_of("\\/")+1);
+	currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
+	if(currentpath == "")currentpath = "/";
+	return retpath;
 }
 
 bool USBMounter::haveIteminPlaylist(){

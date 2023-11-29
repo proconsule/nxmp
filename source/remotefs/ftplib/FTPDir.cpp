@@ -65,12 +65,14 @@ bool *FTPDir::checked(int pos){
 	return &currentlist[pos].checked;
 }
 
-void FTPDir::backDir(){
+std::string FTPDir::backDir(){
 	if(currpath.find_last_of("/") == 0)currpath = basepath;
 	if(currpath.find_last_of("/") == -1)currpath = basepath;
-	if(currpath == basepath)return;
+	if(currpath == basepath)return "";
 	currpath = FS::removeLastSlash(currpath);
+	std::string retpath = currpath.substr(currpath.find_last_of("\\/")+1);
 	currpath = currpath.substr(0, currpath.find_last_of("/"));
+	return retpath;
 }
 
 void FTPDir::SetFileDbStatus(int idx,int dbstatus){

@@ -10,7 +10,7 @@ public:
 	localFs(std::string _path,Playlist * _playlist);
 	~localFs();
 	std::string getCurrentPath();
-	void backPath();
+	std::string backPath();
 	std::vector<FS::FileEntry> getCurrList();
 	std::vector<FS::FileEntry> getCurrListUnicode();
 	void DirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);

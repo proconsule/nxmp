@@ -220,12 +220,14 @@ std::string sambaDir::getShare(){
 	return share;
 }
 
-void sambaDir::backDir(){
+std::string sambaDir::backDir(){
 	if(currentpath.find_last_of("/") == 0)currentpath = basepath;
 	if(currentpath.find_last_of("/") == -1)currentpath = basepath;
-	if(currentpath == basepath)return;
+	if(currentpath == basepath)return "";
 	currentpath = FS::removeLastSlash(currentpath);
+	std::string retpath = currentpath.substr(currentpath.find_last_of("\\/")+1);
 	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
+	return retpath;
 }
 
 
@@ -305,6 +307,16 @@ bool sambaDir::getfileContents(std::string filepath,unsigned char ** _filedata,i
 	_size = st.smb2_size;
 	*_filedata = (unsigned char *)malloc(st.smb2_size);
 	int count = smb2_pread(smb2, fh, *_filedata, st.smb2_size, 0);
+	
+	int chunksize = 16*1024;
+	off_t chunk=0;
+	while ( chunk < st.smb2_size ){
+		size_t readnow;
+		readnow = smb2_pread(smb2, fh, *_filedata+chunk, chunksize, 0);
+		chunk=chunk+readnow;
+	}
+	
+	
 	
 	if (count < 0) {
 		smb2_close(smb2, fh);

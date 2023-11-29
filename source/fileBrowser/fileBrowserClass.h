@@ -28,7 +28,7 @@ public:
 	std::vector<FS::FileEntry> getCurrList();
 	std::vector<FS::FileEntry> getChecked();
 	
-	void backDir();
+	std::string backDir();
 	std::string getUrl();
 	std::string getCurrentPath();
 	std::string getBasePath();

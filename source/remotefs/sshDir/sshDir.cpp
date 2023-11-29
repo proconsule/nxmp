@@ -294,7 +294,16 @@ bool sshDir::getfileContents(std::string filepath,unsigned char ** _filedata,int
 	_size = fileinfo.st_size;
 	*_filedata = (unsigned char *)malloc(fileinfo.st_size);
 	
-	libssh2_channel_read(channel, *_filedata, fileinfo.st_size);
+	int chunksize = 16*1024;
+	off_t chunk=0;
+	while ( chunk < fileinfo.st_size ){
+		size_t readnow;
+		readnow = libssh2_channel_read(channel, *_filedata+chunk, chunksize);
+		chunk=chunk+readnow;
+	}
+	
+	
+	//libssh2_channel_read(channel, *_filedata, fileinfo.st_size);
 	
 	libssh2_channel_free(channel);
 
@@ -309,12 +318,14 @@ bool sshDir::getfileContents(std::string filepath,unsigned char ** _filedata,int
 	return true;
 }
 
-void sshDir::backDir(){
+std::string sshDir::backDir(){
 	if(currentpath.find_last_of("/") == 0)currentpath = basepath;
 	if(currentpath.find_last_of("/") == -1)currentpath = basepath;
-	if(currentpath == basepath)return;
+	if(currentpath == basepath)return "";
 	currentpath = FS::removeLastSlash(currentpath);
+	std::string retpath = currentpath.substr(currentpath.find_last_of("\\/")+1);
 	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
+	return retpath;
 }
 
 void sshDir::SetFileDbStatus(int idx,int dbstatus){

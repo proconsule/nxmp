@@ -84,28 +84,29 @@
 		}
 	}
 	
-	void CFileBrowser::backDir(){
+	std::string CFileBrowser::backDir(){
 		if(mylocal!= nullptr){
-			mylocal->backPath();
+			return mylocal->backPath();
 		}
 		if(mysamba!= nullptr){
-			mysamba->backDir();
+			return mysamba->backDir();
 		}
 		if(myssh!= nullptr){
-			myssh->backDir();
+			return myssh->backDir();
 		}
 		if(myftp!= nullptr){
-			myftp->backDir();
+			return myftp->backDir();
 		}
 		if(myhttp!= nullptr){
-			myhttp->backDir();
+			return myhttp->backDir();
 		}
 		if(mynfs!= nullptr){
-			mynfs->backDir();
+			return mynfs->backDir();
 		}
 		if(myusb!= nullptr){
-			myusb->backPath();
+			return myusb->backDir();
 		}
+		return "";
 	}
 	
 	std::vector<FS::FileEntry> CFileBrowser::getCurrList(){
@@ -420,7 +421,7 @@
 			return mylocal->getfileContents(filepath,_filedata,_size); 
 		}
 		if(mysamba!= nullptr){
-			mysamba->getfileContents(filepath,_filedata,_size); 
+			return mysamba->getfileContents(filepath,_filedata,_size); 
 		}
 		if(myssh!= nullptr){
 			return myssh->getfileContents(filepath,_filedata,_size); 
@@ -435,7 +436,7 @@
 			//mynfs->SetFileDbStatus(idx,dbstatus);
 		}
 		if(myusb!= nullptr){
-			myusb->getfileContents(filepath,_filedata,_size);
+			return myusb->getfileContents(filepath,_filedata,_size);
 		}
 		return false;
 	}

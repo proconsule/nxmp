@@ -26,7 +26,7 @@ public:
 	void curlDownload(char * url ,HTTPMemoryStruct * chunk);
 	
 	void DirList(std::string path,const std::vector<std::string> &extensions);
-	void backDir();
+	std::string backDir();
 	std::vector<FS::FileEntry> getCurrList();
 	std::string getUrl();
 	std::string getBasePath();

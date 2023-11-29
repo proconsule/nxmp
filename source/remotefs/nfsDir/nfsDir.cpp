@@ -193,12 +193,14 @@ void nfsDir::clearChecked(){
 
 
 
-void nfsDir::backDir(){
+std::string nfsDir::backDir(){
 	if(currentpath.find_last_of("/") == 0)currentpath = basepath;
 	if(currentpath.find_last_of("/") == -1)currentpath = basepath;
-	if(currentpath == basepath)return;
+	if(currentpath == basepath)return "";
 	currentpath = FS::removeLastSlash(currentpath);
+	std::string retpath = currentpath.substr(currentpath.find_last_of("\\/")+1);
 	currentpath = currentpath.substr(0, currentpath.find_last_of("/"));
+	return retpath;
 }
 
 void nfsDir::SetFileDbStatus(int idx,int dbstatus){

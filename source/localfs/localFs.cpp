@@ -123,10 +123,11 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 
 	}
 	
-	void localFs::backPath(){
+	std::string localFs::backPath(){
+		std::string retpath = currentpath.substr(currentpath.find_last_of("\\/")+1);
 		currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
 		if(currentpath == "")currentpath = "/";
-
+		return retpath;
 	}
 	
 
