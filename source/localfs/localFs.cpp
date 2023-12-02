@@ -157,17 +157,16 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 		_size = ftell(infile);
 		fseek(infile, 0L, SEEK_SET);
 		*_filedata = (unsigned char*)malloc(_size); 
-		/*
-		int chunksize = 1024*1024;
-		off_t chunk=0;
-		while ( chunk < _size ){
-			size_t readnow;
-			readnow = fread(*_filedata+chunk, sizeof(unsigned char), chunksize, infile);
-			chunk=chunk+readnow;
-		}
-		*/
 		
-		fread(*_filedata, sizeof(unsigned char), _size, infile);
+		size_t bytesRead = 0;
+		size_t offset = 0;
+		char buffer[4096];
+		
+		while ((bytesRead = fread(buffer, 1, sizeof(buffer), infile)) > 0) {
+			memcpy(*_filedata+offset,buffer,bytesRead);
+			offset+=bytesRead;
+		}
+
 		fclose(infile);
 		return true;
 	}

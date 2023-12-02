@@ -8,6 +8,10 @@
 #define discard_const(ptr) ((void *)((intptr_t)(ptr)))
 
 
+#define MAXBUF 1024 * 1024
+
+
+
 
 sambaDir::sambaDir(std::string _url,Playlist * _playlist){
 	url = _url;	
@@ -145,10 +149,16 @@ bool sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 				tmpentry.accessed = (time_t)ent->st.smb2_atime;
 				tmpentry.created = (time_t)ent->st.smb2_ctime;
 				
-				currentlist.push_back(tmpentry);
+				
 				if(Utility::isImageExtension(tmpentry.name)){
+					tmpentry.mediatype = FS::FileMediaType::Image;
 					currentimagelist.push_back(tmpentry);
 				}
+				if(Utility::isArchiveExtension(tmpentry.name)){
+					tmpentry.mediatype = FS::FileMediaType::Archive;
+				}
+				currentlist.push_back(tmpentry);
+				
         }
 	
 	//std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
@@ -314,32 +324,35 @@ bool sambaDir::getfileContents(std::string filepath,unsigned char ** _filedata,i
 	*_filedata = (unsigned char *)malloc(st.smb2_size);
 
 	
-	int chunksize = 16*1024;
-	off_t chunk=0;
-	while ( chunk < st.smb2_size ){
-		size_t readnow;
-		readnow = smb2_pread(smb2, fh, *_filedata+chunk, chunksize, 0);
-		chunk=chunk+readnow;
+	size_t bytesRead = 0;
+	size_t offset = 0;
+	
+	int rc = 0;
+	
+	uint32_t mybufsize = smb2_get_max_read_size(smb2);
+	_size = st.smb2_size;
+	while (offset <  st.smb2_size) {
+		bytesRead = smb2_pread(smb2, fh, *_filedata+offset, mybufsize, offset);
+		if (bytesRead == -EAGAIN) {
+			continue;
+		}
+		if (bytesRead < 0) {
+			rc = 1;
+			break;
+		}
+		if(bytesRead == 0)break;
+		offset+=bytesRead;
+		
 	}
-	
-	/*
-	
-	if (count < 0) {
-		smb2_close(smb2, fh);
-		smb2_disconnect_share(smb2);
-		smb2_destroy_url(myurl);
-		smb2_destroy_context(smb2);
-		NXLOG::DEBUGLOG("SMB2 Failed to read file");
-		return false;
-	}
-	
-	*/
 
-	
+
 	smb2_close(smb2, fh);
 	smb2_disconnect_share(smb2);
 	smb2_destroy_url(myurl);
 	smb2_destroy_context(smb2);
+
+	
+	if(rc == 1)return false;
 	
 	return true;
 	

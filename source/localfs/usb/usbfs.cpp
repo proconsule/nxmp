@@ -303,10 +303,14 @@ void USBMounter::DirList(const std::string &path,bool showHidden,const std::vect
 						file.accessed = (time_t)st.st_atime;
 					}
 					
-					currentlist.push_back(file);
 					if(Utility::isImageExtension(file.name)){
+						file.mediatype = FS::FileMediaType::Image;
 						currentimagelist.push_back(file);
 					}
+					if(Utility::isArchiveExtension(file.name)){
+						file.mediatype = FS::FileMediaType::Archive;
+					}
+					currentlist.push_back(file);
 					
 				}
 				
@@ -408,7 +412,16 @@ bool USBMounter::getfileContents(std::string filepath,unsigned char ** _filedata
 	_size = ftell(infile);
 	fseek(infile, 0L, SEEK_SET);
 	*_filedata = (unsigned char*)malloc(_size*sizeof(unsigned char)); 
-	fread(*_filedata, sizeof(unsigned char), _size, infile);
+	
+	size_t bytesRead = 0;
+	size_t offset = 0;
+	char buffer[4096];
+		
+	while ((bytesRead = fread(buffer, 1, sizeof(buffer), infile)) > 0) {
+		memcpy(*_filedata+offset,buffer,bytesRead);
+		offset+=bytesRead;
+	}
+	
 	fclose(infile);
 	return true;
 }

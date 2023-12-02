@@ -150,10 +150,14 @@ bool sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 			if ((strlen(mem) == 2) && mem[0] == '.' && mem[1] == '.') {
 				continue;
 			}
-			currentlist.push_back(tmpentry);
 			if(Utility::isImageExtension(tmpentry.name)){
+				tmpentry.mediatype = FS::FileMediaType::Image;
 				currentimagelist.push_back(tmpentry);
 			}
+			if(Utility::isArchiveExtension(tmpentry.name)){
+				tmpentry.mediatype = FS::FileMediaType::Archive;
+			}
+			currentlist.push_back(tmpentry);
         }
         else
             break;
@@ -300,16 +304,27 @@ bool sshDir::getfileContents(std::string filepath,unsigned char ** _filedata,int
 	_size = fileinfo.st_size;
 	*_filedata = (unsigned char *)malloc(fileinfo.st_size);
 	
-	int chunksize = 16*1024;
+	int chunksize = 1024*1024;
 	off_t chunk=0;
+	
+	int ret = 0;
+	
 	while ( chunk < fileinfo.st_size ){
 		size_t readnow;
 		readnow = libssh2_channel_read(channel, *_filedata+chunk, chunksize);
+		
+		if(readnow > 0) {
+
+        }
+        else if(readnow < 0) {
+            NXLOG::ERRORLOG("libssh2_channel_read() failed: %d\n",(int)readnow);
+            ret = 1;
+			break;
+        }
+		
+		
 		chunk=chunk+readnow;
 	}
-	
-	
-	//libssh2_channel_read(channel, *_filedata, fileinfo.st_size);
 	
 	libssh2_channel_free(channel);
 
@@ -319,6 +334,10 @@ bool sshDir::getfileContents(std::string filepath,unsigned char ** _filedata,int
 
     close(sock);
     libssh2_exit();
+	if(ret == 1){
+		NXLOG::DEBUGLOG("\tFile Read Error\n");
+		return false;
+	}
 	
 	NXLOG::DEBUGLOG("\tFile Read OK\n");
 	return true;

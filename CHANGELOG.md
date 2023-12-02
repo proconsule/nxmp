@@ -7,7 +7,9 @@
 - Added Brazilian Portuguese language
 - Added deko3d Backend capable of 4K HDR 60fps decoding (experimental)
 - Light/Dark Theme (mimic the native HOS UI)
-- Added a trivial image viewer instead of using mpv
+- Added a trivial image viewer instead of using mpv (feature zoom/pan)
+- Added ZL/ZR to show prev/next image
+- Added Archive browsing support (experimental) .zip,.rar,.tar,.tar.gz support
 
 # Removed
 
@@ -17,7 +19,7 @@
 
 ## Fixed
 
-- Ghosting was mitigated but still present in 0.8.2 now is fixed
+- Ghosting was mitigated but still present in 0.8.2 now is fixed forever
 
 ### Knonw Issues
 

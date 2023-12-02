@@ -599,7 +599,7 @@ std::string KeyboardCall (std::string hint, std::string text){
 	}
 	
 	bool isArchiveExtension(std::string path){
-		if(Utility::endsWith(path,".zip",false) || Utility::endsWith(path,".rar",false) || Utility::endsWith(path,".tar",false)){
+		if(Utility::endsWith(path,".zip",false) || Utility::endsWith(path,".rar",false) || Utility::endsWith(path,".tar",false) || Utility::endsWith(path,".gz",false)){
 			return true;
 		}
 											
