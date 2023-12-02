@@ -146,6 +146,9 @@ bool sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 				tmpentry.created = (time_t)ent->st.smb2_ctime;
 				
 				currentlist.push_back(tmpentry);
+				if(Utility::isImageExtension(tmpentry.name)){
+					currentimagelist.push_back(tmpentry);
+				}
         }
 	
 	//std::sort(currentlist.begin(), currentlist.end(), FS::Sort);
@@ -192,6 +195,10 @@ bool sambaDir::DirList(std::string path,bool showHidden,const std::vector<std::s
 
 std::vector<FS::FileEntry> sambaDir::getCurrList(){
 	return currentlist;
+}
+
+std::vector<FS::FileEntry> sambaDir::getCurrImageList(){
+	return currentimagelist;
 }
 
 bool *sambaDir::checked(int pos){
@@ -304,9 +311,8 @@ bool sambaDir::getfileContents(std::string filepath,unsigned char ** _filedata,i
 		return false;
 	}
 	
-	_size = st.smb2_size;
 	*_filedata = (unsigned char *)malloc(st.smb2_size);
-	int count = smb2_pread(smb2, fh, *_filedata, st.smb2_size, 0);
+
 	
 	int chunksize = 16*1024;
 	off_t chunk=0;
@@ -316,7 +322,7 @@ bool sambaDir::getfileContents(std::string filepath,unsigned char ** _filedata,i
 		chunk=chunk+readnow;
 	}
 	
-	
+	/*
 	
 	if (count < 0) {
 		smb2_close(smb2, fh);
@@ -327,6 +333,7 @@ bool sambaDir::getfileContents(std::string filepath,unsigned char ** _filedata,i
 		return false;
 	}
 	
+	*/
 
 	
 	smb2_close(smb2, fh);

@@ -73,8 +73,8 @@ namespace nxmpgfx{
 	//unsigned int WIDTH = 1920;
 	//unsigned int HEIGHT = 1080;
 	
-	constexpr auto MAX_SAMPLERS = 29;
-	constexpr auto MAX_IMAGES   = 29;
+	constexpr auto MAX_SAMPLERS = 31;
+	constexpr auto MAX_IMAGES   = 31;
 
 	constexpr auto FB_NUM       = 2u;
 
@@ -1676,16 +1676,17 @@ void deko3dExit() {
 		return Texture{out_image, std::move(out_memblock), out_handle,width,height};
 	}
 
-	Texture load_texture_from_mem(unsigned char *_image_data,int _img_size,DkImageFormat format, std::uint32_t flags,int desc_slot) {
+	Texture load_texture_from_mem(unsigned char *image_data,int width, int height,int channels,DkImageFormat format, std::uint32_t flags,int desc_slot) {
 		
-		if(_image_data == NULL)return {};
+		if(image_data == NULL)return {};
 		auto &cmdbuf = s_cmdBuf[0];
-		 
+		
+/*		
 		int width, height, channels;
 		unsigned char* image_data = stbi_load_from_memory(_image_data,_img_size, &width, &height, NULL, 4);
 			if (image_data == NULL)
 				return {};
-		
+*/		
 		 
 
 		dk::UniqueMemBlock transfer = dk::MemBlockMaker(s_device, imgui::deko3d::align(width*height*4, DK_MEMBLOCK_ALIGNMENT))
@@ -1693,7 +1694,7 @@ void deko3dExit() {
 			.create();
 
 		
-		memcpy(transfer.getCpuAddr(),image_data,width*height*4);
+		memcpy(transfer.getCpuAddr(),image_data,width*height*channels);
 		
 
 		dk::ImageLayout layout;

@@ -18,6 +18,10 @@ std::vector<FS::FileEntry> localFs::getCurrList(){
 	return currentlist;
 }
 
+std::vector<FS::FileEntry> localFs::getCurrImageList(){
+	return currentimagelist;
+}
+
 void localFs::clearChecked(){
 	for(int i=0;i<currentlist.size();i++){
 		currentlist[i].checked = false;
@@ -32,6 +36,7 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 
 		currentpath = path;
 		currentlist.clear();
+		currentimagelist.clear();
 		struct dirent *ent;
 		DIR *dir;
 
@@ -58,11 +63,7 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 					file.path = FS::removeLastSlash(path) + "/" + file.name;
 					file.checked = playlist->isPresent(file,file.path);
 					
-					
-					
-					//FsFileSystem sdmc;
 					FsTimeStampRaw timestamp = {0};
-					//fsOpenSdCardFileSystem(&sdmc);
 					char safe_buf[FS_MAX_PATH];
 					strcpy(safe_buf, file.path.c_str());
 					fsFsGetFileTimeStampRaw(&sdmc, safe_buf, &timestamp);
@@ -88,6 +89,13 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 							}
 						}
 						if(isMediafile){
+							if(Utility::isImageExtension(file.name)){
+								file.mediatype = FS::FileMediaType::Image;
+								currentimagelist.push_back(file);
+							}
+							if(Utility::isArchiveExtension(file.name)){
+								file.mediatype = FS::FileMediaType::Archive;
+							}
 							currentlist.push_back(file);
 						}
 					}else if(file.type == FS::FileEntryType::Directory){
@@ -103,14 +111,14 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 				if(sortOrder == FS::FS_NAME_DESCENDINGORDER){
 					std::sort(currentlist.begin(), currentlist.end(), FS::SortNameDesc);
 				}
-				/*
+				
 				if(sortOrder == FS::FS_DATE_ASCENDINGORDER){
 					std::sort(currentlist.begin(), currentlist.end(), FS::SortDateAsc);
 				}
 				if(sortOrder == FS::FS_DATE_DESCENDINGORDER){
 					std::sort(currentlist.begin(), currentlist.end(), FS::SortDateDesc);
 				}
-				*/
+				
 				if(sortOrder == FS::FS_SIZE_ASCENDINGORDER){
 					std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeAsc);
 				}
@@ -144,11 +152,41 @@ void localFs::DirList(const std::string &path,bool showHidden,const std::vector<
 	
 	bool localFs::getfileContents(std::string filepath,unsigned char ** _filedata,int &_size){
 		FILE * infile = fopen(filepath.c_str(), "rb");
+		if(infile == NULL)return false;
 		fseek(infile, 0L, SEEK_END);
 		_size = ftell(infile);
 		fseek(infile, 0L, SEEK_SET);
-		*_filedata = (unsigned char*)malloc(_size*sizeof(unsigned char)); 
+		*_filedata = (unsigned char*)malloc(_size); 
+		/*
+		int chunksize = 1024*1024;
+		off_t chunk=0;
+		while ( chunk < _size ){
+			size_t readnow;
+			readnow = fread(*_filedata+chunk, sizeof(unsigned char), chunksize, infile);
+			chunk=chunk+readnow;
+		}
+		*/
+		
 		fread(*_filedata, sizeof(unsigned char), _size, infile);
 		fclose(infile);
 		return true;
+	}
+	
+	
+	bool localFs::OpenFile(std::string filepath){
+		open_file = fopen(filepath.c_str(), "rb");
+		if(open_file == NULL)return false;
+		
+	}
+	int localFs::FileRead(unsigned char * data,unsigned int count,unsigned int offset){
+		if(open_file!=NULL){
+			fseek(open_file, offset, SEEK_SET);
+			return fread(data, sizeof(unsigned char), count, open_file);
+		}
+		
+		return -1;
+	}
+	
+	void localFs::FileClose(){
+		if(open_file != NULL)fclose(open_file);
 	}

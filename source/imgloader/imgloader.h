@@ -75,6 +75,8 @@ typedef struct {
 	/* File Browser Icons */
 	Texture FolderTexture;
 	Texture FileTexture;
+	Texture ImageTexture;
+	Texture ArchiveTexture;
 	Texture GUI_D_UP;
 	Texture GUI_D_DOWN;
 	Texture GUI_D_LEFT;
@@ -117,7 +119,6 @@ public:
 		~CImgLoader();
 		nxmpicon_struct icons;
 		
-		bool isImageExtension(std::string path);
 		
 #ifdef OPENGL_BACKEND
 		Tex OpenImageFile(std::string path);

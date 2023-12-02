@@ -16,6 +16,7 @@ public:
 	
 	bool DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
+	std::vector<FS::FileEntry> getCurrImageList();
 	
 	std::string backDir();
 	std::string getUrl();
@@ -36,6 +37,7 @@ public:
 	
 private:
 	std::vector<FS::FileEntry> currentlist;
+	std::vector<FS::FileEntry> currentimagelist;
 	std::string url;
 	std::string basepath = "";
 	std::string currentpath = "";

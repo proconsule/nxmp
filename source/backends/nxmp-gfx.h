@@ -42,6 +42,8 @@
 #define FONT_X_BUTTON_FILLED "\xEE\x83\xA2"
 #define FONT_Y_BUTTON_FILLED "\xEE\x83\xA3"
 
+#define FONT_ZL_BUTTON_FILLED "\xEE\x83\xA6"
+#define FONT_ZR_BUTTON_FILLED "\xEE\x83\xA7"
 
 
 #define FONT_CHECKED_ICON "\xEE\x85\x8B"
@@ -227,7 +229,7 @@ namespace nxmpgfx{
 	
 	
 	Texture load_texture(std::string path,DkImageFormat format, std::uint32_t flags,int desc_slot);
-	Texture load_texture_from_mem(unsigned char *image_data,int img_size,DkImageFormat format, std::uint32_t flags,int desc_slot);
+	Texture load_texture_from_mem(unsigned char *image_data,int width, int height,int channels,DkImageFormat format, std::uint32_t flags,int desc_slot);
 	
 	
 	

@@ -589,6 +589,25 @@ std::string KeyboardCall (std::string hint, std::string text){
 	
 }
 
+
+	bool isImageExtension(std::string path){
+		if(Utility::endsWith(path,".jpg",false) || Utility::endsWith(path,".png",false) || Utility::endsWith(path,".bmp",false)){
+			return true;
+		}
+											
+		return false;
+	}
+	
+	bool isArchiveExtension(std::string path){
+		if(Utility::endsWith(path,".zip",false) || Utility::endsWith(path,".rar",false) || Utility::endsWith(path,".tar",false)){
+			return true;
+		}
+											
+		return false;
+	}
+	
+	
+
 		
 }
 

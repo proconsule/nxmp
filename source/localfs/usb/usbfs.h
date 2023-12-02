@@ -39,6 +39,7 @@ public:
 	std::string getCurrentPath();
 	std::string backDir();
 	std::vector<FS::FileEntry> getCurrList();
+	std::vector<FS::FileEntry> getCurrImageList();
 	void DirList(const std::string &path,bool showHidden,const std::vector<std::string> &extensions);
 	void clearChecked();
 	bool *checked(int pos);
@@ -67,6 +68,7 @@ private:
 	std::string basepath = "";
 	std::string currentpath = "";
 	std::vector<FS::FileEntry> currentlist;
+	std::vector<FS::FileEntry> currentimagelist;
 	
 };
 

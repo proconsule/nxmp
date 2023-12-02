@@ -70,9 +70,9 @@ namespace Windows {
 				ImGui::Text("%s",filebrowser->errormsg.c_str());
 			}else{
 				if (ImGui::BeginTable("table1", 3,/*ImGuiTableFlags_RowBg|*/ImGuiTableFlags_ScrollY)){
-					ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, (940.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); 
+					ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, (910.0f*multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); 
 					ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 125.0f*multiplyRes);
-					ImGui::TableSetupColumn("Date", ImGuiTableColumnFlags_WidthFixed,215.f*multiplyRes);       
+					ImGui::TableSetupColumn("Date", ImGuiTableColumnFlags_WidthFixed,255.f*multiplyRes);       
 					ImGui::TableSetupScrollFreeze(0, 1);
 					//ImGui::TableHeadersRow();
 					ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
@@ -97,10 +97,11 @@ namespace Windows {
 							}
 						}
 						//movenavfocus=false;
-						//clipper.StartPosY = navfocusid;
+						clipper.ForceDisplayRangeByIndices( navfocusid, navfocusid+41 );
+						 
 					}
 					
-					
+					bool changefolder = false;
 					while (clipper.Step())
 					{
 						for (unsigned int n = clipper.DisplayStart; n < clipper.DisplayEnd; n++){
@@ -111,6 +112,7 @@ namespace Windows {
 									ImGui::SetKeyboardFocusHere();
 									NXLOG::DEBUGLOG("FOCUS ON %d",n);
 								}
+								
 							}
 							
 							
@@ -135,7 +137,13 @@ namespace Windows {
 							if(thislist[n].type == FS::FileEntryType::Directory){
 								GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FolderTexture.id, ImVec2(30,30));
 							}else{
-								GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FileTexture.id, ImVec2(30,30));
+								if(thislist[n].mediatype == FS::FileMediaType::Media){
+									GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FileTexture.id, ImVec2(30,30));
+								}else if(thislist[n].mediatype == FS::FileMediaType::Image){
+									GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ImageTexture.id, ImVec2(30,30));
+								}else if(thislist[n].mediatype == FS::FileMediaType::Archive){
+									GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ArchiveTexture.id, ImVec2(30,30));
+								}
 							}
 							
 							
@@ -145,11 +153,12 @@ namespace Windows {
 								if (ImGui::Selectable(itemid.c_str(), selected == n,selectable_flags,ImVec2(0,30.0f*multiplyRes))){
 										if(filebrowser->getCurrList()[n].type == FS::FileEntryType::Directory){
 										triggerselect = true;
+										changefolder = true;
 										filebrowser->DirList(thislist[n].path,configini->getshowHidden(false),Utility::getMediaExtensions());
 									} else{
 										item.laststate = item.state;
 										
-										if(imgloader->isImageExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
+										if(Utility::isImageExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
 											unsigned char * img_data = NULL;
 											int img_size;
 											if(filebrowser->getfileContents(thislist[n].path,&img_data,img_size)){
@@ -157,9 +166,12 @@ namespace Windows {
 												item.state = MENU_STATE_IMGVIEWER;
 												Windows::setImageZoom(1.0f);
 												Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
-												if(img_data!=NULL)free(img_data);
 											}
-											
+											if(img_data!=NULL)free(img_data);
+										
+										}else if(Utility::isArchiveExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
+											filebrowser->OpenArchive(thislist[n].path);
+											filebrowser->DirList("",configini->getshowHidden(false),Utility::getMediaExtensions());
 										}else{
 										
 											playlist->clearPlaylist();
@@ -215,7 +227,7 @@ namespace Windows {
 								ImGui::SameLine();
 								ImGui::SetCursorPosX(ImGui::GetCursorPosX()-10.0f);
 								ImGui::SetCursorPosY(ImGui::GetCursorPosY() +5.0f*multiplyRes);
-								BrowserTextScroller->DrawColor(bsid.c_str(),textcolor,(940.0f*multiplyRes -2* ImGui::GetStyle().ItemSpacing.x),(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y),thislist[n].name.c_str());	
+								BrowserTextScroller->DrawColor(bsid.c_str(),textcolor,(910.0f*multiplyRes -2* ImGui::GetStyle().ItemSpacing.x),(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y),thislist[n].name.c_str());	
 							}else{
 								ImGui::Dummy(ImVec2(-10.0,(30.0f*multiplyRes-2 * ImGui::GetStyle().ItemSpacing.y)));
 								
@@ -245,9 +257,14 @@ namespace Windows {
 								ImGui::TextColored(textcolor,"%s",strdate.c_str());
 							}
 							
+							
 						}
 					}
 					movenavfocus = false;
+					if(changefolder){
+						SetBrowserNav("");
+						changefolder = false;
+					}
 					if(item.popupstate == POPUP_STATE_NONE){
 						ImGui::SetWindowFocus();
 					}

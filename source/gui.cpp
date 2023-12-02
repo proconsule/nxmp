@@ -462,6 +462,8 @@ namespace GUI {
 				if(item.state == MENU_STATE_IMGVIEWER){
 					if(Windows::getImageZoom()>=1.1f){
 						Windows::setImageZoom(Windows::getImageZoom()-0.1);
+					}else{
+						Windows::setImageZoom(1.0f);
 					}
 				}else{
 					ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadLStickDown,true);
@@ -740,12 +742,48 @@ namespace GUI {
 			}
 			
 			if (is_bit_set(event_ret,nxmpgfx::BUT_ZR)){
+				if(item.state == MENU_STATE_IMGVIEWER){
+					if(filebrowser!= NULL){
+						unsigned char * img_data = NULL;
+						int img_size;
+						int newidx = filebrowser->getNextImg();
+						NXLOG::DEBUGLOG("newimgidx %d\n",newidx);
+						if(newidx > -1){
+							if(filebrowser->getfileContents(filebrowser->getCurrImageList()[newidx].path,&img_data,img_size)){
+								
+								item.state = MENU_STATE_IMGVIEWER;
+								Windows::setImageZoom(1.0f);
+								Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
+							}
+							if(img_data!=NULL)free(img_data);
+						}
+						
+					}
+				}
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 					libmpv->seek(libmpv->getPosition() + configini->getLongSeek(false),item.playershowcontrols);
 				}
 						
 			}
 			if (is_bit_set(event_ret,nxmpgfx::BUT_ZL)){
+				if(item.state == MENU_STATE_IMGVIEWER){
+					if(filebrowser!= NULL){
+						unsigned char * img_data = NULL;
+						int img_size;
+						int newidx = filebrowser->getPrevImg();
+						NXLOG::DEBUGLOG("newimgidx %d\n",newidx);
+						if(newidx > -1){
+							if(filebrowser->getfileContents(filebrowser->getCurrImageList()[newidx].path,&img_data,img_size)){
+								
+								item.state = MENU_STATE_IMGVIEWER;
+								Windows::setImageZoom(1.0f);
+								Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
+							}
+							if(img_data!=NULL)free(img_data);
+						}
+						
+					}
+				}
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 					libmpv->seek(libmpv->getPosition() - configini->getLongSeek(false),item.playershowcontrols);
 						

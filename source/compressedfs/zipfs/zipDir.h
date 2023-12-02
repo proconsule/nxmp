@@ -1,11 +1,7 @@
-#ifndef NXMP_SAMBADIR_H
-#define NXMP_SAMBADIR_H
+#ifndef NXMP_ZIPDIR_H
+#define NXMP_ZIPDIR_H
 
-#include <stdint.h>
-#include <sys/_types.h>
-#include <smb2/smb2.h>
-#include <smb2/libsmb2.h>
-#include <smb2/libsmb2-raw.h>
+
 #include <string>
 #include <vector>
 #include <stdio.h>
@@ -13,42 +9,71 @@
 #include "localfiles.h"
 #include "playlist.h"
 
-#define SMB_MAX_PATH_LENGTH 1024
+#include <archive.h>
+#include <archive_entry.h>
 
-class sambaDir{
-public:
-	sambaDir(std::string _url,Playlist * _playlist);
+
+typedef struct{
+	std::string parent;
+	FS::FileEntry fileentry;
+	int level;
 	
-	bool DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
+	
+}archfileentry_struct;
+
+
+class zipDir{
+public:
+	zipDir(unsigned char * _archive_data,int _archive_size);
+	void ReadList();
+	
+	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
 	std::vector<FS::FileEntry> getCurrImageList();
 	
+	std::string getCurrentPath();
 	std::string backDir();
-	std::string getUrl();
-	std::string getCurrPath();
-	std::string getBasePath();
-	std::string getShare();
-	
+
 	bool *checked(int pos);
 	void clearChecked();
 	
 	int sortOrder=0;
 	
-	void SetFileDbStatus(int idx,int dbstatus);
-	void ResetDbStatus();
+	//void SetFileDbStatus(int idx,int dbstatus);
+	//void ResetDbStatus();
 	
 	bool getfileContents(std::string filepath,unsigned char ** _filedata,int &_size);
 	
 	std::string errormsg = "";
 	
+	
+
+	
 private:
+
+	unsigned char * archive_data;
+	int archive_size;
+	
+	std::vector<archfileentry_struct> totalfilelist;
+
 	std::vector<FS::FileEntry> currentlist;
 	std::vector<FS::FileEntry> currentimagelist;
-	std::string url;
+	std::string path;
 	std::string share = "";
 	std::string basepath = "";
 	std::string currentpath = "";
 	Playlist *playlist;
 };
+
+
+
+
+
+
+
+
+
+
+
 
 #endif

@@ -151,7 +151,9 @@ bool sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 				continue;
 			}
 			currentlist.push_back(tmpentry);
-
+			if(Utility::isImageExtension(tmpentry.name)){
+				currentimagelist.push_back(tmpentry);
+			}
         }
         else
             break;
@@ -206,6 +208,10 @@ bool sshDir::DirList(std::string path,bool showHidden,const std::vector<std::str
 
 std::vector<FS::FileEntry> sshDir::getCurrList(){
 	return currentlist;
+}
+
+std::vector<FS::FileEntry> sshDir::getCurrImageList(){
+	return currentimagelist;
 }
 
 bool *sshDir::checked(int pos){

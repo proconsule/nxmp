@@ -304,6 +304,9 @@ void USBMounter::DirList(const std::string &path,bool showHidden,const std::vect
 					}
 					
 					currentlist.push_back(file);
+					if(Utility::isImageExtension(file.name)){
+						currentimagelist.push_back(file);
+					}
 					
 				}
 				
@@ -355,6 +358,10 @@ void USBMounter::setBasePath(std::string _basepath){
 
 std::vector<FS::FileEntry> USBMounter::getCurrList(){
 	return currentlist;
+}
+
+std::vector<FS::FileEntry> USBMounter::getCurrImageList(){
+	return currentimagelist;
 }
 
 void USBMounter::clearChecked(){

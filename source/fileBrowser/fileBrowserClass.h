@@ -9,6 +9,8 @@
 #include "nfsDir.h"
 #include "usbfs.h"
 
+#include "compressedfs.h"
+
 #include "utils.h"
 
 class CFileBrowser{
@@ -23,9 +25,14 @@ public:
 	FTPDir *myftp = nullptr;
 	HTTPDir *myhttp = nullptr;
 	USBMounter *myusb = nullptr;
+	compressedFS * compressedArchive = nullptr;
+	
+	void OpenArchive(std::string _path);
+	void CloseArchive();
 	
 	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
+	std::vector<FS::FileEntry> getCurrImageList();
 	std::vector<FS::FileEntry> getChecked();
 	
 	std::string backDir();
@@ -50,6 +57,8 @@ public:
 	std::string getTitle(); 
 	std::string path;
 	
+	std::string currentFileinUse;
+	
 	FS::FILESORTORDER sortOrder = FS::FS_NAME_ASCENDINGORDER;
 	bool currshowHidden = false;
 	
@@ -57,9 +66,19 @@ public:
 	bool connected = true;
 	std::string errormsg = "";
 	std::vector<usb_devices> getUsbDev(bool dummy = false);
+	
+	int getNextImg();
+	int getPrevImg();
+	
+	
 
 private:
 	std::string title;
+	
+	unsigned char *archive_data = NULL;
+	int archive_datasize = 0;
+	
+	std::string oldtitle = "";
 	
 };
 

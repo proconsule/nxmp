@@ -27,6 +27,12 @@ namespace FS {
 		Directory = 2
 	};
 	
+	enum class FileMediaType {
+		Media = 0,
+		Image = 1,
+		Archive = 2
+	};
+	
 	enum FILESORTORDER{
 		FS_NAME_ASCENDINGORDER = 0,
 		FS_NAME_DESCENDINGORDER,
@@ -42,6 +48,7 @@ namespace FS {
 		std::string path;
 		int64_t size = 0;
 		FileEntryType type = FileEntryType::Unknown;
+		FileMediaType mediatype = FileMediaType::Media;
 		int is_valid=0;
 		time_t modified;
 		time_t accessed;

@@ -2,6 +2,8 @@
 #include "nxmp-gfx.h"
 #include "logger.h"
 
+#include "stb_image.h"
+#include <turbojpeg.h>
 
 enum{
 	JPGFILE,
@@ -84,26 +86,27 @@ CImgLoader::CImgLoader(std::string basepath){
 
 	icons.FolderTexture =  nxmpgfx::load_texture(basepath+"/folder.png",DkImageFormat_RGBA8_Unorm, 0,10);
 	icons.FileTexture =  nxmpgfx::load_texture(basepath+"/file.png",DkImageFormat_RGBA8_Unorm, 0,11);
+	icons.ImageTexture =  nxmpgfx::load_texture(basepath+"/image.png",DkImageFormat_RGBA8_Unorm, 0,12);
+	icons.ArchiveTexture =  nxmpgfx::load_texture(basepath+"/archive.png",DkImageFormat_RGBA8_Unorm, 0,13);
 
+	icons.ShareAddTexture =  nxmpgfx::load_texture(basepath+"/shareadd.png",DkImageFormat_RGBA8_Unorm, 0,14);
+	icons.HTTPTexture =  nxmpgfx::load_texture(basepath+"/http.png",DkImageFormat_RGBA8_Unorm, 0,15);
+	icons.FTPTexture =  nxmpgfx::load_texture(basepath+"/ftp.png",DkImageFormat_RGBA8_Unorm, 0,16);
+	icons.SFTPTexture =  nxmpgfx::load_texture(basepath+"/sftp.png",DkImageFormat_RGBA8_Unorm, 0,17);
+	icons.SMBTexture =  nxmpgfx::load_texture(basepath+"/smb.png",DkImageFormat_RGBA8_Unorm, 0,18);
+	icons.NFSTexture =  nxmpgfx::load_texture(basepath+"/nfs.png",DkImageFormat_RGBA8_Unorm, 0,19);
 
-	icons.ShareAddTexture =  nxmpgfx::load_texture(basepath+"/shareadd.png",DkImageFormat_RGBA8_Unorm, 0,12);
-	icons.HTTPTexture =  nxmpgfx::load_texture(basepath+"/http.png",DkImageFormat_RGBA8_Unorm, 0,13);
-	icons.FTPTexture =  nxmpgfx::load_texture(basepath+"/ftp.png",DkImageFormat_RGBA8_Unorm, 0,14);
-	icons.SFTPTexture =  nxmpgfx::load_texture(basepath+"/sftp.png",DkImageFormat_RGBA8_Unorm, 0,15);
-	icons.SMBTexture =  nxmpgfx::load_texture(basepath+"/smb.png",DkImageFormat_RGBA8_Unorm, 0,16);
-	icons.NFSTexture =  nxmpgfx::load_texture(basepath+"/nfs.png",DkImageFormat_RGBA8_Unorm, 0,17);
+	icons.PlayIcon =  nxmpgfx::load_texture(basepath+"/player/play.png",DkImageFormat_RGBA8_Unorm, 0,20);
+	icons.StopIcon =  nxmpgfx::load_texture(basepath+"/player/stop.png",DkImageFormat_RGBA8_Unorm, 0,21);
+	icons.PauseIcon =  nxmpgfx::load_texture(basepath+"/player/pause.png",DkImageFormat_RGBA8_Unorm, 0,22);
+	icons.MuteIcon =  nxmpgfx::load_texture(basepath+"/player/mute.png",DkImageFormat_RGBA8_Unorm, 0,23);
+	icons.VolumeIcon =  nxmpgfx::load_texture(basepath+"/player/volume.png",DkImageFormat_RGBA8_Unorm, 0,24);
+	icons.LoopIcon =  nxmpgfx::load_texture(basepath+"/player/loop.png",DkImageFormat_RGBA8_Unorm, 0,25);
+	icons.NoLoopIcon =  nxmpgfx::load_texture(basepath+"/player/noloop.png",DkImageFormat_RGBA8_Unorm, 0,26);
 
-	icons.PlayIcon =  nxmpgfx::load_texture(basepath+"/player/play.png",DkImageFormat_RGBA8_Unorm, 0,18);
-	icons.StopIcon =  nxmpgfx::load_texture(basepath+"/player/stop.png",DkImageFormat_RGBA8_Unorm, 0,19);
-	icons.PauseIcon =  nxmpgfx::load_texture(basepath+"/player/pause.png",DkImageFormat_RGBA8_Unorm, 0,20);
-	icons.MuteIcon =  nxmpgfx::load_texture(basepath+"/player/mute.png",DkImageFormat_RGBA8_Unorm, 0,21);
-	icons.VolumeIcon =  nxmpgfx::load_texture(basepath+"/player/volume.png",DkImageFormat_RGBA8_Unorm, 0,22);
-	icons.LoopIcon =  nxmpgfx::load_texture(basepath+"/player/loop.png",DkImageFormat_RGBA8_Unorm, 0,23);
-	icons.NoLoopIcon =  nxmpgfx::load_texture(basepath+"/player/noloop.png",DkImageFormat_RGBA8_Unorm, 0,24);
-
-	icons.NXMPBannerTexture =  nxmpgfx::load_texture(basepath+"/nxmp-banner.jpg",DkImageFormat_RGBA8_Unorm, 0,25);
-	icons.FFMPEGTexture =  nxmpgfx::load_texture(basepath+"/ffmpeg.png",DkImageFormat_RGBA8_Unorm, 0,26);
-	icons.MPVTexture =  nxmpgfx::load_texture(basepath+"/mpv.png",DkImageFormat_RGBA8_Unorm, 0,27);
+	icons.NXMPBannerTexture =  nxmpgfx::load_texture(basepath+"/nxmp-banner.jpg",DkImageFormat_RGBA8_Unorm, 0,27);
+	icons.FFMPEGTexture =  nxmpgfx::load_texture(basepath+"/ffmpeg.png",DkImageFormat_RGBA8_Unorm, 0,28);
+	icons.MPVTexture =  nxmpgfx::load_texture(basepath+"/mpv.png",DkImageFormat_RGBA8_Unorm, 0,29);
 
 
 	
@@ -266,6 +269,26 @@ CImgLoader::~CImgLoader(){
 	
 }
 
+int guessImageMemoryFormat(unsigned char *_img_data){
+	int guessret = -1;
+	if(_img_data[0]=='G' && _img_data[1]=='I' && _img_data[2]=='F' && _img_data[3]=='8') {
+		guessret = GIFFILE;
+	}
+	else if(_img_data[0]==0xff && _img_data[1]==0xd8){
+		guessret = JPGFILE;
+	}
+	else if(_img_data[0]==0x89 && _img_data[1]==0x50 && _img_data[2]==0x4e && _img_data[3]==0x47) {
+		guessret = PNGFILE;
+	}
+	else if(_img_data[0]==0x42 && _img_data[1]==0x4d) {
+		guessret = BMPFILE;
+	}
+	
+	
+	return guessret;
+}	
+
+
 int guessImageFormat(std::string path){
 	char testread[5];
 	FILE *fptr = fopen(path.c_str(), "rb");
@@ -327,8 +350,43 @@ Tex CImgLoader::OpenImageMemory(unsigned char *_img_data,int _size){
 #ifdef DEKO3D_BACKEND
 
 
+unsigned char * jpg_decode(unsigned char *_img_data,int _size,int *width, int *height, int *channels){
+	
+	tjhandle _jpegDecompressor = tjInitDecompress();
+
+	int jpegSubsamp;
+	tjDecompressHeader2(_jpegDecompressor, _img_data, _size, width, height, &jpegSubsamp);
+
+	int img_w = *width;
+	int img_h = *height;
+
+	unsigned char * buffer = (unsigned char *)malloc(img_w*img_h*4);
+	*channels = 4;
+	tjDecompress2(_jpegDecompressor, _img_data, _size, buffer, img_w, 0/*pitch*/, img_h, TJPF_RGBA, TJFLAG_FASTDCT);
+
+	tjDestroy(_jpegDecompressor);
+	return buffer;
+}
+
+
 Texture CImgLoader::OpenImageMemory(unsigned char *_img_data,int _size){
-	return nxmpgfx::load_texture_from_mem(_img_data,_size,DkImageFormat_RGBA8_Unorm, 0,nxmpgfx::getMaxSamplers()-1);
+	
+	int myformat = guessImageMemoryFormat(_img_data);
+	if(myformat == -1){
+		return {};
+	}
+	
+	if(myformat == PNGFILE || myformat == BMPFILE || myformat == GIFFILE){
+		int width, height, channels;
+		unsigned char* image_data = stbi_load_from_memory(_img_data,_size, &width, &height, NULL, 4);
+		channels = 4;
+		return nxmpgfx::load_texture_from_mem(image_data,width,height,channels,DkImageFormat_RGBA8_Unorm, 0,nxmpgfx::getMaxSamplers()-1);
+	}
+	if(myformat == JPGFILE){
+		int width, height, channels;
+		unsigned char* image_data = jpg_decode(_img_data,_size, &width, &height,&channels);
+		return nxmpgfx::load_texture_from_mem(image_data,width,height,channels,DkImageFormat_RGBA8_Unorm, 0,nxmpgfx::getMaxSamplers()-1);
+	}
 }
 
 
@@ -339,13 +397,7 @@ Texture CImgLoader::OpenImageFile(std::string path){
 		return {};
 	}
 	
-	//if(guessImageFormat(path) == -1){
-	//	return {};
-	//}			
-	
 	int width, height;
-	unsigned char* image_data;
-	
 	
 	if(myformat == JPGFILE || myformat == PNGFILE || myformat == BMPFILE || myformat == GIFFILE){
 		return nxmpgfx::load_texture(path,DkImageFormat_RGBA8_Unorm, 0,nxmpgfx::getMaxSamplers()-1);
@@ -355,12 +407,4 @@ Texture CImgLoader::OpenImageFile(std::string path){
 }
 
 #endif
-
-bool CImgLoader::isImageExtension(std::string path){
-	if(Utility::endsWith(path,".jpg",false) || Utility::endsWith(path,".png",false) || Utility::endsWith(path,".bmp",false)){
-		return true;
-	}
-										
-	return false;
-}
 
