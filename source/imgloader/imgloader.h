@@ -22,6 +22,8 @@ typedef struct {
 	/* File Browser Icons */
 	Tex FolderTexture;
 	Tex FileTexture;
+	Tex ImageTexture;
+	Tex ArchiveTexture;
 	Tex GUI_D_UP;
 	Tex GUI_D_DOWN;
 	Tex GUI_D_LEFT;

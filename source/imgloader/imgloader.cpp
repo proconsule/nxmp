@@ -34,6 +34,8 @@ CImgLoader::CImgLoader(std::string basepath){
 	/* File Browser Icons */
 	Utility::TxtLoadFromFile(basepath+"/folder.png",&icons.FolderTexture.id,&icons.FolderTexture.width,&icons.FolderTexture.height);
 	Utility::TxtLoadFromFile(basepath+"/file.png",&icons.FileTexture.id,&icons.FileTexture.width,&icons.FileTexture.height);
+	Utility::TxtLoadFromFile(basepath+"/archive.png",&icons.ArchiveTexture.id,&icons.ArchiveTexture.width,&icons.ArchiveTexture.height);
+	Utility::TxtLoadFromFile(basepath+"/image.png",&icons.ImageTexture.id,&icons.ImageTexture.width,&icons.ImageTexture.height);
 	Utility::TxtLoadFromFile(basepath+"/gui/dpad-up.png",&icons.GUI_D_UP.id,&icons.GUI_D_UP.width,&icons.GUI_D_UP.height);
 	Utility::TxtLoadFromFile(basepath+"/gui/dpad-down.png",&icons.GUI_D_DOWN.id,&icons.GUI_D_DOWN.width,&icons.GUI_D_DOWN.height);
 	Utility::TxtLoadFromFile(basepath+"/gui/dpad-left.png",&icons.GUI_D_LEFT.id,&icons.GUI_D_LEFT.width,&icons.GUI_D_LEFT.height);
@@ -132,6 +134,8 @@ CImgLoader::~CImgLoader(){
 	/* File Browser Icons */
 	glDeleteTextures(1, &icons.FileTexture.id);
 	glDeleteTextures(1, &icons.FolderTexture.id);
+	glDeleteTextures(1, &icons.ArchiveTexture.id);
+	glDeleteTextures(1, &icons.ImageTexture.id);
 	glDeleteTextures(1, &icons.GUI_D_UP.id);
 	glDeleteTextures(1, &icons.GUI_D_DOWN.id);
 	glDeleteTextures(1, &icons.GUI_D_LEFT.id);
