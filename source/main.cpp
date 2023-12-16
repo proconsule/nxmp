@@ -14,13 +14,8 @@
 #include "utils.h"
 #include "localfiles.h"
 #include "networkShareClass.h"
-#include "ftplib.h"
 #include "HTTPDir.h"
-#include "FTPDir.h"
-#include "sshDir.h"
-#include "sambaDir.h"
 #include "NX-UPNP.h"
-#include "nfsDir.h"
 
 #include "nxmp-i18n.h"
 
@@ -220,9 +215,6 @@ extern "C" void userAppExit(void) {
 	appletUnlockExit();
 
 }
-
-
-#include "compressedfs.h"
 
 int main(int argc, char* argv[]) {
 	appletLockExit();

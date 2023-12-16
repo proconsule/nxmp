@@ -626,7 +626,9 @@ namespace GUI {
 						}else{
 							item.first_item = true;
 							std::string mybackdir = filebrowser->backDir();
-							Windows::SetBrowserNav(mybackdir);
+							std::string relbackdir = mybackdir.substr(mybackdir.find_first_of(":")+1);
+							NXLOG::DEBUGLOG("BACKDIR REL %s\n",relbackdir.c_str());
+							Windows::SetBrowserNav(relbackdir);
 							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
 						}

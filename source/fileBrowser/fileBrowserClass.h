@@ -1,15 +1,16 @@
 #ifndef NXMP_FILEBROWSER_H
 #define NXMP_FILEBROWSER_H
 
-#include "localFs.h"
-#include "sambaDir.h"
-#include "sshDir.h"
-#include "FTPDir.h"
 #include "HTTPDir.h"
-#include "nfsDir.h"
 #include "usbfs.h"
 
-#include "compressedfs.h"
+
+#include "smb2fs.h"
+#include "sshfs.h"
+#include "nfsfs.h"
+#include "libarchivefs.h"
+#include "ftpfs.h"
+
 
 #include "utils.h"
 
@@ -18,17 +19,13 @@ public:
 	CFileBrowser(std::string _path,Playlist * _playlist,USBMounter * _myusb = nullptr);
 	~CFileBrowser();
 	
-	localFs *mylocal= nullptr;
-	sambaDir *mysamba = nullptr;
-	sshDir *myssh = nullptr;
-	nfsDir *mynfs = nullptr;
-	FTPDir *myftp = nullptr;
 	HTTPDir *myhttp = nullptr;
 	USBMounter *myusb = nullptr;
-	compressedFS * compressedArchive = nullptr;
+	
+	
 	
 	void OpenArchive(std::string _path);
-	void CloseArchive();
+	std::string CloseArchive();
 	
 	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
@@ -71,14 +68,32 @@ public:
 	int getPrevImg();
 	
 	
+protected:
+	CSSHFS * sshfs = nullptr;
+	CSMB2FS * smb2fs = nullptr;
+	CNFSFS * nfsfs = nullptr;
+	CARCHFS * archfs = nullptr;
+	CFTPFS *ftpfs = nullptr;
 
 private:
+	
+	
+
 	std::string title;
 	
 	unsigned char *archive_data = NULL;
 	int archive_datasize = 0;
 	
 	std::string oldtitle = "";
+	std::string oldmount = "";
+	
+	
+	std::string basepath = "/";
+	std::string currentpath = "";
+	std::vector<FS::FileEntry> currentlist;
+	std::vector<FS::FileEntry> currentimagelist;
+
+	uint32_t maxreadsize = 1024*1024;
 	
 };
 

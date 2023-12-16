@@ -9,7 +9,11 @@
 - Light/Dark Theme (mimic the native HOS UI)
 - Added a trivial image viewer instead of using mpv (feature zoom/pan)
 - Added ZL/ZR to show prev/next image
-- Added Archive browsing support (experimental) .zip,.rar,.tar,.tar.gz support
+- Added Archive browsing support using libarchive as a devoptab mount
+
+### Changes
+
+- samba,nfs,sftp,ftp,libarchive are now implemented as devoptabs mounts
 
 # Removed
 

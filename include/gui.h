@@ -42,10 +42,7 @@
 
 
 #include "HTTPDir.h"
-#include "FTPDir.h"
-#include "sshDir.h"
-#include "sambaDir.h"
-#include "nfsDir.h"
+
 
 
 #include "NX-UPNP.h"

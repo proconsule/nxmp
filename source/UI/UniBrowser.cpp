@@ -160,7 +160,7 @@ namespace Windows {
 										
 										if(Utility::isImageExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
 											unsigned char * img_data = NULL;
-											int img_size;
+											int img_size=0;
 											if(filebrowser->getfileContents(thislist[n].path,&img_data,img_size)){
 												NXLOG::DEBUGLOG("filesize %d\n",img_size);
 												item.state = MENU_STATE_IMGVIEWER;
@@ -170,8 +170,8 @@ namespace Windows {
 											if(img_data!=NULL)free(img_data);
 										
 										}else if(Utility::isArchiveExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
-											filebrowser->OpenArchive(thislist[n].path);
-											filebrowser->DirList("",configini->getshowHidden(false),Utility::getMediaExtensions());
+											filebrowser->OpenArchive(filebrowser->getOpenUrlPart()+thislist[n].path);
+											filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 										}else{
 										
 											playlist->clearPlaylist();

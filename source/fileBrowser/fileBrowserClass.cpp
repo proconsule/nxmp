@@ -1,331 +1,322 @@
 #include "fileBrowserClass.h"
-	
-	
-
 
 	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist,USBMounter * _myusb){
 		
 		if(_myusb!= nullptr){
 			title = "USB Browser";
 			myusb = _myusb;
+			basepath = myusb->getBasePath();
+			connected = true;
 		}else{
 			path = _path;
 			urlschema thisurl = Utility::parseUrl(_path); 
 			if(Utility::startWith(path,"/",false)){
-				mylocal = new localFs(path,_playlist);
 				title = "File Browser";
-				//timelessFS = true;
+				basepath = "/";
 			}else if(Utility::startWith(path,"smb",false)){
-				mysamba = new sambaDir(path,_playlist);
+				smb2fs = new CSMB2FS(_path,"smb0","smb0:");
+				connected = smb2fs->RegisterFilesystem();
+				basepath = "smb0:/";
 				title = "SMB Browser " + thisurl.server;
+				
 			}else if(Utility::startWith(path,"sftp",false)){
-				myssh = new sshDir(path,_playlist);
-				title = "SFTP Browser " + thisurl.server;;
+				//myssh = new sshDir(path,_playlist);
+				sshfs = new CSSHFS(_path,"ssh0","ssh0:");
+				connected = sshfs->RegisterFilesystem();
+				basepath = "ssh0:/";
+				title = "SFTP Browser " + thisurl.server;
 			}else if(Utility::startWith(path,"ftp",false)){
-				myftp = new FTPDir(path,_playlist);
-				title = "FTP Browser " + thisurl.server;;
+				//myftp = new FTPDir(path,_playlist);
+				ftpfs = new CFTPFS(_path,"ftp0","ftp0:");
+				connected = ftpfs->RegisterFilesystem();
+				basepath = "ftp0:/" + thisurl.path;
+				currentpath = basepath;
+				title = "FTP Browser " + thisurl.server;
+				maxreadsize = 8192;
 			}else if(Utility::startWith(path,"http",false)){
 				myhttp = new HTTPDir(path);
-				title = "HTTP Browser " + thisurl.server;;
+				title = "HTTP Browser " + thisurl.server;
 				timelessFS = true;
 			}else if(Utility::startWith(path,"nfs",false)){
-				title = "NFS Browser " + thisurl.server;;
-				mynfs = new nfsDir(path,_playlist);
+				title = "NFS Browser " + thisurl.server;
+				nfsfs = new CNFSFS(_path,"nfs0","nfs0:");
+				connected = nfsfs->RegisterFilesystem();
+				basepath = "nfs0:/";
+				currentpath = basepath;
 			}
 		}
 	}
 	
 	CFileBrowser::~CFileBrowser(){
-		if(mylocal!= nullptr){
-			delete mylocal;
-		}
-		if(mysamba!= nullptr){
-			delete mysamba;
-		}
-		if(myssh!= nullptr){
-			delete myssh;
-		}
-		if(myftp!= nullptr){
-			delete myftp;
-		}
+		
 		if(myhttp!= nullptr){
 			delete myhttp;
 		}
-		if(mynfs!= nullptr){
-			delete mynfs;
+		if(sshfs!= nullptr){
+			delete sshfs;
 		}
-		if(compressedArchive != nullptr){
-			delete compressedArchive;
+		if(smb2fs!= nullptr){
+			delete smb2fs;
 		}
-		
+		if(nfsfs!= nullptr){
+			delete nfsfs;
+		}
+		if(archfs!= nullptr){
+			delete archfs;
+		}
+		if(ftpfs!= nullptr){
+			delete archfs;
+		}
+	
 	}
 	
 	void CFileBrowser::OpenArchive(std::string _path){
 		oldtitle = title;
+		oldmount = currentpath;
 		title = "Compressed Archive - " + _path.substr(_path.find_last_of("/") + 1);
-		if(getfileContents(_path,&archive_data,archive_datasize)){
-			compressedArchive = new compressedFS(archive_data,archive_datasize);
-			compressedArchive->ReadList();
-		}
+		archfs = new CARCHFS(_path,"arc0","arc0:");
+		connected = archfs->is_connected;
+		basepath = archfs->mount_name+"/";
+		currentpath = archfs->mount_name+"/";
+		
 	}
-	void CFileBrowser::CloseArchive(){
+	std::string CFileBrowser::CloseArchive(){
 		title = oldtitle;
-		delete compressedArchive;
-		compressedArchive = nullptr;
-		if(archive_data != nullptr)free(archive_data);
+		basepath = oldmount.substr(0,oldmount.find_first_of("/")+1);
+		connected = true;
+		delete archfs;
+		archfs = nullptr;
+		return oldmount;
 	}
 	
 	void CFileBrowser::DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions){
-		if(compressedArchive != nullptr){
-			compressedArchive->DirList(path,showHidden,extensions);
-		}else{
-			currshowHidden = showHidden;
-			if(mylocal!= nullptr){
-				mylocal->DirList(path,showHidden,extensions);
-			}
-			if(mysamba!= nullptr){
-				connected = mysamba->DirList(path,showHidden,extensions);
-				errormsg = mysamba->errormsg;
-			}
-			if(myssh!= nullptr){
-				connected = myssh->DirList(path,showHidden,extensions);
-				errormsg = myssh->errormsg;
-			}
-			if(myftp!= nullptr){
-				myftp->DirList(path,extensions);
-			}
-			if(myhttp!= nullptr){
-				myhttp->DirList(path,extensions);
-			}
-			if(mynfs!= nullptr){
-				mynfs->DirList(path,showHidden,extensions);
-			}
-			if(myusb!= nullptr){
-				myusb->DirList(path,showHidden,extensions);
+		currshowHidden = showHidden;
+		if(myhttp!= nullptr){
+			myhttp->DirList(path,extensions);
+		}
+		/*
+		if(myusb!= nullptr){
+			myusb->DirList(path,showHidden,extensions);
+		}
+		*/
+		if(basepath.find_first_of("/") == 0 || smb2fs!= nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs!=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+			currentpath = path;
+			currentlist.clear();
+			//struct dirent *ent;
+			DIR *dir;
+			NXLOG::DEBUGLOG("DIRLIST: %s\n",path.c_str());
+			if (!path.empty()) {
+				if ((dir = opendir(path.c_str())) != nullptr) {
+				NXLOG::DEBUGLOG("DIR OPEN",path.c_str());
+					auto *reent    = __syscall_getreent();
+					auto *devoptab = devoptab_list[dir->dirData->device];	
+					
+					struct stat st;
+					
+					while (/*(ent = readdir(dir)) != nullptr*/ true) {
+							reent->deviceData = devoptab->deviceData;
+							if (devoptab->dirnext_r(reent, dir->dirData, dir->fileData.d_name, &st))
+							break;
+							
+							if ((/*path == "/" ||*/ strlen(dir->fileData.d_name) == 1) && dir->fileData.d_name[0] == '.') {
+								continue;
+							}
+							if ((/*path == "/" ||*/ strlen(dir->fileData.d_name) == 2) && dir->fileData.d_name[0] == '.' && dir->fileData.d_name[1] == '.') {
+								continue;
+							}
+							if (!showHidden && dir->fileData.d_name[0] == '.') {
+								if (strlen(dir->fileData.d_name) != 2 && dir->fileData.d_name[1] != '.') {
+									continue;
+								}
+							}
+							FS::FileEntry file;
+							file.name = dir->fileData.d_name;
+							
+							file.path = FS::removeLastSlash(path) + "/" + file.name;
+							file.size = (size_t) st.st_size;
+								file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
+								file.is_valid = 1;
+								file.created = (time_t)st.st_ctime;
+								file.modified = (time_t)st.st_mtime;
+								file.accessed = (time_t)st.st_atime;
+							
+							
+							
+							if(Utility::isImageExtension(file.name)){
+								file.mediatype = FS::FileMediaType::Image;
+								currentimagelist.push_back(file);
+							}
+							if(Utility::isArchiveExtension(file.name)){
+								file.mediatype = FS::FileMediaType::Archive;
+							}
+							currentlist.push_back(file);
+							
+						}
+						
+					
+						closedir(dir);
+						if(sortOrder == FS::FS_NAME_ASCENDINGORDER){
+							std::sort(currentlist.begin(), currentlist.end(), FS::SortNameAsc);
+						}
+						if(sortOrder == FS::FS_NAME_DESCENDINGORDER){
+							std::sort(currentlist.begin(), currentlist.end(), FS::SortNameDesc);
+						}
+						if(sortOrder == FS::FS_DATE_ASCENDINGORDER){
+							std::sort(currentlist.begin(), currentlist.end(), FS::SortDateAsc);
+						}
+						if(sortOrder == FS::FS_DATE_DESCENDINGORDER){
+							std::sort(currentlist.begin(), currentlist.end(), FS::SortDateDesc);
+						}
+						if(sortOrder == FS::FS_SIZE_ASCENDINGORDER){
+							std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeAsc);
+						}
+						if(sortOrder == FS::FS_SIZE_DESCENDINGORDER){
+							std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeDesc);
+						}
+						currentlist.erase(
+							std::remove_if(currentlist.begin(), currentlist.end(), [extensions](const FS::FileEntry &file) {
+								for (auto &ext : extensions) {
+									if (Utility::endsWith(file.name, ext, false)) {
+										return false;
+									}
+								}
+								return file.type == FS::FileEntryType::File;
+						}), currentlist.end());
+					}
+				
 			}
 		}
 	}
 	
 	std::string CFileBrowser::backDir(){
-		if(compressedArchive != nullptr){
-			std::string retback = compressedArchive->backDir();
-			if(retback == ""){
-				CloseArchive();
-				return "";
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+			std::string oldpath = currentpath;
+			std::string relpath = currentpath.substr(currentpath.find_last_of("\\/")+1);
+			
+			currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
+			int pos = currentpath.find_last_of("\\/");
+			if(pos<0)currentpath = currentpath+"/";
+			if(oldpath == currentpath && archfs != nullptr){
+				currentpath = CloseArchive();
+				
 			}
-			return retback;
-		}else{
-			if(mylocal!= nullptr){
-				return mylocal->backPath();
-			}
-			if(mysamba!= nullptr){
-				return mysamba->backDir();
-			}
-			if(myssh!= nullptr){
-				return myssh->backDir();
-			}
-			if(myftp!= nullptr){
-				return myftp->backDir();
-			}
-			if(myhttp!= nullptr){
-				return myhttp->backDir();
-			}
-			if(mynfs!= nullptr){
-				return mynfs->backDir();
-			}
-			if(myusb!= nullptr){
-				return myusb->backDir();
-			}
+			if(currentpath == "")currentpath = "/";
+			return relpath;
+		}else if(myhttp!= nullptr){
+			return myhttp->backDir();
+		}/*else if(myusb!= nullptr){
+			return myusb->backDir();
 		}
+		*/
 		return "";
 	}
 	
 	std::vector<FS::FileEntry> CFileBrowser::getCurrImageList(){
-		if(compressedArchive != nullptr){
-			return compressedArchive->getCurrImageList();
-		}else{
-			if(mylocal!= nullptr){
-				return mylocal->getCurrImageList();
-			}
-			if(mysamba!= nullptr){
-				return mysamba->getCurrImageList();
-			}
-			if(myssh!= nullptr){
-				return myssh->getCurrImageList();
-			}
-			if(myftp!= nullptr){
-				//return myftp->getCurrList();
+		
+			if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+				return currentimagelist;
 			}
 			if(myhttp!= nullptr){
 				//return myhttp->getCurrList();
 			}
-			if(mynfs!= nullptr){
-				//return mynfs->getCurrList();
-			}
+			/*
 			if(myusb!= nullptr){
 				return myusb->getCurrImageList();
 			}
-		}
+			*/
+		
 		std::vector<FS::FileEntry> retnull;
 		return retnull;
 	}
 	
 	std::vector<FS::FileEntry> CFileBrowser::getCurrList(){
-		if(compressedArchive != nullptr){
-			return compressedArchive->getCurrList();
-		}else{
-			if(mylocal!= nullptr){
-				return mylocal->getCurrList();
-			}
-			if(mysamba!= nullptr){
-				return mysamba->getCurrList();
-			}
-			if(myssh!= nullptr){
-				return myssh->getCurrList();
-			}
-			if(myftp!= nullptr){
-				return myftp->getCurrList();
-			}
+		
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr|| sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+			return currentlist;
+		}
 			if(myhttp!= nullptr){
 				return myhttp->getCurrList();
 			}
-			if(mynfs!= nullptr){
-				return mynfs->getCurrList();
-			}
+			/*
 			if(myusb!= nullptr){
 				return myusb->getCurrList();
 			}
-		}
+			*/
+		
 		std::vector<FS::FileEntry> retnull;
 		return retnull;
 	}
 	
 	std::string CFileBrowser::getCurrentPath(){
-		if(compressedArchive != nullptr){
-			return compressedArchive->getCurrentPath();
-		}else{
-			if(mylocal!= nullptr){
-				return mylocal->getCurrentPath();
+		
+			if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr || ftpfs!= nullptr){
+				return currentpath;
 			}
-			if(mysamba!= nullptr){
-				return mysamba->getCurrPath();
-			}
-			if(myssh!= nullptr){
-				return myssh->getCurrPath();
-			}
-			if(myftp!= nullptr){
-				return myftp->getCurrPath();
-			}
+			
+			
+			
 			if(myhttp!= nullptr){
 				return myhttp->getCurrPath();
 			}
-			if(mynfs!= nullptr){
-				return mynfs->getCurrPath();
-			}
+			/*
 			if(myusb!= nullptr){
 				return myusb->getCurrentPath();
 			}
-		}
+				*/	
 		
 		return "";
 	}
 	
 	void CFileBrowser::clearChecked(){
-		if(mylocal!= nullptr){
-			mylocal->clearChecked();
-		}
-		if(mysamba!= nullptr){
-			mysamba->clearChecked();
-		}
-		if(myssh!= nullptr){
-			myssh->clearChecked();
-		}
-		if(myftp!= nullptr){
-			myftp->clearChecked();
-		}
+		
+				
 		if(myhttp!= nullptr){
 			myhttp->clearChecked();
 		}
-		if(mynfs!= nullptr){
-			mynfs->clearChecked();
-		}
-		if(myusb!= nullptr){
-			return myusb->clearChecked();
-		}
+		
 	}
 	
 	bool *CFileBrowser::checked(int pos){
-		if(mylocal!= nullptr){
-			return (bool *)mylocal->checked(pos);
-		}
-		if(mysamba!= nullptr){
-			return (bool *)mysamba->checked(pos);
-		}
-		if(myssh!= nullptr){
-			return (bool *)myssh->checked(pos);
-		}
-		if(myftp!= nullptr){
-			return (bool *)myftp->checked(pos);
-		}
+		
+		
+		
 		if(myhttp!= nullptr){
 			return (bool *)myhttp->checked(pos);
 		}
-		if(mynfs!= nullptr){
-			return (bool *)mynfs->checked(pos);
-		}
-		if(mynfs!= nullptr){
-			return (bool *)mynfs->checked(pos);
-		}
-		if(myusb!= nullptr){
-			return (bool *)myusb->checked(pos);
-		}
+		
 		return (bool *)false;
 	}
 	
 	std::string CFileBrowser::getBasePath(){
-		if(mysamba!= nullptr){
-			return mysamba->getBasePath();
-		}
-		if(myssh!= nullptr){
-			return myssh->getBasePath();
-		}
-		if(myftp!= nullptr){
-			return myftp->getBasePath();
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!= nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+			return basepath;
 		}
 		if(myhttp!= nullptr){
 			return myhttp->getBasePath();
 		}
-		if(mynfs!= nullptr){
-			return mynfs->getBasePath();
-		}
+		/*
 		if(myusb!= nullptr){
 			return myusb->getBasePath();
 		}
+		*/
 		return "";
 	}
 	std::string CFileBrowser::getShare(){
+		/*
 		if(mysamba!= nullptr){
 			return mysamba->getShare();
 		}
+		*/
 		return "";
 	}
 	
 	std::string CFileBrowser::getUrl(){
-		if(mysamba!= nullptr){
-			return mysamba->getUrl();
-		}
-		if(myssh!= nullptr){
-			return myssh->getUrl();
-		}
-		if(myftp!= nullptr){
-			return myftp->getUrl();
-		}
+		
+		
 		if(myhttp!= nullptr){
 			return myhttp->getUrl();
 		}
-		if(mynfs!= nullptr){
-			return mynfs->getUrl();
-		}
+		
 		return "";
 	}
 	
@@ -334,33 +325,14 @@
 	}
 	
 	std::string CFileBrowser::getOpenUrlPart(){
-		if(compressedArchive != nullptr){
-			return "";
-		}
-		if(mylocal!= nullptr){
-			return "";
-		}
+		
+		
 		urlschema thisurl = Utility::parseUrl(path); 
-		if(mysamba!= nullptr){
-			if(thisurl.user.empty()){
-				return thisurl.scheme + std::string("://") + "Guest" + std::string("@") + thisurl.server + std::string("/") + getShare() + std::string("/");
-			}else{
-				
-				return thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + std::string("/") + getShare() + std::string("/");
-			}
-		}
-		if(myssh!= nullptr){
-			return thisurl.scheme + std::string("://") + thisurl.user + std::string(":") + thisurl.pass + std::string("@") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port);							
-		}
-		if(myftp!= nullptr){
-			return thisurl.scheme + std::string("://") + (thisurl.port.empty() ? std::string(): thisurl.user + std::string(":") + thisurl.pass + std::string("@")) + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/");
-		}
+		
 		if(myhttp!= nullptr){
 			return thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/");
 		}
-		if(mynfs!= nullptr){
-			return thisurl.scheme + std::string("://") + thisurl.server;
-		}
+		
 		if(myusb!= nullptr){
 			return "";
 		}
@@ -372,38 +344,12 @@
 		if(timelessFS){
 			if(sortOrder == FS::FS_DATE_ASCENDINGORDER|| sortOrder == FS::FS_DATE_DESCENDINGORDER)sortOrder = FS::FS_NAME_ASCENDINGORDER;
 		}
-		if(compressedArchive != nullptr){
+		
 			
-		}else{
-			if(mylocal!= nullptr){
-				mylocal->sortOrder = sortOrder;
-				mylocal->DirList(mylocal->getCurrentPath(),currshowHidden,Utility::getMediaExtensions());
-			}
-			if(mysamba!= nullptr){
-				mysamba->sortOrder = sortOrder;
-				mysamba->DirList(mysamba->getCurrPath(),currshowHidden,Utility::getMediaExtensions());
-			}
-			if(myssh!= nullptr){
-				myssh->sortOrder = sortOrder;
-				myssh->DirList(myssh->getCurrPath(),currshowHidden,Utility::getMediaExtensions());
-			}
-			if(myftp!= nullptr){
-				myftp->sortOrder = sortOrder;
-				//myftp->DirList(myftp->getCurrPath(),Utility::getMediaExtensions());
-			}
 			if(myhttp!= nullptr){
 				myhttp->sortOrder = sortOrder;
 				myhttp->DirList(myhttp->getCurrPath(),Utility::getMediaExtensions());
 			}
-			if(mynfs!= nullptr){
-				mynfs->sortOrder = sortOrder;
-				mynfs->DirList(mynfs->getCurrPath(),currshowHidden,Utility::getMediaExtensions());
-			}
-			if(myusb!= nullptr){
-				myusb->sortOrder = sortOrder;
-				myusb->DirList(myusb->getCurrentPath(),currshowHidden,Utility::getMediaExtensions());
-			}
-		}
 	}
 	
 	std::vector<FS::FileEntry> CFileBrowser::getChecked(){
@@ -418,59 +364,47 @@
 	}
 	
 	void CFileBrowser::ResetDbStatus(){
-		if(mylocal!= nullptr){
-			mylocal->ResetDbStatus();
-		}
-		if(mysamba!= nullptr){
-			mysamba->ResetDbStatus();
-		}
-		if(myssh!= nullptr){
-			myssh->ResetDbStatus();
-		}
-		if(myftp!= nullptr){
-			myftp->ResetDbStatus();
-		}
+		
 		if(myhttp!= nullptr){
 			myhttp->ResetDbStatus();
 		}
-		if(mynfs!= nullptr){
-			mynfs->ResetDbStatus();
-		}
+		/*
 		if(myusb!= nullptr){
 			myusb->ResetDbStatus();
+		}
+		*/
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr){
+			for(int i=0;i<currentlist.size();i++)
+			{		
+				currentlist[i].dbread = -1;
+			}
+		}
+	}
+	
+	void CFileBrowser::SetFileDbStatus(int idx,int dbstatus){
+		
+		if(myhttp!= nullptr){
+			myhttp->SetFileDbStatus(idx,dbstatus);
+		}
+		/*
+		if(myusb!= nullptr){
+			myusb->SetFileDbStatus(idx,dbstatus);
+		}
+		*/
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr|| ftpfs!= nullptr){
+			currentlist[idx].dbread = dbstatus;
 		}
 		
 	}
 	
-	void CFileBrowser::SetFileDbStatus(int idx,int dbstatus){
-		if(mylocal!= nullptr){
-			mylocal->SetFileDbStatus(idx,dbstatus);
-		}
-		if(mysamba!= nullptr){
-			mysamba->SetFileDbStatus(idx,dbstatus);
-		}
-		if(myssh!= nullptr){
-			myssh->SetFileDbStatus(idx,dbstatus);
-		}
-		if(myftp!= nullptr){
-			myftp->SetFileDbStatus(idx,dbstatus);
-		}
-		if(myhttp!= nullptr){
-			myhttp->SetFileDbStatus(idx,dbstatus);
-		}
-		if(mynfs!= nullptr){
-			mynfs->SetFileDbStatus(idx,dbstatus);
-		}
-		if(myusb!= nullptr){
-			myusb->SetFileDbStatus(idx,dbstatus);
-		}
-	}
-	
 	
 	void CFileBrowser::setBasePath(std::string _basepath){
+		
 		if(myusb != nullptr){
+			basepath = _basepath;
 			myusb->setBasePath(_basepath);
 		}
+		
 	}
 	
 	std::vector<usb_devices> CFileBrowser::getUsbDev(bool dummy){
@@ -494,30 +428,56 @@
 	
 	bool CFileBrowser::getfileContents(std::string filepath,unsigned char ** _filedata,int &_size){
 		currentFileinUse = filepath;
-		if(compressedArchive != nullptr){
-			return compressedArchive->getfileContents(filepath,_filedata,_size); 
-		}else{
-			if(mylocal!= nullptr){
-				return mylocal->getfileContents(filepath,_filedata,_size); 
-			}
-			if(mysamba!= nullptr){
-				return mysamba->getfileContents(filepath,_filedata,_size); 
-			}
-			if(myssh!= nullptr){
-				return myssh->getfileContents(filepath,_filedata,_size); 
-			}
-			if(myftp!= nullptr){
-				//myftp->SetFileDbStatus(idx,dbstatus);
-			}
+		
+			
 			if(myhttp!= nullptr){
 				//myhttp->SetFileDbStatus(idx,dbstatus);
 			}
-			if(mynfs!= nullptr){
-				//mynfs->SetFileDbStatus(idx,dbstatus);
-			}
-			if(myusb!= nullptr){
-				return myusb->getfileContents(filepath,_filedata,_size);
-			}
+			
+			if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr){
+				
+				
+				struct stat st = {0}; 
+				if (stat(filepath.c_str(), &st) == 0) {
+					*_filedata = (unsigned char*)malloc(st.st_size*sizeof(unsigned char)); 
+					
+					int myfd = open(filepath.c_str(),O_RDONLY);
+					if(myfd<0){
+						free(*_filedata);
+						return false;
+					}
+					
+					NXLOG::DEBUGLOG("OPEN %s\n",filepath.c_str());
+					
+					
+					_size = st.st_size;
+					
+					size_t offset = 0;
+					int bytesRead = 0;
+					
+					
+					
+					while (true){
+						bytesRead = read(myfd, *_filedata+offset, maxreadsize);
+						if(bytesRead<=0)break;
+						offset+=bytesRead;
+					}
+					
+					/*	
+					while ((bytesRead = read(myfd, *_filedata+offset, maxreadsize)) > 0) {
+						offset+=bytesRead;
+					}
+					*/
+					close(myfd);
+					
+					
+				}else{
+					NXLOG::DEBUGLOG("STAT ERROR\n");
+					return false;
+				}
+				return true;
+			
+			
 		}
 		return false;
 	}
