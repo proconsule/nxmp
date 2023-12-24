@@ -7,6 +7,8 @@ namespace GUI{
 }
 
 namespace Windows {
+	std::string NativeInputSwitchKeyboard(std::string uuid,std::string label,std::string data);
+	
 	std::string InputSwitchKeyboard(std::string uuid,std::string label,std::string data);
 	void newbatteryIcon(ImVec2 pos,bool absolute,uint32_t batlevel, float w, float h,bool showperc);
 }

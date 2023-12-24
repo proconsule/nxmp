@@ -579,9 +579,8 @@ namespace GUI {
 				}
 						
 				if(item.state == MENU_STATE_NETWORKBROWSER){
-					if(Windows::netwinselected != -1){
 						item.popupstate = POPUP_STATE_NETWORKMENU;
-					}
+					
 				}
 						
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
@@ -614,20 +613,21 @@ namespace GUI {
 				
 					if(item.state == MENU_STATE_IMGVIEWER){
 						item.state = item.laststate;
+					}else if(item.state == MENU_STATE_ADDSHARE){
+						item.state = MENU_STATE_NETWORKBROWSER;
 					}else if(item.state == MENU_STATE_APPEXIT){
 						item.state = MENU_STATE_HOME;
 					}else if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup != -1){
 						Windows::settingsview_combopopup = -1;
 					}else if(item.selectionstate == FILE_SELECTION_CHECKBOX){
 						item.selectionstate =FILE_SELECTION_NONE;
-					}else if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER|| item.state == MENU_STATE_USB_BROWSER){
+					}else if(item.state == MENU_STATE_NETWORKBROWSER || item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER|| item.state == MENU_STATE_USB_BROWSER){
 						if(item.popupstate != POPUP_STATE_NONE){
 							item.popupstate = POPUP_STATE_NONE;
 						}else{
 							item.first_item = true;
 							std::string mybackdir = filebrowser->backDir();
 							std::string relbackdir = mybackdir.substr(mybackdir.find_first_of(":")+1);
-							NXLOG::DEBUGLOG("BACKDIR REL %s\n",relbackdir.c_str());
 							Windows::SetBrowserNav(relbackdir);
 							filebrowser->DirList(filebrowser->getCurrentPath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 							
@@ -749,8 +749,15 @@ namespace GUI {
 						unsigned char * img_data = NULL;
 						int img_size;
 						int newidx = filebrowser->getNextImg();
-						NXLOG::DEBUGLOG("newimgidx %d\n",newidx);
 						if(newidx > -1){
+							
+							if(filebrowser->getfileContentsThreaded(filebrowser->getCurrImageList()[newidx].path)){
+							
+								item.state = MENU_STATE_IMGVIEWER;
+								Windows::setImageZoom(1.0f);
+								Windows::loadimage = true;
+							}
+							/*
 							if(filebrowser->getfileContents(filebrowser->getCurrImageList()[newidx].path,&img_data,img_size)){
 								
 								item.state = MENU_STATE_IMGVIEWER;
@@ -758,6 +765,7 @@ namespace GUI {
 								Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
 							}
 							if(img_data!=NULL)free(img_data);
+							*/
 						}
 						
 					}
@@ -773,15 +781,14 @@ namespace GUI {
 						unsigned char * img_data = NULL;
 						int img_size;
 						int newidx = filebrowser->getPrevImg();
-						NXLOG::DEBUGLOG("newimgidx %d\n",newidx);
 						if(newidx > -1){
-							if(filebrowser->getfileContents(filebrowser->getCurrImageList()[newidx].path,&img_data,img_size)){
+							if(filebrowser->getfileContentsThreaded(filebrowser->getCurrImageList()[newidx].path)){
 								
 								item.state = MENU_STATE_IMGVIEWER;
 								Windows::setImageZoom(1.0f);
-								Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
+								Windows::loadimage = true;
 							}
-							if(img_data!=NULL)free(img_data);
+							
 						}
 						
 					}
@@ -926,7 +933,7 @@ namespace GUI {
 				case MENU_STATE_USB_BROWSER:
 					Windows::UniBrowserWindow(/*&item.focus, &item.first_item*/);
 					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
-						Popups::FileContextPopup();
+						Popups::FileContextNativePopup();
 					}
 					break;
 				
@@ -934,13 +941,15 @@ namespace GUI {
 					Windows::USBMountWindow(&item.focus, &item.first_item);
 					break;
 				case MENU_STATE_NETWORKBROWSER:
-					Windows::NetworkWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_NETWORKMENU){
 						Popups::NetMenuPopup();
 					}
+					Windows::NetworkWindow(&item.focus, &item.first_item);
+					
 					break;
 	            case MENU_STATE_ADDSHARE:
-					Windows::ShareAddWindow(&item.focus, &item.first_item);
+					//Windows::ShareAddWindow(&item.focus, &item.first_item);
+					Windows::NewShareWindow();
 					break;
 				
 				case MENU_STATE_UPNPBROWSER:

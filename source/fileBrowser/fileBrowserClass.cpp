@@ -1,5 +1,6 @@
 #include "fileBrowserClass.h"
 
+
 	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist,USBMounter * _myusb){
 		
 		if(_myusb!= nullptr){
@@ -29,10 +30,10 @@
 				//myftp = new FTPDir(path,_playlist);
 				ftpfs = new CFTPFS(_path,"ftp0","ftp0:");
 				connected = ftpfs->RegisterFilesystem();
-				basepath = "ftp0:/" + thisurl.path;
+				basepath = "ftp0:" + thisurl.path;
 				currentpath = basepath;
 				title = "FTP Browser " + thisurl.server;
-				maxreadsize = 8192;
+				maxreadsize = 65536;
 			}else if(Utility::startWith(path,"http",false)){
 				myhttp = new HTTPDir(path);
 				title = "HTTP Browser " + thisurl.server;
@@ -104,10 +105,10 @@
 			currentlist.clear();
 			//struct dirent *ent;
 			DIR *dir;
-			NXLOG::DEBUGLOG("DIRLIST: %s\n",path.c_str());
+			//NXLOG::DEBUGLOG("DIRLIST: %s\n",path.c_str());
 			if (!path.empty()) {
 				if ((dir = opendir(path.c_str())) != nullptr) {
-				NXLOG::DEBUGLOG("DIR OPEN",path.c_str());
+				//NXLOG::DEBUGLOG("DIR OPEN",path.c_str());
 					auto *reent    = __syscall_getreent();
 					auto *devoptab = devoptab_list[dir->dirData->device];	
 					
@@ -350,6 +351,7 @@
 				myhttp->sortOrder = sortOrder;
 				myhttp->DirList(myhttp->getCurrPath(),Utility::getMediaExtensions());
 			}
+			DirList(getCurrentPath(),currshowHidden,Utility::getMediaExtensions());	
 	}
 	
 	std::vector<FS::FileEntry> CFileBrowser::getChecked(){
@@ -426,59 +428,132 @@
 		return std::vector<usb_devices>();
 	}
 	
+	
+	void file_read_Thread(void *arg) {
+		//CFileBrowser * ctx = (CFileBrowser *)arg;
+		fileload_struct *fileref  = (fileload_struct *)arg;
+		
+		
+		fileref->currentOffset = 0;
+		//size_t offset = 0;
+		size_t bytesRead = 0;
+		
+		if(fileref->mem != nullptr)free(fileref->mem);
+		
+		int myfd = open(fileref->path,O_RDONLY);
+		if(myfd<0){
+				return;
+		}
+		
+		fileref->mem = (unsigned char*)malloc(fileref->size*sizeof(unsigned char)); 
+			
+		char buffer[8192];
+		while (true){
+			bytesRead = read(myfd, buffer, 8192);
+			if(bytesRead<=0)break;
+			memcpy(fileref->mem+fileref->currentOffset,buffer,bytesRead);
+			fileref->currentOffset+=bytesRead;
+		}
+		
+		close(myfd);
+		fileref->memvalid = true;
+		
+		/*
+		if (stat(ctx->LoadedFileName.c_str(), &st) == 0) {
+			
+			if(ctx->LoadedFileBuffer!=nullptr)free(ctx->LoadedFileBuffer);
+					
+			ctx->LoadedFileBuffer = (unsigned char*)malloc(st.st_size*sizeof(unsigned char)); 
+			
+			int myfd = open(ctx->LoadedFileName.c_str(),O_RDONLY);
+			
+			if(myfd<0){
+				free(ctx->LoadedFileBuffer);
+				return;
+			}
+			
+			//size_t offset = 0;
+			char buffer[ctx->maxreadsize];
+			
+			
+			while (true){
+				bytesRead = read(myfd, buffer, ctx->maxreadsize);
+				if(bytesRead<=0)break;
+				memcpy(ctx->LoadedFileBuffer+ctx->CurrentReadOffset,buffer,bytesRead);
+				ctx->CurrentReadOffset+=bytesRead;
+			}
+			
+			if(ctx->CurrentReadOffset>=st.st_size){
+				
+				ctx->LoadedFileSize = st.st_size;
+				ctx->LoadedFileStatus = true;
+			}
+			
+			close(myfd);
+			
+			
+			
+		}
+		*/
+		
+	}
+	
+	
+	bool CFileBrowser::getfileContentsThreaded(std::string filepath){
+		currentFileinUse = filepath;
+		
+			
+		if(myhttp!= nullptr){
+				//myhttp->SetFileDbStatus(idx,dbstatus);
+		}
+			
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr){
+				struct stat st = {0}; 
+				if (stat(filepath.c_str(), &st) == 0) {
+					if(LoadedFile!=nullptr){
+						if(LoadedFile->mem !=nullptr){
+							free(LoadedFile->mem);
+						}
+						free(LoadedFile);
+					}
+					
+					
+					LoadedFile = (fileload_struct *)malloc(sizeof(fileload_struct));
+					LoadedFile->memvalid = false;
+					LoadedFile->readbuffersize = maxreadsize;
+					memset(LoadedFile->path,0,NAME_MAX);
+					memcpy(LoadedFile->path,filepath.c_str(),filepath.length());
+					//LoadedFile->path = filepath;
+					LoadedFile->size = st.st_size;
+					LoadedFile->mem = (unsigned char*)malloc(st.st_size*sizeof(unsigned char)); 
+		
+					LoadedFile->currentOffset = 0;
+					threadCreate(&readThreadref, file_read_Thread, LoadedFile, NULL, 0x100000, 0x3B, -2);
+					threadStart(&readThreadref);
+					
+					/*
+					LoadedFile.memvalid = false;
+					LoadedFile.readbuffersize = maxreadsize;
+					LoadedFile.path = filepath;
+					LoadedFile.size = st.st_size;
+					LoadedFile.currentOffset = 0;
+					threadCreate(&readThreadref, file_read_Thread, (void *)&LoadedFile, NULL, 0x100000, 0x3B, -2);
+					threadStart(&readThreadref);
+					*/
+					return true;
+				}
+				
+			
+		}
+		return false;
+	}
+	
+	
 	bool CFileBrowser::getfileContents(std::string filepath,unsigned char ** _filedata,int &_size){
 		currentFileinUse = filepath;
 		
 			
-			if(myhttp!= nullptr){
-				//myhttp->SetFileDbStatus(idx,dbstatus);
-			}
-			
-			if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr){
-				
-				
-				struct stat st = {0}; 
-				if (stat(filepath.c_str(), &st) == 0) {
-					*_filedata = (unsigned char*)malloc(st.st_size*sizeof(unsigned char)); 
-					
-					int myfd = open(filepath.c_str(),O_RDONLY);
-					if(myfd<0){
-						free(*_filedata);
-						return false;
-					}
-					
-					NXLOG::DEBUGLOG("OPEN %s\n",filepath.c_str());
-					
-					
-					_size = st.st_size;
-					
-					size_t offset = 0;
-					int bytesRead = 0;
-					
-					
-					
-					while (true){
-						bytesRead = read(myfd, *_filedata+offset, maxreadsize);
-						if(bytesRead<=0)break;
-						offset+=bytesRead;
-					}
-					
-					/*	
-					while ((bytesRead = read(myfd, *_filedata+offset, maxreadsize)) > 0) {
-						offset+=bytesRead;
-					}
-					*/
-					close(myfd);
-					
-					
-				}else{
-					NXLOG::DEBUGLOG("STAT ERROR\n");
-					return false;
-				}
-				return true;
-			
-			
-		}
+		
 		return false;
 	}
 	
@@ -504,3 +579,4 @@
 		
 		return -1;
 	}
+	

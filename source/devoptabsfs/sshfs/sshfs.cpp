@@ -121,6 +121,7 @@ CSSHFS::sshurlschema CSSHFS::parseSSHUrl(std::string url){
 		res.server = match[4];
 		res.port = match[5];
 		res.path = match[8];
+		res.path = "/" + res.path;
 	}
 	return res;
 }
@@ -173,7 +174,7 @@ bool CSSHFS::CheckConnection(){
 bool CSSHFS::RegisterFilesystem(){
 	
 	if(connect(urlschema.server,atoi(urlschema.port.c_str()),urlschema.user,urlschema.pass) == 0){
-		this->cwd = "/" + urlschema.path;
+		this->cwd = urlschema.path;
 		register_fs();
 		this->fs_regisered = true;
 		return true;

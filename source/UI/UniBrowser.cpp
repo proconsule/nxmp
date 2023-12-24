@@ -90,7 +90,7 @@ namespace Windows {
 					int navfocusid = 0;
 					if(movenavfocus){
 						for(int i=0;i<thislist.size();i++){
-							NXLOG::DEBUGLOG("%s %s",thislist[i].name.c_str(),navfocusstring.c_str());
+							//NXLOG::DEBUGLOG("%s %s",thislist[i].name.c_str(),navfocusstring.c_str());
 						
 							if(thislist[i].name == navfocusstring){
 								navfocusid = i;
@@ -110,7 +110,7 @@ namespace Windows {
 							if(movenavfocus){
 								if(navfocusid == n){
 									ImGui::SetKeyboardFocusHere();
-									NXLOG::DEBUGLOG("FOCUS ON %d",n);
+									
 								}
 								
 							}
@@ -159,16 +159,23 @@ namespace Windows {
 										item.laststate = item.state;
 										
 										if(Utility::isImageExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
-											unsigned char * img_data = NULL;
-											int img_size=0;
+											//unsigned char * img_data = NULL;
+											//int img_size=0;
+											/*
 											if(filebrowser->getfileContents(thislist[n].path,&img_data,img_size)){
 												NXLOG::DEBUGLOG("filesize %d\n",img_size);
 												item.state = MENU_STATE_IMGVIEWER;
 												Windows::setImageZoom(1.0f);
-												Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
+												//Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
 											}
 											if(img_data!=NULL)free(img_data);
-										
+											*/
+											if(filebrowser->getfileContentsThreaded(thislist[n].path)){
+												item.state = MENU_STATE_IMGVIEWER;
+												Windows::setImageZoom(1.0f);
+												Windows::loadimage = true;
+											}
+											
 										}else if(Utility::isArchiveExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
 											filebrowser->OpenArchive(filebrowser->getOpenUrlPart()+thislist[n].path);
 											filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());

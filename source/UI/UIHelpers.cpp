@@ -148,6 +148,73 @@ namespace Windows {
 		return InitialValueStr;
 	}		
 	
+	std::string NativeInputSwitchKeyboard(std::string uuid,std::string label,std::string data){
+		ImVec2 textsize = ImGui::CalcTextSize(data.c_str());
+		if(data.empty()){
+			textsize = ImGui::CalcTextSize("A");
+		}
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f,0.0f,0.0f,0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
+    	float currstartpos = ImGui::GetCursorPosX();
+		float currstartposy = ImGui::GetCursorPosY();
+		ImGui::SetCursorPosX(currstartpos+10*multiplyRes);
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0f);
+		
+		ImGui::Text(label.c_str());
+		ImGui::SameLine(1280.0f*multiplyRes-2.0f*ImGui::GetStyle().ItemSpacing.x-textsize.x-10.0f*multiplyRes);
+		ImGui::Text(data.c_str());
+		ImGui::SetCursorPosX(currstartpos);
+		ImGui::SetCursorPosY(currstartposy);
+		
+		if (ImGui::Selectable(uuid.c_str(), false,0,ImVec2(1280.0f*multiplyRes-2.0f*ImGui::GetStyle().ItemSpacing.x,50.0f*multiplyRes))){
+				SwkbdConfig kbd;
+				char tmpoutstr[256] = {0};
+				Result rc = swkbdCreate(&kbd, 0);
+				
+				if (R_SUCCEEDED(rc)) {
+					// Select a Preset to use, if any.
+					swkbdConfigMakePresetDefault(&kbd);
+					//swkbdConfigMakePresetPassword(&kbd);
+					//swkbdConfigMakePresetUserName(&kbd);
+					//swkbdConfigMakePresetDownloadCode(&kbd);
+
+					// Optional, set any text if you want (see swkbd.h).
+					//swkbdConfigSetOkButtonText(&kbd, "Submit");
+					//swkbdConfigSetLeftOptionalSymbolKey(&kbd, "a");
+					//swkbdConfigSetRightOptionalSymbolKey(&kbd, "b");
+					swkbdConfigSetHeaderText(&kbd, label.c_str());
+					//swkbdConfigSetSubText(&kbd, "Sub");
+					//swkbdConfigSetGuideText(&kbd, "Guide");
+
+					//swkbdConfigSetTextCheckCallback(&kbd, validate_text);//Optional, can be removed if not using TextCheck.
+
+					// Set the initial string if you want.
+					swkbdConfigSetInitialText(&kbd, data.c_str());
+
+					// You can also use swkbdConfigSet*() funcs if you want.
+
+					//printf("Running swkbdShow...\n");
+					rc = swkbdShow(&kbd, tmpoutstr, sizeof(tmpoutstr));
+					//printf("swkbdShow(): 0x%x\n", rc);
+					swkbdClose(&kbd);
+					
+					if (R_SUCCEEDED(rc)) {
+						ImGui::PopStyleColor();
+						ImGui::PopStyleVar();
+						return tmpoutstr;
+						
+					}
+					
+				}
+				
+				
+			}
+			ImGui::PopStyleColor();
+			ImGui::PopStyleVar();
+			return data;
+	}
+	
+	
 	std::string InputSwitchKeyboard(std::string uuid,std::string label,std::string data){
 		ImGui::Text(label.c_str());
 		ImGui::SameLine();

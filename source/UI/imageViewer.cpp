@@ -31,6 +31,9 @@ namespace Windows {
 	float textfadealpha = 1.0f;
 	
 	
+	bool loadimage = false;
+	
+	
 	void SetupImgViewerWindow(void) {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Always);
@@ -150,13 +153,41 @@ namespace Windows {
 		if(myimgresize)ImGui::SetNextWindowScroll(imgviewer_image.newscrollPos);
 		if (ImGui::Begin("##imgviewer", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_HorizontalScrollbar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove)) {
 			
-			ImVec2 mouse_delta = ImGui::GetIO().MouseDelta;
-			ScrollWhenDraggingOnVoid(ImVec2(-mouse_delta.x, -mouse_delta.y));
-			MakeSizes(ImVec2(currentImg.width,currentImg.height),imgzoom,ImVec2(ImGui::GetScrollX(),ImGui::GetScrollY()));
-		
-			ImGui::SetCursorPos(ImVec2(imgviewer_image.nCenteringFactorX,imgviewer_image.nCenteringFactorY));
-			ImGui::Image((void*)(intptr_t)currentImg.id, imgviewer_image.renderSize);
+			if(loadimage){
+				if(filebrowser->LoadedFile!=nullptr){
+					if(filebrowser->LoadedFile->memvalid){
+#ifdef OPENGL_BACKEND
+						glDeleteTextures(1, &Windows::currentImg.id);
+#endif
+#ifdef DEKO3D_BACKEND
+						Windows::currentImg.memblock.destroy();
+#endif
+						Windows::currentImg =  imgloader->OpenImageMemory(filebrowser->LoadedFile->mem,filebrowser->LoadedFile->size);
+						loadimage=false;
+					}
+				}
+			}
 			
+			if(filebrowser->LoadedFile!=nullptr){
+				if(filebrowser->LoadedFile->memvalid){
+					ImVec2 mouse_delta = ImGui::GetIO().MouseDelta;
+					ScrollWhenDraggingOnVoid(ImVec2(-mouse_delta.x, -mouse_delta.y));
+					MakeSizes(ImVec2(currentImg.width,currentImg.height),imgzoom,ImVec2(ImGui::GetScrollX(),ImGui::GetScrollY()));
+				
+					ImGui::SetCursorPos(ImVec2(imgviewer_image.nCenteringFactorX,imgviewer_image.nCenteringFactorY));
+					ImGui::Image((void*)(intptr_t)currentImg.id, imgviewer_image.renderSize);
+				}
+			}
+			
+			if(filebrowser->LoadedFile!=nullptr){
+				if(loadimage){
+					float progress = (filebrowser->LoadedFile->currentOffset*100.0/filebrowser->LoadedFile->size)/100.0f;
+					ImGui::SetCursorPosY(720.0f*multiplyRes/2.0f);
+					ImGui::PushStyleColor(ImGuiCol_PlotHistogram,ImVec4(1.0f,1.0f,1.0f,1.0f));
+					ImGui::ProgressBar(progress, ImVec2(-1.0f, 0.0f));
+					ImGui::PopStyleColor();
+				}
+			}
 			
 			ImGuiContext& g = *GImGui;
 			if(g.Time - imgControlsHide < 5){

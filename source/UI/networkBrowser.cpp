@@ -8,12 +8,313 @@
 
 #include "nxmp-i18n.h"
 
+
+#include "smb2fs.h"
+#include "sshfs.h"
+#include "nfsfs.h"
+#include "ftpfs.h"
+
 namespace Windows {
 	
 	int netwinselected = -1;
 	
 	CFileBrowser * sharecheck = nullptr;
 	
+	bool urlcheck_isconnected = false;
+	
+	std::string newnetaddress = "";
+	std::string newentryname = "New Share";
+	
+	void NewShareWindow(){
+		Windows::SetupWindow();
+		
+		if (ImGui::Begin("Add Network Source", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
+			/*
+			if (!*focus) {
+                ImGui::SetNextWindowFocus();
+                *focus = true;
+            }
+			*/
+			
+		}
+		
+		float total_w = ImGui::GetContentRegionAvail().x;
+		float total_h = ImGui::GetContentRegionAvail().y;
+		float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
+		ImGui::BeginChild("##shareaddmainview",ImVec2(total_w,total_h-45*multiplyRes),false,ImGuiWindowFlags_NoScrollbar);
+		
+		ImGui::PushStyleColor(ImGuiCol_ChildBg,nxmpgfx::OptsTab_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
+		ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(40.0f,0));
+		
+		ImGui::PushStyleColor(ImGuiCol_Button,nxmpgfx::Button_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive,nxmpgfx::ButtonActive_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,nxmpgfx::NavHover_color);
+		
+		ImGui::Separator();
+		newentryname = NativeInputSwitchKeyboard("##netaddentry","Name:",newentryname);
+		ImGui::Separator();
+		
+		newnetaddress = NativeInputSwitchKeyboard("##netaddredd","Enter Net URL:",newnetaddress);
+		
+		
+		if(!newnetaddress.empty()){
+		
+			urlschema thisurl = Utility::parseUrl(newnetaddress);
+			
+			ImGui::Separator();
+			float currentposy = ImGui::GetCursorPosY();
+			ImVec2 textsize = ImGui::CalcTextSize("A");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::Text("Network Type:");
+			//textsize = ImGui::CalcTextSize(thisurl);
+			ImGui::SameLine(1280.0f*multiplyRes-50-2*ImGui::GetStyle().ItemSpacing.x);
+			//ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			//ImGui::Text(curr_subfontsizestr.c_str());
+			//ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(currentposy);
+			if(Utility::startWith(newnetaddress,"smb",false)){
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SMBTexture.id, ImVec2(50,50));
+				
+			}else if(Utility::startWith(newnetaddress,"sftp",false)){
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SFTPTexture.id, ImVec2(50,50));
+				
+			}else if(Utility::startWith(newnetaddress,"ftp",false)){
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FTPTexture.id, ImVec2(50,50));
+						
+			}else if(Utility::startWith(newnetaddress,"http",false)){
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.HTTPTexture.id, ImVec2(50,50));
+				
+			}else if(Utility::startWith(newnetaddress,"nfs",false)){
+				GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NFSTexture.id, ImVec2(50,50));
+				
+			}else{
+				ImGui::Dummy(ImVec2(50.0f,50.0f));
+			}
+			
+			ImGui::Separator();
+			currentposy = ImGui::GetCursorPosY();
+			textsize = ImGui::CalcTextSize("A");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::Text("Host:");
+			//textsize = ImGui::CalcTextSize(thisurl);
+			textsize = ImGui::CalcTextSize(thisurl.server.c_str());
+			ImGui::SameLine(1280.0f*multiplyRes-textsize.x-2*ImGui::GetStyle().ItemSpacing.x);
+			//ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			//ImGui::Text(curr_subfontsizestr.c_str());
+			//ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::Text(thisurl.server.c_str());
+			ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			
+			ImGui::Separator();
+			currentposy = ImGui::GetCursorPosY();
+			textsize = ImGui::CalcTextSize("A");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::Text("Port:");
+			//textsize = ImGui::CalcTextSize(thisurl);
+			std::string portstr = thisurl.port.empty() ? "Protocol Default":thisurl.port;
+			textsize = ImGui::CalcTextSize(portstr.c_str());
+			ImGui::SameLine(1280.0f*multiplyRes-textsize.x-2*ImGui::GetStyle().ItemSpacing.x);
+			//ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			//ImGui::Text(curr_subfontsizestr.c_str());
+			//ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::Text(portstr.c_str());
+			ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			
+			
+			ImGui::Separator();
+			currentposy = ImGui::GetCursorPosY();
+			textsize = ImGui::CalcTextSize("A");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::Text("Username:");
+			//textsize = ImGui::CalcTextSize(thisurl);
+			textsize = ImGui::CalcTextSize(thisurl.user.c_str());
+			ImGui::SameLine(1280.0f*multiplyRes-textsize.x-2*ImGui::GetStyle().ItemSpacing.x);
+			//ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			//ImGui::Text(curr_subfontsizestr.c_str());
+			//ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::Text(thisurl.user.c_str());
+			ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			
+			
+			ImGui::Separator();
+			currentposy = ImGui::GetCursorPosY();
+			textsize = ImGui::CalcTextSize("A");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::Text("Password:");
+			//textsize = ImGui::CalcTextSize(thisurl);
+			textsize = ImGui::CalcTextSize(thisurl.pass.c_str());
+			ImGui::SameLine(1280.0f*multiplyRes-textsize.x-2*ImGui::GetStyle().ItemSpacing.x);
+			//ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			//ImGui::Text(curr_subfontsizestr.c_str());
+			//ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::Text(thisurl.pass.c_str());
+			ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			
+			ImGui::Separator();
+			currentposy = ImGui::GetCursorPosY();
+			textsize = ImGui::CalcTextSize("A");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			
+			if(Utility::startWith(newnetaddress,"smb",false)){
+				ImGui::Text("Share:");
+			}else{
+				ImGui::Text("Remote Path:");
+			}
+			//textsize = ImGui::CalcTextSize(thisurl);
+			textsize = ImGui::CalcTextSize(thisurl.path.c_str());
+			ImGui::SameLine(1280.0f*multiplyRes-textsize.x-2*ImGui::GetStyle().ItemSpacing.x);
+			//ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			//ImGui::Text(curr_subfontsizestr.c_str());
+			//ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::Text(thisurl.path.c_str());
+			ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			
+			
+			
+			ImGui::Separator();
+			
+			currentposy = ImGui::GetCursorPosY();
+			
+			//ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f*multiplyRes);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+10.0f*multiplyRes);
+			ImVec2 button_size(total_w-10.0*multiplyRes-2*ImGui::GetStyle().ItemSpacing.x, 60.0f);
+				
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);	
+				
+			
+			
+			if (ImGui::Button("Test Connection", button_size))
+			{
+					if(Utility::startWith(newnetaddress,"smb",false)){
+						CSMB2FS *testcon = new CSMB2FS(newnetaddress,"smb0","smb0:");
+						urlcheck_isconnected = testcon->CheckConnection();
+						delete testcon;
+						
+					}else if(Utility::startWith(newnetaddress,"sftp",false)){
+						CSSHFS *testcon = new CSSHFS(newnetaddress,"ssh0","ssh0:");
+						urlcheck_isconnected = testcon->CheckConnection();
+						delete testcon;
+						
+					}else if(Utility::startWith(newnetaddress,"ftp",false)){
+						CFTPFS *testcon = new CFTPFS(newnetaddress,"ftp0","ftp0:");
+						urlcheck_isconnected = testcon->CheckConnection();
+						delete testcon;		
+					}else if(Utility::startWith(newnetaddress,"nfs",false)){
+						CNFSFS *testcon = new CNFSFS(newnetaddress,"nfs0","nfs0:");
+						urlcheck_isconnected = testcon->CheckConnection();
+						delete testcon;
+					}else{
+						ImGui::Dummy(ImVec2(50.0f,50.0f));
+					}
+			}
+			
+			
+			
+			
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
+			
+			
+			ImGui::Separator();
+			std::string connectstr = urlcheck_isconnected ? "Connected" : "Not Connected";
+			currentposy = ImGui::GetCursorPosY();
+			textsize = ImGui::CalcTextSize("A");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+			ImGui::Text("Connection Test Status:");
+			//textsize = ImGui::CalcTextSize(thisurl);
+			textsize = ImGui::CalcTextSize(connectstr.c_str());
+			ImGui::SameLine(1280.0f*multiplyRes-textsize.x-2*ImGui::GetStyle().ItemSpacing.x);
+			//ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			//ImGui::Text(curr_subfontsizestr.c_str());
+			//ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
+			if(urlcheck_isconnected){
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			}else{
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color );
+			}
+			ImGui::Text(connectstr.c_str());
+			ImGui::PopStyleColor();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
+		
+			ImGui::Separator();
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);	
+			
+			
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f*multiplyRes);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+10.0f*multiplyRes);
+			if (ImGui::Button("Save Connection", button_size))
+			{
+				oldnetworkSource tmpsource;
+				tmpsource.name = newentryname;
+				tmpsource.url = newnetaddress;
+				configini->addNetworkShare(tmpsource);
+				item.networksources = configini->getNetworks();
+				item.state = MENU_STATE_NETWORKBROWSER;
+				
+			}
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
+			ImGui::Separator();
+		}
+		
+		
+		
+		ImGui::PopStyleColor(6);
+		ImGui::PopStyleVar();
+		ImGui::EndChild();
+		
+		
+		ImGui::BeginChild("##helpchild",ImVec2(total_w,ImGui::GetContentRegionAvail().y));
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		ImGui::Dummy(ImVec2(0,5));
+		ImVec2 startpos =  ImGui::GetCursorScreenPos();
+		ImGui::Dummy(ImVec2(0,5));
+		ImGui::Text(FONT_DPADUP_BUTTON_FILLED);
+		ImGui::SameLine();
+		ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
+		ImGui::SameLine();
+		ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+		ImGui::Text(FONT_A_BUTTON_FILLED);
+		ImGui::SameLine();
+		ImGui::Text(Common_STR[NXCOMMON_SELECT]);
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
+		ImGui::Text(FONT_B_BUTTON_FILLED);
+		ImGui::SameLine();
+		ImGui::Text(Common_STR[NXCOMMON_CANCEL]);
+		
+		window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(nxmpgfx::Text_color), 1.0f);
+		
+		ImGui::EndChild();
+		
+		Windows::ExitWindow();
+		
+	}
 
 	void ShareAddWindow(bool *focus, bool *first_item){
 		Windows::SetupWindow();
@@ -169,6 +470,8 @@ namespace Windows {
 			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
 			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
 			
+			
+		
 			if(item.networkselect){
 				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-45*multiplyRes));
 				ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
@@ -187,14 +490,14 @@ namespace Windows {
 					if (ImGui::Selectable("##addsharesel", selected == 0,selectable_flags,ImVec2(1280*multiplyRes,50*multiplyRes))){
 						NewNetworkShare = new CNetworkShare();
 						item.state = MENU_STATE_ADDSHARE;
-					}	
-					if(ImGui::IsItemHovered()){
-						netwinselected = -1;
 					}
 					ImGui::TableSetColumnIndex(1);
 					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
 					ImGui::Text(Network_STR[NXNET_ADDSHARE]);
-					
+					if(ImGui::IsItemHovered()){
+						netwinselected = -1;
+					}
+
 					for(unsigned int n=0;n<item.networksources.size();n++){
 						
 						ImGui::TableNextRow();
@@ -258,6 +561,9 @@ namespace Windows {
 								ImGui::SetItemDefaultFocus();
 							}
 						}
+						if(ImGui::IsItemHovered()){
+							netwinselected = n;
+						}
 						ImGui::TableSetColumnIndex(1);
 						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
 						ImGui::Text(std::string(item.networksources[n].name + " @ " +thisurl.server).c_str());
@@ -270,13 +576,18 @@ namespace Windows {
 					
 					ImGui::PopStyleVar();			
 					if (*first_item) {
-                        ImGui::SetFocusID(ImGui::GetID((item.networksources[0].name.c_str())), ImGui::GetCurrentWindow());
-                        *first_item = false;
+						if(item.popupstate == POPUP_STATE_NONE){
+							ImGui::SetFocusID(ImGui::GetID((item.networksources[0].name.c_str())), ImGui::GetCurrentWindow());
+                        }
+						*first_item = false;
                     }
 					ImGui::EndTable();
-					ImGui::SetWindowFocus();
+					if(item.popupstate == POPUP_STATE_NONE){
+						ImGui::SetWindowFocus();
+					}
 				}
 				ImGui::EndChild();
+				
 				ImGui::BeginChild("##helpchild",ImVec2(total_w,ImGui::GetContentRegionAvail().y));
 				ImGuiWindow* window = ImGui::GetCurrentWindow();
 				

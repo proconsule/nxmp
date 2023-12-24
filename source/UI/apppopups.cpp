@@ -395,73 +395,7 @@ namespace Popups{
 	}
 
 
-	void NetMenuPopup(void) {
-		Popups::SetupPopup(Popup_STR[NXPOPUP_NETWORKPOPUP]);
-
-		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_NETWORKPOPUP], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			
-			ImGui::Text("%s",item.networksources[Windows::netwinselected].name.c_str());
-			
-			ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
-			if(Windows::netwinselected == 0){
-				ImGui::BeginDisabled();
-			}
-			if (ImGui::Button(Common_STR[NXCOMMON_MOVEUP], button_size))
-            {
-					
-					oldnetworkSource v1 = item.networksources[Windows::netwinselected];
-					oldnetworkSource v2 = item.networksources[Windows::netwinselected-1];
-					
-					item.networksources[Windows::netwinselected]  = v2;
-					item.networksources[Windows::netwinselected-1]  = v1;
-					configini->RefreshNetworkShare(item.networksources);
-					item.popupstate = POPUP_STATE_NONE;
-					ImGui::CloseCurrentPopup();
-					
-					
-			}
-			if(Windows::netwinselected == 0){
-				ImGui::EndDisabled();
-			}
-			if(Windows::netwinselected == item.networksources.size()-1){
-				ImGui::BeginDisabled();
-			}
-			if (ImGui::Button(Common_STR[NXCOMMON_MOVEDOWN], button_size))
-            {
-					oldnetworkSource v1 = item.networksources[Windows::netwinselected];
-					oldnetworkSource v2 = item.networksources[Windows::netwinselected+1];
-					
-					item.networksources[Windows::netwinselected]  = v2;
-					item.networksources[Windows::netwinselected+1]  = v1;
-					configini->RefreshNetworkShare(item.networksources);
-					item.popupstate = POPUP_STATE_NONE;
-					ImGui::CloseCurrentPopup();
-			}
-			if(Windows::netwinselected == item.networksources.size()-1){
-				ImGui::EndDisabled();
-			}
-			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
-			if (ImGui::Button(Common_STR[NXCOMMON_DELETE], button_size))
-            {	
-				item.networksources.erase(item.networksources.begin() + Windows::netwinselected);
-				item.popupstate = POPUP_STATE_NONE;
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::PopStyleColor(3);
-			
-			
-			
-			if (ImGui::Button(Common_STR[NXCOMMON_EXIT], button_size))
-			{
-                item.popupstate = POPUP_STATE_NONE;
-				ImGui::CloseCurrentPopup();
-             }
-			
-		}
-		Popups::ExitPopup();
-	}
+	
 	
 	
 	void FileContextPopup(void) {
@@ -767,4 +701,196 @@ namespace Popups{
 		Popups::ExitNativePopup();
 	}
 	
+	void NetMenuPopup(void) {
+		if(Windows::netwinselected==-1)return;
+		Popups::SetupNativeContextPopup("##netmenupopup",4);
+
+		if (ImGui::BeginPopupModal("##netmenupopup", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
+			
+			ImGui::SetWindowFontScale(1.5f);
+			
+			ImVec2 textsize = ImGui::CalcTextSize(item.networksources[Windows::netwinselected].name.c_str());
+			
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+((771.0f*multiplyRes-textsize.x)/2.0f));
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(70.0f*multiplyRes-multiplyRes-textsize.y)/2.0f);
+			ImGui::Text("%s",item.networksources[Windows::netwinselected].name.c_str());
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(70.0f*multiplyRes-multiplyRes-textsize.y)/2.0f);
+			
+			
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			
+			
+			
+			ImVec2 button_size(771.0f*multiplyRes, 70.0f);
+			if (ImGui::Button(Common_STR[NXCOMMON_MOVEUP], button_size))
+            {
+					if(Windows::netwinselected>0){
+						oldnetworkSource v1 = item.networksources[Windows::netwinselected];
+						oldnetworkSource v2 = item.networksources[Windows::netwinselected-1];
+						
+						item.networksources[Windows::netwinselected]  = v2;
+						item.networksources[Windows::netwinselected-1]  = v1;
+						configini->RefreshNetworkShare(item.networksources);
+					}
+					item.popupstate = POPUP_STATE_NONE;
+					ImGui::CloseCurrentPopup();
+					
+					
+			}
+			if (ImGui::Button(Common_STR[NXCOMMON_MOVEDOWN], button_size))
+            {
+					if(Windows::netwinselected<item.networksources.size()-2){
+						oldnetworkSource v1 = item.networksources[Windows::netwinselected];
+						oldnetworkSource v2 = item.networksources[Windows::netwinselected+1];
+					
+						item.networksources[Windows::netwinselected]  = v2;
+						item.networksources[Windows::netwinselected+1]  = v1;
+						configini->RefreshNetworkShare(item.networksources);
+					}
+					item.popupstate = POPUP_STATE_NONE;
+					ImGui::CloseCurrentPopup();
+			}
+			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+			if (ImGui::Button(Common_STR[NXCOMMON_DELETE], button_size))
+            {	
+				item.networksources.erase(item.networksources.begin() + Windows::netwinselected);
+				item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::PopStyleColor(3);
+			
+			
+			
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor();
+			
+		}
+		Popups::ExitNativePopup();
+	}
+	void FileContextNativePopup(void) {
+		Popups::SetupNativeContextPopup("##filecontext",6);
+		if(FilePopupTextScroller == nullptr){
+			FilePopupTextScroller = new CTextScroller("##filepopuptextscroll");
+		}
+		
+		if (ImGui::BeginPopupModal("##filecontext", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
+			ImGui::SetWindowFontScale(1.2f);
+			ImVec2 button_size(771.0f*multiplyRes, 70.0f);
+			std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
+			int myorder = filebrowser->sortOrder;
+			
+			if(selectionlist.size()!=0){
+				std::string outstring = "";
+				for(int i=0;i<selectionlist.size();i++){
+					outstring = outstring + selectionlist[i].name + " ";
+				}
+				FilePopupTextScroller->DrawPopupNative("##filepopuptextscroll",771.0f,70.0f,"%s",outstring.c_str());
+			}else{
+				FilePopupTextScroller->DrawPopupNative("##filepopuptextscroll",771.0f,70.0f,"%s",filebrowser->getCurrList()[item.fileHoveredidx].name.c_str());
+				
+			
+			}
+			
+			
+			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Text_color);
+			
+			if(myorder == FS::FS_NAME_ASCENDINGORDER|| myorder == FS::FS_NAME_DESCENDINGORDER){
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			}
+			
+			if(myorder == FS::FS_NAME_ASCENDINGORDER){
+				
+				if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_NAME],button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_NAME_DESCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+				
+			}else{
+				
+				if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_NAME],button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_NAME_ASCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+				
+			}
+			if(myorder == FS::FS_NAME_ASCENDINGORDER|| myorder == FS::FS_NAME_DESCENDINGORDER){
+				ImGui::PopStyleColor();
+			}
+			if(!filebrowser->timelessFS){
+				if(myorder == FS::FS_DATE_ASCENDINGORDER|| myorder == FS::FS_DATE_DESCENDINGORDER){
+					ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+				}
+				if(myorder == FS::FS_DATE_ASCENDINGORDER){
+					if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_DATE],button_size))
+					{
+						filebrowser->setSordOrder(FS::FS_DATE_DESCENDINGORDER);
+						item.popupstate = POPUP_STATE_NONE;
+					}
+				}else{
+					if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_DATE],button_size))
+					{
+						filebrowser->setSordOrder(FS::FS_DATE_ASCENDINGORDER);
+						item.popupstate = POPUP_STATE_NONE;
+					}
+					
+				}
+			}
+			if(myorder == FS::FS_DATE_ASCENDINGORDER|| myorder == FS::FS_DATE_DESCENDINGORDER){
+				ImGui::PopStyleColor();
+			}
+			if(myorder == FS::FS_SIZE_ASCENDINGORDER|| myorder == FS::FS_SIZE_DESCENDINGORDER){
+				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			}
+			if(myorder == FS::FS_SIZE_ASCENDINGORDER){
+				if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_SIZE],button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_SIZE_DESCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}else{
+				if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_SIZE],button_size))
+				{
+					filebrowser->setSordOrder(FS::FS_SIZE_ASCENDINGORDER);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}
+			if(myorder == FS::FS_SIZE_ASCENDINGORDER|| myorder == FS::FS_SIZE_DESCENDINGORDER){
+				ImGui::PopStyleColor();
+			}
+			
+			if(selectionlist.size()!=0){
+				if (ImGui::Button(Popup_STR[NXPOPUP_ADDSELEPLAYLIST],button_size))
+				{
+					
+					for(int i=0;i<selectionlist.size();i++){
+						playlist->appendFile(selectionlist[i],filebrowser->getOpenUrlPart()+selectionlist[i].path);
+					}
+					item.popupstate = POPUP_STATE_NONE;
+				}
+			}else{
+				if (ImGui::Button(Popup_STR[NXPOPUP_ADDFILEPLAYLIST],button_size))
+				{
+					playlist->appendFile(filebrowser->getCurrList()[item.fileHoveredidx],filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path);
+					item.popupstate = POPUP_STATE_NONE;
+				}
+				
+			}
+			
+			if (ImGui::Button(Common_STR[NXCOMMON_EXIT], button_size))
+			{
+                item.popupstate = POPUP_STATE_NONE;
+				ImGui::CloseCurrentPopup();
+            }
+			
+			ImGui::PopStyleColor();
+			
+		}
+		Popups::ExitNativePopup();
+	}
 }
+

@@ -105,7 +105,7 @@ private:
 	sshurlschema urlschema;
 	std::string cwd = "";
 	std::mutex session_mutex;
-
+	
 protected:
 	devoptab_t devoptab = {};
 		

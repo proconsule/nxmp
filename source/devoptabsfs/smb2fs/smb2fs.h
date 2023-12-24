@@ -14,6 +14,8 @@
 
 #include <mutex>
 
+#include <vector>
+
 #include <smb2/smb2.h>
 #include <smb2/libsmb2.h>
 #include <smb2/libsmb2-raw.h>
@@ -68,13 +70,21 @@ public:
 	bool RegisterFilesystem();
 	bool fs_regisered = false;
 	
+	struct dircache{
+		std::string name;
+		std::string fullpathname;
+		struct stat st;
+	};
+	
+	std::vector<dircache> cachedirlist;
+	
 private:
 	std::string connect_url;
 	
 	int connect();
 	void disconnect();
 	
-	
+	std::string translate_path(const char *path);
 	
 	struct smb2_context * smb2 = nullptr;
 	struct smb2_url *smb2url = nullptr;
@@ -84,14 +94,16 @@ private:
 	void stat_entry(smb2_stat_64  *entry, struct stat *st);
 	
 	struct CSMB2FSFile {
-			struct smb2fh *fh;
+			struct smb2fh *fh = nullptr;;
 			smb2_stat_64  smb2st;
             off_t offset;
         };
 
         struct CSMB2FSDir {
-			struct smb2dir *dir;
+			int diridx = 0;
+			
         };
+	
 	
 	
 	

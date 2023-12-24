@@ -13,6 +13,19 @@
 
 
 #include "utils.h"
+#include "nxmp-gfx.h"
+#include "imgloader.h"
+
+
+typedef struct{
+	char path[NAME_MAX];
+	size_t size;
+	size_t currentOffset;
+	size_t readbuffersize;
+	bool memvalid = false;
+	unsigned char * mem = nullptr;
+}fileload_struct;
+
 
 class CFileBrowser{
 public:
@@ -44,7 +57,12 @@ public:
 	void clearChecked();
 	bool *checked(int pos);
 	
+	
+	Texture OpenImageMemory(unsigned char *_img_data,int _size);
 	bool getfileContents(std::string filepath,unsigned char ** _filedata,int &_size);
+	bool getfileContentsThreaded(std::string filepath);
+	
+	
 	
 	void setSordOrder(FS::FILESORTORDER myorder);
 	void SetFileDbStatus(int idx,int dbstatus);
@@ -64,9 +82,23 @@ public:
 	std::string errormsg = "";
 	std::vector<usb_devices> getUsbDev(bool dummy = false);
 	
+	
+	
+	bool LoadedFileStatus = false;
+	std::string LoadedFileName;
+	unsigned char * LoadedFileBuffer = nullptr;
+	size_t LoadedFileSize = 0;
+	uint32_t maxreadsize = 1024*1024;
+	size_t CurrentReadOffset = 0; 
+	
 	int getNextImg();
 	int getPrevImg();
 	
+	Thread readThreadref;
+	fileload_struct *LoadedFile = nullptr;
+
+	
+
 	
 protected:
 	CSSHFS * sshfs = nullptr;
@@ -93,7 +125,7 @@ private:
 	std::vector<FS::FileEntry> currentlist;
 	std::vector<FS::FileEntry> currentimagelist;
 
-	uint32_t maxreadsize = 1024*1024;
+	
 	
 };
 

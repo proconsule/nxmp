@@ -71,6 +71,7 @@ namespace Windows {
 	void EnigmaWindow(bool *focus, bool *first_item);
 	void MainMenuWindow(bool *focus, bool *first_item);
 	void ShareAddWindow(bool *focus, bool *first_item);
+	void NewShareWindow();
 	void FtpWindow(bool *focus, bool *first_item);
 	void HttpWindow(bool *focus, bool *first_item);
 	void SSHWindow(bool *focus, bool *first_item);
@@ -92,6 +93,8 @@ namespace Windows {
 	void imageViewer();
 	void setImageZoom(float zoomfactor);
 	float getImageZoom();
+	
+	extern bool loadimage;
 	
 	std::string ShowSWKeyboard(std::string InitialValueStr,std::string headertext = "",bool numeric = false);
 	

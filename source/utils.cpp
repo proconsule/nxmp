@@ -46,6 +46,7 @@ namespace Utility{
          res.server = match[4];
          res.port = match[5];
          res.path = match[8];
+		 res.path = "/"+res.path;
       }
 	  return res;
 	}

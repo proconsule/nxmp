@@ -50,6 +50,27 @@ namespace Popups {
 		ImGui::SetNextWindowSize(ImVec2(771.0f*multiplyRes, 292.0f*multiplyRes), ImGuiCond_Once);
 		ImGui::OpenPopup(id);
 	};
+	
+	inline void SetupNativeContextPopup(const char *id,int elesize) {
+        
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+		//ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
+		
+		
+		ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_Button,nxmpgfx::Button_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive,nxmpgfx::ButtonActive_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,nxmpgfx::NavHover_color);
+		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
+		ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+        ImGui::SetNextWindowPos(ImVec2(255.0f*multiplyRes, 214.0f*multiplyRes), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(771.0f*multiplyRes, 70.0f*elesize*multiplyRes), ImGuiCond_Always);
+		ImGui::OpenPopup(id);
+	};
     
     inline void ExitNativePopup(void) {
         ImGui::PopStyleVar(5);
@@ -69,6 +90,7 @@ namespace Popups {
 	void FileContextPopup(void);
 	void PlaylistContextPopup(void);
 	void AppExitPopup(void);
+	void FileContextNativePopup(void);
 	//void PopupScrollText(float w,float h,const char* fmt, ...);
 	
 }
