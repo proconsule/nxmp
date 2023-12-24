@@ -777,6 +777,7 @@ namespace Popups{
 		}
 		
 		if (ImGui::BeginPopupModal("##filecontext", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
+			ImVec2 popup_screen_pos = ImGui::GetCursorScreenPos();
 			ImGui::SetWindowFontScale(1.2f);
 			ImVec2 button_size(771.0f*multiplyRes, 70.0f);
 			std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
@@ -881,12 +882,17 @@ namespace Popups{
 				
 			}
 			
-			if (ImGui::Button(Common_STR[NXCOMMON_EXIT], button_size))
-			{
-                item.popupstate = POPUP_STATE_NONE;
-				ImGui::CloseCurrentPopup();
-            }
-			
+			if(ImGui::IsMouseClicked(0)){
+				ImVec2 popup_screen_pos2 = ImVec2(popup_screen_pos.x+771.0f*multiplyRes,popup_screen_pos.y+70.0f*multiplyRes*6);
+				ImVec2 mousepos = ImGui::GetMousePos();
+				if(mousepos.x<popup_screen_pos.x || mousepos.x>popup_screen_pos.x){
+					item.popupstate = POPUP_STATE_NONE;
+				}
+				if(mousepos.y<popup_screen_pos.y || mousepos.y>popup_screen_pos.y){
+					item.popupstate = POPUP_STATE_NONE;
+				}
+				
+			}
 			ImGui::PopStyleColor();
 			
 		}

@@ -100,7 +100,7 @@
 			myusb->DirList(path,showHidden,extensions);
 		}
 		*/
-		if(basepath.find_first_of("/") == 0 || smb2fs!= nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs!=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+		if(smb2fs!= nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs!=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
 			currentpath = path;
 			currentlist.clear();
 			//struct dirent *ent;
@@ -133,6 +133,8 @@
 							FS::FileEntry file;
 							file.name = dir->fileData.d_name;
 							
+							
+							
 							file.path = FS::removeLastSlash(path) + "/" + file.name;
 							file.size = (size_t) st.st_size;
 								file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
@@ -141,6 +143,19 @@
 								file.modified = (time_t)st.st_mtime;
 								file.accessed = (time_t)st.st_atime;
 							
+							
+							if(basepath.find_first_of("/")){
+								FsFileSystem sdmc;
+								fsOpenSdCardFileSystem(&sdmc);
+								FsTimeStampRaw timestamp = {0};
+								char safe_buf[FS_MAX_PATH];
+								strcpy(safe_buf, file.path.c_str());
+								fsFsGetFileTimeStampRaw(&sdmc, safe_buf, &timestamp);
+								fsFsClose(&sdmc);
+								file.created = timestamp.created;
+								file.modified = timestamp.modified;
+								file.accessed = timestamp.accessed;
+							}
 							
 							
 							if(Utility::isImageExtension(file.name)){
@@ -185,6 +200,98 @@
 						}), currentlist.end());
 					}
 				
+			}
+		}else if(basepath.find_first_of("/") == 0){
+			currentlist.clear();
+			currentimagelist.clear();
+			struct dirent *ent;
+			DIR *dir;
+
+			if (!path.empty()) {
+				if ((dir = opendir(path.c_str())) != nullptr) {
+					FsFileSystem sdmc;
+					fsOpenSdCardFileSystem(&sdmc);
+					while ((ent = readdir(dir)) != nullptr) {
+						if ((path == "/" || strlen(ent->d_name) == 1) && ent->d_name[0] == '.') {
+							continue;
+						}
+						if ((path == "/" || strlen(ent->d_name) == 2) && ent->d_name[0] == '.' && ent->d_name[1] == '.') {
+							continue;
+						}
+						if (!showHidden && ent->d_name[0] == '.') {
+							if (strlen(ent->d_name) != 2 && ent->d_name[1] != '.') {
+								continue;
+							}
+						}
+
+						FS::FileEntry file;
+						file.name = ent->d_name;
+						file.dbread = -1;
+						file.path = FS::removeLastSlash(path) + "/" + file.name;
+						
+						FsTimeStampRaw timestamp = {0};
+						char safe_buf[FS_MAX_PATH];
+						strcpy(safe_buf, file.path.c_str());
+						fsFsGetFileTimeStampRaw(&sdmc, safe_buf, &timestamp);
+						
+						
+						
+						struct stat st{0};
+						if (stat(file.path.c_str(), &st) == 0) {
+							file.size = (size_t) st.st_size;
+							file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
+							file.is_valid = 1;
+							file.created = timestamp.created;
+							file.modified = timestamp.modified;
+							file.accessed = timestamp.accessed;
+						}
+						
+						
+						if(file.type == FS::FileEntryType::File){
+							bool isMediafile = false;
+							for (auto &ext : extensions) {
+								if (Utility::endsWith(file.name, ext, false)) {
+									isMediafile = true;
+								}
+							}
+							if(isMediafile){
+								if(Utility::isImageExtension(file.name)){
+									file.mediatype = FS::FileMediaType::Image;
+									currentimagelist.push_back(file);
+								}
+								if(Utility::isArchiveExtension(file.name)){
+									file.mediatype = FS::FileMediaType::Archive;
+								}
+								currentlist.push_back(file);
+							}
+						}else if(file.type == FS::FileEntryType::Directory){
+							currentlist.push_back(file);
+						}
+
+					}
+					fsFsClose(&sdmc);
+					closedir(dir);
+					if(sortOrder == FS::FS_NAME_ASCENDINGORDER){
+						std::sort(currentlist.begin(), currentlist.end(), FS::SortNameAsc);
+					}
+					if(sortOrder == FS::FS_NAME_DESCENDINGORDER){
+						std::sort(currentlist.begin(), currentlist.end(), FS::SortNameDesc);
+					}
+					
+					if(sortOrder == FS::FS_DATE_ASCENDINGORDER){
+						std::sort(currentlist.begin(), currentlist.end(), FS::SortDateAsc);
+					}
+					if(sortOrder == FS::FS_DATE_DESCENDINGORDER){
+						std::sort(currentlist.begin(), currentlist.end(), FS::SortDateDesc);
+					}
+					
+					if(sortOrder == FS::FS_SIZE_ASCENDINGORDER){
+						std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeAsc);
+					}
+					if(sortOrder == FS::FS_SIZE_DESCENDINGORDER){
+						std::sort(currentlist.begin(), currentlist.end(), FS::SortSizeDesc);
+					}
+				}
 			}
 		}
 	}

@@ -57,8 +57,9 @@ public:
 	void clearChecked();
 	bool *checked(int pos);
 	
-	
+#ifdef DEKO3D_BACKEND
 	Texture OpenImageMemory(unsigned char *_img_data,int _size);
+#endif
 	bool getfileContents(std::string filepath,unsigned char ** _filedata,int &_size);
 	bool getfileContentsThreaded(std::string filepath);
 	

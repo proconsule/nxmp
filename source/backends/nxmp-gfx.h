@@ -48,6 +48,9 @@
 
 #define FONT_CHECKED_ICON "\xEE\x85\x8B"
 
+#define FONT_FILLED_CROSS "\xEE\x81\xB1"
+
+
 #define FONT_DPADUP_BUTTON "\xEE\x82\xAF"
 #define FONT_DPADDOWN_BUTTON "\xEE\x82\xB0"
 
@@ -70,6 +73,7 @@
 
 #define FONT_LEFTSTICK "\xEE\x83\x81"
 #define FONT_RIGHTSTICK "\xEE\x83\x82"
+
 
 #ifdef DEKO3D_BACKEND
 struct Texture {
