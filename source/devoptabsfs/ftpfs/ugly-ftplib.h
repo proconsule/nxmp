@@ -81,4 +81,7 @@ int UFTP_STATFile(server_connection * connection,std::string filename, struct st
 int UFTP_CheckFeat(server_connection *connection);
 int UFTP_MLSDList(server_connection * connection,std::string path);
 
+bool UFTP_SetBlocking(int fd,bool val);
+	
+
 #endif

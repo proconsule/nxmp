@@ -16,6 +16,8 @@
 #include <locale>
 #include <sstream>
 
+#include <fcntl.h>
+
 #include <time.h>
 
 extern "C" {
@@ -25,15 +27,39 @@ extern "C" {
 int controlSocket = 0;
 
 int ftp_net_read(int fd, char *buf, size_t len) {
-	while (1) {
-        int c = recv(fd, buf, len,0);
-        if (c == -1) {
-            if (errno != EINTR && errno != EAGAIN)
-                return -1;
-        } else {
-            return c;
-        }
-    }
+	
+/* TIMEOUT TEST  */
+	struct timeval tv;
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
+	fd_set pfd, *rfd = nullptr;
+	rfd = &pfd;
+	FD_ZERO(&pfd);
+	
+	while(true){
+		FD_SET(fd, &pfd);
+		int rv = select(fd+1, rfd, nullptr, nullptr, &tv);
+		if(rv==1){
+			break;
+		}else{
+			return -1;
+		}
+		
+	
+	}
+	
+	
+		while (1) {
+			int c = recv(fd, buf, len,0 );
+			if (c == -1) {
+				if (errno != EINTR && errno != EAGAIN)
+					return -1;
+			} else {
+				return c;
+			}
+		}
+	
+	
 }
 
 
@@ -257,6 +283,12 @@ int UFTP_OpenDirListing(server_connection *myconnection,std::string path) {
 		
 }
 
+bool UFTP_SetBlocking(int fd,bool val){
+   int flags = fcntl(fd, F_GETFL, 0);
+   if (flags == -1) return false;
+   flags = val ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
+   return (fcntl(fd, F_SETFL, flags) == 0) ? true : false;}
+
 
 int UFTP_OpenPortEPSV(server_connection *myconnection) {
 	
@@ -304,6 +336,7 @@ int UFTP_OpenPortEPSV(server_connection *myconnection) {
 		net_close(myconnection->data_socket);
 		return -1;
 	}
+	
 	
 	return 0;
 }
@@ -518,7 +551,7 @@ int UFTP_FTPModDate(int c_socket,std::string filename){
 		msg = UFTP_SendCommand(myconnection->control_socket,retrcommand);
 		if(msg.code == 150){
 			wait_socket(myconnection->data_socket);
-			printf("DATA SOCKET!\n");
+			//printf("DATA SOCKET!\n");
 			return 0;
 		}
 	}
@@ -762,7 +795,7 @@ int UFTP_MLSDList(server_connection * connection,std::string path){
 		//dircache entry;
 		char *p = strtok(buf, ";"); 
 		while (p != NULL) {
-			printf("%s\n",p);
+			//printf("%s\n",p);
 			p = strtok(NULL, ";");
 		}
 		//printf("Line %s\n",buf);

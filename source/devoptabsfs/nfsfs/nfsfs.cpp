@@ -8,7 +8,7 @@
 #include <sys/syslimits.h>
 #include <regex>
 
-
+void nfsstat_entry(nfs_stat_64  *entry, struct stat *st);
 
 CNFSFS::CNFSFS(std::string _url,std::string _name,std::string _mount_name){
 	this->connect_url = _url;
@@ -209,7 +209,7 @@ int CNFSFS::nfsfs_fstat(struct _reent *r, void *fd, struct stat *st) {
 	auto *priv_file = static_cast<CNFSFSFile *>(fd);
 	
 	auto lk = std::scoped_lock(priv->session_mutex);
-    priv->stat_entry(&priv_file->filestat, st);
+    nfsstat_entry(&priv_file->filestat, st);
     return 0;
 }
 
@@ -233,7 +233,7 @@ int CNFSFS::nfsfs_stat(struct _reent *r, const char *file, struct stat *st) {
         return -1;
     }
 
-    priv->stat_entry(&nfsfilestat, st);
+    nfsstat_entry(&nfsfilestat, st);
     return 0;
 }
 
@@ -259,11 +259,30 @@ DIR_ITER *CNFSFS::nfsfs_diropen(struct _reent *r, DIR_ITER *dirState, const char
     
 	auto lk = std::scoped_lock(priv->session_mutex);
 
-	int ret = nfs_opendir(priv->nfs, internal_path.data(), &priv_dir->nfsdir);
+
+	struct nfsdir *nfsdir;
+	int ret = nfs_opendir(priv->nfs, internal_path.data(), &nfsdir);
+	
 
 	if (ret!=0) {
         return nullptr;
     }
+	
+	struct nfsdirent *ent;
+	while ((ent = nfs_readdir(priv->nfs, nfsdir))) {
+			dircache entry;
+			
+			entry.name = ent->name;
+			entry.fullpathname =  internal_path + entry.name;
+			
+			entry.st.st_size = ent->size;
+			entry.st.st_mode = ent->mode;
+			entry.st.st_mtime = ent->mtime.tv_sec;
+			priv->cachedirlist.push_back(entry);
+	}
+	priv_dir->diridx = 0;
+	nfs_closedir(priv->nfs,nfsdir);
+	
 
     return dirState;
 }
@@ -279,23 +298,17 @@ int CNFSFS::nfsfs_dirnext(struct _reent *r, DIR_ITER *dirState, char *filename, 
 
     auto lk = std::scoped_lock(priv->session_mutex);
 
-	struct nfsdirent *mynfsdirent;
-	while(true) {
-		mynfsdirent = nfs_readdir(priv->nfs, priv_dir->nfsdir);
-		if(mynfsdirent == NULL)return -1;
-		
-		*filestat = {};
-		filestat->st_size = mynfsdirent->size;
-		filestat->st_mode = mynfsdirent->mode;
-		filestat->st_mtime = mynfsdirent->mtime.tv_sec;
-		
-		memset(filename,0,NAME_MAX);
-		memcpy(filename,mynfsdirent->name,NAME_MAX);
-		auto fname = std::string(filename);
-        if (fname != "." && fname != "..")
-        break;
-	}
-
+	if(priv_dir->diridx >= priv->cachedirlist.size()){
+			priv_dir->diridx = 0;
+			return -1;
+		}
+	
+	memset(filename,0,NAME_MAX);
+	memcpy(filename,priv->cachedirlist[priv_dir->diridx].name.c_str(),priv->cachedirlist[priv_dir->diridx].name.length());
+    memcpy(filestat,&priv->cachedirlist[priv_dir->diridx].st,sizeof(struct stat));
+	
+	priv_dir->diridx++;
+	
     return 0;
 }
 
@@ -304,7 +317,7 @@ int CNFSFS::nfsfs_dirclose(struct _reent *r, DIR_ITER *dirState) {
     auto *priv_dir = static_cast<CNFSFSDir *>(dirState->dirStruct);
 
     auto lk = std::scoped_lock(priv->session_mutex);
-	nfs_closedir(priv->nfs,priv_dir->nfsdir);
+	
 	return 0;
 }
 
@@ -341,7 +354,7 @@ int CNFSFS::nfsfs_statvfs(struct _reent *r, const char *path, struct statvfs *bu
     return 0;
 }
 
-void CNFSFS::stat_entry(nfs_stat_64  *entry, struct stat *st)
+void nfsstat_entry(nfs_stat_64  *entry, struct stat *st)
 {
 	*st = {};
 	

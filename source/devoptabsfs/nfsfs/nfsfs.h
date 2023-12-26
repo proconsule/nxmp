@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #include <mutex>
+#include <vector>
 
 typedef unsigned int u_int;
 
@@ -68,6 +69,15 @@ public:
 	static int       nfsfs_lstat    (struct _reent *r, const char *file, struct stat *st);
 	
 	bool is_connected = false;
+	
+	struct dircache{
+		std::string name;
+		std::string fullpathname;
+		struct stat st;
+	};
+	
+	std::vector<dircache> cachedirlist;
+	
 private:
 	std::string connect_url;
 	
@@ -88,7 +98,7 @@ private:
         };
 
         struct CNFSFSDir {
-			struct nfsdir *nfsdir = NULL;
+			int diridx = 0;
         };
 		
 

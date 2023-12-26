@@ -112,10 +112,11 @@
 					auto *reent    = __syscall_getreent();
 					auto *devoptab = devoptab_list[dir->dirData->device];	
 					
-					struct stat st;
+					
 					
 					while (/*(ent = readdir(dir)) != nullptr*/ true) {
 							reent->deviceData = devoptab->deviceData;
+							struct stat st{0};
 							if (devoptab->dirnext_r(reent, dir->dirData, dir->fileData.d_name, &st))
 							break;
 							
@@ -134,28 +135,14 @@
 							file.name = dir->fileData.d_name;
 							
 							
-							
 							file.path = FS::removeLastSlash(path) + "/" + file.name;
 							file.size = (size_t) st.st_size;
-								file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
-								file.is_valid = 1;
-								file.created = (time_t)st.st_ctime;
-								file.modified = (time_t)st.st_mtime;
-								file.accessed = (time_t)st.st_atime;
-							
-							
-							if(basepath.find_first_of("/")){
-								FsFileSystem sdmc;
-								fsOpenSdCardFileSystem(&sdmc);
-								FsTimeStampRaw timestamp = {0};
-								char safe_buf[FS_MAX_PATH];
-								strcpy(safe_buf, file.path.c_str());
-								fsFsGetFileTimeStampRaw(&sdmc, safe_buf, &timestamp);
-								fsFsClose(&sdmc);
-								file.created = timestamp.created;
-								file.modified = timestamp.modified;
-								file.accessed = timestamp.accessed;
-							}
+							file.type = S_ISDIR(st.st_mode) ? FS::FileEntryType::Directory : FS::FileEntryType::File;
+							file.is_valid = 1;
+							file.created = (time_t)st.st_ctime;
+							file.modified = (time_t)st.st_mtime;
+							file.accessed = (time_t)st.st_atime;
+						
 							
 							
 							if(Utility::isImageExtension(file.name)){
