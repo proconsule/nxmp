@@ -63,6 +63,7 @@ libMpv::libMpv(const std::string &configDir) {
 	
 	mpv_set_option_string(handle, "interpolation", "no");
 	mpv_set_option_string(handle, "scale", "linear");
+	mpv_set_option_string(handle, "user-agent","Mozilla/5.0 (X11; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0");
 
 	
 	mpv_set_option_string(handle, "image-display-duration", "inf");

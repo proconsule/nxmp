@@ -80,6 +80,7 @@ namespace Utility{
 	
 	bool isImageExtension(std::string path);
 	bool isArchiveExtension(std::string path);
+	bool isM3UExtension(std::string path);
 	
 	//void FontLoader(std::string fontpath,float fontSize,ImGuiIO &io);
 	//void FontLoader(std::string latinfontpath,float latinfontSize,std::string japanaesechinesefontpath,float japanaesechinesefontSize);

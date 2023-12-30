@@ -10,6 +10,7 @@
 #include "nfsfs.h"
 #include "libarchivefs.h"
 #include "ftpfs.h"
+#include "m3u8fs.h"
 
 
 #include "utils.h"
@@ -39,6 +40,9 @@ public:
 	
 	void OpenArchive(std::string _path);
 	std::string CloseArchive();
+	
+	void OpenM3U(std::string _path);
+	std::string CloseM3U();
 	
 	void DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions);
 	std::vector<FS::FileEntry> getCurrList();
@@ -107,6 +111,7 @@ protected:
 	CNFSFS * nfsfs = nullptr;
 	CARCHFS * archfs = nullptr;
 	CFTPFS *ftpfs = nullptr;
+	CM3U8FS *m3u8fs = nullptr;
 
 private:
 	

@@ -66,7 +66,10 @@
 			delete archfs;
 		}
 		if(ftpfs!= nullptr){
-			delete archfs;
+			delete ftpfs;
+		}
+		if(m3u8fs!= nullptr){
+			delete m3u8fs;
 		}
 	
 	}
@@ -90,6 +93,27 @@
 		return oldmount;
 	}
 	
+	
+	void CFileBrowser::OpenM3U(std::string _path){
+		oldtitle = title;
+		oldmount = currentpath;
+		title = "M3U - " + _path.substr(_path.find_last_of("/") + 1);
+		m3u8fs = new CM3U8FS(_path,"m3u0","m3u0:");
+		m3u8fs->RegisterFilesystem();
+		connected = m3u8fs->is_connected;
+		basepath = m3u8fs->mount_name+"/";
+		currentpath = m3u8fs->mount_name+"/";
+		
+	}
+	std::string CFileBrowser::CloseM3U(){
+		title = oldtitle;
+		basepath = oldmount.substr(0,oldmount.find_first_of("/")+1);
+		connected = true;
+		delete m3u8fs;
+		m3u8fs = nullptr;
+		return oldmount;
+	}
+	
 	void CFileBrowser::DirList(std::string path,bool showHidden,const std::vector<std::string> &extensions){
 		currshowHidden = showHidden;
 		if(myhttp!= nullptr){
@@ -100,7 +124,7 @@
 			myusb->DirList(path,showHidden,extensions);
 		}
 		*/
-		if(smb2fs!= nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs!=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+		if(smb2fs!= nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs!=nullptr || myusb!= nullptr|| ftpfs!= nullptr || m3u8fs != nullptr){
 			currentpath = path;
 			currentlist.clear();
 			//struct dirent *ent;
@@ -190,6 +214,7 @@
 			}
 		}else if(basepath.find_first_of("/") == 0){
 			currentlist.clear();
+			currentpath = path;
 			currentimagelist.clear();
 			struct dirent *ent;
 			DIR *dir;
@@ -284,13 +309,17 @@
 	}
 	
 	std::string CFileBrowser::backDir(){
-		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr || m3u8fs != nullptr){
 			std::string oldpath = currentpath;
 			std::string relpath = currentpath.substr(currentpath.find_last_of("\\/")+1);
 			
 			currentpath = currentpath.substr(0, currentpath.find_last_of("\\/"));
 			int pos = currentpath.find_last_of("\\/");
 			if(pos<0)currentpath = currentpath+"/";
+			if(oldpath == currentpath && m3u8fs != nullptr){
+				currentpath = CloseM3U();
+				
+			}
 			if(oldpath == currentpath && archfs != nullptr){
 				currentpath = CloseArchive();
 				
@@ -308,7 +337,7 @@
 	
 	std::vector<FS::FileEntry> CFileBrowser::getCurrImageList(){
 		
-			if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+			if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr || m3u8fs != nullptr){
 				return currentimagelist;
 			}
 			if(myhttp!= nullptr){
@@ -326,7 +355,7 @@
 	
 	std::vector<FS::FileEntry> CFileBrowser::getCurrList(){
 		
-		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr|| sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr|| sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr || m3u8fs != nullptr){
 			return currentlist;
 		}
 			if(myhttp!= nullptr){
@@ -344,7 +373,7 @@
 	
 	std::string CFileBrowser::getCurrentPath(){
 		
-			if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr || ftpfs!= nullptr){
+			if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr || ftpfs!= nullptr || m3u8fs != nullptr){
 				return currentpath;
 			}
 			
@@ -383,7 +412,7 @@
 	}
 	
 	std::string CFileBrowser::getBasePath(){
-		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!= nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr){
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!= nullptr || nfsfs!=nullptr || archfs !=nullptr || myusb!= nullptr|| ftpfs!= nullptr || m3u8fs != nullptr){
 			return basepath;
 		}
 		if(myhttp!= nullptr){
@@ -469,7 +498,7 @@
 			myusb->ResetDbStatus();
 		}
 		*/
-		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr){
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr || m3u8fs != nullptr){
 			for(int i=0;i<currentlist.size();i++)
 			{		
 				currentlist[i].dbread = -1;
@@ -487,7 +516,7 @@
 			myusb->SetFileDbStatus(idx,dbstatus);
 		}
 		*/
-		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr|| ftpfs!= nullptr){
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr|| ftpfs!= nullptr || m3u8fs != nullptr){
 			currentlist[idx].dbread = dbstatus;
 		}
 		
@@ -601,7 +630,7 @@
 				//myhttp->SetFileDbStatus(idx,dbstatus);
 		}
 			
-		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr){
+		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr || m3u8fs != nullptr){
 				struct stat st = {0}; 
 				if (stat(filepath.c_str(), &st) == 0) {
 					if(LoadedFile!=nullptr){

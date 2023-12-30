@@ -607,6 +607,13 @@ std::string KeyboardCall (std::string hint, std::string text){
 		return false;
 	}
 	
+	bool isM3UExtension(std::string path){
+		if(Utility::endsWith(path,".m3u",false) || Utility::endsWith(path,".m3u8",false)) {
+			return true;
+		}
+											
+		return false;
+	}
 	
 
 		

@@ -179,6 +179,9 @@ namespace Windows {
 										}else if(Utility::isArchiveExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
 											filebrowser->OpenArchive(filebrowser->getOpenUrlPart()+thislist[n].path);
 											filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
+										}else if(Utility::isM3UExtension(filebrowser->getOpenUrlPart()+thislist[n].path) && Utility::startWith(filebrowser->getOpenUrlPart()+thislist[n].path,"m3u0:/",false) == false){
+											filebrowser->OpenM3U(filebrowser->getOpenUrlPart()+thislist[n].path);
+											filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 										}else{
 										
 											playlist->clearPlaylist();
