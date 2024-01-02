@@ -183,18 +183,22 @@ namespace Windows {
 											filebrowser->OpenM3U(filebrowser->getOpenUrlPart()+thislist[n].path);
 											filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 										}else{
-										
-											playlist->clearPlaylist();
-											filebrowser->clearChecked();
-											NXLOG::DEBUGLOG("OPEN FILE: %s\n",(filebrowser->getOpenUrlPart()+thislist[n].path).c_str());
-											libmpv->loadFile(filebrowser->getOpenUrlPart()+thislist[n].path);
-											if(configini->getDbActive(true)){
-												libmpv->getFileInfo()->resume = sqlitedb->getResume(filebrowser->getOpenUrlPart()+thislist[n].path);
-												if(libmpv->getFileInfo()->resume>0){
-													item.popupstate = POPUP_STATE_RESUME;
+											if(Utility::startWith(filebrowser->getOpenUrlPart()+thislist[n].path,"m3u0:/",false)){
+												playlist->clearPlaylist();
+												filebrowser->clearChecked();
+												libmpv->loadFile(filebrowser->getOpenUrlPart()+thislist[n].path);
+												
+											}else{
+												playlist->clearPlaylist();
+												filebrowser->clearChecked();
+												libmpv->loadFile(filebrowser->getOpenUrlPart()+thislist[n].path);
+												if(configini->getDbActive(true)){
+													libmpv->getFileInfo()->resume = sqlitedb->getResume(filebrowser->getOpenUrlPart()+thislist[n].path);
+													if(libmpv->getFileInfo()->resume>0){
+														item.popupstate = POPUP_STATE_RESUME;
+													}
 												}
 											}
-										
 										}
 									}
 								}

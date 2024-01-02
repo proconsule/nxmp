@@ -94,13 +94,14 @@ int CM3U8FS::connect(){
 	
 	struct stat st;
 	if (stat(connect_url.c_str(), &st) == 0) {
+		
 		int filefd = open(connect_url.c_str(),O_RDONLY);
 		if(filefd>0){
 			m3u8_file_memory = (unsigned char *)malloc(st.st_size*sizeof(char));
 			int ret = read(filefd,m3u8_file_memory,st.st_size);
 			if(ret==st.st_size){
 				
-				
+				plsmtime = st.st_mtime;
 				std::regex plsregex("(?:^|\n)#EXTINF:(.+),(.*?)[\r\n]+(.*)");
 				
 				std::smatch match;
@@ -345,7 +346,7 @@ int CM3U8FS::m3u8fs_dirnext(struct _reent *r, DIR_ITER *dirState, char *filename
 		memset(filename,0,NAME_MAX);
 		memcpy(filename,priv->m3u8_list[priv_dir->diridx].name.c_str(),priv->m3u8_list[priv_dir->diridx].name.length());
 		filestat->st_mode = S_IFDIR;
-			
+		filestat->st_mtime = priv->plsmtime;
 		//filestat->st_size = priv->m3u8_list[priv_dir->diridx].url.length();
 		priv_dir->diridx++;
 		return 0;
@@ -361,7 +362,7 @@ int CM3U8FS::m3u8fs_dirnext(struct _reent *r, DIR_ITER *dirState, char *filename
 		memcpy(filename,newpath.c_str(),newpath.length());
 		filestat->st_mode = S_IFREG;
 		filestat->st_size = priv->m3u8_list[priv_dir->listoffset].name.length()+priv->m3u8_list[priv_dir->listoffset].url[0].length()+m3u8_format_args.length()-4;
-		
+		filestat->st_mtime = priv->plsmtime;
 		priv_dir->diridx++;
 		return 0;
 	}

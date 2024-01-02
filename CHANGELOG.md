@@ -10,6 +10,7 @@
 - Added a trivial image viewer instead of using mpv (feature zoom/pan)
 - Added ZL/ZR to show prev/next image
 - Added Archive browsing support using libarchive as a devoptab mount
+- Added M3U parser as a devoptab mount
 
 ### Changes
 

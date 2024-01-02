@@ -89,6 +89,8 @@ public:
 	
 	std::vector<m3uele> m3u8_list;
 	
+	time_t plsmtime;
+	
 	unsigned char * m3u8_file_memory = nullptr;
 	
 private:
