@@ -105,7 +105,7 @@ int CM3U8FS::connect(){
 				std::regex plsregex("(?:^|\n)#EXTINF:(.+),(.*?)[\r\n]+(.*)");
 				
 				std::smatch match;
-				std::string testmatch = strdup((const char *)m3u8_file_memory);
+				std::string testmatch = (const char *)m3u8_file_memory;
 				
 				int idx = 0;
 				
