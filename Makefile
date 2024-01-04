@@ -51,7 +51,7 @@ GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'
 VERSION_MAJOR := 0
 VERSION_MINOR := 9
 VERSION_MICRO := 0
-RELEASETYPE := -DRELEASE_TYPE=1
+RELEASETYPE := -DRELEASE_TYPE=0
 
 APP_TITLE     := NXMP (OpenGL)
 APP_AUTHOR    := proconsule and darkxex

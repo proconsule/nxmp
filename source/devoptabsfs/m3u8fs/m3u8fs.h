@@ -104,7 +104,7 @@ private:
 
 	
 	
-	
+	std::string m3uabspath = "";
 	
 	struct CM3U8FSFile {
 			int fileidx;

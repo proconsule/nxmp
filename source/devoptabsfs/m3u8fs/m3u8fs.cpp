@@ -92,6 +92,7 @@ static std::string m3u8_format_args = "#EXTM3U\n#EXTINF:-1,%s\n%s\n";
 
 int CM3U8FS::connect(){
 	
+	m3uabspath = connect_url.substr(0,connect_url.find_last_of("/")+1);
 	struct stat st;
 	if (stat(connect_url.c_str(), &st) == 0) {
 		
@@ -123,10 +124,10 @@ int CM3U8FS::connect(){
 							tmpvector.push_back(entry);
 							idx++;
 							/*
-							printf("STRING: %s\n",m.str(0).c_str());
-							printf("STRING: %s\n",m.str(1).c_str());
-							printf("STRING: %s\n",m.str(2).c_str());
-							printf("STRING: %s\n",m.str(3).c_str());
+							printf("STRING0: %s\n",m.str(0).c_str());
+							printf("STRING1: %s\n",m.str(1).c_str());
+							printf("STRING2: %s\n",m.str(2).c_str());
+							printf("STRING3: %s\n",m.str(3).c_str());
 							*/
 						 }
 				
@@ -284,8 +285,7 @@ int CM3U8FS::m3u8fs_stat(struct _reent *r, const char *file, struct stat *st) {
 			return 0;
 		}
 	}
-   
-	
+  
     return -1;
 }
 
