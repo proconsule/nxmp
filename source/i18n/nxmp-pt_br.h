@@ -49,17 +49,17 @@ const char *Popup_STR_PT_BR[] = {
 	"Retomar reprodução",
 	"Atualização do banco de dados",
 	"O banco de dados foi atualizado",
-	"Menu pop-up de rede",
-	"Popup do menu de contexto do arquivo",
+	"Menu de pop-up de rede",
+	"Menu de pop-up do arquivo",
 	"Classificar em ordem crescente (nome)",
-	"Classificar em ordem crescente (Tamanho)",
-	"Classificar em ordem crescente (Data)",
-	"Classificar em ordem decrescente (Nome)",
-	"Classificar em ordem decrescente (Tamanho)",
-	"Classificar em ordem decrescente (Data)",
+	"Classificar em ordem crescente (tamanho)",
+	"Classificar em ordem crescente (data)",
+	"Classificar em ordem decrescente (nome)",
+	"Classificar em ordem decrescente (tamanho)",
+	"Classificar em ordem decrescente (data)",
 	"Adicionar o arquivo à lista de reprodução",
 	"Adicionar os arquivos à lista de reprodução",
-	"Remover elemento",
+	"Remover",
 	"Limpar lista de reprodução",
 	"Definir como elemento inicial"
 };
@@ -99,12 +99,11 @@ const char *SettingsMenu_STR_PT_BR[] = {
 	"Usar banco de dados",
 	"Versão do banco de dados :",
 	"Versão do SQLite :",
-	"Retomar a partir de: ",
+	"Retomar em: ",
 	"Exibição concluída: ",
-	"Banco de dados não ativo",
+	"Banco de dados desativado",
 	"Iniciar retorno do vídeo:",
 	"Parar retorno do vídeo:",
-	
 	"Configurações de tela de toque",
 };
 
@@ -121,17 +120,12 @@ const char *Network_STR_PT_BR[] = {
 	"Senha:",
 	"Anônimo",
 	"Caminho remoto:",
-	"Caminho remoto a partir do servidor ex: /movie/",
-	"Caminho remoto a partir do servidor ex (compartilhamento não caminho)",
+	"Caminho remoto a partir do servidor ex: /filme/",
+	"Caminho remoto a partir do servidor ex: (nome do compartilhamento)",
 	"Testar conexão",
 	"Conexão OK",
 	"Erro de conexão",
 	"Seleção de fonte de rede",
 	"Menu de origem da rede",
 };
-
-
-
-
-
 #endif
