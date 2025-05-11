@@ -125,17 +125,8 @@ FAQ
 Translations
 -----
 
-If you want to have NXMP translated to your native language use this
-https://github.com/proconsule/nxmp/blob/master/source/i18n/nxmp-en.h
-as reference,create a file for your lang and send it to me.
-
-- Spanish thanks to Jorge E. García "nWo"
-- French thanks to Zoria, Pharuxtan, Gum
-- Deutsch thanks to Extreme
-- Italian thanks to proconsule 
-- Japanese thanks to mossan0101
-- Chinese thanks to dragonflybee
-- Korean thanks to Asadayot
+Starting from version 0.9.1 translations uses json files, look at langs folder for examples
+Thanks to all who contriubuted with translations 
 
 
 
