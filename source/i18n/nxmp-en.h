@@ -6,7 +6,7 @@ const char *en_i18n_author = "proconsule";
 bool en_i18n_status = true;
 bool en_i18n_native = true;
 
-const char *MainMenu_STR_EN[] = {
+std::vector<std::string> MainMenu_STR_EN = {
 	"Local Files",
 	"USB",
 	"Stream Url",
@@ -17,9 +17,10 @@ const char *MainMenu_STR_EN[] = {
 	"Settings",
 	"Info",
 	"Exit"
+	
 };
 
-const char *Common_STR_EN[] = {
+std::vector<std::string> Common_STR_EN = {
 	"Yes",
 	"No",
 	"OK",
@@ -41,10 +42,11 @@ const char *Common_STR_EN[] = {
 	"Cancel",
 	"Save",
 	"Checkbox",
+	
 };
 
 
-const char *Popup_STR_EN[] = {
+std::vector<std::string> Popup_STR_EN = {
 	"Save Settings",
 	"Resume Play",
 	"Database Update",
@@ -62,9 +64,10 @@ const char *Popup_STR_EN[] = {
 	"Remove Element",
 	"Clear Playlist",
 	"Set as starting element"
+	
 };
 
-const char *SettingsMenu_STR_EN[] = {
+std::vector<std::string> SettingsMenu_STR_EN = {
 	"Generals",
 	"File Browser",
 	"Show Hidden Files",
@@ -107,8 +110,9 @@ const char *SettingsMenu_STR_EN[] = {
 	
 	"Touch Settings",
 };
-
-const char *Network_STR_EN[] = {
+	
+	
+std::vector<std::string> Network_STR_EN = {
 	"Add Share",
 	"Add Share Menu",
 	"Share Config",
@@ -129,9 +133,6 @@ const char *Network_STR_EN[] = {
 	"Network Source Selection",
 	"Network Source Menu",
 };
-
-
-
 
 
 #endif

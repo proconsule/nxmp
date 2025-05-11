@@ -548,6 +548,13 @@ void CIniParser::ReadConfig(){
 	opened =  fileref->read(inidata);
 	
 	if(opened){
+		
+		
+			
+		
+		
+		
+		
 	
 		if(inidata["Main"].has("startpath")){
 			nxmpconfig.startpath = inidata.get("Main").get("startpath");
@@ -679,7 +686,47 @@ void CIniParser::ReadConfig(){
 			nxmpconfig.e2addr = inidata.get("Enigma2").get("e2address");
 		}
 		
-		InitLang((NX_LANGS)nxmpconfig.intlang);
+		for (auto const& it2 : inidata){
+			
+			auto const& key = it2.first;
+			if(key.compare("Main") && key.compare("Network") && key.compare("Enigma2")){
+				//printf("Network Share %s\r\n",key.c_str());
+				
+				if(inidata[key].has("server")){
+					networkstruct_v2 tmpnet;
+					tmpnet.name = key.c_str();
+					tmpnet.server = inidata.get(key).get("server");
+					tmpnet.type = inidata.get(key).get("type");
+					if(inidata[key].has("username")){
+						tmpnet.username = inidata.get(key).get("username");
+						if(inidata[key].has("password")){
+							tmpnet.password = inidata.get(key).get("password");
+						}
+					}
+					
+					if(inidata[key].has("pubkeypath")){
+						tmpnet.pubkeypath = inidata.get(key).get("pubkeypath");
+					}
+					if(inidata[key].has("privkeypath")){
+						tmpnet.privkeypath = inidata.get(key).get("privkeypath");
+					}
+					if(inidata[key].has("passphrase")){
+						tmpnet.passphrase = inidata.get(key).get("passphrase");
+					}
+					if(inidata[key].has("port")){
+						tmpnet.port = string_to_int(inidata.get(key).get("port"));
+					}
+					
+					if(inidata[key].has("path")){
+						tmpnet.path = inidata.get(key).get("path");
+					}
+					
+					networks_v2.push_back(tmpnet);
+				}
+			
+			}
+		}
+		
 	
 	}
 	

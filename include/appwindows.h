@@ -6,7 +6,8 @@
 #include "imgui_internal.h"
 #include "UIHelpers.h"
 #include "textscroller.h"
-#include "nxmp-gfx.h"
+#include "globals.h"
+#include "nxmp-render.h"
 
 extern int newResW;
 extern int newResH;
@@ -38,7 +39,7 @@ namespace Windows {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Always);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::PushStyleColor(ImGuiCol_WindowBg,nxmpgfx::Window_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg,Window_Bg_color);
     };
 	
 	
@@ -46,7 +47,7 @@ namespace Windows {
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes), ImGuiCond_Always);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::PushStyleColor(ImGuiCol_WindowBg,nxmpgfx::Window_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg,Window_Bg_color);
     };
 
     inline void ExitMainWindow(void) {
@@ -62,12 +63,13 @@ namespace Windows {
     };
 	
 	void UniBrowserWindow(/*bool *focus, bool *first_item*/);
+	void UniUPNPServersWindow(/*bool *focus, bool *first_item*/);
+	void UniUPNPBrowserWindow(/*bool *focus, bool *first_item*/);
 	void SetBrowserNav(std::string foldername);
 	
 	void USBMountWindow(bool *focus, bool *first_item);
 
     void FileBrowserWindow(bool *focus, bool *first_item);
-	//void USBBrowserWindow(bool *focus, bool *first_item);
 	void EnigmaWindow(bool *focus, bool *first_item);
 	void MainMenuWindow(bool *focus, bool *first_item);
 	void ShareAddWindow(bool *focus, bool *first_item);

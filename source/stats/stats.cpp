@@ -34,7 +34,7 @@ CStats::CStats(){
 }
 
 CStats::~CStats(){
-
+	CloseThreads();
  	i2cExit();
 	psmExit();
 	nvClose(fd); 
@@ -133,8 +133,7 @@ void Misc(void*arg) {
 
 void CStats::StartThreads() {
 
-	if(!emuoverrides){
-
+	
 		psmCheck = psmInitialize();
 			if (R_SUCCEEDED(psmCheck)) {
 				psmService = psmGetServiceSession();
@@ -152,7 +151,6 @@ void CStats::StartThreads() {
 			NXLOG::ERRORLOG("Cannot Init nvhost-nvdec");
 		}
 
-	}
 	
 	threadCreate(&t0, CheckCore0, this, NULL, 0x1000, 0x3B, 0);
 	threadCreate(&t1, CheckCore1, this, NULL, 0x1000, 0x3B, 1);
@@ -195,6 +193,7 @@ void CStats::CloseThreads() {
 	
 	threadClose(&t7);
 	
+	NXLOG::DEBUGLOG("Threads Exited\r\n");
 	
 }
 
@@ -259,11 +258,11 @@ void CStats::UpdateStats(){
 
         int hours = timeStruct->tm_hour;
         int minutes = timeStruct->tm_min;
-        int seconds = timeStruct->tm_sec;
-        int day = timeStruct->tm_mday;
-        int month = timeStruct->tm_mon;
-        int year = timeStruct->tm_year +1900;
-        int wday = timeStruct->tm_wday;
+        //int seconds = timeStruct->tm_sec;
+        //int day = timeStruct->tm_mday;
+        //int month = timeStruct->tm_mon;
+        //int year = timeStruct->tm_year +1900;
+        //int wday = timeStruct->tm_wday;
 		sprintf(currentTime,"%02i:%02i", hours, minutes);
 		
 		sprintf(loopstat_c,"Event time: %.3f Layer time: %.3f Render Time: %.3f",event_time_delay/1000.0,layer_time_delay/1000.0,render_time_delay/1000.0);

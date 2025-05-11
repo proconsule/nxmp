@@ -3,7 +3,10 @@
 
 #include "imgui.h"
 #include "textscroller.h"
-#include "nxmp-gfx.h"
+#include "globals.h"
+#include "nxmp-render.h"
+
+
 
 extern int newResW;
 extern int newResH;
@@ -39,13 +42,13 @@ namespace Popups {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
 		
 		
-		ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
-		ImGui::PushStyleColor(ImGuiCol_Button,nxmpgfx::Button_color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive,nxmpgfx::ButtonActive_color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,nxmpgfx::NavHover_color);
+		ImGui::PushStyleColor(ImGuiCol_PopupBg,Popup_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_Button,Button_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive,ButtonActive_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,NavHover_color);
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
-		ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, NavHover_color);
+		ImGui::PushStyleColor(ImGuiCol_NavHighlight, Active_color);
         ImGui::SetNextWindowPos(ImVec2(255.0f*multiplyRes, 214.0f*multiplyRes), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(771.0f*multiplyRes, 292.0f*multiplyRes), ImGuiCond_Once);
 		ImGui::OpenPopup(id);
@@ -60,13 +63,13 @@ namespace Popups {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
 		
 		
-		ImGui::PushStyleColor(ImGuiCol_PopupBg,nxmpgfx::Popup_Bg_color);
-		ImGui::PushStyleColor(ImGuiCol_Button,nxmpgfx::Button_color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive,nxmpgfx::ButtonActive_color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,nxmpgfx::NavHover_color);
+		ImGui::PushStyleColor(ImGuiCol_PopupBg,Popup_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_Button,Button_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive,ButtonActive_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,NavHover_color);
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
-		ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, NavHover_color);
+		ImGui::PushStyleColor(ImGuiCol_NavHighlight, Active_color);
         ImGui::SetNextWindowPos(ImVec2(255.0f*multiplyRes, 214.0f*multiplyRes), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(771.0f*multiplyRes, 70.0f*elesize*multiplyRes), ImGuiCond_Always);
 		ImGui::OpenPopup(id);

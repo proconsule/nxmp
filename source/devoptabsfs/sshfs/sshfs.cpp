@@ -162,6 +162,97 @@ CSSHFS::CSSHFS(std::string _url,std::string _name,std::string _mount_name){
 	
 }
 
+
+CSSHFS::CSSHFS(std::string _server,int _port,std::string _username,std::string _password,std::string _path,std::string _name,std::string _mount_name){
+	
+	
+	this->name       = _name;
+    this->mount_name = _mount_name;
+	
+	this->server = _server;
+	this->username = _username;
+	this->password = _password;
+	this->path = _path;
+	this->port = _port;
+
+    this->devoptab = {
+        .name         = CSSHFS::name.data(),
+
+        .structSize   = sizeof(CSSHFSFile),
+        .open_r       = CSSHFS::sshfs_open,
+        .close_r      = CSSHFS::sshfs_close,
+        .read_r       = CSSHFS::sshfs_read,
+        .seek_r       = CSSHFS::sshfs_seek,
+        .fstat_r      = CSSHFS::sshfs_fstat,
+
+        .stat_r       = CSSHFS::sshfs_stat,
+        .chdir_r      = CSSHFS::sshfs_chdir,
+
+        .dirStateSize = sizeof(CSSHFSDir),
+        .diropen_r    = CSSHFS::sshfs_diropen,
+        .dirreset_r   = CSSHFS::sshfs_dirreset,
+        .dirnext_r    = CSSHFS::sshfs_dirnext,
+        .dirclose_r   = CSSHFS::sshfs_dirclose,
+
+        .statvfs_r    = CSSHFS::sshfs_statvfs,
+
+        .deviceData   = this,
+
+        .lstat_r      = CSSHFS::sshfs_lstat,
+    };
+	
+	
+}
+
+
+CSSHFS::CSSHFS(std::string _server,int _port,std::string _username,std::string _pubkeypath,std::string _privkeypath,std::string _passphrase,std::string _path,std::string _name,std::string _mount_name){
+	this->name       = _name;
+    this->mount_name = _mount_name;
+	
+	this->server = _server;
+	this->username = _username;
+	this->pubkeypath = _pubkeypath;
+	this->privkeypath = _privkeypath;
+	this->passphrase = _passphrase;
+	
+	this->path = _path;
+	if(_port == 0){
+		this->port = 22;
+	}else{
+		this->port = _port;
+	}
+
+    this->devoptab = {
+        .name         = CSSHFS::name.data(),
+
+        .structSize   = sizeof(CSSHFSFile),
+        .open_r       = CSSHFS::sshfs_open,
+        .close_r      = CSSHFS::sshfs_close,
+        .read_r       = CSSHFS::sshfs_read,
+        .seek_r       = CSSHFS::sshfs_seek,
+        .fstat_r      = CSSHFS::sshfs_fstat,
+
+        .stat_r       = CSSHFS::sshfs_stat,
+        .chdir_r      = CSSHFS::sshfs_chdir,
+
+        .dirStateSize = sizeof(CSSHFSDir),
+        .diropen_r    = CSSHFS::sshfs_diropen,
+        .dirreset_r   = CSSHFS::sshfs_dirreset,
+        .dirnext_r    = CSSHFS::sshfs_dirnext,
+        .dirclose_r   = CSSHFS::sshfs_dirclose,
+
+        .statvfs_r    = CSSHFS::sshfs_statvfs,
+
+        .deviceData   = this,
+
+        .lstat_r      = CSSHFS::sshfs_lstat,
+    };
+	
+}
+	
+
+
+
 bool CSSHFS::CheckConnection(){
 	if(connect(urlschema.server,atoi(urlschema.port.c_str()),urlschema.user,urlschema.pass) == 0){
 		return true;
@@ -170,6 +261,29 @@ bool CSSHFS::CheckConnection(){
 	return false;
 }
 
+bool CSSHFS::RegisterFilesystem_v2(){
+	
+	if(connect(server,port,username,password) == 0){
+		this->cwd = path;
+		register_fs();
+		this->fs_regisered = true;
+		return true;
+	}
+	
+	return false;
+}
+
+bool CSSHFS::RegisterFilesystem_pubkey_v2(){
+	
+	if(connect_pubkey(server,port,username,pubkeypath,privkeypath,passphrase) == 0){
+		this->cwd = path;
+		register_fs();
+		this->fs_regisered = true;
+		return true;
+	}
+	
+	return false;
+}
 
 bool CSSHFS::RegisterFilesystem(){
 	
@@ -217,25 +331,79 @@ std::string CSSHFS::translate_path(const char *path){
 }
 
 
+int CSSHFS::connect_pubkey(std::string host, std::uint16_t port,
+        std::string username, std::string pubkeypath,std::string privkeypath,std::string passphrase){
+		
+	
+	if (auto rc = libssh2_init(0); rc)
+        return rc;
+
+    this->ssh_session = libssh2_session_init();
+    if (!this->ssh_session){
+        return -1;	
+	}
+	
+	this->socket = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (this->socket < 0){
+        return -1;
+	}
+	
+
+    auto hostaddr = inet_addr(host.data());
+
+    sockaddr_in sin = {
+        .sin_family = AF_INET,
+        .sin_port   = htons(port),
+        .sin_addr   = {
+            .s_addr = hostaddr,
+        },
+    };
+
+	
+    if (auto rc = ::connect(this->socket, reinterpret_cast<sockaddr *>(&sin), sizeof(sin)); rc)
+        return errno;
+
+	
+    auto lk = std::scoped_lock(this->session_mutex);
+
+	
+    if (auto rc = libssh2_session_handshake(this->ssh_session, this->socket); rc){
+        return ssh2_translate_error(rc, nullptr);
+	}
+
+	if (auto rc = libssh2_userauth_publickey_fromfile(this->ssh_session, username.data(), pubkeypath.data(),privkeypath.data(),""); rc){
+        return ssh2_translate_error(rc, nullptr);
+	}
+
+    this->sftp_session = libssh2_sftp_init(this->ssh_session);
+    if (!this->sftp_session)
+        return ssh2_translate_error(libssh2_session_last_errno(this->ssh_session), this->sftp_session);
+
+    libssh2_session_set_blocking(this->ssh_session, 1);
+
+    this->is_connected = true;
+
+    return 0;	
+			
+}
+
+
 int CSSHFS::connect(std::string host, std::uint16_t port,
         std::string username, std::string password){
-	
-	if(port == 0)port=22;
-	
 	
 	
 	if (auto rc = libssh2_init(0); rc)
         return rc;
 
     this->ssh_session = libssh2_session_init();
-    if (!this->ssh_session)
+    if (!this->ssh_session){
         return -1;
-	
+	}
 	
 	this->socket = ::socket(AF_INET, SOCK_STREAM, 0);
-    if (this->socket < 0)
+    if (this->socket < 0){
         return -1;
-	
+	}
 	
 
     auto hostaddr = inet_addr(host.data());
@@ -380,8 +548,8 @@ int CSSHFS::sshfs_stat(struct _reent *r, const char *file, struct stat *st) {
     auto lk = std::scoped_lock(priv->session_mutex);
 
     LIBSSH2_SFTP_ATTRIBUTES attrs;
-    //auto rc = libssh2_sftp_stat(priv->sftp_session, internal_path.data(), &attrs);
-    auto rc = libssh2_sftp_stat_ex(priv->sftp_session, internal_path.data(),internal_path.length(),LIBSSH2_SFTP_STAT, &attrs);
+    
+	auto rc = libssh2_sftp_stat_ex(priv->sftp_session, internal_path.data(),internal_path.length(),LIBSSH2_SFTP_STAT, &attrs);
     
 	if (rc) {
         __errno_r(r) = ssh2_translate_error(rc, priv->sftp_session);

@@ -17,6 +17,7 @@
 
 #include "curldownloader.h"
 #include "localfiles.h"
+#include "imgloader.h"
 
 #include <sstream>
 #include <tinyxml2.h>
@@ -24,7 +25,7 @@
 #ifdef __SWITCH__
 #include <switch.h>
 
-#include "nxmp-gfx.h"
+#include "nxmp-render.h"
 
 using namespace tinyxml2;
 
@@ -58,6 +59,10 @@ public:
 	~Device();
 	std::string getIP();
 	std::string getfriendlyName();
+	std::string getmanufacturer();
+	std::string getmodelDescription();
+	std::string getmodelName();
+	
 	std::string getUDN();
 #ifdef OPENGL_BACKEND
 	Tex devIcon;
@@ -70,10 +75,14 @@ public:
 	void back();
 	std::vector<upnpres_struct> currentlist;
 	std::vector<std::string> parentList;
+	std::vector<std::string> friendlyparentList;
 	
 private:
 	std::string devUDN;
 	std::string friendlyName;
+	std::string manufacturer;
+	std::string modelDescription;
+	std::string modelName;
 	std::string currentID = "0";
 	std::string parentID = "0";
 	
@@ -95,14 +104,16 @@ public:
 	void addDevice(Device * _dev);
 	Device * getDevice(int idx);
 	std::vector<Device *> getDevicesList();
-	//UpnpClient_Handle  CtrlPnt;
+	
 	int getSelDevice();
 	void setSelDevice(int idx);
+	
+	CImgLoader *imgloader;
 	
 private:
 	pthread_t DiscoverThreadID;
 	int discoverSocket = -1;
-	//UpnpLib * libpointer = NULL;
+	
 	std::vector<Device *> deviceslist;
 	int seldevice = -1;
 	

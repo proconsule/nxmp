@@ -6,23 +6,21 @@
 #include "localfiles.h"
 #include "Enigma2.h"
 
-#include "nxmp-gfx.h"
+//#include "nxmp-gfx.h"
+
+#include "nxmp-render.h"
+
 
 namespace GUI {
 	
 	// For auto scale images using multiplyRes
 	void NXMPImage(ImTextureID user_texture_id, const ImVec2& size){
 		ImVec2 newsize = ImVec2(size.x*multiplyRes,size.y*multiplyRes);
-#ifdef OPENGL_BACKEND
-		//size.x = size.x*multiplyRes;
-		//size.y = size.y*multiplyRes;
-		ImGui::Image((void*)(intptr_t)user_texture_id, newsize);
-#endif
-#ifdef DEKO3D_BACKEND
+
+
 		ImGui::Image(user_texture_id, newsize);
-		//ImGui::Image(ImGui::GetIO().Fonts->TexID, newsize);
 		
-#endif
+
 
 	}
 	

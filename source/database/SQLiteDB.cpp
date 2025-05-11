@@ -2,7 +2,6 @@
 
 
 SQLiteDB::SQLiteDB(std::string _filename){
-	char cwd[256];
 	
 	NXLOG::DEBUGLOG("Opening DB\n");
 	fflush(stdout);

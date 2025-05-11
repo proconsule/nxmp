@@ -8,49 +8,7 @@
 
 
 namespace Popups{
-	/*
-	float pupuptextscrollpos = 0.0f;
-	int popuptextwaitpos = 0;
 	
-	
-	bool pupuptextforwardscroll = true;
-	bool pupuptextlaststate = true;
-	
-	void PopupScrollText(float w,float h,const char* fmt, ...){
-		
-		ImGui::BeginChild("###scrollable", ImVec2(w, h), false);
-		va_list args;
-		va_start(args, fmt);
-		ImGui::TextV(fmt, args);
-		va_end(args);
-		
-		float scroll_max_x = ImGui::GetScrollMaxX();
-		if(pupuptextscrollpos>=scroll_max_x){
-			pupuptextforwardscroll=false;
-			if(!pupuptextlaststate==pupuptextforwardscroll){
-				popuptextwaitpos = 0;
-			}
-		}else if(pupuptextscrollpos<=0) {
-			pupuptextforwardscroll=true;	
-			if(!pupuptextlaststate==pupuptextforwardscroll){
-				popuptextwaitpos = 0;
-			}
-		}
-		if(popuptextwaitpos <= 60){
-			popuptextwaitpos++;
-		}else{
-			if(pupuptextforwardscroll){
-				pupuptextscrollpos+=0.5;
-			}else{
-				pupuptextscrollpos-=0.5;
-			}
-		}
-		
-		pupuptextlaststate = pupuptextforwardscroll;
-		ImGui::SetScrollX(pupuptextscrollpos);
-		ImGui::EndChild();
-	}
-	*/
 	
 	void PlaylistStartPlaylist(void) {
 		Popups::SetupPopup("Playlist Start");
@@ -94,25 +52,25 @@ namespace Popups{
 	}
 	
 	void SaveSettingsPopup(void) {
-		Popups::SetupNativePopup(Popup_STR[NXPOPUP_SAVESETTINGS]);
+		Popups::SetupNativePopup(nxlangs::get_popup_str(nxlangs::NXPOPUP_SAVESETTINGS).c_str());
 
-		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_SAVESETTINGS], nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
+		if (ImGui::BeginPopupModal(nxlangs::get_popup_str(nxlangs::NXPOPUP_SAVESETTINGS).c_str(), nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
 			
 			ImGui::SetWindowFontScale(1.5f);
-			ImVec2 textsize = ImGui::CalcTextSize(Popup_STR[NXPOPUP_SAVESETTINGS]);
+			ImVec2 textsize = ImGui::CalcTextSize(nxlangs::get_popup_str(nxlangs::NXPOPUP_SAVESETTINGS).c_str());
 			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize.x)/2.0);
 			ImGui::SetCursorPosY((292.0f*multiplyRes-70-textsize.y)/2.0);
 			
-			ImGui::Text("%s?",Popup_STR[NXPOPUP_SAVESETTINGS]);
+			ImGui::Text("%s?",nxlangs::get_popup_str(nxlangs::NXPOPUP_SAVESETTINGS).c_str());
 			
 			ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
 			ImVec2 button_size(771.0f*multiplyRes/2.0, 70.0f);
 			
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			
             
-			if (ImGui::Button(Common_STR[NXCOMMON_NO], button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_NO).c_str(), button_size))
 			{
 				configini->ReadConfig();
 				item.state = MENU_STATE_HOME;
@@ -120,14 +78,14 @@ namespace Popups{
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button(Common_STR[NXCOMMON_YES], button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_YES).c_str(), button_size))
             {
 				item.state = MENU_STATE_HOME;
 				item.popupstate = POPUP_STATE_NONE;
 				configini->saveSettings();
 				configini->ReadConfig();
-				delete libmpv;
-				GUI::initMpv();
+				//delete libmpv;
+				//GUI::initMpv();
 					
 			}
 			ImGui::PopStyleVar();
@@ -146,20 +104,20 @@ namespace Popups{
 			ImGui::SetWindowFontScale(1.5f);
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+25.0f);
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+25.0f);
-			ImGui::Text("%s?",Popup_STR[NXPOPUP_RESUMEPLAY]);
+			ImGui::Text("%s?",nxlangs::get_popup_str(nxlangs::NXPOPUP_RESUMEPLAY).c_str());
 			
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+25.0f);
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX()+25.0f);
 			
-			ImGui::Text("%s @ %s",Popup_STR[NXPOPUP_RESUMEPLAY],Utility::formatTimeShort(libmpv->getFileInfo()->resume).c_str());
+			ImGui::Text("%s @ %s",nxlangs::get_popup_str(nxlangs::NXPOPUP_RESUMEPLAY).c_str(),Utility::formatTimeShort(libmpv->getFileInfo()->resume).c_str());
             
 			
 			ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
 			ImVec2 button_size(771.0f*multiplyRes/2.0, 70.0f);
 			
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
-			if (ImGui::Button(Common_STR[NXCOMMON_NO], button_size))
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_NO).c_str(), button_size))
 			{
                     
 				
@@ -167,7 +125,7 @@ namespace Popups{
 				ImGui::CloseCurrentPopup();
             }
 			ImGui::SameLine();
-			if (ImGui::Button(Common_STR[NXCOMMON_YES], button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_YES).c_str(), button_size))
             {
 				libmpv->seek(libmpv->getFileInfo()->resume,false);
 				item.popupstate = POPUP_STATE_NONE;
@@ -399,12 +357,12 @@ namespace Popups{
 	
 	
 	void FileContextPopup(void) {
-		Popups::SetupPopup(Popup_STR[NXPOPUP_FILEMENU]);
+		Popups::SetupPopup(nxlangs::get_popup_str(nxlangs::NXPOPUP_FILEMENU).c_str());
 		if(FilePopupTextScroller == nullptr){
 			FilePopupTextScroller = new CTextScroller("##filepopuptextscroll");
 		}
 		
-		if (ImGui::BeginPopupModal(Popup_STR[NXPOPUP_FILEMENU], nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal(nxlangs::get_popup_str(nxlangs::NXPOPUP_FILEMENU).c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
 			ImVec2 button_size(400.0f, 0.0f);
 			std::vector<FS::FileEntry> selectionlist = filebrowser->getChecked();
@@ -432,13 +390,13 @@ namespace Popups{
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
 			if(filebrowser->sortOrder == FS::FS_NAME_ASCENDINGORDER){
-				if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_NAME],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTDESC_NAME).c_str(),button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_NAME_DESCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_NAME],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTASC_NAME).c_str(),button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_NAME_ASCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
@@ -448,13 +406,13 @@ namespace Popups{
 				if (off > 0.0f)
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 				if(filebrowser->sortOrder == FS::FS_DATE_ASCENDINGORDER){
-					if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_DATE],button_size))
+					if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTDESC_DATE).c_str(),button_size))
 					{
 						filebrowser->setSordOrder(FS::FS_DATE_DESCENDINGORDER);
 						item.popupstate = POPUP_STATE_NONE;
 					}
 				}else{
-					if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_DATE],button_size))
+					if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTASC_DATE).c_str(),button_size))
 					{
 						filebrowser->setSordOrder(FS::FS_DATE_ASCENDINGORDER);
 						item.popupstate = POPUP_STATE_NONE;
@@ -464,13 +422,13 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			if(filebrowser->sortOrder == FS::FS_SIZE_ASCENDINGORDER){
-				if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_SIZE],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTDESC_SIZE).c_str(),button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_SIZE_DESCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_SIZE],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTASC_SIZE).c_str(),button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_SIZE_ASCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
@@ -481,7 +439,7 @@ namespace Popups{
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
 			if(selectionlist.size()!=0){
-				if (ImGui::Button(Popup_STR[NXPOPUP_ADDSELEPLAYLIST],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_ADDSELEPLAYLIST).c_str(),button_size))
 				{
 					
 					for(int i=0;i<selectionlist.size();i++){
@@ -490,7 +448,7 @@ namespace Popups{
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button(Popup_STR[NXPOPUP_ADDFILEPLAYLIST],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_ADDFILEPLAYLIST).c_str(),button_size))
 				{
 					playlist->appendFile(filebrowser->getCurrList()[item.fileHoveredidx],filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path);
 					item.popupstate = POPUP_STATE_NONE;
@@ -500,7 +458,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button(Common_STR[NXCOMMON_EXIT], button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_EXIT).c_str(), button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;
 				ImGui::CloseCurrentPopup();
@@ -544,7 +502,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button(Popup_STR[NXPOPUP_SETASSTARTING],button_size))
+			if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SETASSTARTING).c_str(),button_size))
 			{
                 playlist->setPlaylistIdx(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;
@@ -556,7 +514,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button(Common_STR[NXCOMMON_MOVEUP],button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_MOVEUP).c_str(),button_size))
 			{
                 playlist->moveBack(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;
@@ -572,7 +530,7 @@ namespace Popups{
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 			
-			if (ImGui::Button(Common_STR[NXCOMMON_MOVEDOWN],button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_MOVEDOWN).c_str(),button_size))
 			{
                 playlist->moveForw(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;
@@ -584,7 +542,7 @@ namespace Popups{
 
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-			if (ImGui::Button(Popup_STR[NXPOPUP_REMOVEELEMENT],button_size))
+			if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_REMOVEELEMENT).c_str(),button_size))
 			{
                 playlist->RemoveElement(item.playlistitemHighlighted);
 				item.popupstate = POPUP_STATE_NONE;
@@ -597,7 +555,7 @@ namespace Popups{
 			
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-			if (ImGui::Button(Popup_STR[NXPOPUP_CLEARPLAYLIST],button_size))
+			if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_CLEARPLAYLIST).c_str(),button_size))
 			{
                 playlist->clearPlaylist();
 				item.popupstate = POPUP_STATE_NONE;
@@ -607,7 +565,7 @@ namespace Popups{
 			
 			if (off > 0.0f)
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-			if (ImGui::Button(Common_STR[NXCOMMON_EXIT], button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_EXIT).c_str(), button_size))
 			{
                 item.popupstate = POPUP_STATE_NONE;
 				ImGui::CloseCurrentPopup();
@@ -623,29 +581,29 @@ namespace Popups{
 			
 			
 			ImGui::SetWindowFontScale(1.5f);
-			std::string dbversionstr = SettingsMenu_STR[NXSET_DATABASEVERSION] + std::string(" ") + sqlitedb->getDbVersion().c_str();
-			ImVec2 textsize = ImGui::CalcTextSize(Popup_STR[NXPOPUP_DBWASUPDATED]);
+			std::string dbversionstr = nxlangs::get_settingsmenu_str(nxlangs::NXSET_DATABASEVERSION).c_str() + std::string(" ") + sqlitedb->getDbVersion().c_str();
+			ImVec2 textsize = ImGui::CalcTextSize(nxlangs::get_popup_str(nxlangs::NXPOPUP_DBWASUPDATED).c_str());
 			ImVec2 textsize2 = ImGui::CalcTextSize(dbversionstr.c_str());
 			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize.x)/2.0);
 			ImGui::SetCursorPosY((292.0f*multiplyRes-70-textsize.y-textsize2.y)/2.0);
 			
-			ImGui::Text(Popup_STR[NXPOPUP_DBWASUPDATED]);
+			ImGui::Text(nxlangs::get_popup_str(nxlangs::NXPOPUP_DBWASUPDATED).c_str());
 			
 			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize2.x)/2.0);
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0*multiplyRes);
-			ImGui::Text("%s %s",SettingsMenu_STR[NXSET_DATABASEVERSION],sqlitedb->getDbVersion().c_str());
+			ImGui::Text("%s %s",nxlangs::get_settingsmenu_str(nxlangs::NXSET_DATABASEVERSION).c_str(),sqlitedb->getDbVersion().c_str());
 			
 			ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
 			ImVec2 button_size(771.0f*multiplyRes, 70.0f);
 		
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			
 			
-			if(ImGui::Button(Common_STR[NXCOMMON_OK],button_size)){
+			if(ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_OK).c_str(),button_size)){
 				item.popupstate = POPUP_STATE_NONE;
 			}
-			ImGui::SetFocusID(ImGui::GetID(Common_STR[NXCOMMON_OK]), ImGui::GetCurrentWindow()); 
+			ImGui::SetFocusID(ImGui::GetID(nxlangs::get_common_str(nxlangs::NXCOMMON_OK).c_str()), ImGui::GetCurrentWindow()); 
 			ImGuiContext& g = *ImGui::GetCurrentContext();
 			g.NavDisableHighlight = false;
 			
@@ -675,7 +633,7 @@ namespace Popups{
 			ImVec2 button_size(771.0f*multiplyRes/2.0, 70.0f);
 			
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			
             
 			if (ImGui::Button("Return to HB-Menu", button_size))
@@ -718,12 +676,12 @@ namespace Popups{
 			
 			
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			
 			
 			
 			ImVec2 button_size(771.0f*multiplyRes, 70.0f);
-			if (ImGui::Button(Common_STR[NXCOMMON_MOVEUP], button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_MOVEUP).c_str(), button_size))
             {
 					if(Windows::netwinselected>0){
 						oldnetworkSource v1 = item.networksources[Windows::netwinselected];
@@ -738,7 +696,7 @@ namespace Popups{
 					
 					
 			}
-			if (ImGui::Button(Common_STR[NXCOMMON_MOVEDOWN], button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_MOVEDOWN).c_str(), button_size))
             {
 					if(Windows::netwinselected<item.networksources.size()-2){
 						oldnetworkSource v1 = item.networksources[Windows::netwinselected];
@@ -754,7 +712,7 @@ namespace Popups{
 			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
-			if (ImGui::Button(Common_STR[NXCOMMON_DELETE], button_size))
+			if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_DELETE).c_str(), button_size))
             {	
 				item.networksources.erase(item.networksources.begin() + Windows::netwinselected);
 				item.popupstate = POPUP_STATE_NONE;
@@ -796,15 +754,15 @@ namespace Popups{
 			}
 			
 			
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Text_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Text_color);
 			
 			if(myorder == FS::FS_NAME_ASCENDINGORDER|| myorder == FS::FS_NAME_DESCENDINGORDER){
-				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			}
 			
 			if(myorder == FS::FS_NAME_ASCENDINGORDER){
 				
-				if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_NAME],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTDESC_NAME).c_str(),button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_NAME_DESCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
@@ -812,7 +770,7 @@ namespace Popups{
 				
 			}else{
 				
-				if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_NAME],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTASC_NAME).c_str(),button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_NAME_ASCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
@@ -824,16 +782,16 @@ namespace Popups{
 			}
 			if(!filebrowser->timelessFS){
 				if(myorder == FS::FS_DATE_ASCENDINGORDER|| myorder == FS::FS_DATE_DESCENDINGORDER){
-					ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+					ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 				}
 				if(myorder == FS::FS_DATE_ASCENDINGORDER){
-					if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_DATE],button_size))
+					if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTDESC_DATE).c_str(),button_size))
 					{
 						filebrowser->setSordOrder(FS::FS_DATE_DESCENDINGORDER);
 						item.popupstate = POPUP_STATE_NONE;
 					}
 				}else{
-					if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_DATE],button_size))
+					if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTASC_DATE).c_str(),button_size))
 					{
 						filebrowser->setSordOrder(FS::FS_DATE_ASCENDINGORDER);
 						item.popupstate = POPUP_STATE_NONE;
@@ -845,16 +803,16 @@ namespace Popups{
 				ImGui::PopStyleColor();
 			}
 			if(myorder == FS::FS_SIZE_ASCENDINGORDER|| myorder == FS::FS_SIZE_DESCENDINGORDER){
-				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			}
 			if(myorder == FS::FS_SIZE_ASCENDINGORDER){
-				if (ImGui::Button(Popup_STR[NXPOPUP_SORTDESC_SIZE],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTDESC_SIZE).c_str(),button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_SIZE_DESCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button(Popup_STR[NXPOPUP_SORTASC_SIZE],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_SORTASC_SIZE).c_str(),button_size))
 				{
 					filebrowser->setSordOrder(FS::FS_SIZE_ASCENDINGORDER);
 					item.popupstate = POPUP_STATE_NONE;
@@ -865,7 +823,7 @@ namespace Popups{
 			}
 			
 			if(selectionlist.size()!=0){
-				if (ImGui::Button(Popup_STR[NXPOPUP_ADDSELEPLAYLIST],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_ADDSELEPLAYLIST).c_str(),button_size))
 				{
 					
 					for(int i=0;i<selectionlist.size();i++){
@@ -874,7 +832,7 @@ namespace Popups{
 					item.popupstate = POPUP_STATE_NONE;
 				}
 			}else{
-				if (ImGui::Button(Popup_STR[NXPOPUP_ADDFILEPLAYLIST],button_size))
+				if (ImGui::Button(nxlangs::get_popup_str(nxlangs::NXPOPUP_ADDFILEPLAYLIST).c_str(),button_size))
 				{
 					playlist->appendFile(filebrowser->getCurrList()[item.fileHoveredidx],filebrowser->getOpenUrlPart()+filebrowser->getCurrList()[item.fileHoveredidx].path);
 					item.popupstate = POPUP_STATE_NONE;

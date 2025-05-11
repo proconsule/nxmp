@@ -23,8 +23,20 @@
 class CSSHFS{
 public:
 	CSSHFS(std::string _url,std::string _name,std::string _mount_name);
+	CSSHFS(std::string _server,int _port,std::string _username,std::string _password,std::string _path,std::string _name,std::string _mount_name);
+	CSSHFS(std::string _server,int _port,std::string _username,std::string _pubkeypath,std::string _privkeypath,std::string _passphrase,std::string _path,std::string _name,std::string _mount_name);
+	
 	~CSSHFS();
 	std::string name, mount_name;
+	
+	std::string server = "";
+	std::string username = "";
+	std::string password = "";
+	std::string path = "";
+	std::string pubkeypath = "";
+	std::string privkeypath = "";
+	std::string passphrase = "";
+	int port = 0;
 	
 	
 	int unregister_fs() const {
@@ -33,12 +45,11 @@ public:
 	
 	int register_fs() const {
 		
-		//auto id = FindDevice(this->mount_name.data());
+		auto id = FindDevice(this->mount_name.data());
 		
-		//if (id < 0){
-		auto id = AddDevice(&this->devoptab);
-		//	printf("AddDevice\n");
-		//}
+		if (id < 0){
+			id = AddDevice(&this->devoptab);
+		}
 		if (id < 0)
 			return id;
 
@@ -47,6 +58,8 @@ public:
 	
 	bool CheckConnection();
 	bool RegisterFilesystem();
+	bool RegisterFilesystem_v2();
+	bool RegisterFilesystem_pubkey_v2();
 	bool fs_regisered = false;
 	
 	static int       sshfs_open     (struct _reent *r, void *fileStruct, const char *path, int flags, int mode);
@@ -69,6 +82,11 @@ private:
 	
 	int connect(std::string host, std::uint16_t port,
         std::string username, std::string password);
+	
+	int connect_pubkey(std::string host, std::uint16_t port,
+        std::string username, std::string pubkeypath,std::string privkeypath,std::string passphrase);
+		
+	
 	void disconnect();
 	
 	

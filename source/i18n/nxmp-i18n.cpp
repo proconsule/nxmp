@@ -2,286 +2,201 @@
 
 #include "nxmp-en.h"
 #include "nxmp-it.h"
-#include "nxmp-es.h"
-#include "nxmp-de.h"
-#include "nxmp-fr.h"
-#include "nxmp-pt.h"
-#include "nxmp-pt_br.h"
-#include "nxmp-jp.h"
-#include "nxmp-cn_s.h"
-#include "nxmp-cn_t.h"
-#include "nxmp-ko.h"
-#include "nxmp-ru.h"
+#include "logger.h"
+#include "utils.h"
 
+#include <fstream>
 
-char *MainMenu_STR[NX_MAINMENU_STR_NR_ITEMS];
-char *Common_STR[NX_COMMON_STR_NR_ITEMS];
-char *Popup_STR[NX_COMMON_STR_NR_ITEMS];
-char *SettingsMenu_STR[NX_SETTINGS_STR_NR_ITEMS];
-char *Network_STR[NX_NETWORK_STR_NR_ITEMS];
-
-const char *NXLANGNAME[] = {
-	"English",
-	"Italiano",
-	"Español",
-	"Deutsch",
-	"Français",
-	"Português",
-	"Português (Br)",
-	"日本語",
-	"中国人 （简体）",
-	"中國人 （傳統的）",
-	"한국인",
-	"Русский",
-};
-
-const char *NXLANGNAME_ENG[] = {
-	"English",
-	"Italian",
-	"Spanish",
-	"Deutsch",
-	"French",
-	"Portuguese",
-	"Brazilian Portuguese",
-	"Japanese",
-	"Chinese Simplified",
-	"Chinese Traditional",
-	"Korean",
-	"Russian",
-};
-
-
-char *NXLANGAUTHORS[NX_LANGS_NR_ITEMS];
-bool NXLANGACTIVE[NX_LANGS_NR_ITEMS];
-bool NXLANGNATIVE[NX_LANGS_NR_ITEMS];
-
-void InitLang(NX_LANGS mylang){
+namespace nxlangs{
 	
 	
-	/* Clear Previous allocs if exists */
-	DestroyLang();
+	std::vector<lang_struct> langslist;
+	std::vector<std::string> langfileslist;
 	
-	/* DUP Strings */
-	NXLANGAUTHORS[English] = strdup(en_i18n_author);
-	NXLANGAUTHORS[Italian] = strdup(it_i18n_author);
-	NXLANGAUTHORS[Spanish] = strdup(es_i18n_author);
-	NXLANGAUTHORS[Deutsch] = strdup(de_i18n_author);
-	NXLANGAUTHORS[French] = strdup(fr_i18n_author);
-	NXLANGAUTHORS[Portuguese] = strdup(pt_i18n_author);
-	NXLANGAUTHORS[Portuguese_Br] = strdup(pt_br_i18n_author);
-	NXLANGAUTHORS[Japanese] = strdup(jp_i18n_author);
-	NXLANGAUTHORS[Chinese_Simplified] = strdup(cn_s_i18n_author);
-	NXLANGAUTHORS[Chinese_Traditional] = strdup(cn_t_i18n_author);
-	NXLANGAUTHORS[Korean] = strdup(ko_i18n_author);
-	NXLANGAUTHORS[Russian] = strdup(ru_i18n_author);
+	unsigned int selectedlang = 0;
+	
+	std::string get_mainmenu_str(NX_MAINMENU_STR strval){
+		return langslist[selectedlang].mainmenu[strval];
+	};
+	
+	std::string get_common_str(NX_COMMON_STR strval){
+		return langslist[selectedlang].common[strval];
+	};
+	
+	std::string get_popup_str(NX_POPUP_STR strval){
+		return langslist[selectedlang].popup[strval];
+	};
+	
+	std::string get_settingsmenu_str(NX_SETTINGS_STR strval){
+		return langslist[selectedlang].settingsmenu[strval];
+	};
+	
+	std::string get_network_str(NX_NETWORK_STR strval){
+		return langslist[selectedlang].network[strval];
+	};
+	
+	std::string GetCurrentLangName(){
+		return langslist[selectedlang].name;
+	}
+	
+	void ParseAddLangfile(std::string _path){
+		
+		
+		json_t * root = NULL;
+		json_error_t error;
+		
+		
+		
+		root = json_load_file(_path.c_str(), 0, &error);
+		if (!root)
+			NXLOG::DEBUGLOG("ERROR PARSING JSON %s\n",_path.c_str());
+		
+	
+		if (!json_is_object(root))
+		{
+			
+			json_decref(root);
+			return;
+		}
+		
+		
+		lang_struct tmplang;
+		
+		tmplang.id = langslist.size();
+		
+		json_t * authorele = NULL;    
+		authorele = json_object_get(root, "author");
+		tmplang.author = json_string_value(authorele);
+		json_t * langnameele = NULL;    
+		langnameele = json_object_get(root, "langname");
+		tmplang.name = json_string_value(langnameele);
+		tmplang.status = true;
+		tmplang.native = true;
+		json_t * mainmenuarray = NULL;
+		json_t * mainmenuarray_element = NULL;
+		mainmenuarray = json_object_get(root, "mainmenu");
+		for (int i = 0; i < (int)json_array_size(mainmenuarray); i++){
+			mainmenuarray_element = json_array_get(mainmenuarray, i);
+			tmplang.mainmenu.push_back(json_string_value(mainmenuarray_element));
+			
+		}
+		json_t * commonarray = NULL;
+		json_t * commonarray_element = NULL;
+		commonarray = json_object_get(root, "common");
+		for (int i = 0; i < (int)json_array_size(commonarray); i++){
+			commonarray_element = json_array_get(commonarray, i);
+			tmplang.common.push_back(json_string_value(commonarray_element));
+			
+		}
+		json_t * popuparray = NULL;
+		json_t * popuparray_element = NULL;
+		popuparray = json_object_get(root, "popup");
+		for (int i = 0; i < (int)json_array_size(popuparray); i++){
+			popuparray_element = json_array_get(popuparray, i);
+			tmplang.popup.push_back(json_string_value(popuparray_element));
+			
+		}
+		json_t * settingsarray = NULL;
+		json_t * settingsarray_element = NULL;
+		settingsarray = json_object_get(root, "settingsmenu");
+		for (int i = 0; i < (int)json_array_size(settingsarray); i++){
+			settingsarray_element = json_array_get(settingsarray, i);
+			tmplang.settingsmenu.push_back(json_string_value(settingsarray_element));
+			
+		}
+		json_t * networkarray = NULL;
+		json_t * networkarray_element = NULL;
+		networkarray = json_object_get(root, "network");
+		for (int i = 0; i < (int)json_array_size(networkarray); i++){
+			networkarray_element = json_array_get(networkarray, i);
+			tmplang.network.push_back(json_string_value(networkarray_element));
+			
+		}
+		
+		
+		langslist.push_back(tmplang);
+		json_decref(root);
+		
+		
+		
+
+	
+	}
 	
 	
-	NXLANGACTIVE[English] = en_i18n_status;
-	NXLANGACTIVE[Italian] = it_i18n_status;
-	NXLANGACTIVE[Spanish] = es_i18n_status;
-	NXLANGACTIVE[Deutsch] = de_i18n_status;
-	NXLANGACTIVE[French] = fr_i18n_status;
-	NXLANGACTIVE[Portuguese] = pt_i18n_status;
-	NXLANGACTIVE[Portuguese_Br] = pt_br_i18n_status;
-	NXLANGACTIVE[Japanese] = jp_i18n_status;
-	NXLANGACTIVE[Chinese_Simplified] = cn_s_i18n_status;
-	NXLANGACTIVE[Chinese_Traditional] = cn_t_i18n_status;
-	NXLANGACTIVE[Korean] = ko_i18n_status;
-	NXLANGACTIVE[Russian] = ru_i18n_status;
+	void FetchUserLangs(std::string _path){
 	
-	NXLANGNATIVE[English] = en_i18n_native;
-	NXLANGNATIVE[Italian] = it_i18n_native;
-	NXLANGNATIVE[Spanish] = es_i18n_native;
-	NXLANGNATIVE[Deutsch] = de_i18n_native;
-	NXLANGNATIVE[French] = fr_i18n_native;
-	NXLANGNATIVE[Portuguese] = pt_i18n_native;
-	NXLANGNATIVE[Portuguese_Br] = pt_br_i18n_native;
-	NXLANGNATIVE[Japanese] = jp_i18n_native;
-	NXLANGNATIVE[Chinese_Simplified] = cn_s_i18n_native;
-	NXLANGNATIVE[Chinese_Traditional] = cn_t_i18n_native;
-	NXLANGNATIVE[Korean] = ko_i18n_native;
-	NXLANGNATIVE[Russian] = ru_i18n_native;
-	
-	for(int i=0;i<NX_MAINMENU_STR_NR_ITEMS;i++){
-		if(mylang == English){
-			MainMenu_STR[i] = strdup(MainMenu_STR_EN[i]);
-		}else if(mylang == Italian){
-			MainMenu_STR[i] = strdup(MainMenu_STR_IT[i]);
-		}else if(mylang == Spanish){
-			MainMenu_STR[i] = strdup(MainMenu_STR_ES[i]);
-		}else if(mylang == Deutsch){
-			MainMenu_STR[i] = strdup(MainMenu_STR_DE[i]);
-		}else if(mylang == French){
-			MainMenu_STR[i] = strdup(MainMenu_STR_FR[i]);
-		}else if(mylang == Portuguese){
-			MainMenu_STR[i] = strdup(MainMenu_STR_PT[i]);
-		}else if(mylang == Portuguese_Br){
-			MainMenu_STR[i] = strdup(MainMenu_STR_PT_BR[i]);
-		}else if(mylang == Japanese){
-			MainMenu_STR[i] = strdup(MainMenu_STR_JP[i]);
-		}else if(mylang == Chinese_Simplified){
-			MainMenu_STR[i] = strdup(MainMenu_STR_CN_S[i]);
-		}else if(mylang == Chinese_Traditional){
-			MainMenu_STR[i] = strdup(MainMenu_STR_CN_T[i]);
-		}else if(mylang == Russian){
-			MainMenu_STR[i] = strdup(MainMenu_STR_RU[i]);
-		}else if(mylang == Korean){
-			MainMenu_STR[i] = strdup(MainMenu_STR_KO[i]);
-		}else{
-			MainMenu_STR[i] = strdup(MainMenu_STR_EN[i]);
+		langfileslist.clear();
+		struct dirent *ent;
+		DIR *dir;
+		NXLOG::DEBUGLOG("Open Langs Dir: %s\n",_path.c_str());
+		if (!_path.empty()) {
+			if ((dir = opendir(_path.c_str())) != nullptr) {
+				FsFileSystem sdmc;
+				fsOpenSdCardFileSystem(&sdmc);
+				while ((ent = readdir(dir)) != nullptr) {
+					if ((_path == "/" || strlen(ent->d_name) == 1) && ent->d_name[0] == '.') {
+						continue;
+					}
+					if ((_path == "/" || strlen(ent->d_name) == 2) && ent->d_name[0] == '.' && ent->d_name[1] == '.') {
+						continue;
+					}
+					
+					if (Utility::endsWith(ent->d_name, ".json", false)) {
+						NXLOG::DEBUGLOG("FILE %s\n",(_path + std::string("/") + ent->d_name).c_str());
+						ParseAddLangfile(_path + std::string("/") + ent->d_name);
+						//langfileslist.push_back(_path + std::string("/") + ent->d_name);
+					}
+						
+				}
+				fsFsClose(&sdmc);
+				closedir(dir);
+					
+			}
 		}
 		
 	}
 	
-	for(int i=0;i<NX_COMMON_STR_NR_ITEMS;i++){
-		if(mylang == English){
-			Common_STR[i] = strdup(Common_STR_EN[i]);
-		}else if(mylang == Italian){
-			Common_STR[i] = strdup(Common_STR_IT[i]);
-		}else if(mylang == Spanish){
-			Common_STR[i] = strdup(Common_STR_ES[i]);
-		}else if(mylang == Deutsch){
-			Common_STR[i] = strdup(Common_STR_DE[i]);
-		}else if(mylang == French){
-			Common_STR[i] = strdup(Common_STR_FR[i]);
-		}else if(mylang == Portuguese){
-			Common_STR[i] = strdup(Common_STR_PT[i]);
-		}else if(mylang == Portuguese_Br){
-			Common_STR[i] = strdup(Common_STR_PT_BR[i]);
-		}else if(mylang == Japanese){
-			Common_STR[i] = strdup(Common_STR_JP[i]);
-		}else if(mylang == Chinese_Simplified){
-			Common_STR[i] = strdup(Common_STR_CN_S[i]);
-		}else if(mylang == Chinese_Traditional){
-			Common_STR[i] = strdup(Common_STR_CN_T[i]);
-		}else if(mylang == Korean){
-			Common_STR[i] = strdup(Common_STR_KO[i]);
-		}else if(mylang == Russian){
-			Common_STR[i] = strdup(Common_STR_RU[i]);
-		}else{
-			Common_STR[i] = strdup(Common_STR_EN[i]);
-		}
+	void Init_Langs(){
+		
+		lang_struct tmp_eng;
+		tmp_eng.id = 0;
+		tmp_eng.name = "English";
+		tmp_eng.author = en_i18n_author;
+		tmp_eng.status = en_i18n_status;
+		tmp_eng.native = en_i18n_native;
+		tmp_eng.mainmenu = MainMenu_STR_EN;
+		tmp_eng.common = Common_STR_EN;
+		tmp_eng.popup = Popup_STR_EN;
+		tmp_eng.settingsmenu = SettingsMenu_STR_EN;
+		tmp_eng.network = Network_STR_EN;
+		tmp_eng.filepath = "0";
+		langslist.push_back(tmp_eng);
+		
+		lang_struct tmp_it;
+		tmp_it.id = 1;
+		tmp_it.name = "Italiano";
+		tmp_it.author = it_i18n_author;
+		tmp_it.status = it_i18n_status;
+		tmp_it.native = it_i18n_native;
+		tmp_it.mainmenu = MainMenu_STR_IT;
+		tmp_it.common = Common_STR_IT;
+		tmp_it.popup = Popup_STR_IT;
+		tmp_it.settingsmenu = SettingsMenu_STR_IT;
+		tmp_it.network = Network_STR_IT;
+		tmp_eng.filepath = "1";
+		
+		langslist.push_back(tmp_it);
+		
+		
+		FetchUserLangs("./langs");
+		
+		
+		
+		
+		
 		
 	}
-	
-	for(int i=0;i<NX_POPUP_STR_NR_ITEMS;i++){
-		if(mylang == English){
-			Popup_STR[i] = strdup(Popup_STR_EN[i]);
-		}else if(mylang == Italian){
-			Popup_STR[i] = strdup(Popup_STR_IT[i]);
-		}else if(mylang == Spanish){
-			Popup_STR[i] = strdup(Popup_STR_ES[i]);
-		}else if(mylang == Deutsch){
-			Popup_STR[i] = strdup(Popup_STR_DE[i]);
-		}else if(mylang == French){
-			Popup_STR[i] = strdup(Popup_STR_FR[i]);
-		}else if(mylang == Portuguese){
-			Popup_STR[i] = strdup(Popup_STR_PT[i]);
-		}else if(mylang == Portuguese_Br){
-			Popup_STR[i] = strdup(Popup_STR_PT_BR[i]);
-		}else if(mylang == Japanese){
-			Popup_STR[i] = strdup(Popup_STR_JP[i]);
-		}else if(mylang == Chinese_Simplified){
-			Popup_STR[i] = strdup(Popup_STR_CN_S[i]);
-		}else if(mylang == Chinese_Traditional){
-			Popup_STR[i] = strdup(Popup_STR_CN_T[i]);
-		}else if(mylang == Korean){
-			Popup_STR[i] = strdup(Popup_STR_KO[i]);
-		}else if(mylang == Russian){
-			Popup_STR[i] = strdup(Popup_STR_RU[i]);
-		}else{
-			Popup_STR[i] = strdup(Popup_STR_EN[i]);
-		}
-		
-	}
-	
-	for(int i=0;i<NX_SETTINGS_STR_NR_ITEMS;i++){
-		if(mylang == English){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_EN[i]);
-		}else if(mylang == Italian){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_IT[i]);
-		}else if(mylang == Spanish){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_ES[i]);
-		}else if(mylang == Deutsch){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_DE[i]);
-		}else if(mylang == French){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_FR[i]);
-		}else if(mylang == Portuguese){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_PT[i]);
-		}else if(mylang == Portuguese_Br){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_PT_BR[i]);
-		}else if(mylang == Japanese){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_JP[i]);
-		}else if(mylang == Chinese_Simplified){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_CN_S[i]);
-		}else if(mylang == Chinese_Traditional){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_CN_T[i]);
-		}else if(mylang == Russian){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_RU[i]);
-		}else if(mylang == Korean){
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_KO[i]);
-		}else{
-			SettingsMenu_STR[i] = strdup(SettingsMenu_STR_EN[i]);
-		}
-		
-	}
-	
-	for(int i=0;i<NX_NETWORK_STR_NR_ITEMS;i++){
-		if(mylang == English){
-			Network_STR[i] = strdup(Network_STR_EN[i]);
-		}else if(mylang == Italian){
-			Network_STR[i] = strdup(Network_STR_IT[i]);
-		}else if(mylang == Spanish){
-			Network_STR[i] = strdup(Network_STR_ES[i]);
-		}else if(mylang == Deutsch){
-			Network_STR[i] = strdup(Network_STR_DE[i]);
-		}else if(mylang == French){
-			Network_STR[i] = strdup(Network_STR_FR[i]);
-		}else if(mylang == Portuguese){
-			Network_STR[i] = strdup(Network_STR_PT[i]);
-		}else if(mylang == Portuguese_Br){
-			Network_STR[i] = strdup(Network_STR_PT_BR[i]);
-		}else if(mylang == Japanese){
-			Network_STR[i] = strdup(Network_STR_JP[i]);
-		}else if(mylang == Chinese_Simplified){
-			Network_STR[i] = strdup(Network_STR_CN_S[i]);
-		}else if(mylang == Chinese_Traditional){
-			Network_STR[i] = strdup(Network_STR_CN_T[i]);
-		}else if(mylang == Korean){
-			Network_STR[i] = strdup(Network_STR_KO[i]);
-		}else if(mylang == Russian){
-			Network_STR[i] = strdup(Network_STR_RU[i]);
-		}else{
-			Network_STR[i] = strdup(Network_STR_EN[i]);
-		}
-	}
-	
-	
-}
 
 
-void DestroyLang(){
-	
-	for(int i=0;i<NX_LANGS_NR_ITEMS;i++){
-		if(NXLANGAUTHORS[i] != NULL)free(NXLANGAUTHORS[i]);
-		NXLANGACTIVE[i] = false;
-		NXLANGNATIVE[i] = false;
-	}
-	
-	for(int i=0;i<NX_MAINMENU_STR_NR_ITEMS;i++){
-		if(MainMenu_STR[i] != NULL)free(MainMenu_STR[i]);
-	}
-	for(int i=0;i<NX_COMMON_STR_NR_ITEMS;i++){
-		if(Common_STR[i] != NULL)free(Common_STR[i]);
-	}
-	for(int i=0;i<NX_POPUP_STR_NR_ITEMS;i++){
-		if(Popup_STR[i] != NULL)free(Popup_STR[i]);
-	}
-	for(int i=0;i<NX_SETTINGS_STR_NR_ITEMS;i++){
-		if(SettingsMenu_STR[i] != NULL)free(SettingsMenu_STR[i]);
-	}
-	for(int i=0;i<NX_NETWORK_STR_NR_ITEMS;i++){
-		if(Network_STR[i] != NULL)free(Network_STR[i]);
-	}
-	
 }

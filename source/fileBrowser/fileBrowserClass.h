@@ -14,8 +14,8 @@
 
 
 #include "utils.h"
-#include "nxmp-gfx.h"
 #include "imgloader.h"
+#include  "iniparser.h"
 
 
 typedef struct{
@@ -30,7 +30,9 @@ typedef struct{
 
 class CFileBrowser{
 public:
-	CFileBrowser(std::string _path,Playlist * _playlist,USBMounter * _myusb = nullptr);
+	CFileBrowser(std::string _path,Playlist * _playlist);
+	CFileBrowser(networkstruct_v2 netconfdata,Playlist * _playlist);
+	CFileBrowser(USBMounter * _myusb,Playlist * _playlist);
 	~CFileBrowser();
 	
 	HTTPDir *myhttp = nullptr;

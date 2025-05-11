@@ -6,7 +6,7 @@ bool it_i18n_status = true;
 bool it_i18n_native = true;
 
 
-const char *MainMenu_STR_IT[] = {
+std::vector<std::string> MainMenu_STR_IT = {
 	"File Locali",
 	"USB",
 	"Stream Url",
@@ -19,7 +19,7 @@ const char *MainMenu_STR_IT[] = {
 	"Esci"
 };
 
-const char *Common_STR_IT[] = {
+std::vector<std::string> Common_STR_IT = {
 	"Si",
 	"No",
 	"OK",
@@ -44,7 +44,7 @@ const char *Common_STR_IT[] = {
 
 };
 
-const char *Popup_STR_IT[] = {
+std::vector<std::string> Popup_STR_IT = {
 	"Salva Settaggi",
 	"Riprendi Riproduzione",
 	"Database Aggiornato",
@@ -64,7 +64,7 @@ const char *Popup_STR_IT[] = {
 	"Setta come elemento di partenza"
 };
 
-const char *SettingsMenu_STR_IT[] = {
+std::vector<std::string> SettingsMenu_STR_IT = {
 	"Generali",
 	"File Browser",
 	"Mostra file nascosti",
@@ -107,7 +107,7 @@ const char *SettingsMenu_STR_IT[] = {
 	"Settaggi Touch",
 };
 
-const char *Network_STR_IT[] = {
+std::vector<std::string> Network_STR_IT = {
 	"Add Share",
 	"Add Share Menu",
 	"Share Config",

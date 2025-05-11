@@ -1,0 +1,271 @@
+diff --git a/include/libsmb2-private.h b/include/libsmb2-private.h
+index 58fc9a5..c848c44 100644
+--- a/include/libsmb2-private.h
++++ b/include/libsmb2-private.h
+@@ -23,7 +23,7 @@
+ #include "config.h"
+ #endif
+ 
+-#if defined(PS2_EE_PLATFORM) || defined(PS3_PPU_PLATFORM) || defined(ESP_PLATFORM) || defined(__APPLE__)
++#if defined(PS2_EE_PLATFORM) || defined(PS3_PPU_PLATFORM) || defined(__SWITCH__) || defined(ESP_PLATFORM) || defined(__APPLE__)
+ /* We need this for time_t */
+ #include <time.h>
+ #endif
+@@ -274,6 +274,10 @@ struct utf16 {
+         uint16_t val[1];
+ };
+ 
++/* Conflicts with libnx functions */
++#define utf8_to_utf16 smb2_utf8_to_utf16
++#define utf16_to_utf8 smb2_utf16_to_utf8
++
+ /* Returns a string converted to UTF-16 format. Use free() to release
+  * the utf16 string.
+  */
+diff --git a/include/portable-endian.h b/include/portable-endian.h
+index 0d2f180..956980c 100644
+--- a/include/portable-endian.h
++++ b/include/portable-endian.h
+@@ -127,6 +127,23 @@
+ #   define be64toh(x) (x)
+ #   define le64toh(x) __builtin_bswap64(x)
+ 
++#elif defined(__SWITCH__)
++
++#   define htobe16(x) __builtin_bswap16(x)
++#   define htole16(x) (x)
++#   define be16toh(x) __builtin_bswap16(x)
++#   define le16toh(x) (x)
++
++#   define htobe32(x) __builtin_bswap32(x)
++#   define htole32(x) (x)
++#   define be32toh(x) __builtin_bswap32(x)
++#   define le32toh(x) (x)
++
++#   define htobe64(x) __builtin_bswap64(x)
++#   define htole64(x) (x)
++#   define be64toh(x) __builtin_bswap64(x)
++#   define le64toh(x) (x)
++
+ #elif defined(__WINDOWS__)
+ 
+ # include <windows.h>
+diff --git a/lib/compat.c b/lib/compat.c
+index efae231..30f95a0 100644
+--- a/lib/compat.c
++++ b/lib/compat.c
+@@ -204,53 +204,153 @@ void smb2_freeaddrinfo(struct addrinfo *res)
+ 
+ #endif /* PS3_PPU_PLATFORM */
+ 
++#ifdef __SWITCH__
++
++#define NEED_READV
++#define NEED_WRITEV
++
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <alloca.h>
++#include <sys/socket.h>
++#include <switch/types.h>
++
++#define __set_errno(e) (errno = (e))
++#define __libc_use_alloca(size) ((size) <= __MAX_ALLOCA_CUTOFF)
++#define __MAX_ALLOCA_CUTOFF 32768
++#define MIN(a,b) (((a) < (b)) ? (a) : (b))
++#define __alloca alloca
++#define __write write
++#define __read read
++#define __writev writev
++#define __readv readv
++#define __mempcpy(dest, src, n) mempcpy(dest, src, n)
++
++static void
++ifree (char **ptrp)
++{
++  free (*ptrp);
++}
++
++#endif /* __SWITCH__ */
++
+ #ifdef NEED_WRITEV
+-ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
++/* Write data pointed by the buffers described by VECTOR, which
++   is a vector of COUNT 'struct iovec's, to file descriptor FD.
++   The data is written in the order specified.
++   Operates just like 'write' (see <unistd.h>) except that the data
++   are taken from VECTOR instead of a contiguous buffer.  */
++ssize_t
++__writev (int fd, const struct iovec *vector, int count)
+ {
+-        int i, count, left, total = 0;
+-        char *ptr;
+-
+-        for (i = 0; i < iovcnt; i++) {
+-                left = iov[i].iov_len;
+-                ptr = iov[i].iov_base;
+-                while (left > 0) {
+-                        count = write(fd, ptr, left);
+-                        if (count == -1) {
+-                                return -1;
+-                        }
+-                        total += count;
+-                        left -= count;
+-                        ptr += count;
+-                }
++  /* Find the total number of bytes to be written.  */
++  size_t bytes = 0;
++  for (int i = 0; i < count; ++i)
++    {
++      /* Check for ssize_t overflow.  */
++      if (SSIZE_MAX - bytes < vector[i].iov_len)
++        {
++          __set_errno (EINVAL);
++          return -1;
+         }
+-        return total;
++      bytes += vector[i].iov_len;
++    }
++
++  /* Allocate a temporary buffer to hold the data.  We should normally
++     use alloca since it's faster and does not require synchronization
++     with other threads.  But we cannot if the amount of memory
++     required is too large.  */
++  char *buffer;
++  char *malloced_buffer __attribute__ ((__cleanup__ (ifree))) = NULL;
++  if (__libc_use_alloca (bytes))
++    buffer = (char *) __alloca (bytes);
++  else
++    {
++      malloced_buffer = buffer = (char *) malloc (bytes);
++      if (buffer == NULL)
++        /* XXX I don't know whether it is acceptable to try writing
++           the data in chunks.  Probably not so we just fail here.  */
++        return -1;
++    }
++
++  /* Copy the data into BUFFER.  */
++  size_t to_copy = bytes;
++  char *bp = buffer;
++  for (int i = 0; i < count; ++i)
++    {
++      size_t copy = MIN (vector[i].iov_len, to_copy);
++
++      bp = __mempcpy ((void *) bp, (void *) vector[i].iov_base, copy);
++
++      to_copy -= copy;
++      if (to_copy == 0)
++        break;
++    }
++
++  ssize_t bytes_written = __write (fd, buffer, bytes);
++
++  return bytes_written;
+ }
+ #endif
+ 
+ #ifdef NEED_READV
+-ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
++/* Read data from file descriptor FD, and put the result in the
++   buffers described by VECTOR, which is a vector of COUNT 'struct iovec's.
++   The buffers are filled in the order specified.
++   Operates just like 'read' (see <unistd.h>) except that data are
++   put in VECTOR instead of a contiguous buffer.  */
++ssize_t
++__readv (int fd, const struct iovec *vector, int count)
+ {
+-        int i, left, count;
+-        ssize_t total = 0;
+-        char *ptr;
+-
+-        for (i = 0; i < iovcnt; i++) {
+-                left = iov[i].iov_len;
+-                ptr = iov[i].iov_base;
+-                while (left > 0) {
+-                        count = read(fd, ptr, left);
+-                        if (count == -1) {
+-                                return -1;
+-                        }
+-                        if (count == 0) {
+-                                return total;
+-                        }
+-                        total += count;
+-                        left -= count;
+-                        ptr += count;
+-                }
++  /* Find the total number of bytes to be read.  */
++  size_t bytes = 0;
++  for (int i = 0; i < count; ++i)
++    {
++      /* Check for ssize_t overflow.  */
++      if (SSIZE_MAX - bytes < vector[i].iov_len)
++        {
++          __set_errno (EINVAL);
++          return -1;
+         }
+-        return total;
++      bytes += vector[i].iov_len;
++    }
++
++  /* Allocate a temporary buffer to hold the data.  We should normally
++     use alloca since it's faster and does not require synchronization
++     with other threads.  But we cannot if the amount of memory
++     required is too large.  */
++  char *buffer;
++  char *malloced_buffer __attribute__ ((__cleanup__ (ifree))) = NULL;
++  if (__libc_use_alloca (bytes))
++    buffer = (char *) __alloca (bytes);
++  else
++    {
++      malloced_buffer = buffer = (char *) malloc (bytes);
++      if (buffer == NULL)
++        return -1;
++    }
++
++  /* Read the data.  */
++  ssize_t bytes_read = __read (fd, buffer, bytes);
++  if (bytes_read < 0)
++    return -1;
++
++  /* Copy the data from BUFFER into the memory specified by VECTOR.  */
++  bytes = bytes_read;
++  for (int i = 0; i < count; ++i)
++    {
++      size_t copy = MIN (vector[i].iov_len, bytes);
++
++      (void) memcpy ((void *) vector[i].iov_base, (void *) buffer, copy);
++
++      buffer += copy;
++      bytes -= copy;
++      if (bytes == 0)
++        break;
++    }
++
++  return bytes_read;
+ }
+ #endif
+ 
+diff --git a/lib/compat.h b/lib/compat.h
+index b812c43..a59a18a 100644
+--- a/lib/compat.h
++++ b/lib/compat.h
+@@ -199,4 +199,18 @@ struct sockaddr_storage {
+ 
+ #endif
+ 
++#ifdef __SWITCH__
++
++#define _GNU_SOURCE
++#include <errno.h>
++#include <string.h>
++#define getlogin_r(a,b) ENXIO
++
++#include <sys/types.h>
++#include <sys/_iovec.h>
++ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
++ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
++
++#endif
++
+ #endif /* _COMPAT_H_ */

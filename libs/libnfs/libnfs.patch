@@ -1,0 +1,139 @@
+diff --git a/lib/init.c b/lib/init.c
+index a17ea9e..3322089 100644
+--- a/lib/init.c
++++ b/lib/init.c
+@@ -139,7 +139,7 @@ struct rpc_context *rpc_init_context(void)
+ 	rpc->fd = -1;
+ 	rpc->tcp_syncnt = RPC_PARAM_UNDEFINED;
+ 	rpc->pagecache_ttl = NFS_PAGECACHE_DEFAULT_TTL;
+-#if defined(WIN32) || defined(ANDROID) || defined(PS3_PPU)
++#if defined(WIN32) || defined(ANDROID) || defined(PS3_PPU) || defined(__SWITCH__)
+ 	rpc->uid = 65534;
+ 	rpc->gid = 65534;
+ #else
+diff --git a/lib/libnfs-zdr.c b/lib/libnfs-zdr.c
+index 1896851..65e9628 100644
+--- a/lib/libnfs-zdr.c
++++ b/lib/libnfs-zdr.c
+@@ -599,7 +599,7 @@ struct AUTH *libnfs_authunix_create(const char *host, uint32_t uid, uint32_t gid
+ 
+ struct AUTH *libnfs_authunix_create_default(void)
+ {
+-#if defined(WIN32) || defined(PS3_PPU)
++#if defined(WIN32) || defined(PS3_PPU) || defined(__SWITCH__)
+ 	return libnfs_authunix_create("libnfs", 65534, 65534, 0, NULL);
+ #else
+ 	return libnfs_authunix_create("libnfs", getuid(), getgid(), 0, NULL);
+diff --git a/lib/libnfs.c b/lib/libnfs.c
+index a84b292..ab73097 100755
+--- a/lib/libnfs.c
++++ b/lib/libnfs.c
+@@ -43,6 +43,7 @@
+ #endif
+ 
+ #ifdef HAVE_UTIME_H
++#include <time.h>
+ #include <utime.h>
+ #endif
+ 
+diff --git a/lib/nfs_v3.c b/lib/nfs_v3.c
+index 3eb39fc..964b659 100644
+--- a/lib/nfs_v3.c
++++ b/lib/nfs_v3.c
+@@ -49,6 +49,7 @@
+ #endif
+ 
+ #ifdef HAVE_UTIME_H
++#include <time.h>
+ #include <utime.h>
+ #endif
+ 
+@@ -68,6 +69,10 @@
+ #define statvfs statfs
+ #endif
+ 
++#ifdef HAVE_ARPA_INET_H
++#include <arpa/inet.h>
++#endif
++
+ #ifdef HAVE_NETINET_IN_H
+ #include <netinet/in.h>
+ #endif
+diff --git a/lib/nfs_v4.c b/lib/nfs_v4.c
+index 2e0499e..145fae7 100644
+--- a/lib/nfs_v4.c
++++ b/lib/nfs_v4.c
+@@ -49,6 +49,7 @@
+ #endif
+ 
+ #ifdef HAVE_UTIME_H
++#include <time.h>
+ #include <utime.h>
+ #endif
+ 
+@@ -68,6 +69,10 @@
+ #define statvfs statfs
+ #endif
+ 
++#ifdef HAVE_ARPA_INET_H
++#include <arpa/inet.h>
++#endif
++
+ #ifdef HAVE_NETINET_IN_H
+ #include <netinet/in.h>
+ #endif
+@@ -438,7 +443,7 @@ nfs_get_ugid(struct nfs_context *nfs, const char *buf, int slen, int is_user)
+                         ugid *= 10;
+                         ugid += *buf - '0';
+                 } else {
+-#ifdef HAVE_GETPWNAM
++#if defined(HAVE_GETPWNAM) && !defined(__SWITCH__)
+                         struct passwd *pwd = getpwnam(name);
+                         if (pwd) {
+                                 if (is_user) {
+diff --git a/lib/pdu.c b/lib/pdu.c
+index d151888..faf132b 100644
+--- a/lib/pdu.c
++++ b/lib/pdu.c
+@@ -35,6 +35,10 @@
+ #include <win32/win32_compat.h>
+ #endif
+ 
++#ifdef HAVE_ARPA_INET_H
++#include <arpa/inet.h>
++#endif
++
+ #ifdef HAVE_NETINET_IN_H
+ #include <netinet/in.h>
+ #endif
+diff --git a/lib/socket.c b/lib/socket.c
+index e633715..031535c 100644
+--- a/lib/socket.c
++++ b/lib/socket.c
+@@ -178,7 +178,7 @@ set_tcp_sockopt(int sockfd, int optname, int value)
+ 	else
+ 		return -1;
+ 	#else
+-		level = SOL_TCP;
++		level = 6;
+ 	#endif
+ 
+ 	return setsockopt(sockfd, level, optname, (char *)&value,
+@@ -837,7 +837,7 @@ rpc_connect_sockaddr_async(struct rpc_context *rpc)
+                                                 sizeof(struct sockaddr_in);
+ #endif
+ 					break;
+-#if !defined(PS3_PPU) && !defined(PS2_EE)
++#if !defined(PS3_PPU) && !defined(PS2_EE) && !defined(__SWITCH__)
+ 				case AF_INET6:
+ 					sin6->sin6_port = port;
+ 					sin6->sin6_family = AF_INET6;
+@@ -895,7 +895,7 @@ rpc_set_sockaddr(struct rpc_context *rpc, const char *server, int port)
+                         sizeof(struct sockaddr_in);
+ #endif
+ 		break;
+-#if !defined(PS3_PPU) && !defined(PS2_EE)
++#if !defined(PS3_PPU) && !defined(PS2_EE) && !defined(__SWITCH__)
+ 	case AF_INET6:
+ 		((struct sockaddr_in6 *)&rpc->s)->sin6_family = ai->ai_family;
+ 		((struct sockaddr_in6 *)&rpc->s)->sin6_port = htons(port);

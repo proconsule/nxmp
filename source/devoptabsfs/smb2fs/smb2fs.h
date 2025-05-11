@@ -22,13 +22,54 @@
 
 #include <switch.h>
 
+class CSMB2_PARSER{
+public:
+	
+	CSMB2_PARSER(std::string myurl){
+		int smbpos = myurl.rfind("smb://", 0);
+		if (smbpos != 0) { // pos=0 limits the search to the prefix
+            valid = false;
+			return;
+        }
+		size_t found = myurl.find(":",6);
+		size_t found2 = myurl.find("@");
+		size_t found3 = myurl.find("/",6);
+		size_t found4 = myurl.find("/",found3+1);
+		size_t found5 = myurl.find("/",found4+1);
+		
+		if(found == -1 || found2 == -1 || found3 == -1){
+			valid = false;
+			return;
+		}
+		
+		user = myurl.substr(6,found-6);
+		pass = myurl.substr(found+1,found2-found-1);
+		server = myurl.substr(found2+1,found3-found2-1);
+		share = myurl.substr(found3+1,found4-found3-1);
+		path = myurl.substr(found4+1,found5-found4-1);
+		valid = true;
+	}
+	
+	bool valid = false;
+	
+	
+	std::string domain;
+    std::string user;
+    std::string pass;
+    std::string server;
+    std::string share;
+    std::string path;
+	
+};
 
 class CSMB2FS{
 public:
 	CSMB2FS(std::string _url,std::string _name,std::string _mount_name);
+	CSMB2FS(std::string _server,std::string _username,std::string _password,std::string _path,std::string _name,std::string _mount_name);
 	~CSMB2FS();
 	std::string name, mount_name;
 	
+	CSMB2_PARSER * SMB2_PARSER;
 	
 	int unregister_fs() const {
 		return RemoveDevice(this->mount_name.data());
@@ -36,12 +77,12 @@ public:
 	
 	int register_fs() const {
 		
-		//auto id = FindDevice(this->mount_name.data());
+		auto id = FindDevice(this->mount_name.data());
 		
-		//if (id < 0){
-		auto id = AddDevice(&this->devoptab);
-		//	printf("AddDevice\n");
-		//}
+		if (id < 0){
+			id = AddDevice(&this->devoptab);
+			
+		}
 		if (id < 0)
 			return id;
 
@@ -68,6 +109,7 @@ public:
 	
 	bool CheckConnection();
 	bool RegisterFilesystem();
+	bool RegisterFilesystem_v2();
 	bool fs_regisered = false;
 	
 	struct dircache{
@@ -82,6 +124,7 @@ private:
 	std::string connect_url;
 	
 	int connect();
+	int connect_v2();
 	void disconnect();
 	
 	std::string translate_path(const char *path);
@@ -104,6 +147,11 @@ private:
 			
         };
 	
+	
+	std::string server = "";
+	std::string username = "";
+	std::string password = "";
+	std::string path = "";
 	
 	
 	

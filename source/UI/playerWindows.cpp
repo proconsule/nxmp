@@ -112,7 +112,7 @@ namespace playerWindows{
 		rightmenuposX = item.rightmenu_startpos;
 		if(item.rightmenu_startpos>1080)item.rightmenu_startpos-=10;
 		playerWindows::SetupRightWindow();
-		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Image","Audio","Subtitle","ShaderMania"};
+		std::vector<std::string> topmenu  = {"Tracks","Chapters","Aspect Ratio","Image","Audio","Subtitle"};
 		if (ImGui::Begin("Right Menu Home", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextWindowFocus();
 			if (ImGui::BeginListBox("Right Menu Home List",ImVec2(1280.0f*multiplyRes, 720.0f*multiplyRes))){
@@ -499,7 +499,7 @@ namespace playerWindows{
 				}
 				ImGui::SetCursorPosX((windowWidth - ImGui::CalcTextSize("Deinterlace", NULL, true).x) * 0.5f);
 				ImGui::Text("Deinterlace");
-				std::vector<std::string> deintmenu = {"No","Yes","Auto"};
+				std::vector<std::string> deintmenu = {"No","Bob","Weave"};
 				const char* combo_deintpreview_value = deintmenu[configini->getDeinterlace(true)].c_str();
 				ImGui::PushItemWidth(190);
 				if (ImGui::BeginCombo("Deinterlace", combo_deintpreview_value, 0))
@@ -1030,47 +1030,6 @@ namespace playerWindows{
 	
 	void RightHomeShaderMania(){
 		playerWindows::SetupRightWindow();
-		std::vector<std::string> topmenu  = {"Default","16:9","16:10","4:3","Custom Ratio"};
-		if (ImGui::Begin("Shader Mania", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::PushItemWidth(200-10);
-				ImGui::Text("Shaders");
-				if (ImGui::BeginCombo("Shaders Combo", shadermania->getCurrList()[shaderidx].name.c_str(), 0))
-				{	
-					for (int n = 0; n < shadermania->getCurrList().size(); n++)
-					{
-						const bool is_selected = (shaderidx == n);
-						std::string itemid = "##" + std::to_string(n);
-						if (ImGui::Selectable(itemid.c_str(), is_selected)){
-							
-							if(n == 0){
-								#ifdef NXMP_SWITCH
-								clockoc = false;
-								SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock); 
-								#endif
-								libmpv->clearShader();
-							}else{
-								NXLOG::DEBUGLOG("PATH: %s\n",shadermania->getCurrList()[n].path.c_str());
-								libmpv->setShader(shadermania->getCurrList()[n].path);
-							}
-							shaderidx = n;
-						}
-						ImGui::SameLine();
-						ImGui::Text("%s",shadermania->getCurrList()[n].name.c_str());
-						
-							
-
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					}
-					ImGuiContext& g = *GImGui;
-					ImGuiWindow* window = g.CurrentWindow;
-					ImGui::NavMoveRequestTryWrapping(window, ImGuiNavMoveFlags_LoopX);
-					
-					ImGui::EndCombo();
-					
-					ImGui::PopItemWidth();
-				}	
-		}
 		
 		playerWindows::ExitWindow();
 	}
@@ -1112,8 +1071,8 @@ namespace playerWindows{
 		playerWindows::SetupStatsWindow();
 		if (ImGui::Begin("Stats Window", nullptr, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0,1.0,1.0,0.2));
-			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0,1.0,1.0,1.0));
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0,1.0,1.0,1.0));
+			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, Text_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Text_color);
 			
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 			ImGui::Text("CPU %s %s %s %s",nxmpstats->CPU_Hz_c ,nxmpstats->CPU_Usage0,nxmpstats->CPU_Usage1,nxmpstats->CPU_Usage2);
@@ -1138,16 +1097,16 @@ namespace playerWindows{
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0,1.0,1.0,1.0));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 			if(libmpv->getFileInfo()->videos.size()>0){
-				ImGui::Text("Video Codec: %s (%s)",nxmpstats->decodingstats.videodecstats.codec.c_str(),nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("tx1")?"HW (GPU)":nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("tx1-copy")?"HW (Copy)" : "SW");
+				ImGui::Text("Video Codec: %s (%s)",nxmpstats->decodingstats.videodecstats.codec.c_str(),nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("nvtegra")?"HW (nvtegra)":nxmpstats->decodingstats.videodecstats.hwdec.c_str()==std::string("nvtegra-copy")?"HW (nvtegra-copy)" : "SW");
 				ImGui::Text("Video Resolution: %dx%d",nxmpstats->decodingstats.videodecstats.width,nxmpstats->decodingstats.videodecstats.height);
-				ImGui::Text("Video Bitrate: %.0f kbps/s",nxmpstats->decodingstats.videodecstats.bitrate/1024.0);
+				ImGui::Text("Video Bitrate: %.0f kbps/s",nxmpstats->decodingstats.videodecstats.bitrate/1000.0f);
 				ImGui::Text("Pixel Format: %s Color Matrix: %s",nxmpstats->decodingstats.videodecstats.pixelformat.c_str(),nxmpstats->decodingstats.videodecstats.colormatrix.c_str());
 				ImGui::Text("FPS: %.1f Frame drop count: %d",nxmpstats->decodingstats.videodecstats.fps,nxmpstats->decodingstats.videodecstats.framedropcount);
 			}
 			if(libmpv->getFileInfo()->audios.size()>0){
 				ImGui::Separator();
 				ImGui::Text("Audio Codec: %s",nxmpstats->decodingstats.audiodecstats.codec.c_str());
-				ImGui::Text("Audio Bitrate: %.0f kbps/s",nxmpstats->decodingstats.audiodecstats.bitrate/1024.0);
+				ImGui::Text("Audio Bitrate: %.0f kbps/s",nxmpstats->decodingstats.audiodecstats.bitrate/1000.0f);
 				ImGui::Text("Audio Sample Rate: %ld Hz",nxmpstats->decodingstats.audiodecstats.samplerate);
 				ImGui::Text("Audio Channels: %s",nxmpstats->decodingstats.audiodecstats.hrchannels.c_str());
 			}

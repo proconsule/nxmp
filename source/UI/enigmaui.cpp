@@ -14,8 +14,8 @@ namespace Windows {
 		
         if (ImGui::Begin("Enigma2", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
 			
-			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
-			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, Active_color);
 			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
 			
 			
@@ -117,34 +117,34 @@ namespace Windows {
 				ImGui::SameLine();
 				ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
+				ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_NAVIGATION).c_str());
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 				ImGui::Text(FONT_DPADLEFT_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::Text(Common_STR[NXCOMMON_CHECKBOX]);
+				ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_CHECKBOX).c_str());
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 				ImGui::Text(FONT_A_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::Text(Common_STR[NXCOMMON_SELECTPLAY]);
+				ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_SELECTPLAY).c_str());
 				if(enigma2->getCurrBouquet().bouquetref != ""){
 					ImGui::SameLine();
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 					ImGui::Text(FONT_B_BUTTON_FILLED);
 					ImGui::SameLine();
-					ImGui::Text(Common_STR[NXCOMMON_BACK]);
+					ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_BACK).c_str());
 				}
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 				ImGui::Text(FONT_X_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::Text(Common_STR[NXCOMMON_CONTEXTMENU]);
+				ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_CONTEXTMENU).c_str());
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 				ImGui::Text(FONT_Y_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::Text(Common_STR[NXCOMMON_HOME]);
+				ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_HOME).c_str());
 				
 				window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f)), 1.0f);
 				

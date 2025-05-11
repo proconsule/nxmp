@@ -109,7 +109,6 @@ public:
 
 	bool threadexit=false;
 	
-	bool emuoverrides = false;
 	
 	Thread t0;
 	Thread t1;

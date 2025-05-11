@@ -52,6 +52,20 @@ struct oldnetworkSource{
 	std::string url;
 };
 
+struct networkstruct_v2{
+	std::string name = "";
+	std::string server = "";
+	std::string type = "";
+	std::string username = "";
+	std::string password = "";
+	std::string path = "";
+	std::string pubkeypath = "";
+	std::string privkeypath = "";
+	std::string passphrase = "";
+	int port = 0;
+};
+
+
 class CIniParser{
 public:
 	CIniParser(std::string inifile);
@@ -59,6 +73,10 @@ public:
 	std::vector<oldnetworkSource> getNetworks();
 	std::string getEnigma();
 	std::string getStartPath();
+	
+	
+	std::vector<networkstruct_v2> networks_v2;
+	
 	
 	void PrintConfig();
 	void ResetTemp();

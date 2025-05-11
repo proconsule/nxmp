@@ -43,14 +43,14 @@ namespace Windows {
 		float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
 		ImGui::BeginChild("##shareaddmainview",ImVec2(total_w,total_h-45*multiplyRes),false,ImGuiWindowFlags_NoScrollbar);
 		
-		ImGui::PushStyleColor(ImGuiCol_ChildBg,nxmpgfx::OptsTab_Bg_color);
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);
-		ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+		ImGui::PushStyleColor(ImGuiCol_ChildBg,OptsTab_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, HeaderHover_color);
+		ImGui::PushStyleColor(ImGuiCol_NavHighlight, Active_color);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(40.0f,0));
 		
-		ImGui::PushStyleColor(ImGuiCol_Button,nxmpgfx::Button_color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive,nxmpgfx::ButtonActive_color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,nxmpgfx::NavHover_color);
+		ImGui::PushStyleColor(ImGuiCol_Button,Button_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive,ButtonActive_color);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,NavHover_color);
 		
 		ImGui::Separator();
 		newentryname = NativeInputSwitchKeyboard("##netaddentry","Name:",newentryname);
@@ -105,7 +105,7 @@ namespace Windows {
 			//ImGui::Text(curr_subfontsizestr.c_str());
 			//ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			ImGui::Text(thisurl.server.c_str());
 			ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
@@ -123,7 +123,7 @@ namespace Windows {
 			//ImGui::Text(curr_subfontsizestr.c_str());
 			//ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			ImGui::Text(portstr.c_str());
 			ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
@@ -141,7 +141,7 @@ namespace Windows {
 			//ImGui::Text(curr_subfontsizestr.c_str());
 			//ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			ImGui::Text(thisurl.user.c_str());
 			ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
@@ -159,7 +159,7 @@ namespace Windows {
 			//ImGui::Text(curr_subfontsizestr.c_str());
 			//ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			ImGui::Text(thisurl.pass.c_str());
 			ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
@@ -181,7 +181,7 @@ namespace Windows {
 			//ImGui::Text(curr_subfontsizestr.c_str());
 			//ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			ImGui::Text(thisurl.path.c_str());
 			ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+(50.0f*multiplyRes-textsize.y)/2.0);
@@ -198,8 +198,8 @@ namespace Windows {
 			ImVec2 button_size(total_w-10.0*multiplyRes-2*ImGui::GetStyle().ItemSpacing.x, 60.0f);
 				
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
-			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);	
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, HeaderHover_color);	
 				
 			
 			
@@ -249,9 +249,9 @@ namespace Windows {
 			//ImGui::PopStyleColor();
 			ImGui::SetCursorPosY(currentposy+(50.0f*multiplyRes-textsize.y)/2.0);
 			if(urlcheck_isconnected){
-				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
+				ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
 			}else{
-				ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Disabled_color );
+				ImGui::PushStyleColor(ImGuiCol_Text, Disabled_color );
 			}
 			ImGui::Text(connectstr.c_str());
 			ImGui::PopStyleColor();
@@ -259,8 +259,8 @@ namespace Windows {
 		
 			ImGui::Separator();
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
-			ImGui::PushStyleColor(ImGuiCol_Text, nxmpgfx::Active_color);
-			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::HeaderHover_color);	
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, HeaderHover_color);	
 			
 			
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f*multiplyRes);
@@ -296,19 +296,19 @@ namespace Windows {
 		ImGui::SameLine();
 		ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
 		ImGui::SameLine();
-		ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
+		ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_NAVIGATION).c_str());
 		ImGui::SameLine();
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 		ImGui::Text(FONT_A_BUTTON_FILLED);
 		ImGui::SameLine();
-		ImGui::Text(Common_STR[NXCOMMON_SELECT]);
+		ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_SELECT).c_str());
 		ImGui::SameLine();
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 		ImGui::Text(FONT_B_BUTTON_FILLED);
 		ImGui::SameLine();
-		ImGui::Text(Common_STR[NXCOMMON_CANCEL]);
+		ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_CANCEL).c_str());
 		
-		window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(nxmpgfx::Text_color), 1.0f);
+		window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(Text_color), 1.0f);
 		
 		ImGui::EndChild();
 		
@@ -318,17 +318,17 @@ namespace Windows {
 
 	void ShareAddWindow(bool *focus, bool *first_item){
 		Windows::SetupWindow();
-		if (ImGui::Begin(Network_STR[NXNET_ADDSHARE], nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+		if (ImGui::Begin(nxlangs::get_network_str(nxlangs::NXNET_ADDSHARE).c_str(), nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
            
 		   
 			if (ImGui::BeginMenuBar()) {
-				ImGui::Text(Network_STR[NXNET_ADDSHAREMENU]);
+				ImGui::Text(nxlangs::get_network_str(nxlangs::NXNET_ADDSHAREMENU).c_str());
 				ImGui::EndMenuBar();
 			}
-			ImGui::SeparatorText(Network_STR[NXNET_SHARECONFIG]);
+			ImGui::SeparatorText(nxlangs::get_network_str(nxlangs::NXNET_SHARECONFIG).c_str());
 			NewNetworkShare->name = InputSwitchKeyboard("##sharename","Share Name:",NewNetworkShare->name);
 			
-			ImGui::Text(Network_STR[NXNET_PROTOCOL]);
+			ImGui::Text(nxlangs::get_network_str(nxlangs::NXNET_PROTOCOL).c_str());
 			ImGui::SameLine();
 			static const char* item_current = NULL;
 			if (ImGui::BeginCombo("##protocombo", item_current, 0)) // The second parameter is the label previewed before opening the combo.
@@ -374,27 +374,27 @@ namespace Windows {
 			}
 			
 			if(NewNetworkShare->type >= 1){
-				ImGui::SeparatorText(Network_STR[NXNET_CREDENTIALS]);
-				NewNetworkShare->address = InputSwitchKeyboard("##address",Network_STR[NXNET_ADDRESS],NewNetworkShare->address);
+				ImGui::SeparatorText(nxlangs::get_network_str(nxlangs::NXNET_CREDENTIALS).c_str());
+				NewNetworkShare->address = InputSwitchKeyboard("##address",nxlangs::get_network_str(nxlangs::NXNET_ADDRESS).c_str(),NewNetworkShare->address);
 				if(NewNetworkShare->type ==3 || NewNetworkShare->type ==4){
 					
 				}else{
-					NewNetworkShare->port = std::stoi(InputSwitchKeyboard("##port",Network_STR[NXNET_PORT],std::to_string(NewNetworkShare->port)));
+					NewNetworkShare->port = std::stoi(InputSwitchKeyboard("##port",nxlangs::get_network_str(nxlangs::NXNET_PORT).c_str(),std::to_string(NewNetworkShare->port)));
 				}
 				ImGui::Checkbox("Anonymous", &NewNetworkShare->anon);
 				if(!NewNetworkShare->anon){
-					NewNetworkShare->username = InputSwitchKeyboard("##username",Network_STR[NXNET_USERNAME],NewNetworkShare->username);
-					NewNetworkShare->password = InputSwitchKeyboard("##password",Network_STR[NXNET_PASSWORD],NewNetworkShare->password);
+					NewNetworkShare->username = InputSwitchKeyboard("##username",nxlangs::get_network_str(nxlangs::NXNET_USERNAME).c_str(),NewNetworkShare->username);
+					NewNetworkShare->password = InputSwitchKeyboard("##password",nxlangs::get_network_str(nxlangs::NXNET_PASSWORD).c_str(),NewNetworkShare->password);
 			
 				}
 				ImGui::SeparatorText("Path");
-				NewNetworkShare->remoteshare = InputSwitchKeyboard("##remoteshare",Network_STR[NXNET_REMOTEPATH],NewNetworkShare->remoteshare);
+				NewNetworkShare->remoteshare = InputSwitchKeyboard("##remoteshare",nxlangs::get_network_str(nxlangs::NXNET_REMOTEPATH).c_str(),NewNetworkShare->remoteshare);
 				if(NewNetworkShare->type == 3){
-					ImGui::Text(Network_STR[NXNET_REMOTESHAREDESC]);
+					ImGui::Text(nxlangs::get_network_str(nxlangs::NXNET_REMOTESHAREDESC).c_str());
 				}else if(NewNetworkShare->type == 4){
 					ImGui::Text("Remote export on server");
 				}else{
-					ImGui::Text(Network_STR[NXNET_REMOTEPATHDESC]);
+					ImGui::Text(nxlangs::get_network_str(nxlangs::NXNET_REMOTEPATHDESC).c_str());
 				}
 				
 			}
@@ -402,13 +402,13 @@ namespace Windows {
 			if(!NewNetworkShare->isValidShare()){
 				 ImGui::BeginDisabled();
 			}
-			if (ImGui::Button(Network_STR[NXNET_TESTCONNECTION])){
+			if (ImGui::Button(nxlangs::get_network_str(nxlangs::NXNET_TESTCONNECTION).c_str())){
 				if(sharecheck == nullptr){
-					sharecheck = new CFileBrowser(NewNetworkShare->GenConfigLine().url,NULL,NULL);
+					sharecheck = new CFileBrowser(NewNetworkShare->GenConfigLine().url,nullptr);
 					sharecheck->DirList(sharecheck->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 				}else{
 					delete sharecheck;
-					sharecheck = new CFileBrowser(NewNetworkShare->GenConfigLine().url,NULL,NULL);
+					sharecheck = new CFileBrowser(NewNetworkShare->GenConfigLine().url,nullptr);
 					sharecheck->DirList(sharecheck->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 				}
 			}
@@ -417,9 +417,9 @@ namespace Windows {
 			}
 			if(sharecheck != nullptr){
 				if(sharecheck->connected){
-					ImGui::TextColored(ImVec4(0.0f,1.0f,0.0f,1.0f),Network_STR[NXNET_TESTOK]);
+					ImGui::TextColored(ImVec4(0.0f,1.0f,0.0f,1.0f),nxlangs::get_network_str(nxlangs::NXNET_TESTOK).c_str());
 				}else{
-					ImGui::TextColored(ImVec4(1.0f,0.0f,0.0f,1.0f),Network_STR[NXNET_TESTERROR]);
+					ImGui::TextColored(ImVec4(1.0f,0.0f,0.0f,1.0f),nxlangs::get_network_str(nxlangs::NXNET_TESTERROR).c_str());
 					ImGui::Text(sharecheck->errormsg.c_str());
 				}
 			}
@@ -435,7 +435,7 @@ namespace Windows {
 			 ImGui::BeginDisabled();
 		}
 		
-		if (ImGui::Button(Common_STR[NXCOMMON_SAVE])){
+		if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_SAVE).c_str())){
 			configini->addNetworkShare(NewNetworkShare->GenConfigLine());
 			item.state = MENU_STATE_NETWORKBROWSER;
 		}
@@ -444,7 +444,7 @@ namespace Windows {
 		}
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine(0,50);
-		if (ImGui::Button(Common_STR[NXCOMMON_CANCEL])){
+		if (ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_CANCEL).c_str())){
 				
 			item.state = MENU_STATE_NETWORKBROWSER;
 		}
@@ -458,7 +458,7 @@ namespace Windows {
     void NetworkWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
 		
-        if (ImGui::Begin(Network_STR[NXNET_NETWORKSOURCESEL], nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
+        if (ImGui::Begin(nxlangs::get_network_str(nxlangs::NXNET_NETWORKSOURCESEL).c_str(), nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_MenuBar)) {
            
 			GUI::cloktimeText(ImVec2((1180.0f*multiplyRes)-ImGui::CalcTextSize(nxmpstats->currentTime).x-(10.0*multiplyRes),2.0f*multiplyRes),true,nxmpstats->currentTime);
 			GUI::newbatteryIcon(ImVec2(1180.0f*multiplyRes,2.0f*multiplyRes),true,batteryPercent,40,20,true);
@@ -466,8 +466,8 @@ namespace Windows {
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			
-			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, nxmpgfx::NavHover_color);
-			ImGui::PushStyleColor(ImGuiCol_NavHighlight, nxmpgfx::Active_color);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, Active_color);
 			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
 			
 			
@@ -475,7 +475,7 @@ namespace Windows {
 			if(item.networkselect){
 				ImGui::BeginChild("##tablecontainer",ImVec2(total_w,total_h-45*multiplyRes));
 				ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns;
-				if (ImGui::BeginTable(Network_STR[NXNET_NETWORKSOURCEMENU],2)){
+				if (ImGui::BeginTable(nxlangs::get_network_str(nxlangs::NXNET_NETWORKSOURCEMENU).c_str(),2)){
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2)); // Fix
     				
 					ImGui::TableSetupColumn("icon", ImGuiTableColumnFlags_WidthFixed, ((80.0f+ImGui::GetStyle().FramePadding.x) *multiplyRes -2 * ImGui::GetStyle().ItemSpacing.x)); 
@@ -493,12 +493,14 @@ namespace Windows {
 					}
 					ImGui::TableSetColumnIndex(1);
 					ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
-					ImGui::Text(Network_STR[NXNET_ADDSHARE]);
+					ImGui::Text(nxlangs::get_network_str(nxlangs::NXNET_ADDSHARE).c_str());
 					if(ImGui::IsItemHovered()){
 						netwinselected = -1;
 					}
-
-					for(unsigned int n=0;n<item.networksources.size();n++){
+					
+					unsigned int n = 0;
+					
+					for(n=0;n<item.networksources.size();n++){
 						
 						ImGui::TableNextRow();
 						ImGui::TableSetColumnIndex(0);
@@ -574,6 +576,49 @@ namespace Windows {
 								
 					}
 					
+					for(unsigned int z=0;z<configini->networks_v2.size();z++){
+						
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						if(configini->networks_v2[z].type == "ftp"){
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.FTPTexture.id, ImVec2(50,50));
+						}
+						if(configini->networks_v2[z].type == "http"){
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.HTTPTexture.id, ImVec2(50,50));
+						}
+						if(configini->networks_v2[z].type == "sftp"){
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SFTPTexture.id, ImVec2(50,50));
+						}
+						if(configini->networks_v2[z].type == "smb"){
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.SMBTexture.id, ImVec2(50,50));
+						}
+						if(configini->networks_v2[z].type == "nfs"){
+							GUI::NXMPImage((void*)(intptr_t)imgloader->icons.NFSTexture.id, ImVec2(50,50));
+						}
+						ImGui::SameLine();
+					
+						std::string itemid = "##itemid" + std::to_string(z+n);
+						if (ImGui::Selectable(itemid.c_str(), selected == z+n+1,selectable_flags,ImVec2(1280*multiplyRes,50*multiplyRes))){
+							filebrowser = new CFileBrowser(configini->networks_v2[z],playlist);
+							filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
+							filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());	
+							item.state = MENU_STATE_SAMBABROWSER;
+						
+						}
+						
+						if(ImGui::IsItemHovered()){
+							netwinselected = z+n;
+						}
+						ImGui::TableSetColumnIndex(1);
+						ImGui::SetCursorPos({ImGui::GetCursorPos().x, ImGui::GetCursorPos().y + ((50*multiplyRes) - ImGui::GetFont()->FontSize) / 2});
+						ImGui::Text(std::string(configini->networks_v2[z].name + " @ " +configini->networks_v2[z].server).c_str());
+						if(ImGui::IsItemHovered()){
+								netwinselected = z+n;
+						}
+						
+					}
+					
+					
 					ImGui::PopStyleVar();			
 					if (*first_item) {
 						if(item.popupstate == POPUP_STATE_NONE){
@@ -598,17 +643,17 @@ namespace Windows {
 				ImGui::SameLine();
 				ImGui::Text(FONT_DPADDOWN_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::Text(Common_STR[NXCOMMON_NAVIGATION]);
+				ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_NAVIGATION).c_str());
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 				ImGui::Text(FONT_A_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::Text(Common_STR[NXCOMMON_SELECT]);
+				ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_SELECT).c_str());
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX()+50.0f*multiplyRes);
 				ImGui::Text(FONT_Y_BUTTON_FILLED);
 				ImGui::SameLine();
-				ImGui::Text(Common_STR[NXCOMMON_HOME]);
+				ImGui::Text(nxlangs::get_common_str(nxlangs::NXCOMMON_HOME).c_str());
 				
 				window->DrawList->AddLine(startpos,ImVec2(startpos.x+1280*multiplyRes,startpos.y) , ImGui::GetColorU32(ImVec4(1.0f,1.0f,1.0f,1.0f)), 1.0f);
 				

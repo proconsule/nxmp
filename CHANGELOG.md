@@ -1,5 +1,32 @@
 # NXMP Changelog
 
+## [0.9.1]
+
+### Added
+
+- Added new network config syntax (fixes password with @ and add pubkey auth for sftp connections)
+- UPNP (same code of 0.8.0 with minor fixes)
+- HW Deinterlace
+- File based translations (using json files, use the files on langs directory as reference)
+- PKGBUILD for libnfs,libsmb2,sqlite3
+
+## Fixed
+
+- NFS entry duplication
+- Software decoding (broken on 0.9.0 deko3d version)
+- USB Browser fixed (no more duplicated devices)
+
+# Removed
+
+- Shadermania (now NXMP uses only deko3d, no more opengl)
+
+### Changes
+
+- Changed Rendering routine in a more sane way
+- Now NXMP runs also in applet mode
+- Updated all libs to last version
+- Updated brasilian translation
+
 ## [0.9.0]
 
 ### Added

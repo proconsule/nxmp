@@ -7,10 +7,16 @@
 #include "imgui_internal.h"
 #include "SwitchSys.h"
 
-#include "GLFW/glfw3.h"
+#include "imgui_nx.h"
 
+
+#define handheldWidth 1280
+#define handheldHeight 720
+#define dockedWidth 1920
+#define dockedHeight 1080
 
 MenuItem item;
+
 
 
 bool B_A_PRESS = false;
@@ -39,7 +45,49 @@ bool mpvevent = false;
 #define is_bit_set(val, bit_no) (((val) >> (bit_no)) & 1)
 
 
+
 namespace GUI {
+	
+	enum BUT_FLAGS{
+		BUT_A,
+		BUT_B,
+		BUT_X,
+		BUT_Y,
+		
+		BUT_DUP,
+		BUT_DDOWN,
+		BUT_DLEFT,
+		BUT_DRIGHT,
+		
+		BUT_L,
+		BUT_R,
+		BUT_ZL,
+		BUT_ZR,
+		
+		BUT_TR,
+		BUT_TL,
+		
+		BUT_PLUS,
+		BUT_MINUS,
+		
+		B_AX_L_UP,
+		B_AX_L_DOWN,
+		B_AX_L_LEFT,
+		B_AX_L_RIGHT,
+		
+	
+		B_AX_R_UP,
+		B_AX_R_DOWN,
+		B_AX_R_LEFT,
+		B_AX_R_RIGHT,
+		
+	};
+	
+	
+	inline uint64_t bit_set(uint64_t number, unsigned int n) {
+		return number | ((unsigned int)1 << n);
+	}
+	
 	
 	const int JOYSTICK_DEAD_ZONE = 8000;
 	const int JOYSTICK_EXTENDED_DEAD_ZONE = 32726;
@@ -51,30 +99,44 @@ namespace GUI {
 	void MpvEvents(void *ctx);
 	void MpvUpdate();
 	
-	static void on_mpv_events(void *ctx)
-	{
-		mpvevent = true;
-	}
 	
-	static void on_mpv_update(void *ctx)
-	{
-		
-		GUI::wakeup = 1;
-	}
-	
-	
-	
-	void initMpv(){
+	bool B_A_PRESS = false;
+	bool B_B_PRESS = false;
+	bool B_X_PRESS = false;
+	bool B_Y_PRESS = false;
+	bool B_DU_PRESS = false;
+	bool B_DD_PRESS = false;
+	bool B_DL_PRESS = false;
+	bool B_DR_PRESS = false;
 
-		libmpv = new libMpv("mpv");
-		mpv_set_wakeup_callback(libmpv->getHandle(), on_mpv_events, NULL);
-		mpv_render_context_set_update_callback(libmpv->getContext(),  on_mpv_update, nullptr);
+	bool B_TL_PRESS = false;
+	bool B_TR_PRESS = false;
+
+
+	bool B_R_PRESS = false;
+	bool B_L_PRESS = false;
+	bool B_ZR_PRESS = false;
+	bool B_ZL_PRESS = false;
+
+	bool B_PLUS_PRESS = false;
+	bool B_MINUS_PRESS = false;
+	
+	bool B_AX_L_UP_PRESS = false;
+	bool B_AX_L_DOWN_PRESS = false;
+	bool B_AX_L_LEFT_PRESS = false;
+	bool B_AX_L_RIGHT_PRESS = false;
+	
+	
+	
+	void GUILESS(){
+
 		if(slaveplayer){
 			libmpv->loadFile(slaveplayer_file.c_str());
 			item.state = MENU_STATE_GUILESS;
 		}
 
 	}
+	
 
 	void toggleMasterLock(){
 		item.masterlock = !item.masterlock;
@@ -123,8 +185,8 @@ namespace GUI {
 				break;
 			}
 			if (mp_event->event_id == MPV_EVENT_LOG_MESSAGE) {
-				mpv_event_log_message *msg = (mpv_event_log_message *) mp_event->data;
-				continue;
+				//mpv_event_log_message *msg = (mpv_event_log_message *) mp_event->data;
+				break;
 			}
 			if (mp_event->event_id == MPV_EVENT_FILE_LOADED) {
 				
@@ -185,9 +247,9 @@ namespace GUI {
 				appletSetMediaPlaybackState(false);
 				struct mpv_event_end_file *eof = (struct mpv_event_end_file *)mp_event->data;
 				libmpv->setLoop(false);
-#ifdef DEKO3D_BACKEND
-				nxmpgfx::setBGAlpha(1.0f);
-#endif
+
+				//setBGAlpha(1.0f);
+
 				if(slaveplayer){
 					renderloopdone = true;
 				}
@@ -294,8 +356,7 @@ namespace GUI {
 										
 							}
 						}
-								
-								//libmpv->getFileInfo()->playbackInfo.position = (int)timepos;
+
 					}
 				}
 						
@@ -446,11 +507,11 @@ namespace GUI {
 		mpvevent=false;
 		
 		
-		uint64_t event_ret = nxmpgfx::Process_UI_Events(std::chrono::system_clock::now());
+		uint64_t event_ret = Process_UI_Events(std::chrono::system_clock::now());
 		
 		if(event_ret>0){
 			
-			if(is_bit_set(event_ret,nxmpgfx::B_AX_R_UP)){
+			if(is_bit_set(event_ret,B_AX_R_UP)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					Windows::setImageZoom(Windows::getImageZoom()+0.1);
 				}else{
@@ -458,7 +519,7 @@ namespace GUI {
 				}
 			}
 			
-			if(is_bit_set(event_ret,nxmpgfx::B_AX_R_DOWN)){
+			if(is_bit_set(event_ret,B_AX_R_DOWN)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					if(Windows::getImageZoom()>=1.1f){
 						Windows::setImageZoom(Windows::getImageZoom()-0.1);
@@ -470,33 +531,33 @@ namespace GUI {
 				}
 			}
 			
-			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_UP)){
+			if(is_bit_set(event_ret,B_AX_L_UP)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					
 				}
 			}
 			
-			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_DOWN)){
+			if(is_bit_set(event_ret,B_AX_L_DOWN)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					
 				}
 			}
 			
-			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_LEFT)){
+			if(is_bit_set(event_ret,B_AX_L_LEFT)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					
 				}
 				ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadLeft,true);
 			}
 			
-			if(is_bit_set(event_ret,nxmpgfx::B_AX_L_RIGHT)){
+			if(is_bit_set(event_ret,B_AX_L_RIGHT)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					
 				}
 				ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadDpadRight,true);
 			}
 			
-			if(is_bit_set(event_ret,nxmpgfx::BUT_Y)){
+			if(is_bit_set(event_ret,BUT_Y)){
 				if(item.state != MENU_STATE_HOME && item.state != MENU_STATE_PLAYER && item.popupstate == POPUP_STATE_NONE){
 			
 					if(item.selectionstate == FILE_SELECTION_CHECKBOX){
@@ -507,7 +568,7 @@ namespace GUI {
 						filebrowser = nullptr;
 					}
 							
-					if(MyUSBMount != nullptr && libmpv->Stopped() && !playlist->HaveUSBEntrys()){
+					if(MyUSBMount != nullptr && libmpv->Stopped()){
 						delete MyUSBMount;
 						MyUSBMount = nullptr;
 					}
@@ -546,13 +607,13 @@ namespace GUI {
 				}
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_DUP) || is_bit_set(event_ret,nxmpgfx::B_AX_L_UP)){
+			if (is_bit_set(event_ret,BUT_DUP) || is_bit_set(event_ret,B_AX_L_UP)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.popupstate == POPUP_STATE_NONE){
 					
 				}
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_DDOWN) || is_bit_set(event_ret,nxmpgfx::B_AX_L_DOWN)){
+			if (is_bit_set(event_ret,BUT_DDOWN) || is_bit_set(event_ret,B_AX_L_DOWN)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.popupstate == POPUP_STATE_NONE){
 					if(item.playercontrolstate == PLAYER_CONTROL_STATE_NONE){
 						item.playercontrolstate = PLAYER_CONTROL_STATE_CONTROLS;
@@ -563,7 +624,7 @@ namespace GUI {
 				}
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_X)){
+			if (is_bit_set(event_ret,BUT_X)){
 				if(item.state == MENU_STATE_FILEBROWSER || item.state == MENU_STATE_FTPBROWSER || item.state == MENU_STATE_HTTPBROWSER || item.state == MENU_STATE_USB_BROWSER || item.state == MENU_STATE_SSHBROWSER || item.state == MENU_STATE_SAMBABROWSER || item.state == MENU_STATE_NFSBROWSER){
 					if(FilePopupTextScroller == nullptr){
 							FilePopupTextScroller = new CTextScroller("##filepopuptextscroll");
@@ -595,7 +656,7 @@ namespace GUI {
 				}
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_A)){
+			if (is_bit_set(event_ret,BUT_A)){
 				if(item.state == MENU_STATE_PLAYER){
 					if(item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER && item.playercontrolstate == PLAYER_CONTROL_STATE_NONE && item.popupstate == POPUP_STATE_NONE){
 						if(libmpv->Paused()){
@@ -609,7 +670,7 @@ namespace GUI {
 				}
 				
 			}
-			if (is_bit_set(event_ret,nxmpgfx::BUT_B)){
+			if (is_bit_set(event_ret,BUT_B)){
 				
 					if(item.state == MENU_STATE_IMGVIEWER){
 						item.state = item.laststate;
@@ -683,7 +744,7 @@ namespace GUI {
 							}else{
 								item.rightmenustate = PLAYER_RIGHT_MENU_HOME;
 							}
-						//bordercolor
+						
 							if(item.popupstate == POPUP_STATE_SUBBORDERCOLOR){
 								item.popupstate = POPUP_STATE_NONE;
 								configini->setSubBorderColor(configini->getSubBorderColor(false));
@@ -706,7 +767,7 @@ namespace GUI {
 					}	
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_DRIGHT)){
+			if (is_bit_set(event_ret,BUT_DRIGHT)){
 				
 				if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup == -1 && item.popupstate == POPUP_STATE_NONE){
 					Windows::settingsview_page = true;
@@ -726,7 +787,7 @@ namespace GUI {
 				}
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_DLEFT)){
+			if (is_bit_set(event_ret,BUT_DLEFT)){
 				
 				if(item.state == MENU_STATE_SETTINGS && Windows::settingsview_combopopup == -1 && item.popupstate == POPUP_STATE_NONE){
 					Windows::settingsview_page = false;
@@ -743,11 +804,9 @@ namespace GUI {
 				}		
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_ZR)){
+			if (is_bit_set(event_ret,BUT_ZR)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					if(filebrowser!= NULL){
-						unsigned char * img_data = NULL;
-						int img_size;
 						int newidx = filebrowser->getNextImg();
 						if(newidx > -1){
 							
@@ -775,11 +834,9 @@ namespace GUI {
 				}
 						
 			}
-			if (is_bit_set(event_ret,nxmpgfx::BUT_ZL)){
+			if (is_bit_set(event_ret,BUT_ZL)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					if(filebrowser!= NULL){
-						unsigned char * img_data = NULL;
-						int img_size;
 						int newidx = filebrowser->getPrevImg();
 						if(newidx > -1){
 							if(filebrowser->getfileContentsThreaded(filebrowser->getCurrImageList()[newidx].path)){
@@ -800,7 +857,7 @@ namespace GUI {
 						
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_R)){
+			if (is_bit_set(event_ret,BUT_R)){
 				
 				
 				
@@ -818,7 +875,7 @@ namespace GUI {
 						
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_L)){
+			if (is_bit_set(event_ret,BUT_L)){
 				
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 					libmpv->seek(libmpv->getPosition() - configini->getShortSeek(false),item.playershowcontrols);
@@ -834,33 +891,33 @@ namespace GUI {
 						
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_TL) && is_bit_set(event_ret,nxmpgfx::BUT_TR)){
+			if (is_bit_set(event_ret,BUT_TL) && is_bit_set(event_ret,BUT_TR)){
 				if(item.state == MENU_STATE_HOME){
 					configini->toggleConsoleWindow();
 				}
 			}
 			
-			if (is_bit_set(event_ret,nxmpgfx::BUT_TL)){
+			if (is_bit_set(event_ret,BUT_TL)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 					toggleOC();
 				}
 						
 			}
-			if (is_bit_set(event_ret,nxmpgfx::BUT_TR)){
+			if (is_bit_set(event_ret,BUT_TR)){
 				if(item.state == MENU_STATE_PLAYER){
 					toggleMasterLock();
 				}
 						
 			}
 				
-			if (is_bit_set(event_ret,nxmpgfx::BUT_PLUS)){
+			if (is_bit_set(event_ret,BUT_PLUS)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
 					item.savestate = item.laststate;
 					item.state = item.laststate;	
-					nxmpgfx::SetFullScreen(false);
-#ifdef DEKO3D_BACKEND
-					nxmpgfx::setBGAlpha(0.3f);
-#endif
+					//nxmpgfx::SetFullScreen(false);
+
+					//nxmpgfx::setBGAlpha(0.3f);
+
 				}else if(item.state != MENU_STATE_PLAYER && !libmpv->Stopped()){
 					std::cout << std::endl <<" State is?: " << item.state << std::endl;
 					//fix crash
@@ -874,16 +931,16 @@ namespace GUI {
 						filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 						item.first_item = true;
 					}
-					nxmpgfx::SetFullScreen(true);
+					//nxmpgfx::SetFullScreen(true);
 					item.state = MENU_STATE_PLAYER;
-#ifdef DEKO3D_BACKEND
-					nxmpgfx::setBGAlpha(1.0f);
-#endif
+
+					//nxmpgfx::setBGAlpha(1.0f);
+
 							
 				}
 			}
 			
-			if(is_bit_set(event_ret,nxmpgfx::B_AX_R_DOWN)){
+			if(is_bit_set(event_ret,B_AX_R_DOWN)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
 					item.showVolume = true;
 					ImGuiContext& g = *GImGui;
@@ -893,7 +950,7 @@ namespace GUI {
 					}
 				}
 			}
-			if(is_bit_set(event_ret,nxmpgfx::B_AX_R_UP)){
+			if(is_bit_set(event_ret,B_AX_R_UP)){
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock && item.rightmenustate == PLAYER_RIGHT_MENU_PLAYER){
 					item.showVolume = true;
 					ImGuiContext& g = *GImGui;
@@ -911,13 +968,15 @@ namespace GUI {
 	}
 	
 	void HandleLayers(){
-		nxmpgfx::NewFrame();
-        ImGui::NewFrame();
+		
+		ImGui::NewFrame();
 			if(item.state == MENU_STATE_PLAYER){
-				nxmpgfx::Draw_VO();
+				//nxmpgfx::Draw_VO();
 			}
 		
 			switch (item.state) {
+				case MENU_STATE_GUILESS:
+					break;
 				case MENU_STATE_HOME:
 					Windows::MainMenuWindow(&item.focus, &item.first_item);
 					if(item.popupstate == POPUP_STATE_DBUPDATED){
@@ -948,15 +1007,18 @@ namespace GUI {
 					
 					break;
 	            case MENU_STATE_ADDSHARE:
-					//Windows::ShareAddWindow(&item.focus, &item.first_item);
+					
 					Windows::NewShareWindow();
 					break;
 				
 				case MENU_STATE_UPNPBROWSER:
-					Windows::UPNPBrowserWindow(&item.focus, &item.first_item);
-					//if(item.popupstate == POPUP_STATE_STARTPLAYLIST){
-					//	Popups::PlaylistStartPlaylist();
-					//}
+					
+				    if(nxupnp->getSelDevice() == -1){
+						Windows::UniUPNPServersWindow();
+					}else{
+						Windows::UniUPNPBrowserWindow();
+					}
+			
 					break;
 				case MENU_STATE_ENIGMABROWSER:
 					Windows::EnigmaWindow(&item.focus, &item.first_item);
@@ -1088,29 +1150,22 @@ namespace GUI {
 	void HandleRender(){
 		
 		
-		nxmpgfx::Render_PreMPV();
 		
 		if(GUI::wakeup == 1){
 
 
 			GUI::wakeup = 0;
 		}
-#ifdef OPENGL_BACKEND
-			mpv_render_context_render(libmpv->getContext(), nxmpgfx::getMPV_Params()); // this "renders" to the video_framebuffer "linked by ID" in the params_fbo - BLOCKING
-			mpv_render_context_report_swap(libmpv->getContext());
-#endif	
-#ifdef DEKO3D_BACKEND
-			
-			nxmpgfx::UpdateFBO();
-			mpv_render_context_render(libmpv->getContext(), nxmpgfx::getMPV_Params());
-			nxmpgfx::queueWaitDoneFence();
-			mpv_render_context_report_swap(libmpv->getContext());
-			
-			
-			
-#endif	
+
 		
-		nxmpgfx::Render_PostMPV();
+		Renderer->GetFBImage();
+		Renderer->begin_frame();
+		Renderer->UpdateVO();
+		ImGui::Render();
+		Renderer->end_frame();
+		ImGui::EndFrame();
+		
+		
 
 	}
 	
@@ -1120,7 +1175,7 @@ namespace GUI {
 			item.popupstate = POPUP_STATE_DBUPDATED;
 		}
 		item.first_item = true;
-		while (!renderloopdone && appletMainLoop() && !nxmpgfx::WindowShouldClose())
+		while (!renderloopdone && appletMainLoop())
 		{
 			
 			AppletOperationMode stus=appletGetOperationMode();
@@ -1166,10 +1221,6 @@ namespace GUI {
 			}
 			
 
-    		//rewrite switch state
-			
-			
-			
 			
 			
 			if(GUI_REINIT){
@@ -1190,12 +1241,118 @@ namespace GUI {
 	{
 		
 		
-		nxmpgfx::Resize(newResW,newResH);
-		nxmpgfx::Resize_VO(newResW,newResH);
+		//nxmpgfx::Resize(newResW,newResH);
+		//nxmpgfx::Resize_VO(newResW,newResH);
 
 		
 		
 		
 	}
+	
+	
+	
+	
+	uint64_t Process_UI_Events(std::chrono::time_point<std::chrono::system_clock> myeventtime){
+		
+		uint64_t ret_event = 0;
+		
+
+#ifdef DEKO3D_BACKEND		
+		
+		uint64_t keydown =  imgui::nx::newFrame();
+		
+		if (keydown & HidNpadButton_A && !B_A_PRESS){
+			ret_event = bit_set(ret_event,BUT_A);
+		}
+		if (keydown & HidNpadButton_B && !B_B_PRESS){
+			ret_event = bit_set(ret_event,BUT_B);
+		}
+		if (keydown & HidNpadButton_Y && !B_Y_PRESS){
+			ret_event = bit_set(ret_event,BUT_Y);
+		}
+		if (keydown & HidNpadButton_X && !B_X_PRESS){
+			ret_event = bit_set(ret_event,BUT_X);
+		}
+		if (keydown & HidNpadButton_Up && !B_DU_PRESS){
+			ret_event = bit_set(ret_event,BUT_DUP);
+		}
+		if (keydown & HidNpadButton_Down && !B_DD_PRESS){
+			ret_event = bit_set(ret_event,BUT_DDOWN);
+		}
+		if (keydown & HidNpadButton_Left && !B_DL_PRESS){
+			ret_event = bit_set(ret_event,BUT_DLEFT);
+		}
+		if (keydown & HidNpadButton_Right && !B_DR_PRESS){
+			ret_event = bit_set(ret_event,BUT_DRIGHT);
+		}
+		if (keydown & HidNpadButton_L && !B_L_PRESS){
+			ret_event = bit_set(ret_event,BUT_L);
+		}
+		if (keydown & HidNpadButton_R && !B_R_PRESS){
+			ret_event = bit_set(ret_event,BUT_R);
+		}
+		if (keydown & HidNpadButton_ZL && !B_ZL_PRESS){
+			ret_event = bit_set(ret_event,BUT_ZL);
+		}
+		if (keydown & HidNpadButton_ZR && !B_ZR_PRESS){
+			ret_event = bit_set(ret_event,BUT_ZR);
+		}
+		if (keydown & HidNpadButton_StickL && !B_TL_PRESS){
+			ret_event = bit_set(ret_event,BUT_TL);
+		}
+		if (keydown & HidNpadButton_StickR && !B_TR_PRESS){
+			ret_event = bit_set(ret_event,BUT_TR);
+		}
+		if (keydown & HidNpadButton_StickRUp){
+			ret_event = bit_set(ret_event,B_AX_R_UP);
+		}
+		if (keydown & HidNpadButton_StickRDown){
+			ret_event = bit_set(ret_event,B_AX_R_DOWN);
+		}
+		if (keydown & HidNpadButton_Minus && !B_MINUS_PRESS){
+			ret_event = bit_set(ret_event,BUT_MINUS);
+		}
+		if (keydown & HidNpadButton_Plus && !B_PLUS_PRESS){
+			ret_event = bit_set(ret_event,BUT_PLUS);
+		}
+		   
+		   
+		B_ZL_PRESS = keydown & HidNpadButton_ZL;
+		B_ZR_PRESS = keydown & HidNpadButton_ZR;
+			
+		B_A_PRESS = keydown & HidNpadButton_A;
+		B_X_PRESS = keydown & HidNpadButton_X;
+		B_B_PRESS = keydown & HidNpadButton_B;
+		B_Y_PRESS = keydown & HidNpadButton_Y;
+		B_DD_PRESS = keydown & HidNpadButton_Down;
+		B_DU_PRESS = keydown & HidNpadButton_Up;
+			
+		B_DL_PRESS = keydown & HidNpadButton_Left;
+		B_DR_PRESS = keydown & HidNpadButton_Right;
+
+		B_R_PRESS = keydown & HidNpadButton_R;
+		B_L_PRESS = keydown & HidNpadButton_L;
+		B_TR_PRESS = keydown & HidNpadButton_StickR;
+		B_TL_PRESS = keydown & HidNpadButton_StickL;
+
+		B_PLUS_PRESS =  keydown & HidNpadButton_Plus;
+		B_MINUS_PRESS = keydown & HidNpadButton_Minus;
+			
+			
+			
+		B_AX_L_UP_PRESS = keydown & HidNpadButton_StickLUp;
+		B_AX_L_DOWN_PRESS = keydown & HidNpadButton_StickLDown;
+		B_AX_L_LEFT_PRESS = keydown & HidNpadButton_StickLLeft;
+		B_AX_L_RIGHT_PRESS = keydown & HidNpadButton_StickLRight;
+		    
+
+#endif
+
+
+	
+	return ret_event;
+	}
+	
+	
 	
 }	

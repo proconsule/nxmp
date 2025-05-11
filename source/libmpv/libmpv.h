@@ -1,22 +1,21 @@
 #ifndef NXMP_LIBMPVMPV_H
 #define NXMP_LIBMPVMPV_H
 
+
 #include <string>
 #include <mpv/client.h>
-#include "nxmp-gfx.h"
-#ifdef OPENGL_BACKEND
-#include <mpv/render_gl.h>
-#endif
+#include <deko3d.hpp>
+
+
 #ifdef DEKO3D_BACKEND
 #include <mpv/render_dk3d.h>
 #endif
 
 
 #include "fileInfo.h"
-//#include "config.h"
+
 #include "iniparser.h"
 #include "logger.h"
-
 
 
 struct decoderlist_struct{
@@ -61,7 +60,7 @@ public:
 	int64_t getVideoWidth();
 	int64_t getVideoHeight();
 	double getFPS();
-	double getVideoBitrate();
+	int64_t getVideoBitrate();
 	double getAudioBitrate();
 	
 	std::string getVideoCodec();
@@ -138,8 +137,8 @@ private:
 
 
 	void resetFileInfo();
-        mpv_handle *handle = nullptr;
-        mpv_render_context *context = nullptr;
+	mpv_handle *handle = nullptr;
+	mpv_render_context *context = nullptr;
 	std::vector<decoderlist_struct> decoderlist;
 	fileInfo * fileinfo = nullptr;
 	

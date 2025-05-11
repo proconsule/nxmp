@@ -1,0 +1,41 @@
+pkgname=switch-libnfs
+pkgver=5.0.2
+pkgrel=1
+pkgdesc="NFS client library"
+url="https://github.com/sahlberg/libnfs"
+license=('LGPL')
+arch=('any')
+options=(!strip libtool staticlibs)
+groups=('switch-portlibs')
+source=("${url}/archive/refs/tags/libnfs-${pkgver}.tar.gz" "libnfs.patch")
+sha256sums=(
+  '637e56643b19da9fba98f06847788c4dad308b723156a64748041035dcdf9bd3'
+  '1a710d929637a9b55522b3ee7c2f4dd5b4298cf23f77f0e09c90cc1aa0c0425d'
+)
+
+prepare() {
+  cd "libnfs-libnfs-${pkgver}"
+  patch -Np1 -i "$srcdir/libnfs.patch"
+}
+
+build() {
+  cd "libnfs-libnfs-${pkgver}"
+
+  source ${DEVKITPRO}/switchvars.sh
+
+  ./bootstrap
+
+  ./configure --prefix="${PORTLIBS_PREFIX}" --host=aarch64-none-elf \
+    --disable-shared --enable-static --disable-werror --disable-utils --disable-examples
+
+  make
+}
+
+package() {
+  cd "libnfs-libnfs-${pkgver}"
+
+  source /opt/devkitpro/switchvars.sh
+
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 COPYING "${pkgdir}/opt/devkitpro/portlibs/switch/licenses/${pkgname}/LICENSE"
+}

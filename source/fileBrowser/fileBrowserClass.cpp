@@ -1,14 +1,66 @@
 #include "fileBrowserClass.h"
 
 
-	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist,USBMounter * _myusb){
+	CFileBrowser::CFileBrowser(networkstruct_v2 netconfdata,Playlist * _playlist){
 		
+		if(netconfdata.type == "sftp"){
+			if(netconfdata.password != ""){
+				sshfs = new CSSHFS(netconfdata.server,netconfdata.port,netconfdata.username,netconfdata.password,netconfdata.path,"ssh0","ssh0:");
+				connected = sshfs->RegisterFilesystem_v2();
+			}else if(netconfdata.pubkeypath != ""){
+				sshfs = new CSSHFS(netconfdata.server,netconfdata.port,netconfdata.username,netconfdata.pubkeypath,netconfdata.privkeypath,netconfdata.passphrase,netconfdata.path,"ssh0","ssh0:");
+				connected = sshfs->RegisterFilesystem_pubkey_v2();
+			
+			}
+			basepath = "ssh0:/";
+			title = "SFTP Browser " + netconfdata.server;
+			
+		}
+		
+		if(netconfdata.type == "smb"){
+			
+			smb2fs = new CSMB2FS(netconfdata.server,netconfdata.username,netconfdata.password,netconfdata.path,"smb0","smb0:");
+			connected = smb2fs->RegisterFilesystem_v2();
+			basepath = "smb0:/";
+			title = "SMB Browser " + netconfdata.server;
+			
+		}
+		
+		if(netconfdata.type == "nfs"){
+			
+			nfsfs = new CNFSFS(netconfdata.server,netconfdata.path,"nfs0","nfs0:");
+			connected = nfsfs->RegisterFilesystem_v2();
+			basepath = "nfs0:/";
+			currentpath = basepath;
+			title = "NFS Browser " + netconfdata.server;
+			
+		}
+		
+		if(netconfdata.type == "ftp"){
+			ftpfs = new CFTPFS(netconfdata.server,netconfdata.port,netconfdata.username,netconfdata.password,netconfdata.path,"ftp0","ftp0:");
+			connected = ftpfs->RegisterFilesystem_v2();
+			basepath = "ftp0:" + netconfdata.path;
+			currentpath = basepath;
+			title = "FTP Browser " + netconfdata.server;
+			maxreadsize = 65536;
+		
+		}
+		
+	}
+	
+	CFileBrowser::CFileBrowser(USBMounter * _myusb,Playlist * _playlist){
 		if(_myusb!= nullptr){
 			title = "USB Browser";
 			myusb = _myusb;
 			basepath = myusb->getBasePath();
 			connected = true;
-		}else{
+		}
+		
+	}
+
+	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist){
+		
+		
 			path = _path;
 			urlschema thisurl = Utility::parseUrl(_path); 
 			if(Utility::startWith(path,"/",false)){
@@ -45,7 +97,7 @@
 				basepath = "nfs0:/";
 				currentpath = basepath;
 			}
-		}
+		
 	}
 	
 	CFileBrowser::~CFileBrowser(){
@@ -119,20 +171,15 @@
 		if(myhttp!= nullptr){
 			myhttp->DirList(path,extensions);
 		}
-		/*
-		if(myusb!= nullptr){
-			myusb->DirList(path,showHidden,extensions);
-		}
-		*/
 		if(smb2fs!= nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs!=nullptr || myusb!= nullptr|| ftpfs!= nullptr || m3u8fs != nullptr){
 			currentpath = path;
 			currentlist.clear();
 			//struct dirent *ent;
 			DIR *dir;
-			//NXLOG::DEBUGLOG("DIRLIST: %s\n",path.c_str());
+			NXLOG::DEBUGLOG("DIRLIST: %s\n",path.c_str());
 			if (!path.empty()) {
 				if ((dir = opendir(path.c_str())) != nullptr) {
-				//NXLOG::DEBUGLOG("DIR OPEN",path.c_str());
+				NXLOG::DEBUGLOG("DIR OPEN",path.c_str());
 					auto *reent    = __syscall_getreent();
 					auto *devoptab = devoptab_list[dir->dirData->device];	
 					
@@ -493,11 +540,6 @@
 		if(myhttp!= nullptr){
 			myhttp->ResetDbStatus();
 		}
-		/*
-		if(myusb!= nullptr){
-			myusb->ResetDbStatus();
-		}
-		*/
 		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr || m3u8fs != nullptr){
 			for(int i=0;i<currentlist.size();i++)
 			{		
@@ -511,11 +553,6 @@
 		if(myhttp!= nullptr){
 			myhttp->SetFileDbStatus(idx,dbstatus);
 		}
-		/*
-		if(myusb!= nullptr){
-			myusb->SetFileDbStatus(idx,dbstatus);
-		}
-		*/
 		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr|| ftpfs!= nullptr || m3u8fs != nullptr){
 			currentlist[idx].dbread = dbstatus;
 		}
@@ -581,44 +618,6 @@
 		close(myfd);
 		fileref->memvalid = true;
 		
-		/*
-		if (stat(ctx->LoadedFileName.c_str(), &st) == 0) {
-			
-			if(ctx->LoadedFileBuffer!=nullptr)free(ctx->LoadedFileBuffer);
-					
-			ctx->LoadedFileBuffer = (unsigned char*)malloc(st.st_size*sizeof(unsigned char)); 
-			
-			int myfd = open(ctx->LoadedFileName.c_str(),O_RDONLY);
-			
-			if(myfd<0){
-				free(ctx->LoadedFileBuffer);
-				return;
-			}
-			
-			//size_t offset = 0;
-			char buffer[ctx->maxreadsize];
-			
-			
-			while (true){
-				bytesRead = read(myfd, buffer, ctx->maxreadsize);
-				if(bytesRead<=0)break;
-				memcpy(ctx->LoadedFileBuffer+ctx->CurrentReadOffset,buffer,bytesRead);
-				ctx->CurrentReadOffset+=bytesRead;
-			}
-			
-			if(ctx->CurrentReadOffset>=st.st_size){
-				
-				ctx->LoadedFileSize = st.st_size;
-				ctx->LoadedFileStatus = true;
-			}
-			
-			close(myfd);
-			
-			
-			
-		}
-		*/
-		
 	}
 	
 	
@@ -654,15 +653,6 @@
 					threadCreate(&readThreadref, file_read_Thread, LoadedFile, NULL, 0x100000, 0x3B, -2);
 					threadStart(&readThreadref);
 					
-					/*
-					LoadedFile.memvalid = false;
-					LoadedFile.readbuffersize = maxreadsize;
-					LoadedFile.path = filepath;
-					LoadedFile.size = st.st_size;
-					LoadedFile.currentOffset = 0;
-					threadCreate(&readThreadref, file_read_Thread, (void *)&LoadedFile, NULL, 0x100000, 0x3B, -2);
-					threadStart(&readThreadref);
-					*/
 					return true;
 				}
 				

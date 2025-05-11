@@ -81,6 +81,54 @@ CFTPFS::CFTPFS(std::string _url,std::string _name,std::string _mount_name){
 	
 }
 
+
+CFTPFS::CFTPFS(std::string _server,int _port,std::string _username,std::string _password,std::string _path,std::string _name,std::string _mount_name){
+	
+	
+	this->name       = _name;
+    this->mount_name = _mount_name;
+	
+	this->server = server;
+	this->port = _port;
+	this->username = _username;
+	this->password = _password;
+	this->path = _path;
+
+    this->devoptab = {
+        .name         = CFTPFS::name.data(),
+
+        .structSize   = sizeof(CFTPFSFile),
+        .open_r       = CFTPFS::ftpfs_open,
+        .close_r      = CFTPFS::ftpfs_close,
+        .read_r       = CFTPFS::ftpfs_read,
+        .seek_r       = CFTPFS::ftpfs_seek,
+        .fstat_r      = CFTPFS::ftpfs_fstat,
+
+        .stat_r       = CFTPFS::ftpfs_stat,
+        .chdir_r      = CFTPFS::ftpfs_chdir,
+
+        .dirStateSize = sizeof(CFTPFSDir),
+        .diropen_r    = CFTPFS::ftpfs_diropen,
+        .dirreset_r   = CFTPFS::ftpfs_dirreset,
+        .dirnext_r    = CFTPFS::ftpfs_dirnext,
+        .dirclose_r   = CFTPFS::ftpfs_dirclose,
+
+        .statvfs_r    = CFTPFS::ftpfs_statvfs,
+
+        .deviceData   = this,
+
+        .lstat_r      = CFTPFS::ftpfs_stat,
+    };
+	//this->urlschema = this->parseFTPUrl(connect_url);
+	//if(connect(urlschema.server,atoi(urlschema.port.c_str()),urlschema.user,urlschema.pass) == 0){
+	//	this->cwd = "/";
+	//	register_fs();
+	//}
+	
+}
+	
+
+
 bool CFTPFS::CheckConnection(){
 	if(connect(urlschema.server,atoi(urlschema.port.c_str()),urlschema.user,urlschema.pass) == 0){
 		this->cwd = "/";
@@ -101,6 +149,17 @@ bool CFTPFS::RegisterFilesystem(){
 }
 
 
+bool CFTPFS::RegisterFilesystem_v2(){
+	if(connect(this->server,this->port,this->username,this->password) == 0){
+		this->cwd = "/";
+		register_fs();
+		fs_regisered = true;
+		return true;
+	}
+	return false;
+}
+
+
 CFTPFS::~CFTPFS(){
 	if (this->is_connected)
         this->disconnect();
@@ -112,8 +171,7 @@ CFTPFS::~CFTPFS(){
 }
 
 void CFTPFS::disconnect(){
-	int rc = 0;
-
+	
     auto lk = std::scoped_lock(this->session_mutex);
 	
 
@@ -219,11 +277,11 @@ ssize_t CFTPFS::ftpfs_read(struct _reent *r, void *fd, char *ptr, size_t len) {
 
 	
 	if(!priv_file->connection.connected){
-		int ret = UFTP_ServerConnect(&priv_file->connection);
+		UFTP_ServerConnect(&priv_file->connection);
 		
 	}
 	if(priv_file->connection.data_socket==-1){
-		int ret = UFTP_OpenFile(&priv_file->connection,priv_file->filename,priv_file->offset);
+		UFTP_OpenFile(&priv_file->connection,priv_file->filename,priv_file->offset);
 		priv_file->opened = true;
 	}
 

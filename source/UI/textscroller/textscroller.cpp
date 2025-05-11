@@ -29,7 +29,7 @@ void CTextScroller::Draw(std::string myuniqueid,float w,float h,const char* fmt,
 	ImGui::TextV(fmt, args);
 	va_end(args);
 	
-	ImVec2 textsize = ImGui::CalcTextSize(buffer);
+	//ImVec2 textsize = ImGui::CalcTextSize(buffer);
 	free(buffer);
 
 	float scroll_max_x = ImGui::GetScrollMaxX();
@@ -132,16 +132,6 @@ void CTextScroller::DrawPopupNative(std::string myuniqueid,float w,float h,const
     vsnprintf(&message[0], len + 1,fmt, args);
     message.resize(len);  // remove the NUL
 	
-	/*
-	
-	va_list args;
-	va_start(args, fmt);
-	size_t needed = snprintf(NULL, 0, fmt, args) + 1;
-    char  *buffer = (char *)malloc(needed);
-	sprintf(buffer, fmt, args);
-	ImGui::TextV(fmt, args);
-	va_end(args);
-	*/
 	ImVec2 textsize = ImGui::CalcTextSize(message.c_str());
 	float centerposx = (w-textsize.x)/2.0f;
 	float centerposy = (h-textsize.y)/2.0f;

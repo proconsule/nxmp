@@ -41,7 +41,7 @@ namespace Windows {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::PushStyleColor(ImGuiCol_WindowBg,nxmpgfx::Window_Bg_color);
+		ImGui::PushStyleColor(ImGuiCol_WindowBg,Window_Bg_color);
     };
 	
 	void ExitImgViewerWindow(void) {
@@ -160,7 +160,8 @@ namespace Windows {
 						glDeleteTextures(1, &Windows::currentImg.id);
 #endif
 #ifdef DEKO3D_BACKEND
-						Windows::currentImg.memblock.destroy();
+						if(Windows::currentImg.id != -1)
+						Renderer->unregister_texture(Windows::currentImg);
 #endif
 						Windows::currentImg =  imgloader->OpenImageMemory(filebrowser->LoadedFile->mem,filebrowser->LoadedFile->size);
 						loadimage=false;
@@ -229,8 +230,8 @@ namespace Windows {
 				draw_list->AddText(mytextpos, ImColor(buttextcol),FONT_B_BUTTON_FILLED);
 				textsize = ImGui::CalcTextSize(FONT_B_BUTTON_FILLED);
 				mytextpos.x = mytextpos.x + textsize.x +5.0f;
-				draw_list->AddText(mytextpos, ImColor(buttextcol),Common_STR[NXCOMMON_BACK]);
-				textsize = ImGui::CalcTextSize(Common_STR[NXCOMMON_BACK]);
+				draw_list->AddText(mytextpos, ImColor(buttextcol),nxlangs::get_common_str(nxlangs::NXCOMMON_BACK).c_str());
+				textsize = ImGui::CalcTextSize(nxlangs::get_common_str(nxlangs::NXCOMMON_BACK).c_str());
 				mytextpos.x = mytextpos.x + textsize.x +50.0f*multiplyRes;
 				
 				draw_list->AddText(mytextpos, ImColor(buttextcol),FONT_A_BUTTON_FILLED);

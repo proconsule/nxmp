@@ -39,9 +39,9 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source/devoptabsfs/m3u8fs source/devoptabsfs/ftpfs source/devoptabsfs/libarchivefs source/devoptabsfs/nfsfs source/devoptabsfs/sshfs source/devoptabsfs/smb2fs source/compressedfs source/compressedfs/libarchiveDir source/i18n source/backends source/backends/glfw3-opengl3 source/iniparser source/imgloader source/networkshareclass source/UI/textscroller source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/imgui libs/imgui/misc/freetype source source/updater source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
+SOURCES		:=	source/i18n source/devoptabsfs/smb2fs source/devoptabsfs/sshfs source/devoptabsfs/m3u8fs source/devoptabsfs/ftpfs source/devoptabsfs/libarchivefs source/devoptabsfs/nfsfs source/compressedfs source/compressedfs/libarchiveDir source/backends/native-deko3d source/backends source/iniparser source/imgloader source/networkshareclass source/UI/textscroller source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/imgui libs/imgui/misc/freetype source source/updater source/curldownloader source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/UI source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir  source/libmpv 
 DATA		:=	data
-INCLUDES	:=	source/devoptabsfs/m3u8fs source/devoptabsfs/ftpfs source/devoptabsfs/libarchivefs source/devoptabsfs/nfsfs source/devoptabsfs/sshfs source/devoptabsfs/smb2fs source/compressedfs source/compressedfs/libarchiveDir source/i18n source/backends source/backends/glfw3-opengl3 source/iniparser source/imgloader source/networkshareclass source/UI/textscroller source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/simpleini libs/imgui include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir
+INCLUDES	:=	source/devoptabsfs/smb2fs source/devoptabsfs/sshfs source/devoptabsfs/m3u8fs source/devoptabsfs/ftpfs source/devoptabsfs/libarchivefs source/devoptabsfs/nfsfs source/compressedfs source/compressedfs/libarchiveDir source/backends/native-deko3d source/i18n source/backends source/iniparser source/imgloader source/networkshareclass source/UI/textscroller source/mediaprobe libs/imgui_toggle source/fileBrowser source/logger source/stats libs/simpleini libs/imgui include source/curldownloader source/updater source/touchcontrols source/playlist source/shadermania source/eqpreset source/database source/remotefs/UPNP source/remotefs/nfsDir source/remotefs/smb2 source/remotefs/sshDir source/remotefs/Enigma2 source/localfs source/localfs/usb source/remotefs/ftplib source/remotefs/HTTPDir source/libmpv
 ROMFS		:=	romfs
 
 OUT_SHADERS	:=	shaders
@@ -50,15 +50,14 @@ GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'
 
 VERSION_MAJOR := 0
 VERSION_MINOR := 9
-VERSION_MICRO := 0
-RELEASETYPE := -DRELEASE_TYPE=0
+VERSION_MICRO := 1
 
-APP_TITLE     := NXMP (OpenGL)
+APP_TITLE     := NXMP
 APP_AUTHOR    := proconsule and darkxex
 APP_VERSION   := ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}
 
 
-#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------	
 # options for code generation
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE 
@@ -66,25 +65,21 @@ ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 CFLAGS	:=	-g -ggdb -Wall -Wno-sign-compare -O2 -ffunction-sections -DCXXOPTS_NO_RTTI\
 			$(ARCH) $(DEFINES) \
                 $(GITREV)
-CFLAGS  +=      `sdl2-config --cflags` `freetype-config --cflags` -I${PORTLIBS}/include/upnp/
+CFLAGS  +=  `freetype-config --cflags` -I${PORTLIBS}/include/upnp/
 
-CFLAGS	+=	$(INCLUDE) -D__SWITCH__ $(RELEASETYPE) -DOPENGL_BACKEND=1
+CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -DDEKO3D_BACKEND=1
 
 CFLAGS  +=      -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION_MINOR=$(VERSION_MINOR) -DVERSION_MICRO=$(VERSION_MICRO) 
 
-CXXFLAGS	:= $(CFLAGS) -std=gnu++17 -fno-rtti -fexceptions -fpermissive -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM \
-		  -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM
+CXXFLAGS	:= $(CFLAGS) -std=gnu++20 -fno-rtti -fexceptions -fpermissive -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM \
+		  -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM 
 
-ASFLAGS	:=	-g $(ARCH)
+ASFLAGS	:=	-g $(ARCH) 
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 
-LIBS	:=  -lmpv `sdl2-config --libs` `curl-config --libs` `freetype-config --libs` -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua5.1 -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lssh2 -lnfs -lglfw3 -ljansson -lusbhsfs -lntfs-3g -llwext4 -larchive -lexpat -llzma -lzstd -llz4 -lbz2 -lnx -lc -lz
+LIBS	:=  -lmpv `curl-config --libs` `freetype-config --libs` -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -ltinyxml2 -lturbojpeg -llua5.1 -lssh2 -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2  -lnfs -ljansson -lusbhsfs -lntfs-3g -llwext4 -ldeko3d -luam -larchive -lexpat -llzma -lzstd -llz4 -lbz2 -lz -lnx -lc -lz
 
-
-#LIBS	:=  -lmpv `sdl2-config --libs` `curl-config --libs` `freetype-config --libs` -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -lglad -lEGL -lglapi -ldrm_nouveau -ltinyxml2 -lturbojpeg -llua5.1 -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lssh2 -lnfs -lglfw3 -ljansson -lusbhsfs -lntfs-3g -llwext4 -lnx -lc -lz
-
-#LIBS	:=  -lmpv `sdl2-config --libs` `curl-config --libs` `freetype-config --libs` -lswscale -lswresample -lavformat -lavfilter -lpostproc -lavcodec -lavutil -llzma -lopus -lvpx -lass -lharfbuzz -lfreetype -lfribidi  -lstdc++ -ldav1d -lpng -lbz2 -ltinyxml2 -lturbojpeg -llua5.1 -lmbedcrypto -lmbedx509 -lmbedtls -lmbedcrypto -lmbedx509 -lmbedtls -lsqlite3 -lsmb2 -lssh2 -lnfs -lglfw3 -ljansson -lusbhsfs -lntfs-3g -llwext4 -ldeko3d -luam -lnx -lc -lz
 
 
 #---------------------------------------------------------------------------------
@@ -187,7 +182,7 @@ ifeq ($(strip $(NO_NACP)),)
 endif
 
 ifneq ($(APP_TITLEID),)
-	export NACPmaFLAGS += --titleid=$(APP_TITLEID)
+	export NACPFLAGS += --titleid=$(APP_TITLEID)
 endif
 
 ifneq ($(ROMFS),)
@@ -197,9 +192,10 @@ endif
 .PHONY: $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
+
 all: $(BUILD)
 
-$(BUILD): 
+$(BUILD): $(ROMFS_TARGETS)
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/$(firstword $(MAKEFILE_LIST)) 
 

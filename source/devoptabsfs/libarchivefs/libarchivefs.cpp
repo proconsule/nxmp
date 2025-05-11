@@ -74,7 +74,7 @@ int CARCHFS::connect(){
 		if(archive_read_next_header2(arch_ctx, entry) != ARCHIVE_OK)break;
 		
 		std::string fullpathname = archive_entry_pathname(entry);
-		size_t pos = fullpathname.find_last_of("/");
+		//size_t pos = fullpathname.find_last_of("/");
 		std::string myfilename = fullpathname.substr(fullpathname.find_last_of("/")+1);
 		std::string parentname =  "/" + fullpathname.substr(0,fullpathname.find_last_of("/"));
 		
@@ -290,8 +290,7 @@ int       CARCHFS::archfs_dirnext  (struct _reent *r, DIR_ITER *dirState, char *
 
 int       CARCHFS::archfs_dirclose (struct _reent *r, DIR_ITER *dirState){
 	auto *priv     = static_cast<CARCHFS    *>(r->deviceData);
-    auto *priv_dir = static_cast<CARCHFSDir *>(dirState->dirStruct);
-	
+    
 	auto lk = std::scoped_lock(priv->session_mutex);
 	
 	
@@ -300,8 +299,7 @@ int       CARCHFS::archfs_dirclose (struct _reent *r, DIR_ITER *dirState){
 }
 
 int       CARCHFS::archfs_statvfs  (struct _reent *r, const char *path, struct statvfs *buf){
-	auto *priv     = static_cast<CARCHFS    *>(r->deviceData);
-	
+			
 	
 	return 0;
 }

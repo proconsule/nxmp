@@ -77,7 +77,9 @@ std::string curlDownloader::scrapeHtml(std::string myurl, std::string postcode, 
 		curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36");
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
-
+		if(res!=CURLE_OK){
+			return nullptr;
+		}
   }
 	return readBuffer;
 }
@@ -138,7 +140,6 @@ SOAPcurlDownloader::SOAPcurlDownloader(){
 void SOAPcurlDownloader::Download(char * url ,MemoryStruct * chunk, char * OID){
 	struct curl_slist *headerchunk = NULL;
 	CURL *curl_handle;
-	CURLcode res;
 	chunk->memory = (unsigned char *)malloc(1);  
 	chunk->size = 0; 
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -170,7 +171,7 @@ void SOAPcurlDownloader::Download(char * url ,MemoryStruct * chunk, char * OID){
 	curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDS, soapdata);
     curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDSIZE, strlen(soapdata));
 	
-	res = curl_easy_perform(curl_handle);
+	curl_easy_perform(curl_handle);
 	
 	curl_easy_cleanup(curl_handle);
 	curl_global_cleanup();

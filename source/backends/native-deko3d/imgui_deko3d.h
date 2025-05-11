@@ -50,7 +50,6 @@ void init (dk::UniqueDevice &device_,
     dk::SamplerDescriptor &samplerDescriptor_,
     dk::ImageDescriptor &imageDescriptor_,
     DkResHandle fontTextureHandle_,
-	dk::Shader *shaders_,
     unsigned imageCount_);
 
 /// \brief Deinitialize deko3d

@@ -99,7 +99,7 @@ int usbThread(void *arg) {
 			tmpdev.fstype = LIBUSBHSFS_FS_TYPE_STR(device->fs_type);
 			tmpdev.capacity = device->capacity;
 			mymounter->mounted_devs.push_back(tmpdev);
-            mymounter->playlist->Invalidate();
+            //mymounter->playlist->Invalidate();
         }
 	
     }
@@ -167,6 +167,7 @@ void USBMounter::usbMscTestDevices(void)
     g_updated = false;
 
     /* Print info from mounted devices. */
+	mounted_devs.clear();
     for(u32 i = 0; i < g_usbDeviceCount; i++)
     {
         UsbHsFsDevice *device = &(g_usbDevices[i]);
@@ -205,7 +206,7 @@ void USBMounter::usbMscTestDevices(void)
 		tmpdev.fstype = LIBUSBHSFS_FS_TYPE_STR(device->fs_type);
 		tmpdev.capacity = device->capacity;
 		mounted_devs.push_back(tmpdev);
-		playlist->Invalidate();
+		//playlist->Invalidate();
        
 
         
@@ -309,6 +310,7 @@ void USBMounter::DirList(const std::string &path,bool showHidden,const std::vect
 					}
 					if(Utility::isArchiveExtension(file.name)){
 						file.mediatype = FS::FileMediaType::Archive;
+						
 					}
 					currentlist.push_back(file);
 					

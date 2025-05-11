@@ -17,11 +17,6 @@ extern int batteryPorcent;
 
 namespace playerWindows{
 	
-	/*
-	extern float playertextscrollpos;
-	extern bool playertextforwardscroll;
-	*/
-	
 	inline void SetupCacheWindow(void){
 		ImGui::SetNextWindowPos(ImVec2(10.0f*multiplyRes, 600.0f*multiplyRes), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(250.0f*multiplyRes, 80.0f*multiplyRes), ImGuiCond_Always);

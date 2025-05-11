@@ -5,12 +5,56 @@
 
 void smb2stat_entry(smb2_stat_64  *entry, struct stat *st);
 
-CSMB2FS::CSMB2FS(std::string _url,std::string _name,std::string _mount_name){
-	connect_url = _url;
-	
+CSMB2FS::CSMB2FS(std::string _server,std::string _username,std::string _password,std::string _path,std::string _name,std::string _mount_name){
 	
 	name       = _name;
     mount_name = _mount_name;
+	
+	server = _server;
+	username = _username;
+	password = _password;
+	path = _path;
+
+    devoptab = {
+        .name         = CSMB2FS::name.data(),
+
+        .structSize   = sizeof(CSMB2FSFile),
+        .open_r       = CSMB2FS::smb2fs_open,
+        .close_r      = CSMB2FS::smb2fs_close,
+        .read_r       = CSMB2FS::smb2fs_read,
+        .seek_r       = CSMB2FS::smb2fs_seek,
+        .fstat_r      = CSMB2FS::smb2fs_fstat,
+
+        .stat_r       = CSMB2FS::smb2fs_stat,
+        .chdir_r      = CSMB2FS::smb2fs_chdir,
+
+        .dirStateSize = sizeof(CSMB2FSDir),
+        .diropen_r    = CSMB2FS::smb2fs_diropen,
+        .dirreset_r   = CSMB2FS::smb2fs_dirreset,
+        .dirnext_r    = CSMB2FS::smb2fs_dirnext,
+        .dirclose_r   = CSMB2FS::smb2fs_dirclose,
+
+        .statvfs_r    = CSMB2FS::smb2fs_statvfs,
+
+        .deviceData   = this,
+
+        .lstat_r      = CSMB2FS::smb2fs_lstat,
+    };
+	
+}
+
+
+CSMB2FS::CSMB2FS(std::string _url,std::string _name,std::string _mount_name){
+	
+	
+	
+	connect_url = _url;
+	
+	SMB2_PARSER = new CSMB2_PARSER(connect_url);
+	
+	name       = _name;
+    mount_name = _mount_name;
+	
 
     devoptab = {
         .name         = CSMB2FS::name.data(),
@@ -51,6 +95,16 @@ bool CSMB2FS::CheckConnection(){
 	
 }
 
+bool CSMB2FS::RegisterFilesystem_v2(){
+	if(connect_v2() == 0){
+		cwd = "/";
+		fs_regisered = true;
+		register_fs();
+		return true;
+	}
+	return false;
+}
+
 bool CSMB2FS::RegisterFilesystem(){
 	if(connect() == 0){
 		cwd = "/";
@@ -85,6 +139,32 @@ void CSMB2FS::disconnect(){
 }
 
 
+int CSMB2FS::connect_v2(){
+	smb2 = smb2_init_context();
+	if (smb2 == NULL) {
+		printf("SMB2 Failed to init context\n");
+		return -1;
+	
+	}
+	smb2_set_user(smb2,username.c_str()); 
+	smb2_set_password(smb2,password.c_str()); 
+	smb2_set_security_mode(smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
+	
+	
+	
+	if (smb2_connect_share(smb2, server.c_str(), path.c_str(), username.c_str()) < 0) {
+		printf("smb2_connect_share failed. %s\n", smb2_get_error(smb2));
+		return -1;
+	}
+	
+	
+	maxreadsize = smb2_get_max_read_size(smb2);
+	
+	is_connected = true;
+	
+	return 0;
+}
+
 int CSMB2FS::connect(){
 	smb2 = smb2_init_context();
 	if (smb2 == NULL) {
@@ -93,21 +173,11 @@ int CSMB2FS::connect(){
 	
 	}
 	
-	smb2url = smb2_parse_url(smb2,connect_url.c_str());
-	
-	if(smb2url->user != NULL){
-		smb2_set_user(smb2,smb2url->user); 
-	}else{
-		smb2_set_user(smb2,"Guest"); 
-	}
-	if(smb2url->pass != NULL){
-		smb2_set_password(smb2,smb2url->pass); 
-	}
+	smb2_set_user(smb2,SMB2_PARSER->user.c_str()); 
+	smb2_set_password(smb2,SMB2_PARSER->pass.c_str()); 
 	smb2_set_security_mode(smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
 	
-	
-	
-	if (smb2_connect_share(smb2, smb2url->server, smb2url->share, smb2url->user) < 0) {
+	if (smb2_connect_share(smb2, SMB2_PARSER->server.c_str(), SMB2_PARSER->share.c_str(), SMB2_PARSER->user.c_str()) < 0) {
 		printf("smb2_connect_share failed. %s\n", smb2_get_error(smb2));
 		return -1;
 	}
@@ -181,9 +251,8 @@ ssize_t   CSMB2FS::smb2fs_read     (struct _reent *r, void *fd, char *ptr, size_
 
     
 	auto lk = std::scoped_lock(priv->session_mutex);
-
-    //auto rc = smb2_read(priv->smb2,priv_file->fh,(uint8_t *)ptr,len);
-    auto rc = smb2_pread(priv->smb2,priv_file->fh,(uint8_t *)ptr,len,priv_file->offset);
+	auto rc = smb2_pread(priv->smb2,priv_file->fh,(uint8_t *)ptr,len,priv_file->offset);
+	
 	if (rc < 0) {
         return -1;
     }
@@ -215,12 +284,10 @@ off_t     CSMB2FS::smb2fs_seek     (struct _reent *r, void *fd, off_t pos, int d
     auto lk = std::scoped_lock(priv->session_mutex);
 	priv_file->offset = offset + pos;
 	
-	//smb2_lseek(priv->smb2, priv_file->fh, priv_file->offset, SEEK_SET, NULL);
-    return priv_file->offset;
+	return priv_file->offset;
 }
 
 int       CSMB2FS::smb2fs_fstat    (struct _reent *r, void *fd, struct stat *st){
-	auto *ctx = static_cast<CSMB2FS *>(r->deviceData);
 	auto *priv_file = static_cast<CSMB2FSFile *>(fd);
     smb2stat_entry(&priv_file->smb2st, st);
     return 0;
@@ -323,8 +390,7 @@ int       CSMB2FS::smb2fs_dirnext  (struct _reent *r, DIR_ITER *dirState, char *
 
 int       CSMB2FS::smb2fs_dirclose (struct _reent *r, DIR_ITER *dirState){
 	auto *priv     = static_cast<CSMB2FS    *>(r->deviceData);
-    auto *priv_dir = static_cast<CSMB2FSDir *>(dirState->dirStruct);
-	
+    
 	auto lk = std::scoped_lock(priv->session_mutex);
 	
 	

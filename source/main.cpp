@@ -1,13 +1,9 @@
-#include <switch.h>
-
 #include <stdio.h>
 #include <ctype.h>
 #include <utility>
 
-
-#include <glad/glad.h>
-
-#include "nxmp-gfx.h"
+#include "nxmp-render.h"
+#include "imgui_nx.h"
 #include "iniparser.h"
 #include "imgloader.h"
 #include "gui.h"
@@ -29,7 +25,6 @@
 
 #include "playlist.h"
 
-#include "shaderMania.h"
 #include "SwitchSys.h"
 
 #include "stats.h"
@@ -37,16 +32,19 @@
 
 #include <switch.h>
 
-#define NDEBUG 1
+#include "globals.h"
 
-//#define APPLETMODEENA 1
+#define NDEBUG 0
 
 
-extern u32 __nx_applet_exit_mode;
+extern "C" u32 __nx_applet_exit_mode, __nx_nv_service_type, __nx_nv_transfermem_size;
+bool                g_application_mode;
 
-static bool init();
+std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
+
 
 /* Classes */
+
 
 libMpv *libmpv = nullptr;
 
@@ -63,9 +61,6 @@ CMediaProbe *MediaProbe = nullptr;
 
 USBMounter *MyUSBMount = nullptr;
 
-shaderMania* shadermania = nullptr;
-
-
 CIniParser *configini = nullptr;
 CImgLoader *imgloader = nullptr;
 
@@ -77,7 +72,8 @@ Playlist *playlist = nullptr;
 CStats *nxmpstats = nullptr;
 CConsoleWindow *ConsoleWindow = nullptr;
 
-//CVOUT *videoout = nullptr;
+NXMPRenderer *Renderer = nullptr;
+
 
 /* VARS */
 
@@ -107,14 +103,6 @@ unsigned int app_exit_mode = 0;
 
 float currFontsize = 20.0f; 
 
-GLuint WIDTH = handheldWidth, HEIGHT = handheldWidth;
-
-#ifdef OPENGL_BACKEND
-std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO)  + std::string(" ") + (RELEASE_TYPE == 0 ? std::string("Stable"): RELEASE_TYPE == 1 ? std::string("Beta"): std::string("R.C.")+ (" (OpenGL)"));
-#endif
-#ifdef DEKO3D_BACKEND
-std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO)  + std::string(" ") + (RELEASE_TYPE == 0 ? std::string("Stable"): RELEASE_TYPE == 1 ? std::string("Beta"): std::string("R.C."))+ (" (deko3d)");
-#endif
 
 
 int64_t playercachesec =  0;
@@ -123,6 +111,78 @@ int64_t playercachesize = 0;
 
 bool slaveplayer = false;
 std::string slaveplayer_file = "";
+
+
+ImVec4 Text_color = ImVec4(255, 255, 255, 1.00f);
+ImVec4 Active_color = ImVec4(0, 255, 203, 1.00f);
+ImVec4 Disabled_color = ImVec4(0.41f, 0.40f, 0.40f, 1.00f);
+ImVec4 Window_Bg_color = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
+ImVec4 OptsTab_Bg_color = ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
+ImVec4 Popup_Bg_color = ImVec4(0.27f, 0.27f, 0.27f, 1.00f);
+ImVec4 NavHover_color = ImVec4(0.0f, 0.0f, 0.0f, 0.20f);
+ImVec4 HeaderHover_color = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+ImVec4 Button_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
+ImVec4 ButtonActive_color = ImVec4(0, 255, 203, 0.30f);
+
+float CurrentVolume = 0.0f;
+
+
+void SetDarkTheme(){
+		Text_color = ImVec4(255, 255, 255, 1.00f);
+		Active_color = ImVec4(0, 255, 203, 1.00f);
+		Disabled_color = ImVec4(0.41f, 0.40f, 0.40f, 1.00f);
+		Window_Bg_color = ImVec4(0.17f, 0.17f, 0.17f, 1.00f);
+		OptsTab_Bg_color = ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
+		Popup_Bg_color = ImVec4(0.27f, 0.27f, 0.27f, 1.00f);
+		NavHover_color = ImVec4(0.0f, 0.0f, 0.0f, 0.20f);
+		HeaderHover_color = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+		Button_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
+		ButtonActive_color = ImVec4(0, 255, 203, 0.30f);
+		
+		ImGuiStyle* style = &ImGui::GetStyle();
+		style->Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.62f);
+		style->Colors[ImGuiCol_Text] = Text_color;
+		
+	}
+	void SetLightTheme(){
+		Text_color = ImVec4(0, 0, 0, 1.00f);
+		Active_color = ImVec4(0, 0, 255, 1.00f);
+		Disabled_color = ImVec4(0.41f, 0.40f, 0.40f, 1.00f);
+		Window_Bg_color = ImVec4(0.92f, 0.92f, 0.92f, 1.00f);
+		OptsTab_Bg_color = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
+		Popup_Bg_color = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
+		NavHover_color = ImVec4(1.0f, 1.0f, 1.0f, 0.20f);
+		HeaderHover_color = ImVec4(0.98f, 0.98f, 0.98f, 1.00f);
+		Button_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
+		ButtonActive_color = ImVec4(0, 0, 255, 0.30f);
+		
+		ImGuiStyle* style = &ImGui::GetStyle();
+		style->Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.62f);
+		style->Colors[ImGuiCol_Text] = Text_color;
+		
+	}
+
+void SetColorTheme(int themecolor){
+		
+		ColorSetId currentTheme;
+		Result rc = setsysInitialize();
+		if (R_SUCCEEDED(rc)) {
+		setsysGetColorSetId(&currentTheme);
+		}
+		
+		if(themecolor == 0){
+			SetDarkTheme();
+		}else if(themecolor == 1){
+			SetLightTheme();
+		} else{
+			if(currentTheme == 1){
+				SetDarkTheme();
+			}else{
+				SetLightTheme();
+			}
+		}
+		setsysExit();
+	}
 
 
 void DeallocateExtern(){
@@ -145,7 +205,7 @@ void DeallocateExtern(){
 	}
 	if(FilePopupTextScroller == nullptr){
 		delete FilePopupTextScroller;
-		BrowserTextScroller = nullptr;
+		FilePopupTextScroller = nullptr;
 	}
 	if(BrowserTextScroller == nullptr){
 		delete BrowserTextScroller;
@@ -185,99 +245,49 @@ void DeallocateExtern(){
 		delete playlist;
 		playlist=nullptr;
 	}
-	if(shadermania != nullptr){
-		delete shadermania;
-		shadermania=nullptr;
-	}
 	
 	if(configini != nullptr){
 		delete configini;
 		configini = nullptr;
 	}
 	
+}
+
+
+
+int main(int argc, const  char **argv) {
 	
-}
 
+/**************** This init taken from SwitchWave https://github.com/averne/SwitchWave  make it applet mode friendly  ************************/	
 
-extern "C" void userAppInit() {
-	romfsInit();
-	SocketInitConfig cfg = *(socketGetDefaultInitConfig());
-	cfg.bsd_service_type = BsdServiceType_System;
-	socketInitialize(&cfg);
-
-}
-
-extern "C" void userAppExit(void) {
+	svcSetThreadPriority(CUR_THREAD_HANDLE, 0x20);
 	
-	plExit();
-	romfsExit();
-	socketExit();
-	appletUnlockExit();
-
-}
-
-int main(int argc, char* argv[]) {
 	appletLockExit();
-	Result ret = 0;
+	auto at = appletGetAppletType();
+    g_application_mode = at == AppletType_Application || at == AppletType_SystemApplication;
+	__nx_nv_service_type     = NvServiceType_Factory;
+    __nx_nv_transfermem_size = (g_application_mode ? 16 : 3) * 0x100000;
 	
 	
-	/*
-	consoleInit(NULL);
-
-    // Configure our supported input layout: a single player with standard controller styles
-    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
-
-    // Initialize the default gamepad (which reads handheld mode inputs as well as the first connected controller)
-    PadState pad;
-    padInitializeDefault(&pad);
-
-    //Move the cursor to row 16 and column 20 and then prints "Hello World!"
-    //To move the cursor you have to print "\x1b[r;cH", where r and c are respectively
-    //the row and column where you want your cursor to move
-    //printf("\x1b[16;20HHello World!");
-
-	localFs *localDir = new localFs("/",nullptr);
-
-	unsigned char *mydata = NULL;
-	int mydatasize = 0;
-	if(localDir->getfileContents("/Jujutsu_test.zip",&mydata,mydatasize)){
-		
-	}
-	compressedFS *test = new compressedFS(mydata,mydatasize);
-	std::vector<std::string> myext = {".jpg"};
-	test->ReadList();
-	test->DirList("",false,myext);
-	printf("--------------");
-	test->DirList("ttf/nxmp-opengl",false,myext);
-
-    while(appletMainLoop())
-    {
-        // Scan the gamepad. This should be done once for each frame
-        padUpdate(&pad);
-
-        // padGetButtonsDown returns the set of buttons that have been newly pressed in this frame compared to the previous one
-        u64 kDown = padGetButtonsDown(&pad);
-
-        if (kDown & HidNpadButton_Plus) break; // break in order to return to hbmenu
-
-        consoleUpdate(NULL);
-    }
-
-    consoleExit(NULL);
+/*************************************************************************************/
+	
+	romfsInit();
+	auto socket_conf = *socketGetDefaultInitConfig();
+    socket_conf.bsd_service_type = BsdServiceType_Auto;
+    socketInitialize(&socket_conf);
 	
 	
-	exit(0);
-	
-	*/
 	
 	
-	/*
-	if (R_FAILED(ret = romfsInit())) {
-		NXLOG::ERRORLOG("romfsInit() failed: 0x%x\n", ret);
-		return ret;
-	}
-	*/
+
+
+#ifdef NDEBUG
+	nxlinkStdio();
+#endif	
+	NXLOG::DEBUGLOG("Starting NXMP\n");
 	
+
+
 	AppletOperationMode stus=appletGetOperationMode();
 	if (stus == AppletOperationMode_Handheld) {
 		NXLOG::DEBUGLOG("Handheld Mode\n");
@@ -296,50 +306,15 @@ int main(int argc, char* argv[]) {
 		currFontsize = 27.0f;
 	}
 	
-#ifndef APPLETMODEENA
-	AppletType at = appletGetAppletType();
-    if ( at != AppletType_Application && at != AppletType_SystemApplication) {
-		
-		
-		nxmpgfx::Init_Backend(!isHandheld,true);
-		nxmpgfx::Init_Backend_AppletMode(!isHandheld);
-		nxmpgfx::loopAppletMode();
-		
-		nxmpgfx::Destroy_Backend();
-		romfsExit();
-		appletUnlockExit();
-		return 0;
-	}
-#endif
 	
-	
-
-
-#ifdef NDEBUG
-	nxlinkStdio();
-#endif	
-	printf("Starting\n");
 	if(argc>1){
 		slaveplayer=true;
-		printf("File: %s\n",argv[1]);
+		NXLOG::DEBUGLOG("Opening File: %s\n",argv[1]);
 		slaveplayer_file = argv[1];
 	}
 	
-	if (R_FAILED(ret = nifmInitialize(NifmServiceType_User))) {
-		NXLOG::ERRORLOG("nifmInitialize(NifmServiceType_User) failed: 0x%x\n", ret);
-		return ret;
-	}
-	
-	if (R_FAILED(ret = plInitialize(PlServiceType_User))) {
-		NXLOG::ERRORLOG("plInitialize(PlServiceType_User) failed: 0x%x\n", ret);
-		return ret;
-	}
 	
 	NXLOG::loglevel = 0;
-	bool emuoverrides = true;
-	
-	printf("Loading Config\n");
-	fflush(stdout);
 	
 	NXLOG::DEBUGLOG("Loading Config\n");
 	
@@ -348,27 +323,29 @@ int main(int argc, char* argv[]) {
 	if(NXLOG::loglevel >0){
 		configini->PrintConfig();
 	}
-	
+	nxlangs::Init_Langs();
 	
 	
 	appletInitializeGamePlayRecording();
     appletSetWirelessPriorityMode(AppletWirelessPriorityMode_OptimizedForWlan);
 	
-	extern u32 __nx_applet_type;
-    auto saved_applet_type = std::exchange(__nx_applet_type, AppletType_SystemApplet );
-
-    nvInitialize();
-    __nx_applet_type = saved_applet_type;
 	
 	if(configini->getDbActive(false) && !slaveplayer){
 		sqlitedb = new SQLiteDB(configini->getDbPath());
 		dbUpdated = sqlitedb->dbwasUpdated();
 	}
 	
-	nxmpgfx::Init_Backend(!isHandheld,configini->getVSYNC(false));
-	nxmpgfx::Init_Backend_Splash(!isHandheld);
+	Renderer = new NXMPRenderer();
+	Renderer->Init_ImGui();
+	if(!Renderer->initialize()){
+		
+	}
+	Renderer->Init_ImGui_deko3d();
+	NXLOG::DEBUGLOG("Renderer Init ok\n");
 	
-	
+
+	imgui::nx::setEnableTouch(configini->getTouchEnable(false));
+		
 	
 	eqpreset = new EQPreset("eqpresets.ini");
 	
@@ -376,41 +353,23 @@ int main(int argc, char* argv[]) {
 	
 	
 	
-	emuoverrides = configini->getEmuOverrides();
-	if(!emuoverrides){
-		audctlInitialize(); // Master Volume Test
-		audctlGetSystemOutputMasterVolume(&nxmpgfx::CurrentVolume); 
-	}
-	
-	shadermania = new shaderMania();
-
-	
-	nxmpgfx::updateSplash(25);
+	audctlInitialize(); // Master Volume Test
+	audctlGetSystemOutputMasterVolume(&CurrentVolume); 
 	
 	
 	
-	nxmpgfx::Init_ImGui(!isHandheld);
 	
-	nxmpgfx::SetColorTheme(configini->getThemeColor(false));
-	nxmpgfx::setEnableTouch(configini->getTouchEnable(false));
-
-
-	nxmpgfx::updateSplash(50);
-	//if(configini->getConsoleWindow()){
-		ConsoleWindow = new CConsoleWindow();
-	//}
-		
+	NXLOG::DEBUGLOG("Imgui Init OK\n");
+	
 	std::vector<std::string> extensionlist = configini->getConfigExtensions();
 		
 	Utility::setMediaExtensions(extensionlist);
 	
+	imgloader = new CImgLoader();
+	imgloader->Renderer = Renderer;
+	imgloader->LoadBaseTextures("romfs:");
 	
 	
-	imgloader = new CImgLoader("romfs:");
-#ifdef OPENGL_BACKEND
-		std::vector<nxmpgfx::fonttype_struct> nullfonts;
-		nxmpgfx::UniFontLoader(configini->getOnlyLatinRange(false));
-#endif
 		
 	if (hosversionBefore(8, 0, 0)) {
 		if (R_SUCCEEDED(pcvInitialize())) {
@@ -425,24 +384,31 @@ int main(int argc, char* argv[]) {
 			SwitchSys::stock_emc_clock = SwitchSys::getClock(SwitchSys::Module::Emc);
 		}
 	}
-	nxmpgfx::updateSplash(100);
+	
 	NXLOG::DEBUGLOG("SWITCHRenderer(): clocks: cpu=%i, gpu=%i, emc=%i\n",
 	SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);
 
-
-	nxmpgfx::Create_VO_FrameBuffer(nxmpgfx::getWidth(),nxmpgfx::getHeight());
 	
-	GUI::initMpv();
+	SetColorTheme(configini->getThemeColor(false));
+	
+	
+	libmpv = new libMpv("mpv");
+	Renderer->create_mpv_render_context(libmpv);
+	NXLOG::DEBUGLOG("MPV Context Done\n");
+	GUI::GUILESS();
+	
 	
 	
 	if(nxmpstats == nullptr){
 		nxmpstats = new CStats();
-		nxmpstats->emuoverrides = emuoverrides;
 		nxmpstats->StartThreads();
-	}
+	}	
 	
 	
+	
+	NXLOG::DEBUGLOG("STATS INIT OK\n");
 	GUI::RenderLoop();
+	
 	
 	if(configini->getExitMode(false) == 1){
 		app_exit_mode = 0;
@@ -450,38 +416,32 @@ int main(int argc, char* argv[]) {
 		app_exit_mode = 1;
 	}
 	
-	NXLOG::DEBUGLOG("Ending Render Loop\n");
-
 	SwitchSys::defaultClock(SwitchSys::stock_cpu_clock, SwitchSys::stock_gpu_clock, SwitchSys::stock_emc_clock);                
 
-	//__nx_applet_exit_mode = configini->getExitMode(true);
-
 	__nx_applet_exit_mode = app_exit_mode;
-	delete libmpv;
-	libmpv = nullptr;
-	NXLOG::DEBUGLOG("Ending MPV\n");
-		
-	DeallocateExtern();	
-	
-	
-	if(nxmpstats != nullptr){
-		nxmpstats->CloseThreads();
-		delete nxmpstats;
-		nxmpstats = nullptr;
-	}
 	
 	if(imgloader != nullptr){
 		delete imgloader;
 		imgloader = nullptr;
 	}
+
 	
-	nxmpgfx::Destroy();
+	NXLOG::DEBUGLOG("Destroy Renderer\n");
+	Renderer->destroy_mpv_render_context();
+	delete libmpv;
+	libmpv = nullptr;
+	NXLOG::DEBUGLOG("Ending MPV\n");	
+	delete Renderer;	
+	DeallocateExtern();	
 	
-	if(!emuoverrides){
-		audctlExit();
+	
+	if(nxmpstats != nullptr){
+		delete nxmpstats;
+		nxmpstats = nullptr;
 	}
-	NXLOG::DEBUGLOG("Exit Services\n");
 	
+	audctlExit();
+
 
 	if (hosversionBefore(8, 0, 0)) {
 		pcvExit();
@@ -489,14 +449,13 @@ int main(int argc, char* argv[]) {
 		clkrstExit();
     }
 
-	nifmExit();
-	plExit();
-    
+    nvExit();
 	
-	NXLOG::DEBUGLOG("Socket End\n");
-	nvExit();
+	romfsExit();
+	NXLOG::DEBUGLOG("NXMP End\n");
+    socketExit();
+	appletUnlockExit();
 	
-	
-	
-    exit(0);
+    return 0;
 }
+

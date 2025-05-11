@@ -85,10 +85,10 @@ constexpr std::array VERTEX_BUFFER_STATE = {
 };
 
 /// \brief Shader code memblock
-//dk::UniqueMemBlock s_codeMemBlock;
+dk::UniqueMemBlock s_codeMemBlock;
 /// \brief Shaders (vertex, fragment)
-//dk::Shader s_shaders[2];
-dk::Shader *s_shaders;
+dk::Shader s_shaders[2];
+//dk::Shader *s_shaders;
 
 /// \brief UBO memblock
 dk::UniqueMemBlock s_uboMemBlock;
@@ -105,7 +105,7 @@ DkResHandle s_fontTextureHandle;
 
 /// \brief Load shader code
 
-/*
+
 void loadShaders (dk::UniqueDevice &device_)
 {
 	/// \brief Shader file descriptor
@@ -188,7 +188,7 @@ void loadShaders (dk::UniqueDevice &device_)
 		offset = imgui::deko3d::align (offset + file.size, DK_SHADER_CODE_ALIGNMENT);
 	}
 }
-*/
+
 
 
 /// \brief Setup render state
@@ -280,42 +280,6 @@ static void ImGui_LoadSwitchFonts(ImGuiIO &io) {
   io.Fonts->Build();
 }
 
-void FontLoader(std::string fontpath,float fontSize,ImGuiIO &io){
-	  
-	unsigned char *pixels = nullptr;
-	int width = 0, height = 0, bpp = 0;
-	ImFontConfig font_cfg = ImFontConfig();
-		
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	font_cfg.PixelSnapH = true;
-		
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	font_cfg.PixelSnapH = true;
-	//NXLOG::DEBUGLOG("Loading TTF\n");
-	
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	
-	io.Fonts->AddFontFromFileTTF("romfs:/DejaVuSans.ttf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesCyrillic());
-	font_cfg.MergeMode = true;
-	//io.Fonts->AddFontFromFileTTF("romfs:/Source Han Sans CN Light.otf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesJapanese());
-	//io.Fonts->AddFontFromFileTTF("romfs:/Source Han Sans CN Light.otf", fontSize, &font_cfg, io.Fonts->GetGlyphRangesChineseFull());
-	
-	static ImFontGlyphRangesBuilder range;
-	range.Clear();
-	static ImVector<ImWchar> gr;
-	gr.clear();
-	range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
-	range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
-	range.BuildRanges(&gr);
-	io.Fonts->AddFontFromFileTTF("romfs:/Source Han Sans CN Light.otf", fontSize, &font_cfg, gr.Data);
-	
-	
-	
-	io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
-	//io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bpp);
-	
-	io.Fonts->Build();
-}
 
 
 void imgui::deko3d::init (dk::UniqueDevice &device_,
@@ -323,20 +287,18 @@ void imgui::deko3d::init (dk::UniqueDevice &device_,
     dk::UniqueCmdBuf &cmdBuf_,
     dk::SamplerDescriptor &samplerDescriptor_,
     dk::ImageDescriptor &imageDescriptor_,
-    DkResHandle fontTextureHandle_,
-	dk::Shader *shaders_,
+	DkResHandle fontTextureHandle_,
     unsigned const imageCount_)
 {
 	auto &io = ImGui::GetIO ();
-	s_shaders = shaders_;
 	// setup back-end capabilities flags
 	io.BackendRendererName = "deko3d";
 	io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 
 	// load shader code
-	//loadShaders (device_);
+	loadShaders (device_);
 
-	// create UBO memblockù
+	// create UBO memblock
 	
 	
 	s_uboMemBlock = dk::MemBlockMaker{device_,
@@ -426,22 +388,15 @@ void imgui::deko3d::init (dk::UniqueDevice &device_,
 
 void imgui::deko3d::exit ()
 {
-	s_fontImageMemBlock.destroy();
-	
-	s_idxMemBlock.clear ();
-	s_vtxMemBlock.clear ();
-	
-	s_uboMemBlock.destroy();
-	
-/*	
 	s_fontImageMemBlock = nullptr;
 
-	s_idxMemBlock.clear ();
-	s_vtxMemBlock.clear ();
+    s_idxMemBlock.clear ();
+    s_vtxMemBlock.clear ();
 
-	s_uboMemBlock  = nullptr;
-	//s_codeMemBlock = nullptr;
-*/
+    s_uboMemBlock  = nullptr;
+    s_codeMemBlock = nullptr;
+	
+
 }
 
 void imgui::deko3d::render (dk::UniqueDevice &device_,

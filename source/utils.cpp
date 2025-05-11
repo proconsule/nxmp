@@ -1,5 +1,4 @@
 #include "utils.h"
-#include "nxmp-gfx.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -69,71 +68,6 @@ namespace Utility{
 		}
 		return str_tolower(a.name) < str_tolower(b.name);
 	}
-
-
-
-	bool TxtLoadFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height){
-#ifdef OPENGL_BACKEND
-		int image_width = 0;
-		int image_height = 0;
-		unsigned char* image_data = stbi_load(filename.c_str(), &image_width, &image_height, NULL, 4);
-		if (image_data == NULL)
-			return false;
-		
-		GLuint id = 0;
-		glGenTextures(1, &id);
-		glBindTexture(GL_TEXTURE_2D, id);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
-		
-		//glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-    
-		*out_texture = id;
-		*out_width = image_width;
-		*out_height = image_height;
-#endif		
-		return true;
-
-	}
-	
-	bool TxtLoadFromMemory(unsigned char* data,size_t image_size, GLuint* out_texture, int* out_width, int* out_height){
-
-		int image_width = 0;
-		int image_height = 0;
-		int comp = 0;
-#ifdef OPENGL_BACKEND		
-		unsigned char* image_data = stbi_load_from_memory((const stbi_uc *)data, image_size, &image_width, &image_height, 0, 4); 
-		
-		if (image_data == NULL){
-			NXLOG::ERRORLOG("Failed to load IMG from memory\n");
-			return false;
-		}
-		GLuint id = 0;
-		glGenTextures(1, &id);
-		glBindTexture(GL_TEXTURE_2D, id);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
-		
-		//if(comp == 3)
-		//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
-		//else if(comp == 4)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-
-		
-		
-		*out_texture = id;
-		*out_width = image_width;
-		*out_height = image_height;
-#endif
-		return true;
-	}
-
 
 
 	std::string humanSize(size_t bytes)
@@ -223,7 +157,13 @@ namespace Utility{
 					".webm",
 					".jpg",
 					".gif",
-					".png"
+					".png",
+					".iso",
+					".zip",
+					".tar",
+					".rar",
+					".gz"
+
 			};
 		}else{
 			supportedExtensions = myext;
@@ -615,46 +555,16 @@ std::string KeyboardCall (std::string hint, std::string text){
 		return false;
 	}
 	
+	std::string pathfromarray(std::vector<std::string> vec,int startpos = 0){
+		std::string retstring = "/";
+		for(int i=0;i<vec.size();i++){
+			if(i>=startpos){
+				retstring = retstring+ vec[i] +std::string("/");
+			}
+		}
+		return retstring;
+	}
+	
 
 		
 }
-
-/*
-void Utility::FontLoader(std::string latinfontpath,float latinfontSize,std::string japanaesechinesefontpath,float japanaesechinesefontSize){
-	NXLOG::DEBUGLOG("Init Fonts\n");
-      
-	
-	unsigned char *pixels = nullptr;
-	int width = 0, height = 0, bpp = 0;
-	ImFontConfig font_cfg = ImFontConfig();
-		
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	font_cfg.PixelSnapH = true;
-		
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	font_cfg.PixelSnapH = true;
-	NXLOG::DEBUGLOG("Loading TTF\n");
-	
-	font_cfg.OversampleH = font_cfg.OversampleV = 1;
-	
-	ImGui::GetIO().Fonts->AddFontFromFileTTF(latinfontpath.c_str(), latinfontSize, &font_cfg, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
-	font_cfg.MergeMode = true;
-	
-	static ImFontGlyphRangesBuilder range;
-	range.Clear();
-	static ImVector<ImWchar> gr;
-	gr.clear();
-	range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesChineseFull());
-	range.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
-	range.BuildRanges(&gr);
-	ImGui::GetIO().Fonts->AddFontFromFileTTF(japanaesechinesefontpath.c_str(), japanaesechinesefontSize, &font_cfg, gr.Data);
-	
-	ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Maplestory OTF Bold.otf", 20.0 ,&font_cfg,ImGui::GetIO().Fonts->GetGlyphRangesKorean());
-	
-	
-	
-	ImGui::GetIO().Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
-	
-	ImGui::GetIO().Fonts->Build();
-}
-*/

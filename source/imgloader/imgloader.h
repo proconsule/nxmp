@@ -2,7 +2,8 @@
 #define NXMP_IMGLOADER_H
 
 #include "utils.h"
-#include "nxmp-gfx.h"
+//#include "nxmp-gfx.h"
+#include "nxmp-render.h"
 #include "deko3d.hpp"
 
 #ifdef OPENGL_BACKEND
@@ -117,10 +118,12 @@ typedef struct {
 
 class CImgLoader{
 public:
-		CImgLoader(std::string basepath);
+		CImgLoader();
+		void LoadBaseTextures(std::string basepath);
 		~CImgLoader();
 		nxmpicon_struct icons;
 		
+		NXMPRenderer *Renderer;
 		
 #ifdef OPENGL_BACKEND
 		Tex OpenImageFile(std::string path);

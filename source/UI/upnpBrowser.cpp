@@ -11,6 +11,9 @@ namespace Windows {
         Windows::SetupWindow();
 		if (ImGui::Begin("UPNP Browser", nullptr, ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
 			ImGui::SetNextWindowFocus();
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, NavHover_color);
+			ImGui::PushStyleColor(ImGuiCol_NavHighlight, Active_color);
+			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {0, 5});
 			float total_w = ImGui::GetContentRegionAvail().x;
 			float total_h = ImGui::GetContentRegionAvail().y;
 			if(nxupnp->getSelDevice() == -1){
@@ -25,9 +28,9 @@ namespace Windows {
 							MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
 							curlDownloader * curldownload = new curlDownloader();
 							curldownload->Download((char *)thislist[n]->iconUrl.c_str(),chunk);
-							Utility::TxtLoadFromMemory(chunk->memory,chunk->size,&thislist[n]->devIcon.id,&thislist[n]->devIcon.width,&thislist[n]->devIcon.height);
-							free(chunk->memory);
-							free(chunk);
+							//Utility::TxtLoadFromMemory(chunk->memory,chunk->size,&thislist[n]->devIcon.id,&thislist[n]->devIcon.width,&thislist[n]->devIcon.height);
+							//free(chunk->memory);
+							//free(chunk);
 							delete curldownload;
 							
 						}
@@ -153,7 +156,9 @@ namespace Windows {
 				}
 				ImGui::EndListBox();
 			}
-			
+		
+			ImGui::PopStyleColor(2);
+			ImGui::PopStyleVar();
 		}
 	
 	Windows::ExitWindow();

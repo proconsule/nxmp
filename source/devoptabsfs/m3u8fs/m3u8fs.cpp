@@ -372,7 +372,7 @@ int CM3U8FS::m3u8fs_dirnext(struct _reent *r, DIR_ITER *dirState, char *filename
 
 int CM3U8FS::m3u8fs_dirclose(struct _reent *r, DIR_ITER *dirState) {
     auto *priv     = static_cast<CM3U8FS    *>(r->deviceData);
-    auto *priv_dir = static_cast<CM3U8FSDir *>(dirState->dirStruct);
+    //auto *priv_dir = static_cast<CM3U8FSDir *>(dirState->dirStruct);
 
     auto lk = std::scoped_lock(priv->session_mutex);
 	

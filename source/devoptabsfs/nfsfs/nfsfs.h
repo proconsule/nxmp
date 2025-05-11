@@ -11,6 +11,8 @@
 #include <sys/iosupport.h>
 #include <sys/param.h>
 #include <unistd.h>
+#include <cstring>
+#include <iostream>
 
 #include <mutex>
 #include <vector>
@@ -28,8 +30,11 @@ typedef unsigned int u_int;
 class CNFSFS{
 public:
 	CNFSFS(std::string _url,std::string _name,std::string _mount_name);
+	CNFSFS(std::string _server,std::string _exportpath,std::string _name,std::string _mount_name);
 	~CNFSFS();
 	std::string name, mount_name;
+	std::string server;
+	std::string exportpath;
 	
 	
 	int unregister_fs() const {
@@ -38,12 +43,11 @@ public:
 	
 	int register_fs() const {
 		
-		//auto id = FindDevice(this->mount_name.data());
+		auto id = FindDevice(this->mount_name.data());
 		
-		//if (id < 0){
-		auto id = AddDevice(&this->devoptab);
-		//	printf("AddDevice\n");
-		//}
+		if (id < 0){
+			id = AddDevice(&this->devoptab);
+		}
 		if (id < 0)
 			return id;
 
@@ -52,6 +56,7 @@ public:
 	
 	bool CheckConnection();
 	bool RegisterFilesystem();
+	bool RegisterFilesystem_v2();
 	bool fs_regisered = false;
 	
 	static int       nfsfs_open     (struct _reent *r, void *fileStruct, const char *path, int flags, int mode);
@@ -70,27 +75,17 @@ public:
 	
 	bool is_connected = false;
 	
-	struct dircache{
-		std::string name;
-		std::string fullpathname;
-		struct stat st;
-	};
-	
-	std::vector<dircache> cachedirlist;
 	
 private:
 	std::string connect_url;
 	
 	int connect();
+	int connect_v2();
 	void disconnect();
 	
 	
 	std::string translate_path(const char *path);
 
-	
-	
-	
-	
 	struct CNFSFSFile {
             struct nfsfh *nfsfh = NULL;
 			nfs_stat_64 filestat;
@@ -98,7 +93,7 @@ private:
         };
 
         struct CNFSFSDir {
-			int diridx = 0;
+			struct nfsdir *handle;
         };
 		
 

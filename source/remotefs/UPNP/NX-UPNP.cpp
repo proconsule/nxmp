@@ -55,7 +55,7 @@ Device::Device(std::string _location){
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
 	curlDownloader * curldown = new curlDownloader();
 	curldown->Download(_location.c_str(),chunk);
-	//NXLOG::DEBUGLOG("%s\n",chunk->memory);
+	NXLOG::DEBUGLOG("%s\n",chunk->memory);
 	fflush(stdout);
 	tinyxml2::XMLDocument doc;
 	doc.Parse( chunk->memory );
@@ -64,6 +64,10 @@ Device::Device(std::string _location){
 		XMLElement * devicenode = pRootElement->FirstChildElement("device");
 		XMLElement * UDNNameTag = devicenode->FirstChildElement("UDN");
 		XMLElement * friendlyNameTag = devicenode->FirstChildElement("friendlyName");
+		XMLElement * manufacturerTag = devicenode->FirstChildElement("manufacturer");
+		XMLElement * modelDescriptionTag = devicenode->FirstChildElement("modelDescription");
+		XMLElement * modelNameTag = devicenode->FirstChildElement("modelName");
+		
 		XMLElement * iconListTag = devicenode->FirstChildElement("iconList");
 		XMLElement * iconnode = iconListTag->FirstChildElement("icon");
 		while(iconnode){
@@ -73,7 +77,6 @@ Device::Device(std::string _location){
 			std::string tmpiconurl = urltag->GetText();
 			if(mimetype == "image/png"){
 				iconUrl = thisurl.scheme + std::string("://") + thisurl.server + ":" +thisurl.port + tmpiconurl;
-				//NXLOG::DEBUGLOG("Icon Url: %s\n",iconUrl.c_str());
 				
 				break;
 			}
@@ -89,7 +92,7 @@ Device::Device(std::string _location){
 			if(serviceTypestring == "urn:schemas-upnp-org:service:ContentDirectory:1"){
 				XMLElement * controlURLtag = servicenode->FirstChildElement("controlURL");
 				controlUrl = thisurl.scheme + std::string("://") + thisurl.server + ":" +thisurl.port + std::string(controlURLtag->GetText());
-				//NXLOG::DEBUGLOG("Control URL: %s\n",controlUrl.c_str());
+				
 				fflush(stdout);
 			}
 			servicenode = servicenode->NextSiblingElement("service");
@@ -97,9 +100,12 @@ Device::Device(std::string _location){
 		
 		
 		friendlyName = friendlyNameTag->GetText();
+		manufacturer = manufacturerTag->GetText();
+		modelDescription = modelDescriptionTag->GetText();
+		modelName = modelNameTag->GetText();
+		
 		devUDN = UDNNameTag->GetText();
-		//NXLOG::DEBUGLOG("UDN: %s\n",friendlyName.c_str());
-		//NXLOG::DEBUGLOG("friendlyName: %s\n",devUDN.c_str());
+		
 		fflush(stdout);
 	}
 	
@@ -131,6 +137,11 @@ void NXUPnP::Discovery(){
 }
 
 NXUPnP::~NXUPnP(){
+	for(int i=0;i<deviceslist.size();i++){
+		if(deviceslist[i]->devIcon.id != -1 && imgloader->Renderer != nullptr){
+			imgloader->Renderer->unregister_texture(deviceslist[i]->devIcon);
+		}
+	}
 	if(searchthreadexit == 0){
 		searchthreadexit = 1;
 		close(discoverSocket);
@@ -157,12 +168,9 @@ void Device::browseOID(){
 	SOAPcurlDownloader *testcurl = new SOAPcurlDownloader();
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
 	testcurl->Download(controlUrl.c_str(),chunk,parentList.back().c_str());
-	//NXLOG::DEBUGLOG("CHUNK MEM\n");
-	//NXLOG::DEBUGLOG("RET: %s\n",chunk->memory);
 	fflush(stdout);
 	char * testret = NULL;
 	decode_html_entities_utf8(chunk->memory,0);
-	//NXLOG::DEBUGLOG("RET2: %s\n",chunk->memory);
 	fflush(stdout);
 	tinyxml2::XMLDocument doc;
 	doc.Parse( chunk->memory ,strlen(chunk->memory));
@@ -214,6 +222,16 @@ std::string Device::getfriendlyName(){
 	return friendlyName;
 }
 
+std::string Device::getmanufacturer(){
+	return manufacturer;
+}
+std::string Device::getmodelDescription(){
+	return modelDescription;
+}
+std::string Device::getmodelName(){
+	return modelName;
+}
+
 void NXUPnP::setSelDevice(int idx){
 	if(searchthreadexit == 0){
 		searchthreadexit = 1;
@@ -227,6 +245,9 @@ void NXUPnP::setSelDevice(int idx){
 void Device::back(){
 		if(parentList.size()>1){
 			parentList.pop_back();
+		}
+		if(friendlyparentList.size()>1){
+			friendlyparentList.pop_back();
 		}
 	}
 
@@ -270,156 +291,12 @@ NXUPnP::NXUPnP(){
 	int reuse = 1;
 	setsockopt(discoverSocket, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse));
 
-#ifdef _WIN32
-	char ttl = 4;
-#else
+
 	int ret = -1;
     socklen_t ttl = 4;
-#endif
+
 char ipv4address[INET_ADDRSTRLEN];
-#ifdef _WIN32
-					/* CODE TAKEN FROM LIBUPNP*/
-        /* ---------------------------------------------------- */
-        /* WIN32 implementation will use the IpHlpAPI library.  */
-        /* ---------------------------------------------------- */
-        PIP_ADAPTER_ADDRESSES adapts = NULL;
-        PIP_ADAPTER_ADDRESSES adapts_item;
-        PIP_ADAPTER_UNICAST_ADDRESS uni_addr;
-        SOCKADDR *ip_addr;
-        struct in_addr v4_addr;
-        struct in6_addr v6_addr;
-        ULONG adapts_sz = 0;
-        ULONG ret;
-        int ifname_found = 0;
-        int valid_addr_found = 0;
-        char inet_addr4[INET_ADDRSTRLEN];
-        char inet_addr6[INET6_ADDRSTRLEN];
-		
-		char ipv4_ifname[180];
-		int ipv4_ifindex;
 
-        /* Get Adapters addresses required size. */
-        ret = GetAdaptersAddresses(AF_UNSPEC,
-                GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER,
-                NULL,
-                adapts,
-                &adapts_sz);
-        if (ret != ERROR_BUFFER_OVERFLOW) {
-                
-        }
-        /* Allocate enough memory. */
-        adapts = (PIP_ADAPTER_ADDRESSES)malloc(adapts_sz);
-        if (adapts == NULL) {
-                
-        }
-        /* Do the call that will actually return the info. */
-        ret = GetAdaptersAddresses(AF_UNSPEC,
-                GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_DNS_SERVER,
-                NULL,
-                adapts,
-                &adapts_sz);
-        if (ret != ERROR_SUCCESS) {
-                free(adapts);
-                
-        }
-        /* Copy interface name, if it was provided. */
-        
-        for (adapts_item = adapts; adapts_item != NULL;
-                adapts_item = adapts_item->Next) {
-                if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST ||
-                        adapts_item->OperStatus != IfOperStatusUp) {
-                        continue;
-                }
-                /*
-                 * Partial fix for Windows: Friendly name is wchar
-                 * string, but currently p->gIF_NAME is char string. For
-                 * now try to convert it, which will work with many (but
-                 * not all) adapters. A full fix would require a lot of
-                 * big changes (p->gIF_NAME to wchar string?).
-                 */
-                if (!ifname_found) {
-                        /* We have found a valid interface name. Keep
-                         * it. */
-                        char tmpIfName[180];
-                        wcstombs(tmpIfName,
-                                adapts_item->FriendlyName,
-                                180);
-                        strcpy(ipv4_ifname, tmpIfName);
-                        ifname_found = 1;
-                } else {
-                        char tmpIfName[180] = {0};
-                        wcstombs(tmpIfName,
-                                adapts_item->FriendlyName,
-                                sizeof(tmpIfName));
-                        if (strncmp(ipv4_ifname,
-                                    tmpIfName,
-                                    180) != 0) {
-                                /* This is not the interface we're
-                                 * looking for.
-                                 */
-                                continue;
-                        }
-                }
-                /* Loop thru this adapter's unicast IP addresses. */
-                uni_addr = adapts_item->FirstUnicastAddress;
-                while (uni_addr) {
-                        ip_addr = uni_addr->Address.lpSockaddr;
-                        switch (ip_addr->sa_family) {
-                        case AF_INET:
-                                memcpy(&v4_addr,
-                                        &((struct sockaddr_in *)ip_addr)
-                                                 ->sin_addr,
-                                        sizeof(v4_addr));
-                                /* TODO: Retrieve IPv4 netmask */
-                                valid_addr_found = 1;
-                                break;
-                        case AF_INET6:
-                                /* TODO: Retrieve IPv6 ULA or GUA
-                                 * address and its prefix */
-                                /* Only keep IPv6 link-local addresses.
-                                 */
-                                if (IN6_IS_ADDR_LINKLOCAL(
-                                            &((struct sockaddr_in6 *)ip_addr)
-                                                     ->sin6_addr)) {
-                                        memcpy(&v6_addr,
-                                                &((struct sockaddr_in6 *)
-                                                                ip_addr)
-                                                         ->sin6_addr,
-                                                sizeof(v6_addr));
-                                        /* TODO: Retrieve IPv6 LLA
-                                         * prefix */
-                                        valid_addr_found = 1;
-                                }
-                                break;
-                        default:
-                                if (valid_addr_found == 0) {
-                                        /* Address is not IPv4 or IPv6
-                                         * and no valid address has  */
-                                        /* yet been found for this
-                                         * interface.
-                                         * Discard interface name. */
-                                        ifname_found = 0;
-                                }
-                                break;
-                        }
-                        /* Next address. */
-                        uni_addr = uni_addr->Next;
-                }
-                if (valid_addr_found == 1) {
-                        ipv4_ifindex = adapts_item->IfIndex;
-                        break;
-                }
-        }
-        free(adapts);
-        /* Failed to find a valid interface, or valid address. */
-        if (ifname_found == 0 || valid_addr_found == 0) {
-                return;
-        }
-        inet_ntop(AF_INET, &v4_addr, inet_addr4, sizeof inet_addr4);
-        strcpy(ipv4address,inet_addr4);
-        
-
-#endif
 
 	struct ip_mreq ssdpMcastAddr;
 
@@ -437,34 +314,17 @@ char ipv4address[INET_ADDRSTRLEN];
 
 
 	
-	nifmInitialize(NifmServiceType_System);
+	nifmInitialize(NifmServiceType_Admin);
 	uint32_t currentIp;
 	nifmGetCurrentIpAddress(&currentIp);
 	inet_ntop(AF_INET, &currentIp, ipv4address, INET_ADDRSTRLEN);
 
 
 
+
+	ssdpMcastAddr.imr_interface.s_addr =  currentIp;
+
 	
-
-
-/*
-	struct in_addr addr;
-	memset((void *)&addr, 0, sizeof(struct in_addr));
-	addr.s_addr = inet_addr(ipv4address);
-	ret = setsockopt(discoverSocket,
-                IPPROTO_IP,
-                IP_MULTICAST_IF,
-                (char *)&addr,
-                sizeof addr);
-    if (ret == -1) {
-		NXLOG::DEBUGLOG("Failed to set Multicast IF\n");
-	}
-*/
-
-
-	ssdpMcastAddr.imr_interface.s_addr =  htonl(INADDR_ANY);
-
-	//ssdpMcastAddr.imr_interface.s_addr = inet_addr(ipv4address);
 	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
 	
 	memset((void *)&ssdpMcastAddr, 0, sizeof ssdpMcastAddr);
@@ -535,8 +395,18 @@ void NXUPnP::ListenSSDPResponse()
 					++i;
 				}
 				std::string location = ss.str().c_str();
-				//NXLOG::DEBUGLOG("location:%s\n",location.c_str());
+				
 				Device *tmpdev = new Device(location);
+				
+				MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
+				curlDownloader * curldownload = new curlDownloader();
+				curldownload->Download((char *)tmpdev->iconUrl.c_str(),chunk);
+				tmpdev->devIcon = imgloader->OpenImageMemory(chunk->memory,chunk->size);
+				
+				free(chunk->memory);
+				free(chunk);
+				delete curldownload;
+				
 				addDevice(tmpdev);
 			}
             memset(buf, 0, MAX_DGRAM_SIZE);

@@ -45,6 +45,44 @@ TestSamba = smb://user:pass@192.168.1.10/share/ (share is a share name not a pat
 TestNFS = nfs://192.168.1.10/export/
 ```
 
+Network from version 0.9.1 can also be added in this way
+
+For SMB
+
+```
+[Samba Test]
+server = 192.168.1.1
+type = smb
+username = USERNAME
+password = PASSWORD
+path = SHAREPATH
+```
+
+For ssh/sftp
+
+```
+[SSH Test]
+server = 192.168.1.1
+type = sftp
+username = USERNAME
+password = PASSWORD
+path = REMOTEPATH
+port = 22
+```
+
+sftp can also use pub/priv key for auth
+
+```
+[SSH Test]
+server = 192.168.1.1
+type = sftp
+username = USERNAME
+path = REMOTEPATH
+pubkeypath = /switch/nxmp/sshkey/id_rsa.pub
+privkeypath = /switch/nxmp/sshkey/id_rsa
+port = 22
+```
+
 Enigma2 have syntax
 ```
 [Enigma2]

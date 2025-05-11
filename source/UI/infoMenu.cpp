@@ -1,3 +1,5 @@
+#include "globals.h"
+
 #include "gui.h"
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -7,6 +9,7 @@
 #include "Enigma2.h"
 
 
+
 namespace Windows {
     void InfoMenuWindow(bool *focus, bool *first_item) {
         Windows::SetupWindow();
@@ -14,7 +17,9 @@ namespace Windows {
             char nxmptext[32];
 			char ffmpegtext[32];
 			char mpvtext[32];
-			sprintf(nxmptext,"NXMP v%d.%d.%d - %s Version",VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO,RELEASE_TYPE == 0 ? "Stable": RELEASE_TYPE == 1 ? "Beta": "R.C.");
+			//sprintf(nxmptext,"NXMP v%d.%d.%d - %s Version",VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO,RELEASE_TYPE == 0 ? "Stable": RELEASE_TYPE == 1 ? "Beta": "R.C.");
+			//sprintf(nxmptext,"NXMP v%d.%d.%d - %s Version",VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO,RELEASE_TYPE == 0 ? "Stable": RELEASE_TYPE == 1 ? "Beta": "R.C.");
+			sprintf(nxmptext,"%s",nxmpTitle.c_str());
 			if(libmpv != nullptr){
 				sprintf(ffmpegtext,"FFMPEG %s",libmpv->ffmpeg_version.c_str());
 				sprintf(mpvtext,"MPV %s",libmpv->mpv_version.c_str());

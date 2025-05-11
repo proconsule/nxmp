@@ -1,0 +1,35 @@
+pkgname=switch-sqlite3
+pkgver=3.49.2 
+pkgrel=1
+pkgdesc="SQlite 3"
+url="https://sqlite.org/"
+license=('Public Domain')
+arch=('any')
+options=(!strip libtool staticlibs)
+groups=('switch-portlibs')
+source=("${url}/snapshot/sqlite-snapshot-202505081618.tar.gz")
+sha256sums=(
+  '14a0ab22111c7b009aee114b21fe39a57bdc8910357fba46b84a29a8e9d0c164'
+)
+
+
+build() {
+
+  
+  cd "sqlite-snapshot-202505081618"
+
+  source ${DEVKITPRO}/switchvars.sh
+  export CFLAGS="$CFLAGS -DSQLITE_DEBUG -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION=1 -DSQLITE_OMIT_WAL -DSQLITE_OS_OTHER"
+  	
+   ./configure --prefix="${PORTLIBS_PREFIX}" --disable-threadsafe --enable-static --disable-shared --disable-largefile --host=arm-noeabi-elf
+
+  make libsqlite3.a
+}
+
+package() {
+  cd "sqlite-snapshot-202505081618"
+
+  source /opt/devkitpro/switchvars.sh
+
+  make DESTDIR="${pkgdir}" libsqlite3.a install-lib
+}

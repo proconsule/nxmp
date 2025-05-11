@@ -25,8 +25,14 @@
 class CFTPFS{
 public:
 	CFTPFS(std::string _url,std::string _name,std::string _mount_name);
+	CFTPFS(std::string _server,int port,std::string _username,std::string _password,std::string _path,std::string _name,std::string _mount_name);
 	~CFTPFS();
 	std::string name, mount_name;
+	std::string server = "";
+	std::string username = "";
+	std::string password = "";
+	//std::string path = "";
+	
 	
 	
 	int unregister_fs() const {
@@ -49,6 +55,7 @@ public:
 	
 	bool CheckConnection();
 	bool RegisterFilesystem();
+	bool RegisterFilesystem_v2();
 	bool fs_regisered = false;
 	
 	static int       ftpfs_open     (struct _reent *r, void *fileStruct, const char *path, int flags, int mode);

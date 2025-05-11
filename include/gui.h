@@ -35,6 +35,7 @@
 
 
 
+
 #include "Enigma2.h"
 #include "mediaprobe.h"
 
@@ -43,20 +44,61 @@
 
 #include "HTTPDir.h"
 
-
-
 #include "NX-UPNP.h"
 
-#include "nxmp-gfx.h"
-//#include "imgui_impl_sdl2.h"
+#include "nxmp-render.h"
 
 #include "touchcontrols.h"
-#include "shaderMania.h"
 
 #include "logger.h"
 
+#define handheldWidth 1280
+#define handheldHeight 720
+#define dockedWidth 1920
+#define dockedHeight 1080
 
 
+#define FONT_A_BUTTON "\xEE\x80\x80"
+#define FONT_B_BUTTON "\xEE\x80\x81"
+#define FONT_X_BUTTON "\xEE\x80\x82"
+#define FONT_Y_BUTTON "\xEE\x80\x83"
+
+#define FONT_A_BUTTON_FILLED "\xEE\x83\xA0"
+#define FONT_B_BUTTON_FILLED "\xEE\x83\xA1"
+#define FONT_X_BUTTON_FILLED "\xEE\x83\xA2"
+#define FONT_Y_BUTTON_FILLED "\xEE\x83\xA3"
+
+#define FONT_ZL_BUTTON_FILLED "\xEE\x83\xA6"
+#define FONT_ZR_BUTTON_FILLED "\xEE\x83\xA7"
+
+
+#define FONT_CHECKED_ICON "\xEE\x85\x8B"
+
+#define FONT_FILLED_CROSS "\xEE\x81\xB1"
+
+
+#define FONT_DPADUP_BUTTON "\xEE\x82\xAF"
+#define FONT_DPADDOWN_BUTTON "\xEE\x82\xB0"
+
+#define FONT_DPADUP_BUTTON_FILLED "\xEE\x83\xAB"
+#define FONT_DPADDOWN_BUTTON_FILLED "\xEE\x83\xAC"
+
+#define FONT_DPADLEFT_BUTTON_FILLED "\xEE\x83\xAD"
+#define FONT_DPADRIGHT_BUTTON_FILLED "\xEE\x83\xAE"
+
+#define FONT_LOADING_ICON0 "\xEE\x80\xA0"
+#define FONT_LOADING_ICON1 "\xEE\x80\xA1"
+#define FONT_LOADING_ICON2 "\xEE\x80\xA2"
+#define FONT_LOADING_ICON3 "\xEE\x80\xA3"
+#define FONT_LOADING_ICON4 "\xEE\x80\xA4"
+#define FONT_LOADING_ICON5 "\xEE\x80\xA5"
+#define FONT_LOADING_ICON6 "\xEE\x80\xA6"
+#define FONT_LOADING_ICON7 "\xEE\x80\xA7"
+
+#define FONT_SPEAKER_ICON "\xEE\x84\xBC"
+
+#define FONT_LEFTSTICK "\xEE\x83\x81"
+#define FONT_RIGHTSTICK "\xEE\x83\x82"
 
 enum MENU_STATES {
 	MENU_STATE_HOME,
@@ -226,23 +268,14 @@ typedef struct {
 
 #endif
 
-//extern SDL_Window *window;
 extern MenuItem item;
 
 extern libMpv *libmpv;
 
 extern CFileBrowser *filebrowser;
 
-/*
-extern localFs *localdir;
-extern HTTPDir *httpdir;
-extern FTPDir *ftpdir;
-extern sshDir *sshdir;
-extern sambaDir *sambadir;
-extern nfsDir *nfsdir;
-*/
+
 extern NXUPnP *nxupnp;
-//extern USBMounter *usbmounter;
 
 extern USBMounter *MyUSBMount;
 
@@ -254,15 +287,11 @@ extern uint32_t wakeup_on_mpv_events;
 
 extern CMediaProbe *MediaProbe;
 
-//extern mpv_opengl_fbo fbo;
-//extern mpv_render_param params[3];
-//extern int __fbo_one;
 
 extern bool renderloopdone;
 
 extern std::string nxmpTitle;
 
-//extern Config *configini;
 extern CIniParser *configini;
 extern CImgLoader *imgloader;
 
@@ -274,7 +303,6 @@ extern bool dbUpdated;
 
 extern Playlist *playlist;
 
-//extern SysIcons nxmpicons;
 
 extern CStats *nxmpstats;
 
@@ -288,21 +316,13 @@ extern float initScale;
 extern bool isHandheld;
 extern bool clockoc;
 extern std::string tempKbUrl;
-//extern SDL_GLContext context;
 
-
-extern shaderMania* shadermania;
 
 extern CNetworkShare *NewNetworkShare;
 
+extern NXMPRenderer *Renderer;
 
 extern float currFontsize;
-
-//extern GLuint mpv_fbo;
-//extern GLuint mpv_fbotexture;
-//extern GLuint mpv_rbo;
-
-
 
 extern int64_t playercachesec;
 extern int64_t playercachesize;
@@ -328,11 +348,19 @@ extern float swipey;
 extern float fingersum;
 */
 
+
+constexpr static float MasterVolumeMin     = 0.0f;
+constexpr static float MasterVolumeMax     = 5.0f;
+constexpr static float MasterVolumeDefault = 1.0f;
+constexpr static float MasterVolumeExp     = 2.0f;
+extern float CurrentVolume;
+
+
 namespace GUI {
 	
 	extern bool GUI_REINIT;
 	
-	void initMpv();
+	void GUILESS();
 	void HandleEvents();
 	void HandleLayers();
 	void HandleRender();
@@ -343,6 +371,11 @@ namespace GUI {
 	void reinit();
 	
 	void NXMPImage(ImTextureID user_texture_id, const ImVec2& size);
+	
+	uint64_t Process_UI_Events(std::chrono::time_point<std::chrono::system_clock> myeventtime);
+	
+	
+	
 	
 }
 

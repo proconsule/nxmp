@@ -142,7 +142,7 @@ void wait_socket(int nData){
 		break;
 	}
 	
-	/*
+	
 	struct timeval tv;
 	tv.tv_sec = 1;
 	tv.tv_usec = 0;
@@ -207,7 +207,7 @@ void parse_pasv(std::string resp,char * ret){
 	int i2 = resp.find_last_of(")");
 	std::string pasv_string = resp.substr(i1,i2-i1);
 	
-	int res = sscanf(pasv_string.data(), "%hhu,%hhu,%hhu,%hhu,%hhu,%hhu", &ret[2], &ret[3], &ret[4], &ret[5], &ret[0], &ret[1]);
+	sscanf(pasv_string.data(), "%hhu,%hhu,%hhu,%hhu,%hhu,%hhu", &ret[2], &ret[3], &ret[4], &ret[5], &ret[0], &ret[1]);
 	
 }
 
@@ -294,8 +294,7 @@ int UFTP_OpenPortEPSV(server_connection *myconnection) {
 	
 	
 	std::string listcommand = "EPSV\r\n";
-	int ret;
-	int16_t epsvport = 0;
+	//int16_t epsvport = 0;
 	
 	struct linger lng = {0, 0};
 	
@@ -347,12 +346,13 @@ int UFTP_OpenPortPASV(server_connection *myconnection) {
 	
 	std::string listcommand = "PASV\r\n";
 	char buf[8192];
-	int ret;
+	//int ret;
 	char v[6];
 	ftp_net_write(myconnection->control_socket,listcommand.c_str(),listcommand.length());
-	ret = read(myconnection->control_socket, buf, sizeof(buf)-1);
+	ssize_t ret = read(myconnection->control_socket, buf, sizeof(buf)-1);
 	parse_pasv(buf,v);
 	
+	if(ret == -1)return -1;
 	
 	
 	
@@ -482,7 +482,7 @@ int UFTP_ParseDirLine(char *linebuf,std::string &filename,struct stat * st) {
 			if (ss.fail()){
 				printf("FAIL PARSE\n");
 			}else{
-				printf("TIME: %d\n",st->st_mtime);
+				printf("TIME: %ld\n",st->st_mtime);
 			}
 			
 			printf("%s\n",match.str(7).c_str());
@@ -673,7 +673,7 @@ int UFTP_Connect2(server_connection * connection){
 
 
 void UFTP_ReconnectControl(server_connection * connection){
-	int ret = UFTP_Connect2(connection);
+	UFTP_Connect2(connection);
 	UFTP_Login(connection);
 	
 }
@@ -681,9 +681,8 @@ void UFTP_ReconnectControl(server_connection * connection){
 ftp_message UFTP_ReadServerCommand(int c_socket){
 	ftp_message msg;
 	msg.code = -1;
-	int ret;
 	char buf[8192] = {0};
-	ret = ftp_net_read(c_socket, buf, sizeof(buf)-1);
+	ssize_t ret = ftp_net_read(c_socket, buf, sizeof(buf)-1);
 	std::string resp = buf;
 	int resnum = resp.find_first_of(" ");
 	if(resnum <=0){
@@ -697,11 +696,10 @@ ftp_message UFTP_ReadServerCommand(int c_socket){
 ftp_message UFTP_SendCommand(int c_socket,std::string command){
 	ftp_message msg;
 	msg.code = -1;
-	int ret;
 	char buf[8192] = {0};
 	ftp_net_write(c_socket,command.c_str(),command.length());
 	
-	ret = ftp_net_read(c_socket, buf, sizeof(buf)-1);
+	ssize_t ret = ftp_net_read(c_socket, buf, sizeof(buf)-1);
 	std::string resp = buf;
 	int resnum = resp.find_first_of(" ");
 	if(resnum <=0){
@@ -716,7 +714,6 @@ ftp_message UFTP_SendCommand(int c_socket,std::string command){
 
 int UFTP_STATFile(server_connection * connection,std::string filename, struct stat * st ){
 	
-	struct stat myst;
 	
 	off_t fsize = UFTP_FTPSize(connection->control_socket,filename);
 	if(fsize <=0)return -1;
@@ -735,22 +732,23 @@ int UFTP_STATFile(server_connection * connection,std::string filename, struct st
 
 int UFTP_CheckFeat(server_connection *connection){
 	
-	int ret;
+	//int ret;
 	char buf[8192];
 	memset(buf,0,sizeof(buf));
 	std::string command = "FEAT\r\n";
 	ftp_net_write(connection->control_socket,command.c_str(),command.length());
 	svcSleepThread(100000000);
-	ret = read(connection->control_socket, buf, sizeof(buf)-1);
+	read(connection->control_socket, buf, sizeof(buf)-1);
 	std::string resp = buf;
 	
 	bool size_support = false;
-	bool epsv_support = false;
-	bool pasv_support = false;
+	//bool epsv_support = false;
+	//bool pasv_support = false;
 	bool rest_support = false;
 	
 	if(resp.find("EPSV")!=std::string::npos){
 		connection->extra_feat_support.epsv = true;
+		
 	}
 	if(resp.find("SIZE")!=std::string::npos){
 		size_support = true;

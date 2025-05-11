@@ -12,7 +12,6 @@
 #include <string.h>
 #include <malloc.h>
 
-#include <glad/glad.h>
 #include <switch.h>
 
 #include "curldownloader.h"
@@ -52,8 +51,10 @@ namespace Utility{
 	std::string formatTimeShort(double seconds);
 	urlschema parseUrl(std::string url); 
 	bool compare(const remotefs_entry &a, const remotefs_entry &b);
+#ifdef OPENGGL_BACKEND
 	bool TxtLoadFromFile(std::string filename, GLuint* out_texture, int* out_width, int* out_height);
 	bool TxtLoadFromMemory(unsigned char* data,size_t image_size, GLuint* out_texture, int* out_width, int* out_height);
+#endif
 	std::string toLower(const std::string &str);
 	std::string toUpper(const std::string &str);
 	
@@ -77,14 +78,12 @@ namespace Utility{
 	std::string rtrim(const std::string &s);
 	std::string trim(const std::string &s);
 	std::string truncateLen(std::string path,int len);
+	std::string pathfromarray(std::vector<std::string> vec,int startpos);
+	
 	
 	bool isImageExtension(std::string path);
 	bool isArchiveExtension(std::string path);
 	bool isM3UExtension(std::string path);
-	
-	//void FontLoader(std::string fontpath,float fontSize,ImGuiIO &io);
-	//void FontLoader(std::string latinfontpath,float latinfontSize,std::string japanaesechinesefontpath,float japanaesechinesefontSize);
-	
 	
 
 }
