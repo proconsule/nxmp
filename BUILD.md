@@ -20,7 +20,7 @@ build and install libsmb2,libnfs,sqlite3 from libs directory (with dkp-makepkg)
 https://github.com/averne/FFmpeg/tree/nvtegra
 build averne FFMpeg with this
 
-
+```
 source /opt/devkitpro/switchvars.sh
 ./configure --prefix=$PORTLIBS_PREFIX --enable-gpl --disable-shared --enable-static \
     --cross-prefix=aarch64-none-elf- --enable-cross-compile \
@@ -39,7 +39,7 @@ source /opt/devkitpro/switchvars.sh
 
 make -j10  
 make install
-
+```
 
 https://github.com/averne/libuam
 build averne libuam 
@@ -49,6 +49,7 @@ build averne libuam
 https://github.com/averne/mpv
 build averne mpv with
 
+```
 ./bootstrap.py
 CFLAGS="$CFLAGS -D_POSIX_VERSION=200809L -I./osdep/switch" TARGET=aarch64-none-elf ./waf configure --prefix=/opt/devkitpro/portlibs/switch --enable-libmpv-static --disable-libmpv-shared --disable-manpage-build \
                             --disable-cplayer --disable-iconv --disable-lua \
@@ -56,7 +57,7 @@ CFLAGS="$CFLAGS -D_POSIX_VERSION=200809L -I./osdep/switch" TARGET=aarch64-none-e
         sed -i 's/#define HAVE_POSIX 1/#define HAVE_POSIX 0/' build/config.h
 
 ./waf install
-
+```
 
 Now on the top NXMP dir 
 make
