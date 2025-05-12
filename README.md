@@ -45,7 +45,7 @@ TestSamba = smb://user:pass@192.168.1.10/share/ (share is a share name not a pat
 TestNFS = nfs://192.168.1.10/export/
 ```
 
-Network from version 0.9.1 can also be added in this way
+Network from version 0.9.1 can also be added in this way (this fix password with @)
 
 For SMB
 
