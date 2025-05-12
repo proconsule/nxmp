@@ -111,16 +111,11 @@ FAQ
 -----
 **Question:** My 4K file dont work? Why?
 
-**Answer** ~~Keep in mind that currently Homebrew apps can't access the HW Decoder, so all is done with CPU, 4K file is too heavy to be decoded~~ **From version 0.7.0 NXMP have HW Decoding for format H264,HEVC,VP9,MPEG2 it can decode up to 4K HDR@30fps**
+**Answer** ~~Keep in mind that currently Homebrew apps can't access the HW Decoder, so all is done with CPU, 4K file is too heavy to be decoded~~ **From version 0.7.0 NXMP have HW Decoding for format H264,HEVC,VP9,MPEG2 it can decode up to 4K HDR@30fps** **From version 0.9.1 NXMP have HW Decoding for format H264,HEVC,VP9,MPEG2 it can decode up to 4K HDR@60fps**
 
 **Q:** What is Enigma2?
 
 **A:** Enigma2 is an application used in Linux-based Digital Video Broadcasting (DVB-S, DVB-C, DVB-T) receivers or TV set-top boxes and Internet Protocol television receivers.
-
-**Q:** What is ShaderMania?
-
-**A:** ShaderMania is an useless but fun feature of NXMP, it uses the ability of MPV to load custom shader into the video output chain. I adopt some shaders from https://www.shadertoy.com/ to make shaders effects to the video. Some like grayscale may be usefull for someone others (like the sea shaders) is only for fun. Users can also make their custom shaders and place in mpv/shaders directory.
-
 
 Translations
 -----
