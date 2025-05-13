@@ -122,6 +122,7 @@ Translations
 -----
 
 Starting from version 0.9.1 translations uses json files, look at langs folder for examples
+You can add as many as you want, also you can have mylangtest1.json and mylangtest2.json both in japanese but with diff sentence
 Thanks to all who contriubuted with translations 
 
 
