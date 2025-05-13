@@ -23,7 +23,8 @@ typedef struct{
 	int alang = 0;
 	bool useslang = false;
 	int slang = 0;
-	int intlang = 0;
+	//int intlang = 0;
+	std::string intlangstr = "0";
 	bool onlylatinrange = false;
     bool useoc = false;
 	bool hwdec = true;
@@ -123,12 +124,17 @@ public:
 	int getSubFontSize(bool tmpvalue);
 	void setSubFontSize(int val);
 	
-	int getInterfaceLang(bool tmpvalue);
-	void setInterfaceLang(int lang);
+	//int getInterfaceLang(bool tmpvalue);
+	//void setInterfaceLang(int lang);
+	std::string getInterfaceLang(bool tmpvalue);
+	void setInterfaceLang(std::string langpath);
+	int getLangId(std::string _langstr);
+	int getConfigLangId(bool tmpvalue);
+	
 	
 	bool getOnlyLatinRange(bool tmpvalue);
-	
 	void setOnlyLatinRange(bool latinrange);
+	
 
 	//subscale
 	float getSubFontScale(bool tmpvalue);

@@ -316,6 +316,8 @@ int main(int argc, const  char **argv) {
 	
 	NXLOG::loglevel = 0;
 	
+	nxlangs::Init_Langs();
+	
 	NXLOG::DEBUGLOG("Loading Config\n");
 	
 	configini = new CIniParser("config.ini");
@@ -323,8 +325,8 @@ int main(int argc, const  char **argv) {
 	if(NXLOG::loglevel >0){
 		configini->PrintConfig();
 	}
-	nxlangs::Init_Langs();
 	
+	nxlangs::selectedlang = configini->getConfigLangId(false);
 	
 	appletInitializeGamePlayRecording();
     appletSetWirelessPriorityMode(AppletWirelessPriorityMode_OptimizedForWlan);

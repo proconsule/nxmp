@@ -226,17 +226,58 @@ void CIniParser::setSlang(int lang){
 }
 //end Slang
 
+std::string CIniParser::getInterfaceLang(bool tmpvalue){
+	if(tmpvalue){
+		return nxmptmpconfig.intlangstr;
+	}
+	return nxmpconfig.intlangstr; 
+}
+
+void CIniParser::setInterfaceLang(std::string langpath){
+	isModified = true;
+	nxmptmpconfig.intlangstr = langpath;
+}
+
+
+int CIniParser::getLangId(std::string _langstr){
+	
+	for(int i=0;i<nxlangs::langslist.size();i++){
+		if(_langstr == nxlangs::langslist[i].filepath)return i;
+	}
+	return -1;
+}
+
+int CIniParser::getConfigLangId(bool tmpvalue){
+	
+	for(int i=0;i<nxlangs::langslist.size();i++){
+		if(tmpvalue){
+			if(nxmptmpconfig.intlangstr == nxlangs::langslist[i].filepath)return i;
+		}
+		if(nxmpconfig.intlangstr == nxlangs::langslist[i].filepath)return i;
+		}
+	return -1;
+	
+}
+
+
+/*
+
 int CIniParser::getInterfaceLang(bool tmpvalue){
 	if(tmpvalue){
 		return nxmptmpconfig.intlang;
 	}
 	return nxmpconfig.intlang; 
 }
+
+*/
 	
+/*
 void CIniParser::setInterfaceLang(int lang){
 	isModified = true;
 	nxmptmpconfig.intlang = lang;
 }
+
+*/
 
 bool CIniParser::getOnlyLatinRange(bool tmpvalue){
 	if(tmpvalue){
@@ -622,9 +663,15 @@ void CIniParser::ReadConfig(){
 		if(inidata["Main"].has("slang")){
 			nxmpconfig.slang =  Utility::getLanguagesIdx(inidata.get("Main").get("slang"));
 		}
+		/*
 		if(inidata["Main"].has("intlang")){
 			nxmpconfig.intlang =  string_to_int(inidata.get("Main").get("intlang"));
 		}
+		*/
+		if(inidata["Main"].has("intlangstr")){
+			nxmpconfig.intlangstr =  inidata.get("Main").get("intlangstr");
+		}
+		
 		if(inidata["Main"].has("onlylatinrange")){
 			nxmpconfig.onlylatinrange =  string_to_bool(inidata.get("Main").get("onlylatinrange"));
 		}
@@ -763,7 +810,7 @@ void CIniParser::saveSettings(){
 		{"alang", Utility::getLanguages()[nxmpconfig.alang].lang3},
 		{"useslang", bool_to_string(nxmpconfig.useslang)},
 		{"slang",Utility::getLanguages()[nxmpconfig.slang].lang3},
-		{"intlang",int_to_string(nxmpconfig.intlang)},
+		{"intlangstr",nxmpconfig.intlangstr},
 		{"onlylatinrange",bool_to_string(nxmpconfig.onlylatinrange)},
 		{"subfontsize", int_to_string(nxmpconfig.subfontsize)},
 		{"subfontscale", float_to_string(nxmpconfig.subfontscale)},

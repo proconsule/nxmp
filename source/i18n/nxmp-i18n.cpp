@@ -113,7 +113,7 @@ namespace nxlangs{
 			
 		}
 		
-		
+		tmplang.filepath = _path;
 		langslist.push_back(tmplang);
 		json_decref(root);
 		

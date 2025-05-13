@@ -620,13 +620,13 @@ namespace Windows {
 						std::string ordercomboid = "##i18nlangcombo" + std::to_string(n);
 						if(ImGui::Selectable(ordercomboid.c_str(),false)){
 							settingsview_combopopup = -1;
-							configini->setInterfaceLang(n);
+							configini->setInterfaceLang(nxlangs::langslist[n].filepath);
 							nxlangs::selectedlang = n;
-							//InitLang((NX_LANGS)n);
+							
 						}	
 						ImGui::SameLine();
 						ImGui::Text(nxlangs::langslist[n].name.c_str());	
-						if(n  == configini->getInterfaceLang(true)){
+						if(n  == configini->getConfigLangId(false)){
 							
 							ImVec2 optstextsize = ImGui::CalcTextSize(nxlangs::langslist[n].name.c_str());
 							ImGui::SameLine(1000*multiplyRes);
