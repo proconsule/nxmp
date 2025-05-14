@@ -30,7 +30,7 @@ int usbThread(void *arg);
 
 class USBMounter{
 public:
-	USBMounter(Playlist *_playlist);
+	USBMounter();
 	~USBMounter();
 	std::vector<usb_devices> mounted_devs;
 	
@@ -52,9 +52,7 @@ public:
 	int sortOrder=0;
 	
 	bool getfileContents(std::string filepath,unsigned char ** _filedata,int &_size);
-	
-	Playlist * playlist;
-	
+
 	//UsbHsFsDevice *g_usbDevices;
 	//u32 g_usbDeviceCount;
 

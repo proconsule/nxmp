@@ -37,7 +37,7 @@ public:
 	
 	HTTPDir *myhttp = nullptr;
 	USBMounter *myusb = nullptr;
-	
+	Playlist * currentplaylist;
 	
 	
 	void OpenArchive(std::string _path);
@@ -59,6 +59,7 @@ public:
 	std::string getOpenUrlPart();
 	
 	void setBasePath(std::string _basepath);
+	bool remotefs = false;
 	
 	void clearChecked();
 	bool *checked(int pos);

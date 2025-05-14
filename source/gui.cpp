@@ -567,11 +567,12 @@ namespace GUI {
 						delete filebrowser;
 						filebrowser = nullptr;
 					}
-							
+					/*		
 					if(MyUSBMount != nullptr && libmpv->Stopped()){
 						delete MyUSBMount;
 						MyUSBMount = nullptr;
 					}
+					*/
 					if(NewNetworkShare != nullptr){
 						delete NewNetworkShare;
 						NewNetworkShare = nullptr;

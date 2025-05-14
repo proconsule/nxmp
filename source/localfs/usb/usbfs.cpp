@@ -99,7 +99,7 @@ int usbThread(void *arg) {
 			tmpdev.fstype = LIBUSBHSFS_FS_TYPE_STR(device->fs_type);
 			tmpdev.capacity = device->capacity;
 			mymounter->mounted_devs.push_back(tmpdev);
-            //mymounter->playlist->Invalidate();
+           
         }
 	
     }
@@ -206,7 +206,7 @@ void USBMounter::usbMscTestDevices(void)
 		tmpdev.fstype = LIBUSBHSFS_FS_TYPE_STR(device->fs_type);
 		tmpdev.capacity = device->capacity;
 		mounted_devs.push_back(tmpdev);
-		//playlist->Invalidate();
+		
        
 
         
@@ -242,10 +242,9 @@ USBMounter::~USBMounter(){
 	if (g_usbDevices) free(g_usbDevices);
 }
 
-USBMounter::USBMounter(Playlist *_playlist){
+USBMounter::USBMounter(){
 	Result rc;
     
-	playlist = _playlist;
     NXLOG::DEBUGLOG("usbInit\n");
 	rc = usbHsFsInitialize(0);
 	if (R_FAILED(rc))
@@ -292,7 +291,7 @@ void USBMounter::DirList(const std::string &path,bool showHidden,const std::vect
 					FS::FileEntry file;
 					file.name = ent->d_name;
 					file.path = FS::removeLastSlash(path) + "/" + file.name;
-					file.checked = playlist->isPresent(file,file.path);
+					//file.checked = playlist->isPresent(file,file.path);
 					
 					struct stat st{};
 					if (stat(file.path.c_str(), &st) == 0) {
@@ -387,14 +386,6 @@ std::string USBMounter::backDir(){
 	return retpath;
 }
 
-bool USBMounter::haveIteminPlaylist(){
-	for(int i=0;i<playlist->getPlaylist().size();i++){
-		if(Utility::startWith(playlist->getPlaylist()[i].fulluri,"ums",false)){
-			return true;
-		}
-	}
-	return false;
-}
 
 void USBMounter::SetFileDbStatus(int idx,int dbstatus){
 	currentlist[idx].dbread = dbstatus;

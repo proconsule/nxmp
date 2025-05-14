@@ -119,12 +119,13 @@ namespace Windows {
 							ImGui::TableNextRow();
 							ImGui::TableSetColumnIndex(0);
 							
-							std::string itemid = "##" + std::to_string(n);
+							std::string itemid = "##cbox" + std::to_string(n);
 							
 							ImGui::Dummy(ImVec2(0,30 + ImGui::GetStyle().FramePadding.y * 2));
 							ImGui::SameLine();
 							
 							if(item.selectionstate == FILE_SELECTION_CHECKBOX){
+								if(filebrowser->remotefs)FILE_SELECTION_NONE;
 								if(thislist[n].type != FS::FileEntryType::Directory){
 									if(ImGui::Checkbox(itemid.c_str(), filebrowser->checked(n))){
 										
@@ -520,12 +521,7 @@ namespace Windows {
 							ImGui::SameLine();
 							
 							if(item.selectionstate == FILE_SELECTION_CHECKBOX){
-								if(thislist[n].type != UPNPTYPE::UPNPContainer){
-									//if(ImGui::Checkbox(itemid.c_str(), filebrowser->checked(n))){
-										
-									//}
-									//ImGui::SameLine();
-								}
+								item.selectionstate == FILE_SELECTION_NONE;
 								
 							}
 							

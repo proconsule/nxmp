@@ -2,6 +2,7 @@
 
 
 	CFileBrowser::CFileBrowser(networkstruct_v2 netconfdata,Playlist * _playlist){
+		currentplaylist = _playlist;
 		
 		if(netconfdata.type == "sftp"){
 			if(netconfdata.password != ""){
@@ -49,6 +50,10 @@
 	}
 	
 	CFileBrowser::CFileBrowser(USBMounter * _myusb,Playlist * _playlist){
+		
+		currentplaylist = _playlist;
+		
+		
 		if(_myusb!= nullptr){
 			title = "USB Browser";
 			myusb = _myusb;
@@ -60,7 +65,8 @@
 
 	CFileBrowser::CFileBrowser(std::string _path,Playlist * _playlist){
 		
-		
+			currentplaylist = _playlist;
+				
 			path = _path;
 			urlschema thisurl = Utility::parseUrl(_path); 
 			if(Utility::startWith(path,"/",false)){
@@ -71,31 +77,34 @@
 				connected = smb2fs->RegisterFilesystem();
 				basepath = "smb0:/";
 				title = "SMB Browser " + thisurl.server;
+				remotefs = true;
 				
 			}else if(Utility::startWith(path,"sftp",false)){
-				//myssh = new sshDir(path,_playlist);
 				sshfs = new CSSHFS(_path,"ssh0","ssh0:");
 				connected = sshfs->RegisterFilesystem();
 				basepath = "ssh0:/";
 				title = "SFTP Browser " + thisurl.server;
+				remotefs = true;
 			}else if(Utility::startWith(path,"ftp",false)){
-				//myftp = new FTPDir(path,_playlist);
 				ftpfs = new CFTPFS(_path,"ftp0","ftp0:");
 				connected = ftpfs->RegisterFilesystem();
 				basepath = "ftp0:" + thisurl.path;
 				currentpath = basepath;
 				title = "FTP Browser " + thisurl.server;
 				maxreadsize = 65536;
+				remotefs = true;
 			}else if(Utility::startWith(path,"http",false)){
 				myhttp = new HTTPDir(path);
 				title = "HTTP Browser " + thisurl.server;
 				timelessFS = true;
+				remotefs = true;
 			}else if(Utility::startWith(path,"nfs",false)){
 				title = "NFS Browser " + thisurl.server;
 				nfsfs = new CNFSFS(_path,"nfs0","nfs0:");
 				connected = nfsfs->RegisterFilesystem();
 				basepath = "nfs0:/";
 				currentpath = basepath;
+				remotefs = true;
 			}
 		
 	}
@@ -451,11 +460,11 @@
 		
 		
 		
-		if(myhttp!= nullptr){
-			return (bool *)myhttp->checked(pos);
-		}
+		//if(myhttp!= nullptr){
+		//	return (bool *)myhttp->checked(pos);
+		//}
 		
-		return (bool *)false;
+		return &currentlist[pos].checked;
 	}
 	
 	std::string CFileBrowser::getBasePath(){

@@ -75,7 +75,7 @@ namespace Windows {
 					if (ImGui::Selectable(itemid.c_str(), selected == n,selectable_flags,ImVec2(1280*multiplyRes,50*multiplyRes))){
 						if(n == nxlangs::MM_LOCALFILES){
 							item.state = MENU_STATE_FILEBROWSER;
-							filebrowser = new CFileBrowser(configini->getStartPath(),nullptr);
+							filebrowser = new CFileBrowser(configini->getStartPath(),playlist);
 							filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
 							filebrowser->DirList(configini->getStartPath(),true,Utility::getMediaExtensions());
 							item.first_item = true;
@@ -83,11 +83,11 @@ namespace Windows {
 						if(n == nxlangs::MM_USB){
 							if(MyUSBMount==nullptr){
 								if(!configini->getEmuOverrides()){
-									MyUSBMount=new USBMounter(nullptr);
+									MyUSBMount=new USBMounter();
 								}
 							}
 							item.state = MENU_STATE_USB_MOUNT;
-							filebrowser = new CFileBrowser(MyUSBMount,nullptr);
+							filebrowser = new CFileBrowser(MyUSBMount,playlist);
 							filebrowser->setSordOrder((FS::FILESORTORDER)configini->getsortOrder(false));
 							
 							
