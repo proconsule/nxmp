@@ -41,6 +41,7 @@ void CImgLoader::LoadBaseTextures(std::string basepath){
 
 	icons.FolderTexture =  Renderer->load_texture(basepath+"/folder.png",DkImageFormat_RGBA8_Unorm, 0);
 	icons.FileTexture =  Renderer->load_texture(basepath+"/file.png",DkImageFormat_RGBA8_Unorm, 0);
+	icons.PDFTexture =  Renderer->load_texture(basepath+"/pdficon.png",DkImageFormat_RGBA8_Unorm, 0);
 	icons.ImageTexture =  Renderer->load_texture(basepath+"/image.png",DkImageFormat_RGBA8_Unorm, 0);
 	icons.ArchiveTexture =  Renderer->load_texture(basepath+"/archive.png",DkImageFormat_RGBA8_Unorm, 0);
 
@@ -218,6 +219,13 @@ Texture CImgLoader::OpenImageMemory(unsigned char *_img_data,int _size){
 	}
 	
 	return {};
+}
+
+Texture CImgLoader::OpenRAWImageMemory(unsigned char *_img_data,int _w,int _h){
+	
+	Texture rettext =  Renderer->load_texture_from_mem(_img_data,_w,_h,4,DkImageFormat_RGBA8_Unorm, 0);
+	return rettext;
+	
 }
 
 

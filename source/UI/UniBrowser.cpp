@@ -144,6 +144,8 @@ namespace Windows {
 									GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ImageTexture.id, ImVec2(30,30));
 								}else if(thislist[n].mediatype == FS::FileMediaType::Archive){
 									GUI::NXMPImage((void*)(intptr_t)imgloader->icons.ArchiveTexture.id, ImVec2(30,30));
+								}else if(thislist[n].mediatype == FS::FileMediaType::PDF){
+									GUI::NXMPImage((void*)(intptr_t)imgloader->icons.PDFTexture.id, ImVec2(30,30));
 								}
 							}
 							
@@ -160,23 +162,19 @@ namespace Windows {
 										item.laststate = item.state;
 										
 										if(Utility::isImageExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
-											//unsigned char * img_data = NULL;
-											//int img_size=0;
-											/*
-											if(filebrowser->getfileContents(thislist[n].path,&img_data,img_size)){
-												NXLOG::DEBUGLOG("filesize %d\n",img_size);
-												item.state = MENU_STATE_IMGVIEWER;
-												Windows::setImageZoom(1.0f);
-												//Windows::currentImg =  imgloader->OpenImageMemory(img_data,img_size);
-											}
-											if(img_data!=NULL)free(img_data);
-											*/
+											
 											if(filebrowser->getfileContentsThreaded(thislist[n].path)){
 												item.state = MENU_STATE_IMGVIEWER;
 												Windows::setImageZoom(1.0f);
 												Windows::loadimage = true;
 											}
 											
+										}else if(Utility::isPDFExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
+											if(filebrowser->getfileContentsThreaded(thislist[n].path)){
+												item.state = MENU_STATE_PDFVIEWER;
+												Windows::setPDFImageZoom(1.0f);
+												Windows::pdf_loadimage = true;
+											}
 										}else if(Utility::isArchiveExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
 											filebrowser->OpenArchive(filebrowser->getOpenUrlPart()+thislist[n].path);
 											filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());

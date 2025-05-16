@@ -19,12 +19,10 @@ extern CTextScroller * playerTextScroller;
 
 namespace Windows {
 
-#ifdef DEKO3D_BACKEND
+
 	extern Texture currentImg;
-#endif
-#ifdef OPENGL_BACKEND
-	extern Tex currentImg;
-#endif		
+	extern Texture pdf_currentImg;
+	
 
 
 	extern int netwinselected;
@@ -93,10 +91,18 @@ namespace Windows {
 	void SettingsUIWindow(bool *focus, bool *first_item);
 	
 	void imageViewer();
+	void PDFViewer();
+	
 	void setImageZoom(float zoomfactor);
 	float getImageZoom();
+	void setPDFImageZoom(float zoomfactor);
+	float getPDFImageZoom();
+	
+	
 	
 	extern bool loadimage;
+	extern bool pdf_loadimage;
+	void ScrollWhenDraggingOnVoid(const ImVec2& delta);
 	
 	std::string ShowSWKeyboard(std::string InitialValueStr,std::string headertext = "",bool numeric = false);
 	

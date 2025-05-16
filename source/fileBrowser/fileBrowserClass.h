@@ -11,6 +11,7 @@
 #include "libarchivefs.h"
 #include "ftpfs.h"
 #include "m3u8fs.h"
+#include "PDFClass.h"
 
 
 #include "utils.h"
@@ -106,7 +107,9 @@ public:
 	fileload_struct *LoadedFile = nullptr;
 
 	
-
+	int OpenPDF(unsigned char ** _image_data,int *_w,int *_h);
+	int getNextPDFPage(unsigned char ** _image_data,int *_w,int *_h);
+	int getPrevPDFPage(unsigned char ** _image_data,int *_w,int *_h);
 	
 protected:
 	CSSHFS * sshfs = nullptr;
@@ -115,6 +118,8 @@ protected:
 	CARCHFS * archfs = nullptr;
 	CFTPFS *ftpfs = nullptr;
 	CM3U8FS *m3u8fs = nullptr;
+	CPDFClass *PDF = nullptr;
+	
 
 private:
 	

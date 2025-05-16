@@ -6,62 +6,8 @@
 #include "nxmp-render.h"
 #include "deko3d.hpp"
 
-#ifdef OPENGL_BACKEND
 
-typedef struct {
-	/* Home Icons */
-	Tex SdCardTexture;
-	Tex UsbTexture;
-	Tex NetworkTexture;
-	Tex UPNPTexture;
-	Tex Enigma2Texture;
-	Tex PlaylistTexture;
-	Tex InfoTexture;
-	Tex SettingsTexture;
-	Tex ExitTexture;
-	
-	/* File Browser Icons */
-	Tex FolderTexture;
-	Tex FileTexture;
-	Tex ImageTexture;
-	Tex ArchiveTexture;
-	Tex GUI_D_UP;
-	Tex GUI_D_DOWN;
-	Tex GUI_D_LEFT;
-	Tex GUI_D_RIGHT;
-	Tex GUI_A_BUT;
-	Tex GUI_B_BUT;
-	Tex GUI_X_BUT;
-	Tex GUI_Y_BUT;
-	
-	/* Networks Icons */
-	Tex ShareAddTexture;
-	Tex FTPTexture;
-	Tex HTTPTexture;
-	Tex SFTPTexture;
-	Tex SMBTexture;
-	Tex NFSTexture;
-	
-	/* Info Icons */
-	Tex NXMPBannerTexture;
-	Tex FFMPEGTexture;
-	Tex MPVTexture;
-	
-	
-	/* Player Icons */
-	Tex PlayIcon;
-	Tex PauseIcon;
-	Tex StopIcon;
-	Tex MuteIcon;
-	Tex VolumeIcon;
-	Tex LoopIcon;
-	Tex NoLoopIcon;
-		
-} nxmpicon_struct;
-	
-#endif
 
-#ifdef DEKO3D_BACKEND
 
 typedef struct {
 	/* Home Icons */
@@ -78,6 +24,7 @@ typedef struct {
 	/* File Browser Icons */
 	Texture FolderTexture;
 	Texture FileTexture;
+	Texture PDFTexture;
 	Texture ImageTexture;
 	Texture ArchiveTexture;
 	Texture GUI_D_UP;
@@ -114,7 +61,7 @@ typedef struct {
 		
 } nxmpicon_struct;
 	
-#endif
+
 
 class CImgLoader{
 public:
@@ -125,14 +72,9 @@ public:
 		
 		NXMPRenderer *Renderer;
 		
-#ifdef OPENGL_BACKEND
-		Tex OpenImageFile(std::string path);
-		Tex OpenImageMemory(unsigned char *_img_data,int _size);
-#endif
-#ifdef DEKO3D_BACKEND
 		Texture OpenImageFile(std::string path);
 		Texture OpenImageMemory(unsigned char *_img_data,int _size);
-#endif
+		Texture OpenRAWImageMemory(unsigned char *_img_data,int _w,int _h);
 
 };
 

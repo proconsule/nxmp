@@ -30,7 +30,8 @@ namespace FS {
 	enum class FileMediaType {
 		Media = 0,
 		Image = 1,
-		Archive = 2
+		Archive = 2,
+		PDF = 3
 	};
 	
 	enum FILESORTORDER{

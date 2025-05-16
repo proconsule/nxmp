@@ -92,6 +92,9 @@ private:
 		
 	};
 	
+	int int_arch_file;
+	FILE * arch_file;
+	
 	std::vector<archfileentry_struct> totalfilelist;
 	std::string cwd = "";
 	std::mutex session_mutex;

@@ -364,6 +364,7 @@ int main(int argc, const  char **argv) {
 	NXLOG::DEBUGLOG("Imgui Init OK\n");
 	
 	std::vector<std::string> extensionlist = configini->getConfigExtensions();
+	extensionlist.push_back(".pdf");
 		
 	Utility::setMediaExtensions(extensionlist);
 	

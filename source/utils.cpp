@@ -530,7 +530,14 @@ std::string KeyboardCall (std::string hint, std::string text){
 	
 }
 
-
+	
+	bool isPDFExtension(std::string path){
+		if(Utility::endsWith(path,".pdf",false)){
+			return true;
+		}
+											
+		return false;
+	}
 	bool isImageExtension(std::string path){
 		if(Utility::endsWith(path,".jpg",false) || Utility::endsWith(path,".png",false) || Utility::endsWith(path,".bmp",false)){
 			return true;

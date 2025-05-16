@@ -144,6 +144,7 @@
 		basepath = archfs->mount_name+"/";
 		currentpath = archfs->mount_name+"/";
 		
+		
 	}
 	std::string CFileBrowser::CloseArchive(){
 		title = oldtitle;
@@ -224,9 +225,12 @@
 							file.accessed = (time_t)st.st_atime;
 						
 							
-							
 							if(Utility::isImageExtension(file.name)){
 								file.mediatype = FS::FileMediaType::Image;
+								currentimagelist.push_back(file);
+							}
+							if(Utility::isPDFExtension(file.name)){
+								file.mediatype = FS::FileMediaType::PDF;
 								currentimagelist.push_back(file);
 							}
 							if(Utility::isArchiveExtension(file.name)){
@@ -325,6 +329,10 @@
 							if(isMediafile){
 								if(Utility::isImageExtension(file.name)){
 									file.mediatype = FS::FileMediaType::Image;
+									currentimagelist.push_back(file);
+								}
+								if(Utility::isPDFExtension(file.name)){
+									file.mediatype = FS::FileMediaType::PDF;
 									currentimagelist.push_back(file);
 								}
 								if(Utility::isArchiveExtension(file.name)){
@@ -702,3 +710,23 @@
 		return -1;
 	}
 	
+	int CFileBrowser::OpenPDF(unsigned char ** _image_data,int *_w,int *_h){
+		if(PDF!=nullptr)delete PDF;
+		PDF = new CPDFClass(LoadedFile->mem,LoadedFile->size);
+		return PDF->Render_PDF_Page(0,200.0,_image_data,_w,_h);
+		
+	}
+	
+	int CFileBrowser::getNextPDFPage(unsigned char ** _image_data,int *_w,int *_h){
+		if(PDF==nullptr)return -1;
+		if(PDF->getCurrentPage()>=PDF->getPageCount())return -1;
+		return PDF->Render_PDF_Page(PDF->getCurrentPage()+1,200.0,_image_data,_w,_h);
+	}
+	int CFileBrowser::getPrevPDFPage(unsigned char ** _image_data,int *_w,int *_h){
+		if(PDF==nullptr)return -1;
+		if(PDF->getCurrentPage()==0)return -1;
+		return PDF->Render_PDF_Page(PDF->getCurrentPage()-1,200.0,_image_data,_w,_h);
+	}
+	
+	
+		

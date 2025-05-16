@@ -514,6 +514,8 @@ namespace GUI {
 			if(is_bit_set(event_ret,B_AX_R_UP)){
 				if(item.state == MENU_STATE_IMGVIEWER){
 					Windows::setImageZoom(Windows::getImageZoom()+0.1);
+				}else if(item.state == MENU_STATE_PDFVIEWER){
+					Windows::setPDFImageZoom(Windows::getPDFImageZoom()+0.1);
 				}else{
 					ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadLStickUp,true);
 				}
@@ -525,6 +527,12 @@ namespace GUI {
 						Windows::setImageZoom(Windows::getImageZoom()-0.1);
 					}else{
 						Windows::setImageZoom(1.0f);
+					}
+				}else if(item.state == MENU_STATE_PDFVIEWER){
+					if(Windows::getPDFImageZoom()>=1.1f){
+						Windows::setPDFImageZoom(Windows::getPDFImageZoom()-0.1);
+					}else{
+						Windows::setPDFImageZoom(1.0f);
 					}
 				}else{
 					ImGui::GetIO().AddKeyEvent(ImGuiKey_GamepadLStickDown,true);
@@ -668,12 +676,16 @@ namespace GUI {
 					}
 				}else if(item.state == MENU_STATE_IMGVIEWER){
 					Windows::setImageZoom(1.0f);
+				}else if(item.state == MENU_STATE_PDFVIEWER){
+					Windows::setPDFImageZoom(1.0f);
 				}
 				
 			}
 			if (is_bit_set(event_ret,BUT_B)){
 				
 					if(item.state == MENU_STATE_IMGVIEWER){
+						item.state = item.laststate;
+					}else if(item.state == MENU_STATE_PDFVIEWER){
 						item.state = item.laststate;
 					}else if(item.state == MENU_STATE_ADDSHARE){
 						item.state = MENU_STATE_NETWORKBROWSER;
@@ -830,6 +842,20 @@ namespace GUI {
 						
 					}
 				}
+				if(item.state == MENU_STATE_PDFVIEWER){
+					if(filebrowser!= NULL){
+						Renderer->unregister_texture(Windows::pdf_currentImg);
+						unsigned char * tmpdata;
+						unsigned int w,h;
+						filebrowser->getNextPDFPage(&tmpdata,&w,&h);
+						//PDFClass->Render_PDF_Page(0,100.0,&tmpdata,&w,&h);
+						Windows::pdf_currentImg = imgloader->OpenRAWImageMemory(tmpdata,w,h);
+						Windows::setPDFImageZoom(1.0f);
+						free(tmpdata);
+						
+					}
+				}
+				
 				if(item.state == MENU_STATE_PLAYER && !item.masterlock){
 					libmpv->seek(libmpv->getPosition() + configini->getLongSeek(false),item.playershowcontrols);
 				}
@@ -848,6 +874,20 @@ namespace GUI {
 							}
 							
 						}
+						
+					}
+				}
+				if(item.state == MENU_STATE_PDFVIEWER){
+					if(filebrowser!= NULL){
+						Renderer->unregister_texture(Windows::pdf_currentImg);
+						unsigned char * tmpdata;
+						unsigned int w,h;
+						filebrowser->getPrevPDFPage(&tmpdata,&w,&h);
+						
+						//PDFClass->Render_PDF_Page(0,100.0,&tmpdata,&w,&h);
+						Windows::pdf_currentImg = imgloader->OpenRAWImageMemory(tmpdata,w,h);
+						Windows::setPDFImageZoom(1.0f);
+						free(tmpdata);
 						
 					}
 				}
@@ -1044,6 +1084,9 @@ namespace GUI {
 					break;
 				case MENU_STATE_IMGVIEWER:
 					Windows::imageViewer();
+					break;
+				case MENU_STATE_PDFVIEWER:
+					Windows::PDFViewer();
 					break;
 				case MENU_STATE_PLAYERCACHING:
 					playerWindows::CacheWindow();

@@ -44,6 +44,7 @@ CARCHFS::CARCHFS(std::string _url,std::string _name,std::string _mount_name){
 
 CARCHFS::~CARCHFS(){
 	
+	fclose(arch_file);
 	//auto lk = std::scoped_lock(this->session_mutex);
 	if (this->is_connected)
         this->disconnect();
@@ -63,7 +64,13 @@ int CARCHFS::connect(){
 	archive_read_support_filter_all(arch_ctx);
 	archive_read_support_format_all(arch_ctx);
 	
-	int ret = archive_read_open_filename(arch_ctx, connect_url.c_str(), 10240);
+	
+	arch_file = fopen(connect_url.c_str(), "rb");
+	
+	int ret = archive_read_open_FILE(arch_ctx, arch_file);
+	
+	
+	
 	if(ret!= ARCHIVE_OK){
 		return -1;
 	}
@@ -116,12 +123,11 @@ int       CARCHFS::archfs_open     (struct _reent *r, void *fileStruct, const ch
     char* colonPos = strchr(path, ':');
     if (colonPos) path = colonPos+1;
 	
-
-    auto lk = std::scoped_lock(priv->session_mutex);
+	auto lk = std::scoped_lock(priv->session_mutex);
 	priv_file->arch_ctx = archive_read_new();
 	archive_read_support_filter_all(priv_file->arch_ctx);
 	archive_read_support_format_all(priv_file->arch_ctx);
-	int ret = archive_read_open_filename(priv_file->arch_ctx, priv->connect_url.c_str(), 10240);
+	int ret = archive_read_open_FILE(priv_file->arch_ctx, priv->arch_file);
 	if(ret!= ARCHIVE_OK){
 		printf("FILE OPEN FAIL %s %d\n",priv->connect_url.c_str(),ret);
 		return -1;
