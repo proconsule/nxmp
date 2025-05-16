@@ -72,6 +72,7 @@ private:
 
 	
 	struct CARCHFSFile {
+			FILE *arch_file;
 			struct archive_entry *entry;
 			struct archive *arch_ctx;
 			off_t offset;
@@ -92,12 +93,11 @@ private:
 		
 	};
 	
-	int int_arch_file;
-	FILE * arch_file;
 	
 	std::vector<archfileentry_struct> totalfilelist;
 	std::string cwd = "";
 	std::mutex session_mutex;
+	
 	protected:
         devoptab_t devoptab = {};
 	

@@ -132,6 +132,9 @@
 		if(m3u8fs!= nullptr){
 			delete m3u8fs;
 		}
+		if(PDF!= nullptr){
+			delete PDF;
+		}
 	
 	}
 	
@@ -726,6 +729,15 @@
 		if(PDF==nullptr)return -1;
 		if(PDF->getCurrentPage()==0)return -1;
 		return PDF->Render_PDF_Page(PDF->getCurrentPage()-1,200.0,_image_data,_w,_h);
+	}
+	
+	int CFileBrowser::getPDFPageCount(){
+		if(PDF == nullptr )return -1;
+		return PDF->getPageCount();
+	}
+	int CFileBrowser::getPDFCurrentPage(){
+		if(PDF == nullptr )return -1;
+		return PDF->getCurrentPage();
 	}
 	
 	

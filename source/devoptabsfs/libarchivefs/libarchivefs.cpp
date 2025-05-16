@@ -9,7 +9,7 @@ CARCHFS::CARCHFS(std::string _url,std::string _name,std::string _mount_name){
 	
 	this->name       = _name;
     this->mount_name = _mount_name;
-
+	
     this->devoptab = {
         .name         = CARCHFS::name.data(),
 
@@ -43,8 +43,6 @@ CARCHFS::CARCHFS(std::string _url,std::string _name,std::string _mount_name){
 }
 
 CARCHFS::~CARCHFS(){
-	
-	fclose(arch_file);
 	//auto lk = std::scoped_lock(this->session_mutex);
 	if (this->is_connected)
         this->disconnect();
@@ -59,14 +57,12 @@ void CARCHFS::disconnect(){
 
 
 int CARCHFS::connect(){
-	struct archive *arch_ctx = archive_read_new();
 	
+	
+	FILE * arch_file = fopen(connect_url.c_str(), "rb");
+	struct archive *arch_ctx = archive_read_new();
 	archive_read_support_filter_all(arch_ctx);
 	archive_read_support_format_all(arch_ctx);
-	
-	
-	arch_file = fopen(connect_url.c_str(), "rb");
-	
 	int ret = archive_read_open_FILE(arch_ctx, arch_file);
 	
 	
@@ -105,7 +101,7 @@ int CARCHFS::connect(){
 		archive_entry_free(entry);
 	}
 	archive_read_free(arch_ctx);
-	
+	fclose(arch_file);
 	is_connected = true;
 	
 	return 0;
@@ -127,11 +123,12 @@ int       CARCHFS::archfs_open     (struct _reent *r, void *fileStruct, const ch
 	priv_file->arch_ctx = archive_read_new();
 	archive_read_support_filter_all(priv_file->arch_ctx);
 	archive_read_support_format_all(priv_file->arch_ctx);
-	int ret = archive_read_open_FILE(priv_file->arch_ctx, priv->arch_file);
-	if(ret!= ARCHIVE_OK){
-		printf("FILE OPEN FAIL %s %d\n",priv->connect_url.c_str(),ret);
-		return -1;
-	}
+	priv_file->arch_file = fopen(priv->connect_url.c_str(), "rb");
+	int ret = archive_read_open_FILE(priv_file->arch_ctx, priv_file->arch_file);
+	//if(ret!= ARCHIVE_OK){
+	//	printf("FILE OPEN FAIL %s %d\n",priv->connect_url.c_str(),ret);
+	//	return -1;
+	//}
 	
 	priv_file->entry = archive_entry_new2( priv_file->arch_ctx );
 	
@@ -158,8 +155,14 @@ int       CARCHFS::archfs_close    (struct _reent *r, void *fd){
 
     auto lk = std::scoped_lock(priv->session_mutex);
 
+	
+	
 	archive_entry_free(priv_file->entry);
-    archive_read_free(priv_file->arch_ctx);
+	archive_read_free(priv_file->arch_ctx);
+    fclose(priv_file->arch_file);
+	
+	//archive_read_free(priv_file->arch_ctx);
+	//archive_read_finish(priv_file->arch_ctx);
 
     return 0;
 }

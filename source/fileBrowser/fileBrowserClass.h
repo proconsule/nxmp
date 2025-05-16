@@ -110,6 +110,8 @@ public:
 	int OpenPDF(unsigned char ** _image_data,int *_w,int *_h);
 	int getNextPDFPage(unsigned char ** _image_data,int *_w,int *_h);
 	int getPrevPDFPage(unsigned char ** _image_data,int *_w,int *_h);
+	int getPDFPageCount();
+	int getPDFCurrentPage();
 	
 protected:
 	CSSHFS * sshfs = nullptr;
