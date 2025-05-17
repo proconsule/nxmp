@@ -325,8 +325,8 @@ int main(int argc, const  char **argv) {
 	if(NXLOG::loglevel >0){
 		configini->PrintConfig();
 	}
-	NXLOG::loglevel = 2;
-	
+
+
 	nxlangs::selectedlang = configini->getConfigLangId(false);
 	
 	appletInitializeGamePlayRecording();
