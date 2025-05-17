@@ -93,13 +93,13 @@ private:
 		
 	};
 	
-	
+	//struct archive *arch_ctx;
 	std::vector<archfileentry_struct> totalfilelist;
 	std::string cwd = "";
 	std::mutex session_mutex;
 	
 	protected:
-        devoptab_t devoptab = {};
+		devoptab_t devoptab = {};
 	
 };
 

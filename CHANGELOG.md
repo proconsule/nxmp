@@ -1,4 +1,15 @@
 # NXMP Changelog
+## [0.9.2]
+
+### Added
+
+- PDF file support
+
+## Fixed
+
+- fixed archive reading from USB
+- playlist from local sdcard and USB drives
+- settings language selection/save 
 
 ## [0.9.1]
 

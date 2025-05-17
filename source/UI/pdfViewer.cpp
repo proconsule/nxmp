@@ -185,12 +185,14 @@ namespace Windows {
 				ImVec2 mytitlepos = ImVec2(10.0f*multiplyRes,15.0f*multiplyRes);
 				draw_list->AddText(mytitlepos, ImColor(buttextcol),myfilename.c_str());
 				
-				std::string pagestext = std::to_string(filebrowser->getPDFCurrentPage()) + " / " +std::to_string(filebrowser->getPDFPageCount());
-				ImVec2 pagestextsize = ImGui::CalcTextSize(pagestext.c_str());
-				ImVec2 mypagestextpos = ImVec2(1280.0f*multiplyRes-pagestextsize.x-20*multiplyRes,10.0f*multiplyRes);
-				draw_list->AddRectFilled(mypagestextpos,ImVec2(1280.0f*multiplyRes,pagestextsize.y+10.0f*multiplyRes),ImColor(ImVec4(0.0f,0.0f,0.0f, pdf_textfadealpha/2.0f)));
-				
-				draw_list->AddText(ImVec2(mypagestextpos.x+10.0f,mypagestextpos.y+5.0f), ImColor(buttextcol),pagestext.c_str());
+				if(filebrowser->getPDFCurrentPage() != -1){
+					std::string pagestext = std::to_string(filebrowser->getPDFCurrentPage()) + " / " +std::to_string(filebrowser->getPDFPageCount());
+					ImVec2 pagestextsize = ImGui::CalcTextSize(pagestext.c_str());
+					ImVec2 mypagestextpos = ImVec2(1280.0f*multiplyRes-pagestextsize.x-20*multiplyRes,10.0f*multiplyRes);
+					draw_list->AddRectFilled(mypagestextpos,ImVec2(1280.0f*multiplyRes,pagestextsize.y+20.0f*multiplyRes),ImColor(ImVec4(0.0f,0.0f,0.0f, pdf_textfadealpha/2.0f)));
+					
+					draw_list->AddText(ImVec2(mypagestextpos.x+10.0f,mypagestextpos.y+5.0f), ImColor(buttextcol),pagestext.c_str());
+				}
 				
 				ImVec2 mytextboxpos = ImVec2(5.0f,720.0f*multiplyRes-35.0f*multiplyRes);
 				draw_list->AddRectFilled(mytextboxpos,ImVec2(1280.0f*multiplyRes-5.0f*multiplyRes,720.0f*multiplyRes),ImColor(ImVec4(0.0f,0.0f,0.0f, pdf_textfadealpha/2.0f)));

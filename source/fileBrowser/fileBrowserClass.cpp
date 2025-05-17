@@ -111,6 +111,13 @@
 	
 	CFileBrowser::~CFileBrowser(){
 		
+		if(LoadedFile != nullptr){
+			if(LoadedFile->mem != nullptr){
+				free(LoadedFile->mem);
+			}
+			free(LoadedFile);
+		}
+		
 		if(myhttp!= nullptr){
 			delete myhttp;
 		}
@@ -135,6 +142,10 @@
 		if(PDF!= nullptr){
 			delete PDF;
 		}
+		
+		
+		
+		
 	
 	}
 	

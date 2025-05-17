@@ -59,7 +59,7 @@ void CARCHFS::disconnect(){
 int CARCHFS::connect(){
 	
 	
-	FILE * arch_file = fopen(connect_url.c_str(), "rb");
+	FILE *arch_file = fopen(connect_url.c_str(), "rb");
 	struct archive *arch_ctx = archive_read_new();
 	archive_read_support_filter_all(arch_ctx);
 	archive_read_support_format_all(arch_ctx);
@@ -100,6 +100,7 @@ int CARCHFS::connect(){
 		archive_read_data_skip(arch_ctx);
 		archive_entry_free(entry);
 	}
+	archive_read_close(arch_ctx);
 	archive_read_free(arch_ctx);
 	fclose(arch_file);
 	is_connected = true;
@@ -158,7 +159,9 @@ int       CARCHFS::archfs_close    (struct _reent *r, void *fd){
 	
 	
 	archive_entry_free(priv_file->entry);
+	archive_read_close(priv_file->arch_ctx);
 	archive_read_free(priv_file->arch_ctx);
+	
     fclose(priv_file->arch_file);
 	
 	//archive_read_free(priv_file->arch_ctx);
@@ -174,6 +177,7 @@ ssize_t   CARCHFS::archfs_read     (struct _reent *r, void *fd, char *ptr, size_
     auto lk = std::scoped_lock(priv->session_mutex);
 	//archive_seek_data(priv_file->arch_ctx, priv_file->offset,SEEK_END);
 	ssize_t bytes = archive_read_data(priv_file->arch_ctx, ptr, len);
+	priv_file->offset=priv_file->offset+bytes;
     return bytes;
 
 }
@@ -197,8 +201,12 @@ off_t     CARCHFS::archfs_seek     (struct _reent *r, void *fd, off_t pos, int d
             break;
     }
 
-    priv_file->offset = offset + pos;
+    
 	auto lk = std::scoped_lock(priv->session_mutex);
+	
+	priv_file->offset = offset + pos;
+	archive_seek_data(priv_file->arch_ctx,priv_file->offset,dir);
+	
 	
 	
     return priv_file->offset;

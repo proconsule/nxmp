@@ -15,7 +15,6 @@ CPDFClass::CPDFClass(unsigned char* _data,size_t _size){
 		fz_register_document_handlers(ctx);
 	fz_catch(ctx)
 	{
-		//fz_report_error(ctx);
 		fprintf(stderr, "cannot register document handlers\n");
 		fz_drop_context(ctx);
 		return;
@@ -31,7 +30,6 @@ CPDFClass::CPDFClass(unsigned char* _data,size_t _size){
 		fz_drop_stream(ctx, stream);
         fz_catch(ctx)
 	{
-		//fz_report_error(ctx);
 		fprintf(stderr, "cannot open document\n");
 		fz_drop_context(ctx);
 		return;
@@ -71,7 +69,6 @@ int CPDFClass::Render_PDF_Page(int _page,float _zoom,unsigned char ** _image_dat
 		fz_register_document_handlers(ctx);
 	fz_catch(ctx)
 	{
-		//fz_report_error(ctx);
 		fprintf(stderr, "cannot register document handlers\n");
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
@@ -85,12 +82,11 @@ int CPDFClass::Render_PDF_Page(int _page,float _zoom,unsigned char ** _image_dat
         fz_always(ctx)
 		fz_drop_stream(ctx, stream);
         fz_catch(ctx)
-	{
-		//fz_report_error(ctx);
-		fprintf(stderr, "cannot open document\n");
-		fz_drop_context(ctx);
-		return EXIT_FAILURE;
-	}
+		{
+			fprintf(stderr, "cannot open document\n");
+			fz_drop_context(ctx);
+			return EXIT_FAILURE;
+		}
         
         
         ctm = fz_scale(_zoom / 100, _zoom / 100);
@@ -99,14 +95,13 @@ int CPDFClass::Render_PDF_Page(int _page,float _zoom,unsigned char ** _image_dat
         
         fz_try(ctx)
 		pix = fz_new_pixmap_from_page_number(ctx, doc, _page, ctm, fz_device_rgb(ctx), 0);
-	fz_catch(ctx)
-	{
-		//fz_report_error(ctx);
-		fprintf(stderr, "cannot render page\n");
-		fz_drop_document(ctx, doc);
-		fz_drop_context(ctx);
-		return EXIT_FAILURE;
-	}
+		fz_catch(ctx)
+		{
+			fprintf(stderr, "cannot render page\n");
+			fz_drop_document(ctx, doc);
+			fz_drop_context(ctx);
+			return EXIT_FAILURE;
+		}
         
         *_w = pix->w;
         *_h = pix->h;
@@ -129,6 +124,10 @@ int CPDFClass::Render_PDF_Page(int _page,float _zoom,unsigned char ** _image_dat
         
 		
 		pagenum = _page;
+		
+		fz_drop_pixmap(ctx, pix);
+		fz_drop_document(ctx, doc);
+		fz_drop_context(ctx);
 		
         return 0;
     

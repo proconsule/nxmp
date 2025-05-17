@@ -26,7 +26,7 @@ libMpv::libMpv(const std::string &configDir) {
 	if(NXLOG::loglevel == 0){
 		mpv_set_option_string(handle, "msg-level", "all=no");
 	}else{
-		mpv_set_option_string(handle, "msg-level", "vd=trace,vo=trace");
+		mpv_set_option_string(handle, "msg-level", "all=v,vd=trace,vo=trace");
 	}
 	mpv_set_option_string(handle, "vd-lavc-threads", "4");
 	//mpv_set_option_string(handle, "vd-lavc-skiploopfilter", "all");

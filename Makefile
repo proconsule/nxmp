@@ -50,7 +50,7 @@ GITREV:= -D'GITREV="$(shell git rev-parse --short HEAD)"'
 
 VERSION_MAJOR := 0
 VERSION_MINOR := 9
-VERSION_MICRO := 1
+VERSION_MICRO := 2
 
 APP_TITLE     := NXMP
 APP_AUTHOR    := proconsule and darkxex
