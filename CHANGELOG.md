@@ -7,6 +7,7 @@
 
 ## Fixed
 
+- fixed archive file seek (useful for playback video file inside an archive)
 - fixed archive reading from USB
 - playlist from local sdcard and USB drives
 - settings language selection/save 
