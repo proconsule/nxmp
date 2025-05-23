@@ -84,6 +84,7 @@ namespace Utility{
 	bool isImageExtension(std::string path);
 	bool isPDFExtension(std::string path);
 	bool isArchiveExtension(std::string path);
+	bool isISOExtension(std::string path);
 	bool isM3UExtension(std::string path);
 	
 

@@ -94,6 +94,7 @@ namespace Popups {
 	void PlaylistContextPopup(void);
 	void AppExitPopup(void);
 	void FileContextNativePopup(void);
+	void ISOOpenPopup(void);
 	//void PopupScrollText(float w,float h,const char* fmt, ...);
 	
 }

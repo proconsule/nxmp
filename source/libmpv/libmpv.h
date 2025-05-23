@@ -37,6 +37,8 @@ public:
 	
 	void loadFile(std::string _path);
 	
+	void loadDVD(std::string _path);
+	
 	void loadFileLive(std::string _path,std::string _changename = "");
 	
 	void Pause();

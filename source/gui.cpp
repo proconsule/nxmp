@@ -1035,6 +1035,9 @@ namespace GUI {
 					if(item.popupstate == POPUP_STATE_FILECONTEXTMENU){
 						Popups::FileContextNativePopup();
 					}
+					if(item.popupstate == POPUP_STATE_ISOOPENCHOOSE){
+						Popups::ISOOpenPopup();
+					}
 					break;
 				
 				case MENU_STATE_USB_MOUNT:

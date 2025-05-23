@@ -6,6 +6,7 @@
 
 #include "nxmp-i18n.h"
 
+#include "nxmp_dvdnav.h"
 
 namespace Popups{
 	
@@ -604,6 +605,54 @@ namespace Popups{
 				item.popupstate = POPUP_STATE_NONE;
 			}
 			ImGui::SetFocusID(ImGui::GetID(nxlangs::get_common_str(nxlangs::NXCOMMON_OK).c_str()), ImGui::GetCurrentWindow()); 
+			ImGuiContext& g = *ImGui::GetCurrentContext();
+			g.NavDisableHighlight = false;
+			
+			
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor();
+			
+			
+		}
+		Popups::ExitNativePopup();
+	}
+	
+	void ISOOpenPopup(void) {
+		Popups::SetupNativePopup("##isoopenpop");
+		if (ImGui::BeginPopupModal("##isoopenpop", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
+			
+			
+			ImGui::SetWindowFontScale(1.5f);
+			std::string isostring = "ISO File Open";
+			ImVec2 textsize = ImGui::CalcTextSize("Choose");
+			ImVec2 textsize2 = ImGui::CalcTextSize(isostring.c_str());
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize.x)/2.0);
+			ImGui::SetCursorPosY((292.0f*multiplyRes-70-textsize.y-textsize2.y)/2.0);
+			
+			ImGui::Text("ISO File Open");
+			ImGui::Text("Choose");
+			
+			//ImGui::SetCursorPosX((771.0f*multiplyRes-textsize2.x)/2.0);
+			//ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0*multiplyRes);
+			
+			
+			//ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
+			ImVec2 button_size(771.0f*multiplyRes, 70.0f);
+		
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
+			
+			
+			if(ImGui::Button("Open as DVD (libdvdnav)",button_size)){
+				item.popupstate = POPUP_STATE_NONE;
+				CDVDNav DVDNav(item.popuparg);
+				DVDNav.ParseDVDISO(item.popuparg);
+				//libmpv->loadDVD(item.popuparg);
+			}
+			if(ImGui::Button("Open Filesytem (mount as an archive)",button_size)){
+				item.popupstate = POPUP_STATE_NONE;
+			}
+			//ImGui::SetFocusID(ImGui::GetID("Open as DVD (libdvdnav)"), ImGui::GetCurrentWindow()); 
 			ImGuiContext& g = *ImGui::GetCurrentContext();
 			g.NavDisableHighlight = false;
 			

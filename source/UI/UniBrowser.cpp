@@ -175,6 +175,11 @@ namespace Windows {
 												Windows::setPDFImageZoom(1.0f);
 												Windows::pdf_loadimage = true;
 											}
+										}else if(Utility::isISOExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
+											item.popupstate = POPUP_STATE_ISOOPENCHOOSE;
+											item.popuparg = filebrowser->getOpenUrlPart()+thislist[n].path;
+											//filebrowser->OpenArchive(filebrowser->getOpenUrlPart()+thislist[n].path);
+											//filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());
 										}else if(Utility::isArchiveExtension(filebrowser->getOpenUrlPart()+thislist[n].path)){
 											filebrowser->OpenArchive(filebrowser->getOpenUrlPart()+thislist[n].path);
 											filebrowser->DirList(filebrowser->getBasePath(),configini->getshowHidden(false),Utility::getMediaExtensions());

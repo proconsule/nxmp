@@ -165,6 +165,44 @@ void libMpv::loadFile(std::string _path){
 	setOcState();
 }
 
+void libMpv::loadDVD(std::string _path){
+	
+	if(!Stopped()){
+		
+		if(fileinfo != nullptr){
+			delete fileinfo;
+			fileinfo = nullptr;
+		}
+		fileinfo = new fileInfo();
+	}else{
+		if(fileinfo != nullptr){
+			delete fileinfo;
+			fileinfo = nullptr;
+		}
+		fileinfo = new fileInfo();
+	}
+	
+	
+	fileinfo->path = _path;
+	
+	 if (mpv_set_option_string(handle, "dvd-device", _path.c_str()) < 0) {
+		 
+	 }
+	
+	const char *cmd[] = {"loadfile", "dvd://", NULL};
+	mpv_command_async(handle, 0, cmd);
+//	mpv_wait_async_requests(handle);
+	
+	setLoop(false);
+	initSize = configini->getSubFontSize(false);
+	setSubFontSize(configini->getSubFontSize(false),false);
+	initScale = configini->getSubFontScale(false);
+	setSubScaleSize(configini->getSubFontScale(false),false);
+	setSubFontColor(configini->getSubFontColorHex(false));
+	setSubBorderColor(configini->getSubBorderColorHex(false));
+	setOcState();
+}
+
 void libMpv::loadFileLive(std::string _path,std::string _changename){
 	if(!Stopped()){
 		resetFileInfo();
