@@ -7,3 +7,6 @@
 [submodule "libs/imgui"]
 	path = libs/imgui
 	url = https://github.com/ocornut/imgui
+[submodule "libs/nxmp-devoptabs"]
+	path = libs/nxmp-devoptabs
+	url = git@github.com:proconsule/nxmp-devoptabs.git
