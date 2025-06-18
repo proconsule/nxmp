@@ -162,7 +162,9 @@ namespace Utility{
 					".zip",
 					".tar",
 					".rar",
-					".gz"
+					".gz",
+					".cbr",
+					".cbz"
 
 			};
 		}else{
@@ -547,7 +549,7 @@ std::string KeyboardCall (std::string hint, std::string text){
 	}
 	
 	bool isArchiveExtension(std::string path){
-		if(Utility::endsWith(path,".zip",false) || Utility::endsWith(path,".rar",false) || Utility::endsWith(path,".tar",false) || Utility::endsWith(path,".gz",false)){
+		if(Utility::endsWith(path,".cbz",false) || Utility::endsWith(path,".cbr",false) || Utility::endsWith(path,".zip",false) || Utility::endsWith(path,".rar",false) || Utility::endsWith(path,".tar",false) || Utility::endsWith(path,".gz",false)){
 			return true;
 		}
 											
