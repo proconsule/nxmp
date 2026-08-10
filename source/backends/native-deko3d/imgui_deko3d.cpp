@@ -268,13 +268,13 @@ static void ImGui_LoadSwitchFonts(ImGuiIO &io) {
   io.Fonts->AddFontFromMemoryTTF(extended.address, extended.size, 18.0f,
                                  &font_cfg, extended_range);
   // NOTE: uncomment to enable Chinese/Korean support but with slow startup time
-/*
+
   io.Fonts->AddFontFromMemoryTTF(
       chinese.address, chinese.size, 18.0f, &font_cfg,
       io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
   io.Fonts->AddFontFromMemoryTTF(korean.address, korean.size, 18.0f, &font_cfg,
                                io.Fonts->GetGlyphRangesKorean());
-  */
+  
 
   io.Fonts->Flags |= ImFontAtlasFlags_NoPowerOfTwoHeight;
   io.Fonts->Build();

@@ -354,6 +354,7 @@ void NXMPRenderer::begin_frame() {
 		s_cmdBuf.clear();
 
 		s_cmdBuf.addMemory(s_cmdMemBlock, imageSlot * NXMPRenderer::CMDBUF_SIZE, NXMPRenderer::CMDBUF_SIZE);
+	    s_cmdBufFences[imageSlot].wait();
 		auto dst_view = dk::ImageView(s_frameBuffers[imageSlot]);
 		s_cmdBuf.bindRenderTargets(&dst_view);
 		s_cmdBuf.setViewports(0, DkViewport{ 0.0f, 0.0f, static_cast<float>(s_width), static_cast<float>(s_height) });
@@ -370,12 +371,12 @@ void NXMPRenderer::end_frame() {
 	
 		
 		imgui::deko3d::render(s_device, s_queue, s_cmdBuf, imageSlot);
-		s_cmdBufFences[imageSlot].wait();
+		//s_cmdBufFences[imageSlot].wait();
 		s_cmdBuf.barrier(DkBarrier_Fragments, 0);
 		
 		s_queue.submitCommands(s_cmdBuf.finishList());
-		
-		s_queue.waitIdle();
+		s_queue.signalFence(s_cmdBufFences[imageSlot]);
+		//s_queue.waitIdle();
 		dkQueuePresentImage(s_queue,s_swapchain,imageSlot);
 		
 		
