@@ -53,60 +53,77 @@ Device::Device(std::string _location){
 	urlschema thisurl = Utility::parseUrl(_location);
 	serversddress = thisurl.server;
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
+	chunk->memory = NULL;
+	chunk->size = 0;
 	curlDownloader * curldown = new curlDownloader();
 	curldown->Download(_location.c_str(),chunk);
-	NXLOG::DEBUGLOG("%s\n",chunk->memory);
+	NXLOG::DEBUGLOG("%s\n",chunk->memory ? chunk->memory : "(no data)");
 	fflush(stdout);
-	tinyxml2::XMLDocument doc;
-	doc.Parse( chunk->memory );
-	XMLElement * pRootElement = doc.RootElement();
-	if (NULL != pRootElement) {
-		XMLElement * devicenode = pRootElement->FirstChildElement("device");
-		XMLElement * UDNNameTag = devicenode->FirstChildElement("UDN");
-		XMLElement * friendlyNameTag = devicenode->FirstChildElement("friendlyName");
-		XMLElement * manufacturerTag = devicenode->FirstChildElement("manufacturer");
-		XMLElement * modelDescriptionTag = devicenode->FirstChildElement("modelDescription");
-		XMLElement * modelNameTag = devicenode->FirstChildElement("modelName");
-		
-		XMLElement * iconListTag = devicenode->FirstChildElement("iconList");
-		XMLElement * iconnode = iconListTag->FirstChildElement("icon");
-		while(iconnode){
-			XMLElement * mymetag = iconnode->FirstChildElement("mimetype");
-			XMLElement * urltag = iconnode->FirstChildElement("url");
-			std::string mimetype = mymetag->GetText();
-			std::string tmpiconurl = urltag->GetText();
-			if(mimetype == "image/png"){
-				iconUrl = thisurl.scheme + std::string("://") + thisurl.server + ":" +thisurl.port + tmpiconurl;
+
+	
+	auto safeText = [](XMLElement *el) -> std::string {
+		if(el == NULL) return "";
+		const char *t = el->GetText();
+		return t ? t : "";
+	};
+
+	if(chunk->memory != NULL){
+		tinyxml2::XMLDocument doc;
+		doc.Parse( chunk->memory );
+		XMLElement * pRootElement = doc.RootElement();
+		if (NULL != pRootElement) {
+			XMLElement * devicenode = pRootElement->FirstChildElement("device");
+			if(devicenode != NULL){
+				XMLElement * UDNNameTag = devicenode->FirstChildElement("UDN");
+				XMLElement * friendlyNameTag = devicenode->FirstChildElement("friendlyName");
+				XMLElement * manufacturerTag = devicenode->FirstChildElement("manufacturer");
+				XMLElement * modelDescriptionTag = devicenode->FirstChildElement("modelDescription");
+				XMLElement * modelNameTag = devicenode->FirstChildElement("modelName");
 				
-				break;
+				XMLElement * iconListTag = devicenode->FirstChildElement("iconList");
+				XMLElement * iconnode = iconListTag ? iconListTag->FirstChildElement("icon") : NULL;
+				while(iconnode){
+					XMLElement * mymetag = iconnode->FirstChildElement("mimetype");
+					XMLElement * urltag = iconnode->FirstChildElement("url");
+					std::string mimetype = safeText(mymetag);
+					std::string tmpiconurl = safeText(urltag);
+					if(mimetype == "image/png" && !tmpiconurl.empty()){
+						iconUrl = thisurl.scheme + std::string("://") + thisurl.server + ":" +thisurl.port + tmpiconurl;
+						
+						break;
+					}
+					
+					
+					iconnode = iconnode->NextSiblingElement("icon");
+				}
+				XMLElement * serviceListTag = devicenode->FirstChildElement("serviceList");
+				XMLElement * servicenode = serviceListTag ? serviceListTag->FirstChildElement("service") : NULL;
+				while(servicenode){
+					XMLElement * serviceTypetag = servicenode->FirstChildElement("serviceType");
+					std::string serviceTypestring = safeText(serviceTypetag);
+					if(serviceTypestring == "urn:schemas-upnp-org:service:ContentDirectory:1"){
+						XMLElement * controlURLtag = servicenode->FirstChildElement("controlURL");
+						std::string controlURLstring = safeText(controlURLtag);
+						if(!controlURLstring.empty()){
+							controlUrl = thisurl.scheme + std::string("://") + thisurl.server + ":" +thisurl.port + controlURLstring;
+						}
+						
+						fflush(stdout);
+					}
+					servicenode = servicenode->NextSiblingElement("service");
+				}
+				
+				
+				friendlyName = safeText(friendlyNameTag);
+				manufacturer = safeText(manufacturerTag);
+				modelDescription = safeText(modelDescriptionTag);
+				modelName = safeText(modelNameTag);
+				
+				devUDN = safeText(UDNNameTag);
 			}
 			
-			
-			iconnode = iconnode->NextSiblingElement("icon");
+			fflush(stdout);
 		}
-		XMLElement * serviceListTag = devicenode->FirstChildElement("serviceList");
-		XMLElement * servicenode = serviceListTag->FirstChildElement("service");
-		while(servicenode){
-			XMLElement * serviceTypetag = servicenode->FirstChildElement("serviceType");
-			std::string serviceTypestring = serviceTypetag->GetText();
-			if(serviceTypestring == "urn:schemas-upnp-org:service:ContentDirectory:1"){
-				XMLElement * controlURLtag = servicenode->FirstChildElement("controlURL");
-				controlUrl = thisurl.scheme + std::string("://") + thisurl.server + ":" +thisurl.port + std::string(controlURLtag->GetText());
-				
-				fflush(stdout);
-			}
-			servicenode = servicenode->NextSiblingElement("service");
-		}
-		
-		
-		friendlyName = friendlyNameTag->GetText();
-		manufacturer = manufacturerTag->GetText();
-		modelDescription = modelDescriptionTag->GetText();
-		modelName = modelNameTag->GetText();
-		
-		devUDN = UDNNameTag->GetText();
-		
-		fflush(stdout);
 	}
 	
 	free(chunk->memory);
@@ -118,6 +135,10 @@ Device::Device(std::string _location){
 
 std::string Device::getUDN(){
 	return devUDN;
+}
+
+Device::~Device(){
+	
 }
 
 
@@ -141,7 +162,9 @@ NXUPnP::~NXUPnP(){
 		if(deviceslist[i]->devIcon.id != -1 && imgloader->Renderer != nullptr){
 			imgloader->Renderer->unregister_texture(deviceslist[i]->devIcon);
 		}
+		delete deviceslist[i];
 	}
+	deviceslist.clear();
 	if(searchthreadexit == 0){
 		searchthreadexit = 1;
 		close(discoverSocket);
@@ -159,6 +182,12 @@ void NXUPnP::addDevice(Device * _dev){
 	}
 	if(!found){
 		deviceslist.push_back(_dev);
+	}else{
+		
+		if(_dev->devIcon.id != -1 && imgloader->Renderer != nullptr){
+			imgloader->Renderer->unregister_texture(_dev->devIcon);
+		}
+		delete _dev;
 	}
 }
 
@@ -167,47 +196,65 @@ void Device::browseOID(){
 	currentlist.clear();
 	SOAPcurlDownloader *testcurl = new SOAPcurlDownloader();
 	MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
+	chunk->memory = NULL;
+	chunk->size = 0;
 	testcurl->Download(controlUrl.c_str(),chunk,parentList.back().c_str());
 	fflush(stdout);
-	char * testret = NULL;
-	decode_html_entities_utf8(chunk->memory,0);
-	fflush(stdout);
-	tinyxml2::XMLDocument doc;
-	doc.Parse( chunk->memory ,strlen(chunk->memory));
-	
-	XMLElement * BrowseResponseEle =  doc.FirstChildElement( "s:Envelope" )->FirstChildElement( "s:Body" )->FirstChildElement( "u:BrowseResponse" );
-	
-	
-	XMLElement * DIDEle =  BrowseResponseEle->FirstChildElement( "Result" )->FirstChildElement( "DIDL-Lite" );
-	
-	XMLElement * containernode = DIDEle->FirstChildElement("container");
-	while(containernode){
-		XMLElement * conttitleele = containernode->FirstChildElement("dc:title");
-		
-		upnpres_struct tmpentry;
-		tmpentry.name = conttitleele->GetText();
-		tmpentry.uri = containernode->Attribute("id");
-		tmpentry.type = UPNPTYPE::UPNPContainer;
-		currentlist.push_back(tmpentry);
-		containernode = containernode->NextSiblingElement("container");
-		
-	}
-	XMLElement * itemnode = DIDEle->FirstChildElement("item");
-	while(itemnode){
-		XMLElement * itemele = itemnode->FirstChildElement("dc:title");
-		upnpres_struct tmpentry;
-		tmpentry.name = itemele->GetText();
-		XMLElement * itemres = itemnode->FirstChildElement("res");
-		tmpentry.uri = itemres->GetText();
-		tmpentry.size = atoi(itemres->Attribute("size"));
 
-		
-		
-		tmpentry.type = UPNPTYPE::UPNPItem;
-		currentlist.push_back(tmpentry);
-		
-		
-		itemnode = itemnode->NextSiblingElement("item");
+	if(chunk->memory != NULL){
+		decode_html_entities_utf8((char *)chunk->memory,0);
+		fflush(stdout);
+		tinyxml2::XMLDocument doc;
+		doc.Parse( (char *)chunk->memory ,strlen((char *)chunk->memory));
+
+		/* This is a SOAP response from a device on the network, not something
+		   NXMP controls - a malformed or unexpected reply must not crash the
+		   app, so every step of the chain is checked before the next lookup. */
+		XMLElement * envelopeEle = doc.FirstChildElement( "s:Envelope" );
+		XMLElement * bodyEle = envelopeEle ? envelopeEle->FirstChildElement( "s:Body" ) : NULL;
+		XMLElement * BrowseResponseEle = bodyEle ? bodyEle->FirstChildElement( "u:BrowseResponse" ) : NULL;
+
+		XMLElement * ResultEle = BrowseResponseEle ? BrowseResponseEle->FirstChildElement( "Result" ) : NULL;
+		XMLElement * DIDEle = ResultEle ? ResultEle->FirstChildElement( "DIDL-Lite" ) : NULL;
+
+		if(DIDEle != NULL){
+			XMLElement * containernode = DIDEle->FirstChildElement("container");
+			while(containernode){
+				XMLElement * conttitleele = containernode->FirstChildElement("dc:title");
+				const char * idattr = containernode->Attribute("id");
+
+				if(conttitleele != NULL && conttitleele->GetText() != NULL && idattr != NULL){
+					upnpres_struct tmpentry;
+					tmpentry.name = conttitleele->GetText();
+					tmpentry.uri = idattr;
+					tmpentry.type = UPNPTYPE::UPNPContainer;
+					currentlist.push_back(tmpentry);
+				}
+				containernode = containernode->NextSiblingElement("container");
+				
+			}
+			XMLElement * itemnode = DIDEle->FirstChildElement("item");
+			while(itemnode){
+				XMLElement * itemele = itemnode->FirstChildElement("dc:title");
+				XMLElement * itemres = itemnode->FirstChildElement("res");
+
+				if(itemele != NULL && itemele->GetText() != NULL && itemres != NULL && itemres->GetText() != NULL){
+					upnpres_struct tmpentry;
+					tmpentry.name = itemele->GetText();
+					tmpentry.uri = itemres->GetText();
+					const char * sizeattr = itemres->Attribute("size");
+					tmpentry.size = sizeattr ? atoi(sizeattr) : 0;
+
+					
+					
+					tmpentry.type = UPNPTYPE::UPNPItem;
+					currentlist.push_back(tmpentry);
+				}
+				
+				
+				itemnode = itemnode->NextSiblingElement("item");
+			}
+		}
 	}
 	
 	fflush(stdout);
@@ -322,12 +369,12 @@ char ipv4address[INET_ADDRSTRLEN];
 
 
 
+	memset((void *)&ssdpMcastAddr, 0, sizeof ssdpMcastAddr);
 	ssdpMcastAddr.imr_interface.s_addr =  currentIp;
 
 	
 	ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
 	
-	memset((void *)&ssdpMcastAddr, 0, sizeof ssdpMcastAddr);
 	ret = setsockopt(discoverSocket,
 		IPPROTO_IP,
 		IP_ADD_MEMBERSHIP,
@@ -384,30 +431,39 @@ void NXUPnP::ListenSSDPResponse()
 		{
 		    
 			//NXLOG::DEBUGLOG("buf:%s\n",buf);
-			if(strstr(buf, "LOCATION:")){
+			char *locationTag = strstr(buf, "LOCATION:");
+			if(locationTag){
 				std::ostringstream ss;
-				int i = 0;
-				char *deviceIp = strstr(buf, "LOCATION:") + 9; 
-				while(deviceIp[i] == ' ') i++; 
-				while(!isspace(deviceIp[i]))
-				{
-					ss << deviceIp[i];
-					++i;
+				char *deviceIp = locationTag + 9;
+				
+				int maxlen = (int)(MAX_DGRAM_SIZE - (deviceIp - buf));
+				if(maxlen > 0){
+					int i = 0;
+					while(i < maxlen && deviceIp[i] == ' ') i++;
+					while(i < maxlen && deviceIp[i] != '\0' && !isspace((unsigned char)deviceIp[i]))
+					{
+						ss << deviceIp[i];
+						++i;
+					}
+					std::string location = ss.str();
+
+					if(!location.empty()){
+						Device *tmpdev = new Device(location);
+						
+						MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
+						chunk->memory = NULL;
+						chunk->size = 0;
+						curlDownloader * curldownload = new curlDownloader();
+						curldownload->Download((char *)tmpdev->iconUrl.c_str(),chunk);
+						tmpdev->devIcon = imgloader->OpenImageMemory(chunk->memory,chunk->size);
+						
+						free(chunk->memory);
+						free(chunk);
+						delete curldownload;
+						
+						addDevice(tmpdev);
+					}
 				}
-				std::string location = ss.str().c_str();
-				
-				Device *tmpdev = new Device(location);
-				
-				MemoryStruct *chunk = (MemoryStruct *)malloc(sizeof(MemoryStruct));
-				curlDownloader * curldownload = new curlDownloader();
-				curldownload->Download((char *)tmpdev->iconUrl.c_str(),chunk);
-				tmpdev->devIcon = imgloader->OpenImageMemory(chunk->memory,chunk->size);
-				
-				free(chunk->memory);
-				free(chunk);
-				delete curldownload;
-				
-				addDevice(tmpdev);
 			}
             memset(buf, 0, MAX_DGRAM_SIZE);
 
