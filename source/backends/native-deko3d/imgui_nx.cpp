@@ -1144,6 +1144,7 @@ ImWchar const nxFontRanges[] = {
     0xe130, 0xe13c, 0xe140, 0xe14d, 0xe150, 0xe153, 0xf929, 0xf929,
     0xf9dc, 0xf9dc, 0xfa0e, 0xfa2d, 0xfb01, 0xfb02, 0xfe30, 0xfe33,
     0xfe35, 0xfe44, 0xff01, 0xff5e, 0xff61, 0xff9f, 0xffe0, 0xffe6,
+	0x3130, 0x318f, 0xac00, 0xd7a3,  // Some korean added 
     0x0000, 0x0000,
     // clang-format on
 };
@@ -1262,6 +1263,26 @@ bool imgui::nx::init(bool latinonly) {
     {
         io.Fonts->AddFontFromMemoryTTF (font.address, font.size, 20.0f, &config, nxFontRanges);
         config.MergeMode = true;
+    }
+	
+	{
+        char langStr[9] = {};
+        std::memcpy (langStr, &languageCode, sizeof (languageCode));
+        bool const isChinese = std::strncmp (langStr, "zh", 2) == 0;
+        bool const isKorean  = std::strncmp (langStr, "ko", 2) == 0;
+ 
+        if (!isChinese)
+        {
+            PlFontData extra;
+            if (R_SUCCEEDED (plGetSharedFontByType (&extra, PlSharedFontType_ChineseSimplified)))
+                io.Fonts->AddFontFromMemoryTTF (extra.address, extra.size, 20.0f, &config, nxFontRanges);
+        }
+        if (!isKorean)
+        {
+            PlFontData extra;
+            if (R_SUCCEEDED (plGetSharedFontByType (&extra, PlSharedFontType_KO)))
+                io.Fonts->AddFontFromMemoryTTF (extra.address, extra.size, 20.0f, &config, nxFontRanges);
+        }
     }
 
     // build font atlas

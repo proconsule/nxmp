@@ -87,7 +87,10 @@ CImgLoader::~CImgLoader(){
 	
 	Renderer->unregister_texture(icons.FileTexture);
 	Renderer->unregister_texture(icons.FolderTexture);
-	Renderer->unregister_texture(icons.GUI_D_UP);
+    Renderer->unregister_texture(icons.PDFTexture);
+	Renderer->unregister_texture(icons.ImageTexture);
+	Renderer->unregister_texture(icons.ArchiveTexture);
+	Renderer->unregister_texture(icons.GUI_D_UP);	
 	Renderer->unregister_texture(icons.GUI_D_DOWN);
 	Renderer->unregister_texture(icons.UPNPTexture);
 	Renderer->unregister_texture(icons.GUI_D_LEFT);
@@ -154,6 +157,9 @@ int guessImageFormat(std::string path){
 	FILE *fptr = fopen(path.c_str(), "rb");
 	int guessret = -1;
 	
+	if(fptr == NULL) {
+		return -1;
+	}
 	
 	
 	if(fgets(testread,5,fptr)) {
@@ -179,14 +185,31 @@ int guessImageFormat(std::string path){
 unsigned char * jpg_decode(unsigned char *_img_data,int _size,int *width, int *height, int *channels){
 	
 	tjhandle _jpegDecompressor = tjInitDecompress();
+	
+	if(_jpegDecompressor == NULL){
+		*width = 0; *height = 0; *channels = 0;
+		return NULL;
+	}
 
 	int jpegSubsamp;
 	tjDecompressHeader2(_jpegDecompressor, _img_data, _size, width, height, &jpegSubsamp);
+	
+	if(tjDecompressHeader2(_jpegDecompressor, _img_data, _size, width, height, &jpegSubsamp) != 0
+		|| *width <= 0 || *height <= 0){
+		tjDestroy(_jpegDecompressor);
+		*width = 0; *height = 0; *channels = 0;
+		return NULL;
+	}
 
 	int img_w = *width;
 	int img_h = *height;
 
 	unsigned char * buffer = (unsigned char *)malloc(img_w*img_h*4);
+	if(buffer == NULL){
+		tjDestroy(_jpegDecompressor);
+		*width = 0; *height = 0; *channels = 0;
+		return NULL;
+	}
 	*channels = 4;
 	tjDecompress2(_jpegDecompressor, _img_data, _size, buffer, img_w, 0/*pitch*/, img_h, TJPF_RGBA, TJFLAG_FASTDCT);
 
@@ -205,6 +228,9 @@ Texture CImgLoader::OpenImageMemory(unsigned char *_img_data,int _size){
 	if(myformat == PNGFILE || myformat == BMPFILE || myformat == GIFFILE){
 		int width, height, channels;
 		unsigned char* image_data = stbi_load_from_memory(_img_data,_size, &width, &height, NULL, 4);
+		if(image_data == NULL){
+			return {};
+		}
 		channels = 4;
 		Texture rettext = Renderer->load_texture_from_mem(image_data,width,height,channels,DkImageFormat_RGBA8_Unorm, 0);
 		free(image_data); 
@@ -213,6 +239,9 @@ Texture CImgLoader::OpenImageMemory(unsigned char *_img_data,int _size){
 	if(myformat == JPGFILE){
 		int width, height, channels;
 		unsigned char* image_data = jpg_decode(_img_data,_size, &width, &height,&channels);
+		if(image_data == NULL){
+			return {};
+		}
 		Texture rettext =  Renderer->load_texture_from_mem(image_data,width,height,channels,DkImageFormat_RGBA8_Unorm, 0);
 		free(image_data); 
 		return rettext;

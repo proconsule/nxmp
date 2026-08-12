@@ -6,6 +6,7 @@
 class CPDFClass{
 public:
     CPDFClass(unsigned char* _data,size_t _size);
+	~CPDFClass();
 	int Render_PDF_Page(int _page,float _zoom,unsigned char ** _image_data,int *_w,int *_h);
 
     int getPageCount(){
