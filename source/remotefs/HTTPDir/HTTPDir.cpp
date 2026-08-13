@@ -60,6 +60,12 @@ void HTTPDir::DirList(std::string path,const std::vector<std::string> &extension
 	currentlist.clear();
 	urlschema thisurl = Utility::parseUrl(url);
 	std::string geturl = thisurl.scheme + std::string("://") + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + path;
+	if (thisurl.user != NULL && thisurl.pass != NULL){
+		std::string geturl = thisurl.scheme + std::string("://") + thisurl.user + ":" + thisurl.pass + "@" + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + path;
+	}
+	else if (thisurl.user != NULL){
+		std::string geturl = thisurl.scheme + std::string("://") + thisurl.user + "@" + thisurl.server + (thisurl.port.empty() ? std::string() : ':' + thisurl.port) + std::string("/") + path;
+	}
 	HTTPMemoryStruct *chunk = (HTTPMemoryStruct *)malloc(sizeof(HTTPMemoryStruct));
 	curlDownload((char *)geturl.c_str(),chunk);
 	std::string s = chunk->memory;
