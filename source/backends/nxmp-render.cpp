@@ -55,6 +55,11 @@ NXMPRenderer::~NXMPRenderer() {
 	this->mpv_render_thread.request_stop();
     this->mpv_redraw_condvar.notify_all();
 
+
+	if (this->mpv_render_thread.joinable())
+			this->mpv_render_thread.join();
+
+
     this->s_queue.waitIdle();
 
 
