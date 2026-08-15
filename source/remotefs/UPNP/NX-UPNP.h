@@ -118,6 +118,7 @@ private:
 	int seldevice = -1;
 	
 	int searchthreadexit = 0;
+	bool discoverThreadStarted = false;
 	
 };
 

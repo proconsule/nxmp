@@ -199,15 +199,15 @@ void DeallocateExtern(){
 		delete NewNetworkShare;
 		NewNetworkShare=nullptr;
 	}
-	if(filebrowser == nullptr){
+	if(filebrowser != nullptr){
 		delete filebrowser;
 		filebrowser = nullptr;
 	}
-	if(FilePopupTextScroller == nullptr){
+	if(FilePopupTextScroller != nullptr){
 		delete FilePopupTextScroller;
 		FilePopupTextScroller = nullptr;
 	}
-	if(BrowserTextScroller == nullptr){
+	if(BrowserTextScroller != nullptr){
 		delete BrowserTextScroller;
 		BrowserTextScroller = nullptr;
 	}

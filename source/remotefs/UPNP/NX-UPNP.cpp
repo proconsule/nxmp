@@ -159,8 +159,10 @@ void NXUPnP::Discovery(){
 
 NXUPnP::~NXUPnP(){
 	for(int i=0;i<deviceslist.size();i++){
-		if(deviceslist[i]->devIcon.id != -1 && imgloader->Renderer != nullptr){
-			imgloader->Renderer->unregister_texture(deviceslist[i]->devIcon);
+		if(imgloader){
+			if(deviceslist[i]->devIcon.id != -1 && imgloader->Renderer != nullptr){
+				imgloader->Renderer->unregister_texture(deviceslist[i]->devIcon);
+			}
 		}
 		delete deviceslist[i];
 	}
@@ -169,7 +171,13 @@ NXUPnP::~NXUPnP(){
 		searchthreadexit = 1;
 		close(discoverSocket);
 	}
-	pthread_join(DiscoverThreadID,NULL);
+	if(discoverThreadStarted){
+		if(searchthreadexit == 0){
+			searchthreadexit = 1;
+			close(discoverSocket);
+		}
+		pthread_join(DiscoverThreadID, NULL);
+	}
 	
 }
 
@@ -309,6 +317,7 @@ void NXUPnP::InitDiscoverThread(){
 	pthread_attr_setstacksize(&attr, 0x10000000);
 	NXLOG::DEBUGLOG("InitDiscoverThread pthread_create\n");
 	pthread_create(&DiscoverThreadID, &attr, DiscoverThreadFunc, this);
+	discoverThreadStarted = true;
       
 }
 
