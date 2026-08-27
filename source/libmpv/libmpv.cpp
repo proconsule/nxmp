@@ -226,7 +226,6 @@ void libMpv::loadFileLive(std::string _path,std::string _changename){
 			delete fileinfo;
 			fileinfo = nullptr;
 		}
-		fileinfo = new fileInfo();
 	}
 	fileinfo = new fileInfo();
 	fileinfo->path = _path;

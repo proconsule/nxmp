@@ -111,6 +111,8 @@
 	
 	CFileBrowser::~CFileBrowser(){
 		
+		waitForReadThread();
+		
 		if(LoadedFile != nullptr){
 			if(LoadedFile->mem != nullptr){
 				free(LoadedFile->mem);
@@ -652,6 +654,14 @@
 	}
 	
 	
+	void CFileBrowser::waitForReadThread(){
+		if(readThreadActive){
+			threadWaitForExit(&readThreadref);
+			threadClose(&readThreadref);
+			readThreadActive = false;
+		}
+	}
+	
 	bool CFileBrowser::getfileContentsThreaded(std::string filepath){
 		currentFileinUse = filepath;
 		
@@ -663,6 +673,9 @@
 		if(basepath.find_first_of("/") == 0 || smb2fs!=nullptr || sshfs!=nullptr || nfsfs!=nullptr || archfs !=nullptr|| myusb!= nullptr || ftpfs!= nullptr || m3u8fs != nullptr){
 				struct stat st = {0}; 
 				if (stat(filepath.c_str(), &st) == 0) {
+					
+					waitForReadThread();
+					
 					if(LoadedFile!=nullptr){
 						if(LoadedFile->mem !=nullptr){
 							free(LoadedFile->mem);
@@ -683,6 +696,7 @@
 					LoadedFile->currentOffset = 0;
 					threadCreate(&readThreadref, file_read_Thread, LoadedFile, NULL, 0x100000, 0x3B, -2);
 					threadStart(&readThreadref);
+					readThreadActive = true;
 					
 					return true;
 				}
