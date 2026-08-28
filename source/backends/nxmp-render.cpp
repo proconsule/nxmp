@@ -107,6 +107,12 @@ int NXMPRenderer::create_mpv_render_context(libMpv *lmpv) {
 }
 
 void NXMPRenderer::destroy_mpv_render_context() {
+	if (this->mpv_render_thread.joinable()) {
+		this->mpv_render_thread.request_stop();
+		this->mpv_redraw_condvar.notify_all();
+		this->mpv_render_thread.join();
+	}
+	
 	auto *tmp = std::exchange(mpv_context, nullptr);
 	mpv_render_context_free(tmp);
 }

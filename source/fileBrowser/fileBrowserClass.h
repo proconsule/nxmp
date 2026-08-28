@@ -104,8 +104,6 @@ public:
 	int getPrevImg();
 	
 	Thread readThreadref;
-	bool readThreadActive = false;
-	void waitForReadThread();
 	fileload_struct *LoadedFile = nullptr;
 
 	
