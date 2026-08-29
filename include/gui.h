@@ -148,7 +148,8 @@ enum APP_POPUP_STATES {
 	POPUP_STATE_NETWORKMENU,
 	POPUP_STATE_FILECONTEXTMENU,
 	POPUP_STATE_PLAYLISTCONTEXTMENU,
-	POPUP_STATE_ISOOPENCHOOSE
+	POPUP_STATE_ISOOPENCHOOSE,
+	POPUP_STATE_APPLETMODE_WARNING
 };
 
 enum PLAYER_RIGHT_MENU_STATES {
@@ -303,6 +304,8 @@ extern SQLiteDB *sqlitedb;
 extern CMTP *mtp;
 
 extern bool dbUpdated;
+
+extern bool g_application_mode;
 
 extern Playlist *playlist;
 

@@ -617,6 +617,68 @@ namespace Popups{
 		Popups::ExitNativePopup();
 	}
 	
+	void AppletModeWarningPopup(void) {
+		Popups::SetupNativePopup("##appletmodewarning");
+		if (ImGui::BeginPopupModal("##appletmodewarning", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {
+
+			ImGui::SetWindowFontScale(1.5f);
+
+			const char* line1 = "Running in Applet Mode";
+			const char* line2 = "Memory is very limited in this mode, so crashes or";
+			const char* line3 = "playback issues may occur, especially with heavy files.";
+			const char* line4 = "For best stability, launch NXMP via a title (hold R";
+			const char* line5 = "on a game) instead of from the Album.";
+
+			ImVec2 textsize1 = ImGui::CalcTextSize(line1);
+			ImVec2 textsize2 = ImGui::CalcTextSize(line2);
+			ImVec2 textsize3 = ImGui::CalcTextSize(line3);
+			ImVec2 textsize4 = ImGui::CalcTextSize(line4);
+			ImVec2 textsize5 = ImGui::CalcTextSize(line5);
+
+			float totalTextHeight = textsize1.y + textsize2.y + textsize3.y + textsize4.y + textsize5.y + 10.0f*4.0f;
+
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize1.x)/2.0);
+			ImGui::SetCursorPosY((292.0f*multiplyRes-70-totalTextHeight)/2.0);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
+			ImGui::Text("%s", line1);
+			ImGui::PopStyleColor();
+
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize2.x)/2.0);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f);
+			ImGui::Text("%s", line2);
+
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize3.x)/2.0);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f);
+			ImGui::Text("%s", line3);
+
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize4.x)/2.0);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f);
+			ImGui::Text("%s", line4);
+
+			ImGui::SetCursorPosX((771.0f*multiplyRes-textsize5.x)/2.0);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY()+10.0f);
+			ImGui::Text("%s", line5);
+
+			ImGui::SetCursorPosY(292.0f*multiplyRes-70.0f);
+			ImVec2 button_size(771.0f*multiplyRes, 70.0f);
+
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize,1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, Active_color);
+
+			if(ImGui::Button(nxlangs::get_common_str(nxlangs::NXCOMMON_OK).c_str(),button_size)){
+				item.popupstate = POPUP_STATE_NONE;
+			}
+			ImGui::SetFocusID(ImGui::GetID(nxlangs::get_common_str(nxlangs::NXCOMMON_OK).c_str()), ImGui::GetCurrentWindow());
+			ImGuiContext& g = *ImGui::GetCurrentContext();
+			g.NavDisableHighlight = false;
+
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor();
+
+		}
+		Popups::ExitNativePopup();
+	}
+	
 	void ISOOpenPopup(void) {
 		Popups::SetupNativePopup("##isoopenpop");
 		if (ImGui::BeginPopupModal("##isoopenpop", nullptr, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {

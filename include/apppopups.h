@@ -89,6 +89,7 @@ namespace Popups {
     void SubBorderColorPopup(void);
 	void PlaylistStartPlaylist(void);
 	void DBUpdatedPopup(void);
+	void AppletModeWarningPopup(void);
 	void NetMenuPopup(void);
 	void FileContextPopup(void);
 	void PlaylistContextPopup(void);

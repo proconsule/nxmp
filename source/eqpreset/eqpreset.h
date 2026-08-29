@@ -14,6 +14,7 @@ struct preset_struct{
 
 public:
 	EQPreset(std::string _filename);
+	~EQPreset();
 	
 	std::vector<preset_struct> getPresets();
 	float * getPresetNum(int presetidx);

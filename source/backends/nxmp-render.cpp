@@ -66,8 +66,12 @@ NXMPRenderer::~NXMPRenderer() {
 	
 	imgui::nx::exit();
     imgui::deko3d::exit();
+	ImGui::DestroyContext();
 	
-	
+	this->s_queue.waitIdle();
+	this->s_swapchain = nullptr;
+	this->s_queue = nullptr;
+	this->s_device = nullptr;
 	
     
 }

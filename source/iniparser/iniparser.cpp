@@ -105,7 +105,10 @@ CIniParser::CIniParser(std::string inifile){
 }
 
 CIniParser::~CIniParser(){
-	
+	if(fileref != nullptr){
+		delete fileref;
+		fileref = nullptr;
+	}
 	
 }
 

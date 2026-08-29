@@ -1,5 +1,12 @@
 #include "eqpreset.h"
 
+EQPreset::~EQPreset(){
+	if(ini != nullptr){
+	delete ini;
+	ini = nullptr;
+	}
+}
+
 EQPreset::EQPreset(std::string _filename){
 	presetsfilePath = _filename;
 	ini = new CSimpleIniA(true,true);

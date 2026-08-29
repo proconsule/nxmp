@@ -43,6 +43,8 @@ bool                g_application_mode;
 std::string nxmpTitle = std::string("NXMP v") + std::to_string(VERSION_MAJOR) + std::string(".") + std::to_string(VERSION_MINOR) + std::string(".") + std::to_string(VERSION_MICRO);
 
 
+unsigned int app_exit_mode = 0;
+
 /* Classes */
 
 
@@ -99,7 +101,7 @@ int initSize = 55;
 int batteryPercent = 0;
 std::string tempKbUrl = "https://";
 
-unsigned int app_exit_mode = 0;
+	
 
 float currFontsize = 20.0f; 
 
@@ -444,6 +446,7 @@ int main(int argc, const  char **argv) {
 		nxmpstats = nullptr;
 	}
 	
+	auddevExit();
 	audctlExit();
 
 

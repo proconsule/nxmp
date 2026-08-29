@@ -1023,6 +1023,9 @@ namespace GUI {
 					if(item.popupstate == POPUP_STATE_DBUPDATED){
 						Popups::DBUpdatedPopup();
 					}
+					if(item.popupstate == POPUP_STATE_APPLETMODE_WARNING){
+						Popups::AppletModeWarningPopup();
+					}
 					break;
 				case MENU_STATE_FILEBROWSER:
 				case MENU_STATE_FTPBROWSER:
@@ -1218,7 +1221,9 @@ namespace GUI {
 	
 
 	int RenderLoop(void) {
-		if(dbUpdated){
+		if(!g_application_mode){
+			item.popupstate = POPUP_STATE_APPLETMODE_WARNING;
+		}else if(dbUpdated){
 			item.popupstate = POPUP_STATE_DBUPDATED;
 		}
 		item.first_item = true;
